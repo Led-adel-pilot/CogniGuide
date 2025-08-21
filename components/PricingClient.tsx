@@ -165,24 +165,26 @@ export default function PricingClient() {
           ],
         } as const;
         const result = await PaddleObj.PricePreview(request);
-        const next: PricesState = { ...prices };
-        result.data.details.lineItems.forEach((item: any) => {
-          const priceText = item.formattedTotals?.subtotal || '';
-          if (item.price?.id === PRICE_IDS.student[cycle]) {
-            next.student[cycle] = priceText;
-          } else if (item.price?.id === PRICE_IDS.pro[cycle]) {
-            next.pro[cycle] = priceText;
-          }
-        });
         if (mountedRef.current) {
-          setPrices(next);
+          setPrices(prev => {
+            const next = { ...prev };
+            result.data.details.lineItems.forEach((item: any) => {
+              const priceText = item.formattedTotals?.subtotal || '';
+              if (item.price?.id === PRICE_IDS.student[cycle]) {
+                next.student[cycle] = priceText;
+              } else if (item.price?.id === PRICE_IDS.pro[cycle]) {
+                next.pro[cycle] = priceText;
+              }
+            });
+            return next;
+          });
         }
       } catch (error: any) {
         const friendly = error?.message || (typeof error?.toString === 'function' ? error.toString() : JSON.stringify(error));
         console.error('Error fetching prices:', friendly);
       }
     },
-    [paddleReady, isConfigured, prices]
+    [paddleReady, isConfigured]
   );
 
   const updateBothCycles = useCallback(async () => {
@@ -260,11 +262,6 @@ export default function PricingClient() {
             displayMode: 'overlay',
             variant: 'one-page',
           },
-          eventCallback: function(data: any) {
-            if (data.name === 'checkout.completed') {
-              window.location.reload();
-            }
-          }
         });
       } catch (error: any) {
         console.error('Checkout error:', error?.message || error);
@@ -338,9 +335,9 @@ export default function PricingClient() {
               <div className="text-sm text-muted-foreground">$0 / year</div>
             </div>
             <ul className="space-y-2 text-sm mb-6">
-              <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> 300 monthly credits</li>
-              <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> Priority generation speed</li>
-              <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> Email support</li>
+              <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> 8 monthly credits</li>
+              <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> Mind maps + flashcards</li>
+              <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> One device, standard speed</li>
             </ul>
             <button disabled className="w-full cursor-not-allowed rounded-full border py-2 text-sm text-gray-600">Current plan</button>
           </div>
@@ -360,9 +357,9 @@ export default function PricingClient() {
               </div>
             </div>
             <ul className="space-y-2 text-sm mb-6">
-              <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> 1,000 monthly credits</li>
-              <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> Highest priority speed</li>
-              <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> Priority support</li>
+              <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> 300 monthly credits</li>
+              <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> Priority generation speed</li>
+              <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> Email support</li>
             </ul>
             <button
               onClick={() => handleChoosePlan('student')}
