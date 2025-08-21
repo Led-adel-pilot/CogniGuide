@@ -188,6 +188,24 @@ export default function DashboardClient() {
     };
   }, [router, searchParams]);
 
+  useEffect(() => {
+    const handleFocus = () => {
+      if (typeof window !== 'undefined' && localStorage.getItem('cogniguide_paddle_checkout_completed') === 'true') {
+        localStorage.removeItem('cogniguide_paddle_checkout_completed');
+        if (user?.id) {
+          loadUserCredits(user.id);
+        }
+      }
+    };
+
+    window.addEventListener('focus', handleFocus);
+    handleFocus(); // Check on mount as well
+
+    return () => {
+      window.removeEventListener('focus', handleFocus);
+    };
+  }, [user?.id]);
+
   const loadHistory = async (userId: string) => {
     const { data, error } = await supabase
       .from('mindmaps')
