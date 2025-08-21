@@ -1,0 +1,937 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Polished Mind Map</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --font-family: "Poppins", sans-serif;
+            --background-color: #f8f9fa;
+            --node-bg-color: #ffffff;
+            --node-border-color: #dee2e6;
+            --node-shadow: 0 4px 8px rgba(0, 0, 0, 0.07);
+            --root-bg-color: #007bff;
+            --root-text-color: #ffffff;
+            --connector-color: #cbd5e0;
+            --text-color: #2d3748;
+            /* --collapsed-indicator-color is now set dynamically */
+            --hover-border-color: #007bff;
+            --code-bg-color: #edf2f7;
+        }
+
+        body {
+            font-family: var(--font-family);
+            font-weight: 500;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            display: flex;
+            margin: 0;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .controls {
+            width: 400px;
+            padding: 20px;
+            background-color: var(--node-bg-color);
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            z-index: 10;
+        }
+
+        .controls h2 {
+            margin-top: 0;
+            border-bottom: 1px solid var(--node-border-color);
+            padding-bottom: 10px;
+        }
+
+        #markdown-input {
+            flex-grow: 1;
+            font-family: monospace;
+            font-size: 14px;
+            border: 1px solid var(--node-border-color);
+            border-radius: 4px;
+            padding: 10px;
+            resize: none;
+            line-height: 1.5;
+        }
+        
+        .button-container {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        #generate-btn, #download-btn {
+            flex: 1;
+            padding: 10px 15px;
+            font-size: 16px;
+            font-weight: bold;
+            color: var(--root-text-color);
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        #generate-btn {
+            background-color: var(--root-bg-color);
+        }
+        #generate-btn:hover {
+            background-color: #0056b3;
+        }
+        
+        /* MODIFICATION: Added Download Button Style */
+        #download-btn {
+            background-color: #28a745;
+        }
+        #download-btn:hover {
+            background-color: #218838;
+        }
+        #download-btn:disabled {
+            background-color: #a0a0a0;
+            cursor: not-allowed;
+        }
+
+
+        .map-viewport {
+            flex-grow: 1;
+            position: relative;
+            overflow: hidden; /* Required for pan/zoom */
+            /* Removed cursor and user-select to allow text selection */
+        }
+
+        #mindmap-container {
+            position: relative;
+            /* Padding is now handled by offsets in rendering */
+            min-width: 100%;
+            min-height: 100%;
+            box-sizing: border-box;
+            transform-origin: 0 0; /* Crucial for zooming towards the cursor */
+        }
+
+        .mindmap-node {
+            position: absolute;
+            background-color: var(--node-bg-color);
+            border: 2px solid var(--node-border-color);
+            border-radius: 25px; /* MODIFICATION: Increased from 8px for a rounder, pill-like shape */
+            padding: 8px 14px;
+            box-shadow: var(--node-shadow);
+            cursor: pointer;
+            /* MODIFICATION: Added smooth transitions for position and opacity */
+            transition: border-color 0.2s, background-color 0.2s,
+                        transform 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+                        opacity 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+                        top 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+                        left 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            white-space: nowrap;
+            font-size: 15px;
+        }
+
+        .mindmap-node:hover {
+            border-color: var(--hover-border-color);
+            transform: scale(1.05);
+            z-index: 5;
+        }
+
+        .mindmap-node.root {
+            background-color: var(--root-bg-color);
+            color: var(--root-text-color);
+            font-weight: bold;
+            border-color: var(--root-bg-color);
+        }
+        
+        .mindmap-node.has-children::after {
+            content: '';
+            position: absolute;
+            right: -7px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 14px;
+            height: 14px;
+            background-color: var(--node-bg-color);
+            /* MODIFICATION: Use a variable for the border color with a fallback */
+            border: 2px solid var(--indicator-border-color, var(--connector-color));
+            border-radius: 50%;
+            box-sizing: border-box;
+            transition: background-color 0.2s, border-color 0.2s;
+        }
+        
+        .mindmap-node.root.has-children::after {
+             background-color: #fff;
+        }
+
+        .mindmap-node.collapsed.has-children::after {
+            /* MODIFICATION: Use a variable for the background color with a fallback */
+            background-color: var(--collapsed-indicator-color, #007bff);
+        }
+
+        #mindmap-svg {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none;
+        }
+        /* MODIFICATION: Connector path color is now a fallback, overridden by JS for colored branches */
+        .connector-path { stroke: var(--connector-color); stroke-width: 2px; fill: none; transition: stroke 0.2s, opacity 0.3s ease 150ms, d 0.35s cubic-bezier(0.4, 0, 0.2, 1); }
+        .mindmap-node code { background-color: var(--code-bg-color); padding: 0.2em 0.4em; margin: 0; font-size: 85%; border-radius: 3px; }
+        .mindmap-node a { color: #007bff; text-decoration: none; }
+        .mindmap-node a:hover { text-decoration: underline; }
+        .mindmap-node del { opacity: 0.7; }
+        .mindmap-node mark { background-color: #f7e776; padding: 0.1em 0.2em; }
+        .katex { font-size: 1.2em !important; } /* Ensure consistent font size */
+    </style>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+</head>
+<body>
+
+    <div class="controls">
+        <h2>Mind Map Input</h2>
+        <textarea id="markdown-input">
+# My Project
+
+## Links
+- [Website](https://markmap.js.org/)
+- [GitHub](https://github.com/gera2ld/markmap)
+
+## Related Projects
+- [coc-markmap](https://github.com/gera2ld/coc-markmap)
+  - For Neovim
+- [markmap-vscode](https://marketplace.visualstudio.com/items?itemName=gera2ld.markmap-vscode)
+  - For VSCode
+
+## Features
+- **strong** ~~del~~ *italic* ==highlight==
+- `inline code` <!-- markmap: fold -->
+  - This node was folded by default.
+- Another Feature
+- Math example: $x = {-b \pm \sqrt{b^2-4ac} \over 2a}$
+        </textarea>
+        <!-- MODIFICATION: Added button container and download button -->
+        <div class="button-container">
+            <button id="generate-btn">Generate Mind Map</button>
+            <button id="download-btn" disabled>Download HTML</button>
+        </div>
+    </div>
+
+    <div class="map-viewport">
+        <div id="mindmap-container"></div>
+    </div>
+
+    <script>
+        const markdownInput = document.getElementById('markdown-input');
+        const generateBtn = document.getElementById('generate-btn');
+        const downloadBtn = document.getElementById('download-btn'); // MODIFICATION
+        const mapContainer = document.getElementById('mindmap-container');
+        const viewport = document.querySelector('.map-viewport');
+
+        const HORIZONTAL_SPACING = 150;
+        const VERTICAL_SPACING = 10;
+        const PADDING = 50; // A single padding value for the container
+        const ANIMATION_DURATION = 350; // Add this line
+        let mindMapTree = null;
+        let stableRootY = null; // Stores the root's Y position from the layout calculation
+
+        // --- Pan and Zoom State ---
+        let scale = 1, panX = 0, panY = 0, isPanning = false, startX = 0, startY = 0;
+
+        // --- MODIFICATION: Added color palette and darken function ---
+        const COLOR_PALETTE = ['#e2b8ff', '#fef859', '#ffbc97', '#c1ccff', '#acff97', '#ffd94d', '#ffc2d1', '#bde0fe', '#a1ccff', '#f6a6b3'];
+
+        // --- MODIFICATION: Refactored color functions for intelligent coloring ---
+        function hexToRgb(hex) {
+            if (!hex) return { r: 0, g: 0, b: 0 };
+            let r = 0, g = 0, b = 0;
+            if (hex.startsWith('#')) {
+                r = parseInt(hex.slice(1, 3), 16);
+                g = parseInt(hex.slice(3, 5), 16);
+                b = parseInt(hex.slice(5, 7), 16);
+            } else if (hex.startsWith('rgb')) {
+                const parts = hex.match(/(\d+)/g);
+                if (parts && parts.length >= 3) {
+                    r = parseInt(parts[0]);
+                    g = parseInt(parts[1]);
+                    b = parseInt(parts[2]);
+                }
+            }
+            return { r, g, b };
+        }
+
+        function rgbToHex(r, g, b) {
+            return `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1).padStart(6, '0')}`;
+        }
+
+        function rgbToHsl(r, g, b) {
+            r /= 255; g /= 255; b /= 255;
+            const max = Math.max(r, g, b), min = Math.min(r, g, b);
+            let h, s, l = (max + min) / 2;
+
+            if (max === min) {
+                h = s = 0; // achromatic
+            } else {
+                const d = max - min;
+                s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+                switch (max) {
+                    case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+                    case g: h = (b - r) / d + 2; break;
+                    case b: h = (r - g) / d + 4; break;
+                }
+                h /= 6;
+            }
+            return { h, s, l };
+        }
+
+        function hslToRgb(h, s, l) {
+            let r, g, b;
+            if (s === 0) {
+                r = g = b = l; // achromatic
+            } else {
+                const hue2rgb = (p, q, t) => {
+                    if (t < 0) t += 1;
+                    if (t > 1) t -= 1;
+                    if (t < 1/6) return p + (q - p) * 6 * t;
+                    if (t < 1/2) return q;
+                    if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+                    return p;
+                };
+                const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+                const p = 2 * l - q;
+                r = hue2rgb(p, q, h + 1/3);
+                g = hue2rgb(p, q, h);
+                b = hue2rgb(p, q, h - 1/3);
+            }
+            return { r: Math.round(r * 255), g: Math.round(g * 255), b: Math.round(b * 255) };
+        }
+
+        function varyHue(color, amount) {
+            const { r, g, b } = hexToRgb(color);
+            let { h, s, l } = rgbToHsl(r, g, b);
+            h = (h + amount + 1) % 1;
+            const { r: newR, g: newG, b: newB } = hslToRgb(h, s, l);
+            return rgbToHex(newR, newG, newB);
+        }
+
+        function varyLightness(color, amount) {
+            const { r, g, b } = hexToRgb(color);
+            let { h, s, l } = rgbToHsl(r, g, b);
+            l = Math.max(0, Math.min(1, l + amount));
+            const { r: newR, g: newG, b: newB } = hslToRgb(h, s, l);
+            return rgbToHex(newR, newG, newB);
+        }
+
+        function darkenColor(color, percent) {
+            if (!color) return '#000000';
+            let { r, g, b } = hexToRgb(color);
+            const amount = 1 - percent / 100;
+            r = Math.floor(r * amount);
+            g = Math.floor(g * amount);
+            b = Math.floor(b * amount);
+            return rgbToHex(r, g, b);
+        }
+
+        function saturateColor(color, percent) {
+            if (!color) return '#000000';
+            let { r, g, b } = hexToRgb(color);
+            let { h, s, l } = rgbToHsl(r, g, b);
+            s = Math.min(1, s * (1 + percent / 100));
+            const { r: newR, g: newG, b: newB } = hslToRgb(h, s, l);
+            return rgbToHex(newR, newG, newB);
+        }
+        
+        function applyTransform() {
+            mapContainer.style.transform = `translate(${panX}px, ${panY}px) scale(${scale})`;
+        }
+
+        function renderMarkdownToHTML(text) {
+            return text
+                .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" onclick="event.stopPropagation()">$1</a>')
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/__(.*?)__/g, '<strong>$1</strong>')
+                .replace(/\*(.*?)\*/g, '<em>$1</em>').replace(/_(.*?)_/g, '<em>$1</em>')
+                .replace(/~~(.*?)~~/g, '<del>$1</del>').replace(/==(.*?)\==/g, '<mark>$1</mark>')
+                .replace(/`([^`]+)`/g, '<code>$1</code>');
+        }
+
+        function parseFrontmatter(markdown) {
+            const match = markdown.match(/^---\s*\n([\s\S]*?)\n---\s*\n/);
+            if (!match) return { frontmatter: {}, content: markdown };
+            const frontmatter = {};
+            const yaml = match[1];
+            yaml.split('\n').forEach(line => {
+                const parts = line.split(':');
+                if (parts.length >= 2) { frontmatter[parts[0].trim()] = parts.slice(1).join(':').trim(); }
+            });
+            return { frontmatter, content: markdown.substring(match[0].length) };
+        }
+
+        function applyColorVariations(node) {
+            const childrenWithSubtrees = node.children.filter(child => child.children.length > 0);
+            if (node.color && childrenWithSubtrees.length >= 2) {
+                const n = childrenWithSubtrees.length;
+                const HUE_VARIATION = 0.03; 
+                const LIGHTNESS_VARIATION = 0.02;
+                const baseColor = node.color;
+                childrenWithSubtrees.forEach((childNode, index) => {
+                    const variationStep = n === 1 ? 0 : (index / (n - 1)) * 2 - 1;
+                    const hueShift = HUE_VARIATION * variationStep;
+                    const lightnessShift = LIGHTNESS_VARIATION * variationStep * (index % 2 === 0 ? 1 : -1);
+                    let variedColor = varyHue(baseColor, hueShift);
+                    variedColor = varyLightness(variedColor, lightnessShift);
+                    function setSubtreeColor(subtreeNode, color) {
+                        subtreeNode.color = color;
+                        subtreeNode.children.forEach(child => setSubtreeColor(child, color));
+                    }
+                    setSubtreeColor(childNode, variedColor);
+                });
+            }
+            node.children.forEach(applyColorVariations);
+        }
+
+        function parseMarkmap(markdown) {
+            const { frontmatter, content } = parseFrontmatter(markdown);
+            let lines = content.split('\n');
+            const getIndent = (line) => line.match(/^\s*/)[0].length;
+            let nodeCounter = 1;
+            let colorIndex = 0;
+            let rootText = frontmatter.title || "Mind Map";
+            const h1Index = lines.findIndex(line => line.trim().startsWith('# '));
+            if (h1Index !== -1) {
+                rootText = lines[h1Index].trim().substring(2);
+                lines.splice(h1Index, 1);
+            }
+            const root = {
+                id: 'node-0', text: rootText, html: renderMarkdownToHTML(rootText),
+                children: [], level: 0, isRoot: true, color: null,
+            };
+            const parentStack = [root];
+            let lastHeadingLevel = 0;
+            for (const line of lines) {
+                if (line.trim() === '') continue;
+                let isFolded = false;
+                let processedLine = line;
+                if (line.includes('<!-- markmap: fold -->')) {
+                    isFolded = true;
+                    processedLine = line.replace('<!-- markmap: fold -->', '');
+                }
+                const headingMatch = processedLine.match(/^(#+)\s(.*)/);
+                const listItemMatch = processedLine.match(/^(\s*)(\*|-|\d+\.)\s(.*)/);
+                let text, level;
+                if (headingMatch) {
+                    level = headingMatch[1].length;
+                    text = headingMatch[2].trim();
+                    lastHeadingLevel = level;
+                } else if (listItemMatch) {
+                    text = listItemMatch[3].trim();
+                    const indent = getIndent(listItemMatch[1]);
+                    level = lastHeadingLevel + 1 + Math.floor(indent / 2);
+                } else {
+                    continue;
+                }
+                while (parentStack[parentStack.length - 1].level >= level) {
+                    parentStack.pop();
+                }
+                const parent = parentStack[parentStack.length - 1];
+                let nodeColor = parent.isRoot ? COLOR_PALETTE[colorIndex++ % COLOR_PALETTE.length] : parent.color;
+                const newNode = {
+                    id: `node-${nodeCounter++}`, text: text, html: renderMarkdownToHTML(text),
+                    children: [], isCollapsed: isFolded, level: level, parent: parent, color: nodeColor,
+                };
+                parent.children.push(newNode);
+                parentStack.push(newNode);
+            }
+            return root;
+        }
+
+        function renderMindMap() {
+            if (!mindMapTree) return;
+            mapContainer.innerHTML = '';
+            const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+            svg.id = 'mindmap-svg';
+            mapContainer.appendChild(svg);
+            measureNodeSizes(mindMapTree);
+            layoutTree(mindMapTree, 0, 0);
+            const newRootY = mindMapTree.y;
+            if (stableRootY === null) {
+                const rootNodeCenterXInLayout = PADDING + mindMapTree.width / 2;
+                const rootNodeCenterYInLayout = PADDING + newRootY + mindMapTree.height / 2;
+                panX = viewport.clientWidth / 2 - rootNodeCenterXInLayout;
+                panY = viewport.clientHeight / 2 - rootNodeCenterYInLayout;
+            } else {
+                const deltaY = newRootY - stableRootY;
+                if (deltaY !== 0) panY -= deltaY * scale;
+            }
+            stableRootY = newRootY;
+            applyTransform();
+            renderNodeAndChildren(mindMapTree, mapContainer, svg, PADDING, PADDING, false);
+            const bounds = getTreeBounds(mindMapTree);
+            mapContainer.style.width = `${bounds.width + 2 * PADDING}px`;
+            mapContainer.style.height = `${bounds.maxY + 2 * PADDING}px`;
+            svg.setAttribute('width', mapContainer.style.width);
+            svg.setAttribute('height', mapContainer.style.height);
+        }
+
+        function measureNodeSizes(node) {
+            const tempNode = document.createElement('div');
+            tempNode.className = 'mindmap-node';
+            if (node.isRoot) tempNode.classList.add('root');
+            tempNode.style.visibility = 'hidden';
+            tempNode.style.position = 'absolute';
+            tempNode.innerHTML = node.html;
+            document.body.appendChild(tempNode);
+            if (window.renderMathInElement) {
+                renderMathInElement(tempNode, {
+                    delimiters: [
+                        {left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false},
+                        {left: '\\(', right: '\\)', display: false}, {left: '\\[', right: '\\]', display: true}
+                    ],
+                    throwOnError: false
+                });
+            }
+            node.width = tempNode.offsetWidth;
+            node.height = tempNode.offsetHeight;
+            document.body.removeChild(tempNode);
+            if (!node.isCollapsed) node.children.forEach(measureNodeSizes);
+        }
+
+        function layoutTree(node, x, y) {
+            node.x = x;
+            node.y = y;
+            if (node.isCollapsed || node.children.length === 0) return node.height;
+            let currentChildY = y;
+            node.children.forEach((child, index) => {
+                const childSubtreeHeight = layoutTree(child, x + node.width + HORIZONTAL_SPACING, currentChildY);
+                currentChildY += childSubtreeHeight;
+                if (index < node.children.length - 1) currentChildY += VERTICAL_SPACING;
+            });
+            const totalChildHeight = currentChildY - y;
+            const firstChild = node.children[0];
+            const lastChild = node.children[node.children.length - 1];
+            node.y = firstChild.y + (lastChild.y + lastChild.height - firstChild.y) / 2 - (node.height / 2);
+            return Math.max(node.height, totalChildHeight);
+        }
+
+        function renderNodeAndChildren(node, container, svg, xOffset, yOffset, isPartOfExpandingSubtree = false) {
+            const nodeEl = document.createElement('div');
+            nodeEl.className = 'mindmap-node';
+            nodeEl.id = node.id;
+            nodeEl.innerHTML = node.html;
+            if (window.renderMathInElement) {
+                renderMathInElement(nodeEl, {
+                    delimiters: [
+                        {left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false},
+                        {left: '\\(', right: '\\)', display: false}, {left: '\\[', right: '\\]', display: true}
+                    ],
+                    throwOnError: false
+                });
+            }
+            
+            // Determine if this specific node should animate in.
+            const shouldAnimateIn = isPartOfExpandingSubtree;
+
+            if (shouldAnimateIn) {
+                // Start transparent and scaled down at the parent's position
+                nodeEl.style.left = `${node.parent.x + xOffset}px`;
+                nodeEl.style.top = `${node.parent.y + yOffset}px`;
+                nodeEl.style.opacity = '0';
+                nodeEl.style.transform = 'scale(0.5)';
+            } else {
+                // Render at its final position
+                nodeEl.style.left = `${node.x + xOffset}px`;
+                nodeEl.style.top = `${node.y + yOffset}px`;
+            }
+            
+            if (node.color) {
+                const borderColor = saturateColor(darkenColor(node.color, 25), 60);
+                nodeEl.style.backgroundColor = node.color;
+                nodeEl.style.borderColor = borderColor;
+                nodeEl.style.color = darkenColor(node.color, 70);
+                nodeEl.style.setProperty('--indicator-border-color', borderColor);
+                nodeEl.style.setProperty('--collapsed-indicator-color', node.color);
+            }
+            if (node.isRoot) {
+                nodeEl.classList.add('root');
+                const rootBgColor = getComputedStyle(document.documentElement).getPropertyValue('--root-bg-color').trim();
+                nodeEl.style.color = darkenColor(rootBgColor, 70);
+            }
+            if (node.children.length > 0) nodeEl.classList.add('has-children');
+            if (node.isCollapsed) nodeEl.classList.add('collapsed');
+            nodeEl.addEventListener('click', (e) => {
+                if (e.target.tagName.toLowerCase() === 'a') return;
+                e.stopPropagation();
+                if (node.children.length > 0) toggleNodeCollapse(node);
+            });
+            container.appendChild(nodeEl);
+
+            if (shouldAnimateIn) {
+                // Use requestAnimationFrame to ensure the initial styles are applied before transitioning
+                requestAnimationFrame(() => {
+                    // Animate to the final position, opacity, and scale
+                    nodeEl.style.left = `${node.x + xOffset}px`;
+                    nodeEl.style.top = `${node.y + yOffset}px`;
+                    nodeEl.style.opacity = '1';
+                    nodeEl.style.transform = 'scale(1)'; // This sets the problematic inline style
+
+                    // *** THE FIX IS HERE ***
+                    // After the CSS transition is complete, remove the inline transform style.
+                    // This allows the :hover pseudo-class to control the transform property again.
+                    setTimeout(() => {
+                        nodeEl.style.transform = '';
+                    }, ANIMATION_DURATION);
+                });
+            }
+
+            if (node.parent) {
+                node.connectorPath = drawConnector(node.parent, node, svg, xOffset, yOffset, shouldAnimateIn);
+            }
+
+            if (!node.isCollapsed) {
+                // A node's children are part of an expanding subtree if the node itself was just expanded
+                // or if it was already part of an expanding subtree from its parent.
+                const childrenAreExpanding = node.isExpanding || isPartOfExpandingSubtree;
+                node.children.forEach(child => renderNodeAndChildren(child, container, svg, xOffset, yOffset, childrenAreExpanding));
+            }
+        }
+
+        function toggleNodeCollapse(node) {
+            if (node.isAnimating) return;
+            const ANIMATION_DURATION = 350;
+            node.isAnimating = true;
+
+            if (node.isCollapsed) { // EXPAND
+                node.isCollapsed = false;
+                node.isExpanding = true;
+                renderMindMap(); 
+                setTimeout(() => {
+                    delete node.isExpanding;
+                    node.isAnimating = false;
+                }, ANIMATION_DURATION);
+
+            } else { // COLLAPSE
+                const allNodes = [];
+                const descendantNodes = [];
+                function traverse(n, isDescendant = false) {
+                    allNodes.push(n);
+                    n.startX = n.x; n.startY = n.y;
+                    if (isDescendant) descendantNodes.push(n);
+                    if (!n.isCollapsed || n === node) {
+                        n.children.forEach(child => traverse(child, isDescendant || n === node));
+                    }
+                }
+                traverse(mindMapTree);
+                node.isCollapsed = true;
+                layoutTree(mindMapTree, 0, 0);
+                const newRootY = mindMapTree.y;
+                if (stableRootY !== null) {
+                    const deltaY = newRootY - stableRootY;
+                    if (deltaY !== 0) {
+                        panY -= deltaY * scale;
+                        applyTransform();
+                    }
+                }
+                stableRootY = newRootY;
+                const rootEl = document.getElementById(mindMapTree.id);
+                if (rootEl) {
+                    rootEl.style.transition = 'none';
+                    rootEl.style.left = `${mindMapTree.x + PADDING}px`;
+                    rootEl.style.top = `${mindMapTree.y + PADDING}px`;
+                    void rootEl.offsetWidth; 
+                }
+                allNodes.forEach(n => { n.endX = n.x; n.endY = n.y; });
+                const startTime = performance.now();
+                function animate(currentTime) {
+                    const elapsedTime = currentTime - startTime;
+                    const progress = Math.min(elapsedTime / ANIMATION_DURATION, 1);
+                    const easedProgress = 1 - Math.pow(1 - progress, 3);
+                    allNodes.forEach(n => {
+                        if (n.isRoot) { n.animX = n.endX; n.animY = n.endY; return; }
+                        let currentX, currentY, opacity = 1, scaleVal = 1;
+                        if (descendantNodes.includes(n)) {
+                            const targetNode = node;
+                            currentX = n.startX + (targetNode.endX - n.startX) * easedProgress;
+                            currentY = n.startY + (targetNode.endY - n.startY) * easedProgress;
+                            opacity = 1 - easedProgress;
+                            scaleVal = 1 - 0.5 * easedProgress;
+                        } else {
+                            currentX = n.startX + (n.endX - n.startX) * easedProgress;
+                            currentY = n.startY + (n.endY - n.startY) * easedProgress;
+                        }
+                        const el = document.getElementById(n.id);
+                        if (el) {
+                            el.style.transition = 'none';
+                            el.style.left = `${currentX + PADDING}px`;
+                            el.style.top = `${currentY + PADDING}px`;
+                            el.style.opacity = opacity;
+                            el.style.transform = `scale(${scaleVal})`;
+                        }
+                        n.animX = currentX; n.animY = currentY;
+                    });
+                    allNodes.forEach(n => {
+                        if (n.connectorPath && n.parent) {
+                            const parent = n.parent;
+                            const p1 = { x: parent.animX + parent.width + PADDING, y: parent.animY + parent.height / 2 + PADDING };
+                            const p2 = { x: n.animX + PADDING, y: n.animY + n.height / 2 + PADDING };
+                            const d = `M ${p1.x} ${p1.y} C ${p1.x + (p2.x - p1.x) / 2} ${p1.y}, ${p1.x + (p2.x - p1.x) / 2} ${p2.y}, ${p2.x} ${p2.y}`;
+                            n.connectorPath.style.transition = 'none';
+                            n.connectorPath.setAttribute('d', d);
+                            if (descendantNodes.includes(n)) {
+                                n.connectorPath.style.opacity = 1 - easedProgress;
+                            }
+                        }
+                    });
+                    if (progress < 1) {
+                        requestAnimationFrame(animate);
+                    } else {
+                        // BUG FIX: The animation is over. The moving nodes had their `transition`
+                        // and `transform` styles set directly. To prevent these inline styles
+                        // from persisting and breaking the CSS :hover effect, we explicitly
+                        // clear them from the surviving nodes before the final re-render.
+                        allNodes.forEach(n => {
+                            if (!descendantNodes.includes(n)) {
+                                const el = document.getElementById(n.id);
+                                if (el) {
+                                    el.style.transition = '';
+                                    el.style.transform = '';
+                                }
+                            }
+                        });
+                        
+                        node.isAnimating = false;
+                        renderMindMap();
+                    }
+                }
+                requestAnimationFrame(animate);
+            }
+        }
+
+        function drawConnector(parent, child, svg, xOffset, yOffset, isExpanding) {
+            const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+            path.setAttribute('class', 'connector-path');
+            if (isExpanding) {
+                path.style.opacity = '0';
+                requestAnimationFrame(() => { path.style.opacity = '1'; });
+            }
+            if (child.color) {
+                path.style.stroke = saturateColor(darkenColor(child.color, 25), 60);
+            }
+            const p1 = { x: parent.x + parent.width + xOffset, y: parent.y + parent.height / 2 + yOffset };
+            const p2 = { x: child.x + xOffset, y: child.y + child.height / 2 + yOffset };
+            const d = `M ${p1.x} ${p1.y} C ${p1.x + (p2.x - p1.x) / 2} ${p1.y}, ${p1.x + (p2.x - p1.x) / 2} ${p2.y}, ${p2.x} ${p2.y}`;
+            path.setAttribute('d', d);
+            svg.appendChild(path);
+            return path;
+        }
+        
+        function getTreeBounds(node) {
+            let minX = node.x, maxX = node.x + node.width;
+            let minY = node.y, maxY = node.y + node.height;
+            function traverse(n) {
+                minX = Math.min(minX, n.x);
+                maxX = Math.max(maxX, n.x + n.width);
+                minY = Math.min(minY, n.y);
+                maxY = Math.max(maxY, n.y + n.height);
+                if (!n.isCollapsed) n.children.forEach(traverse);
+            }
+            traverse(node);
+            return { width: maxX - minX, height: maxY - minY, minY, maxY };
+        }
+
+        generateBtn.addEventListener('click', () => {
+            try {
+                scale = 1; panX = 0; panY = 0; stableRootY = null;
+                mindMapTree = parseMarkmap(markdownInput.value);
+                applyColorVariations(mindMapTree);
+                renderMindMap();
+                downloadBtn.disabled = false; // Enable download button
+            } catch (error) {
+                alert('Error parsing Markdown: ' + error.message);
+                console.error(error);
+                downloadBtn.disabled = true; // Disable on error
+            }
+        });
+        
+        // --- NEW FEATURE: DOWNLOAD HTML ---
+        downloadBtn.addEventListener('click', generateAndDownloadHtml);
+
+        function generateAndDownloadHtml() {
+            if (!mindMapTree) {
+                alert("Please generate a mind map first.");
+                return;
+            }
+
+            // 1. Get all necessary assets and data
+            const styles = document.querySelector('style').innerHTML;
+            const katexCssLink = document.querySelector('link[href*="katex.min.css"]').outerHTML;
+            const katexJsScript = document.querySelector('script[src*="katex.min.js"]').outerHTML;
+            const katexAutoRenderScript = document.querySelector('script[src*="auto-render.min.js"]').outerHTML;
+            const fontLinks = Array.from(document.querySelectorAll('link[href*="fonts.googleapis.com"]')).map(l => l.outerHTML).join('\n');
+            
+            // 2. Serialize mind map data, removing circular 'parent' references for JSON.stringify
+            const replacer = (key, value) => (key === 'parent' ? undefined : value);
+            const mindMapDataString = JSON.stringify(mindMapTree, replacer);
+
+            // 3. Create the script for the standalone file
+            // Note: We are embedding the entire interaction logic.
+            // We also add a function to rebuild the 'parent' links on load.
+            const downloadableScript = `
+                // --- Data and State ---
+                const mindMapData = ${mindMapDataString};
+                let mindMapTree = null; // Will be assigned after processing
+                const mapContainer = document.getElementById('mindmap-container');
+                const viewport = document.querySelector('.map-viewport');
+                const HORIZONTAL_SPACING = 150, VERTICAL_SPACING = 10, PADDING = 50;
+                const ANIMATION_DURATION = ${ANIMATION_DURATION}; // <<< THIS IS THE FIX
+                let stableRootY = null, scale = 1, panX = 0, panY = 0, isPanning = false, startX = 0, startY = 0;
+                
+                // --- All Helper Functions (Copied from original script) ---
+                ${hexToRgb.toString()}
+                ${rgbToHex.toString()}
+                ${rgbToHsl.toString()}
+                ${hslToRgb.toString()}
+                ${varyHue.toString()}
+                ${varyLightness.toString()}
+                ${darkenColor.toString()}
+                ${saturateColor.toString()}
+                ${applyTransform.toString()}
+                ${measureNodeSizes.toString()}
+                ${layoutTree.toString()}
+                ${renderNodeAndChildren.toString()}
+                ${toggleNodeCollapse.toString()}
+                ${drawConnector.toString()}
+                ${getTreeBounds.toString()}
+
+                // --- NEW function to rebuild parent links after parsing JSON ---
+                function rebuildParentLinks(node, parent = null) {
+                    node.parent = parent;
+                    if (node.children) {
+                        node.children.forEach(child => rebuildParentLinks(child, node));
+                    }
+                }
+
+                // --- Main Render Function (Slightly modified from original) ---
+                function renderMindMap() {
+                    if (!mindMapTree) return;
+                    mapContainer.innerHTML = '';
+                    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+                    svg.id = 'mindmap-svg';
+                    mapContainer.appendChild(svg);
+                    measureNodeSizes(mindMapTree);
+                    layoutTree(mindMapTree, 0, 0);
+                    const newRootY = mindMapTree.y;
+                    if (stableRootY === null) {
+                        const rootNodeCenterXInLayout = PADDING + mindMapTree.width / 2;
+                        const rootNodeCenterYInLayout = PADDING + newRootY + mindMapTree.height / 2;
+                        panX = viewport.clientWidth / 2 - rootNodeCenterXInLayout;
+                        panY = viewport.clientHeight / 2 - rootNodeCenterYInLayout;
+                    } else {
+                        const deltaY = newRootY - stableRootY;
+                        if (deltaY !== 0) panY -= deltaY * scale;
+                    }
+                    stableRootY = newRootY;
+                    applyTransform();
+                    renderNodeAndChildren(mindMapTree, mapContainer, svg, PADDING, PADDING, false);
+                    const bounds = getTreeBounds(mindMapTree);
+                    mapContainer.style.width = \`\${bounds.width + 2 * PADDING}px\`;
+                    mapContainer.style.height = \`\${bounds.maxY + 2 * PADDING}px\`;
+                    svg.setAttribute('width', mapContainer.style.width);
+                    svg.setAttribute('height', mapContainer.style.height);
+                }
+                
+                // --- Event Listeners for Pan & Zoom ---
+                viewport.addEventListener('wheel', e => {
+                    e.preventDefault();
+                    const zoomSpeed = 0.1; const oldScale = scale; const rect = viewport.getBoundingClientRect();
+                    const mouseX = e.clientX - rect.left; const mouseY = e.clientY - rect.top;
+                    if (e.deltaY < 0) { scale = Math.min(scale + zoomSpeed, 5); } else { scale = Math.max(0.1, scale - zoomSpeed); }
+                    panX = mouseX - (mouseX - panX) * (scale / oldScale); panY = mouseY - (mouseY - panY) * (scale / oldScale);
+                    applyTransform();
+                });
+                viewport.addEventListener('mousedown', e => {
+                    if (e.target.closest('.mindmap-node')) return;
+                    e.preventDefault(); isPanning = true; startX = e.clientX - panX; startY = e.clientY - panY;
+                });
+                window.addEventListener('mouseup', () => { isPanning = false; });
+                window.addEventListener('mousemove', e => { if (!isPanning) return; panX = e.clientX - startX; panY = e.clientY - startY; applyTransform(); });
+
+                // --- Initial Load Logic ---
+                window.addEventListener('load', () => {
+                    mindMapTree = mindMapData;
+                    rebuildParentLinks(mindMapTree); // Re-establish parent connections
+                    renderMindMap(); // Render the map on load
+                });
+            `;
+
+            // 4. Assemble the final HTML content
+            const htmlContent = `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>${mindMapTree.text || 'Interactive Mind Map'}</title>
+    ${fontLinks}
+    ${katexCssLink}
+    <style>${styles}</style>
+</head>
+<body>
+    <div class="map-viewport">
+        <div id="mindmap-container"></div>
+    </div>
+    ${katexJsScript}
+    ${katexAutoRenderScript}
+    <script>${downloadableScript}<\/script>
+</body>
+</html>`;
+
+            // 5. Trigger the download
+            const blob = new Blob([htmlContent.trim()], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            const sanitizedTitle = (mindMapTree.text || 'mindmap').replace(/[^a-z0-9]/gi, '_').toLowerCase();
+            a.href = url;
+            a.download = `${sanitizedTitle}.html`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+        
+        viewport.addEventListener('wheel', e => {
+            e.preventDefault();
+            const zoomSpeed = 0.1;
+            const oldScale = scale;
+            const rect = viewport.getBoundingClientRect();
+            const mouseX = e.clientX - rect.left;
+            const mouseY = e.clientY - rect.top;
+            if (e.deltaY < 0) {
+                scale = Math.min(scale + zoomSpeed, 5);
+            } else {
+                scale = Math.max(0.1, scale - zoomSpeed);
+            }
+            panX = mouseX - (mouseX - panX) * (scale / oldScale);
+            panY = mouseY - (mouseY - panY) * (scale / oldScale);
+            applyTransform();
+        });
+
+        viewport.addEventListener('mousedown', e => {
+            if (e.target.closest('.mindmap-node')) return;
+            e.preventDefault(); 
+            isPanning = true;
+            startX = e.clientX - panX;
+            startY = e.clientY - panY;
+        });
+
+        window.addEventListener('mouseup', () => { isPanning = false; });
+        window.addEventListener('mousemove', e => {
+            if (!isPanning) return;
+            panX = e.clientX - startX;
+            panY = e.clientY - startY;
+            applyTransform();
+        });
+
+        window.addEventListener('load', () => generateBtn.click());
+    </script>
+</body>
+</html>

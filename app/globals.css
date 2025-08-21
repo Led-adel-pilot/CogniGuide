@@ -1,0 +1,202 @@
+@import "tailwindcss";
+
+@theme {
+  --color-background: #ffffff;
+  --color-foreground: oklch(8% 0.01 240);
+  --color-primary: oklch(65% 0.2 260);
+  --color-primary-foreground: oklch(98.5% 0.01 240);
+  --color-secondary: oklch(90% 0.02 250);
+  --color-muted: oklch(94% 0.015 250);
+  --color-muted-foreground: oklch(40% 0.015 250);
+  --color-accent: oklch(75% 0.15 260);
+  --color-border: oklch(90% 0.02 250);
+  --color-ring: oklch(65% 0.2 260);
+
+  --font-sans: "Poppins", "sans-serif";
+  --font-heading: "Poppins", "sans-serif";
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-feature-settings: "rlig" 1, "calt" 1;
+    font-family: "Poppins", system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  }
+  .container {
+    @apply mx-auto px-4 sm:px-6 lg:px-8;
+  }
+}
+
+
+/* Mind Map Styles - Unchanged */
+:root {
+    --background-color: #f8f9fa;
+    --node-bg-color: #ffffff;
+    --node-border-color: #dee2e6;
+    --node-shadow: 0 4px 8px rgba(0, 0, 0, 0.07);
+    --root-bg-color: #007bff;
+    --root-text-color: #ffffff;
+    --connector-color: #cbd5e0;
+    --text-color: #2d3748;
+    --hover-border-color: #007bff;
+    --code-bg-color: #edf2f7;
+}
+
+.map-viewport {
+    flex-grow: 1;
+    position: relative;
+    overflow: hidden;
+}
+
+#mindmap-container {
+    position: relative;
+    min-width: 100%;
+    min-height: 100%;
+    box-sizing: border-box;
+    transform-origin: 0 0;
+}
+
+.mindmap-node {
+    position: absolute;
+    background-color: var(--node-bg-color);
+    border: 2px solid var(--node-border-color);
+    border-radius: 25px;
+    padding: 8px 14px;
+    box-shadow: var(--node-shadow);
+    cursor: pointer;
+    transition: border-color 0.2s, background-color 0.2s,
+                transform 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+                opacity 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+                top 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+                left 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    white-space: nowrap;
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--text-color);
+}
+
+.mindmap-node:hover {
+    border-color: var(--hover-border-color);
+    transform: scale(1.05);
+    z-index: 5;
+}
+
+.mindmap-node.root {
+    background-color: var(--root-bg-color);
+    color: var(--root-text-color, #ffffff);
+    font-weight: bold;
+    border-color: var(--root-bg-color);
+}
+
+.mindmap-node.has-children::after {
+    content: '';
+    position: absolute;
+    right: -7px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 14px;
+    height: 14px;
+    background-color: var(--node-bg-color);
+    border: 2px solid var(--indicator-border-color, var(--connector-color));
+    border-radius: 50%;
+    box-sizing: border-box;
+    transition: background-color 0.2s, border-color 0.2s;
+}
+
+.mindmap-node.root.has-children::after {
+     background-color: #fff;
+}
+
+.mindmap-node.collapsed.has-children::after {
+    background-color: var(--collapsed-indicator-color, #007bff);
+}
+
+#mindmap-svg {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none;
+}
+
+.connector-path {
+    stroke: var(--connector-color);
+    stroke-width: 2px;
+    fill: none;
+    transition: stroke 0.2s, opacity 0.3s ease 150ms, d 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.mindmap-node code {
+    background-color: var(--code-bg-color);
+    padding: 0.2em 0.4em;
+    margin: 0;
+    font-size: 85%;
+    border-radius: 3px;
+}
+
+.mindmap-node a {
+    color: #007bff;
+    text-decoration: none;
+}
+
+.mindmap-node a:hover {
+    text-decoration: underline;
+}
+
+.mindmap-node del {
+    opacity: 0.7;
+}
+
+.mindmap-node mark {
+    background-color: #f7e776;
+    padding: 0.1em 0.2em;
+}
+
+.katex {
+    font-size: 1.2em !important;
+}
+
+@layer utilities {
+  .bg-grid-pattern {
+    background-image: linear-gradient(to right, var(--color-border) 1px, transparent 1px),
+                      linear-gradient(to bottom, var(--color-border) 1px, transparent 1px);
+    background-size: 3rem 3rem;
+  }
+}
+
+/* Scrollbar: transparent track, thicker, shorter track, hover fades */
+@layer base {
+  /* Chromium/WebKit */
+  *::-webkit-scrollbar {
+    width: 12px;  /* a little less thick */
+    height: 12px; /* a little less thick (horizontal) */
+    background: transparent;
+  }
+  *::-webkit-scrollbar-track {
+    background: transparent;
+    /* shorten the effective track so the thumb doesn't touch the ends */
+    margin: 16px; /* applies to both vertical and horizontal orientations */
+  }
+  *::-webkit-scrollbar-thumb {
+    background-color: color-mix(in oklab, var(--color-foreground) 12%, transparent); /* more transparent */
+    border-radius: 9999px;
+    border: 3px solid transparent; /* controls visible thickness */
+    background-clip: content-box;
+    min-height: 12px; /* much shorter */
+    min-width: 12px;  /* much shorter for horizontal */
+    transition: background-color 150ms ease-in-out;
+  }
+  *::-webkit-scrollbar-thumb:hover {
+    background-color: color-mix(in oklab, var(--color-foreground) 28%, transparent);
+  }
+  *::-webkit-scrollbar-thumb:active {
+    background-color: color-mix(in oklab, var(--color-foreground) 40%, transparent);
+  }
+  *::-webkit-scrollbar-corner { background: transparent; }
+
+  /* Firefox */
+  * {
+    scrollbar-width: thin; /* a little less thick in Firefox */
+    scrollbar-color: color-mix(in oklab, var(--color-foreground) 18%, transparent) transparent; /* more transparent */
+  }
+}
