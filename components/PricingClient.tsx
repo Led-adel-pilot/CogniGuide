@@ -344,7 +344,7 @@ export default function PricingClient({ onPurchaseComplete }: PricingClientProps
             <ul className="space-y-2 text-sm mb-6">
               <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> 8 monthly credits</li>
               <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> Mind maps + flashcards</li>
-              <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> One device, standard speed</li>
+              <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> Spaced repetition</li>
             </ul>
             <button disabled className="w-full cursor-not-allowed rounded-full border py-2 text-sm text-gray-600">Current plan</button>
           </div>
@@ -365,8 +365,8 @@ export default function PricingClient({ onPurchaseComplete }: PricingClientProps
             </div>
             <ul className="space-y-2 text-sm mb-6">
               <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> 300 monthly credits</li>
-              <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> Priority generation speed</li>
-              <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> Email support</li>
+              <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> Mind maps + flashcards</li>
+              <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> Spaced repetition</li>
             </ul>
             <button
               onClick={() => handleChoosePlan('student')}
@@ -394,8 +394,8 @@ export default function PricingClient({ onPurchaseComplete }: PricingClientProps
             </div>
             <ul className="space-y-2 text-sm mb-6">
               <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> 1,000 monthly credits</li>
-              <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> Highest priority speed</li>
-              <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> Priority support</li>
+              <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> Mind maps + flashcards</li>
+              <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> Spaced repetition</li>
             </ul>
             <button
               onClick={() => handleChoosePlan('pro')}
@@ -413,7 +413,7 @@ export default function PricingClient({ onPurchaseComplete }: PricingClientProps
         <div className="mt-12 rounded-[1.25rem] border bg-muted/30 p-6">
           <h2 className="text-lg font-bold font-heading mb-2">How credits work</h2>
           <p className="text-sm text-muted-foreground">
-            A credit is a unit used to process your content with AI, longer text extracts from uploaded documents consume more credits. As a rule of thumb: 1 credit ≈ 10 slides, a 2-page PDF, or 2 images.
+            A credit is a unit used to process your content with AI, longer text extracts from uploaded documents consume more credits. As a rule of thumb: 1 credit ≈ 10 slides, a 2-page PDF, or 2 images, and each generation consumes at least 1 credit.
           </p>
           <p className="text-sm text-muted-foreground mt-3">
             With 300 credits per month, you can upload over 600 pages of text!

@@ -38,7 +38,7 @@ export default function PricingTiers({
         <ul className="space-y-2 text-sm mb-6">
           <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> 8 monthly credits</li>
           <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> Mind maps + flashcards</li>
-          <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> One device, standard speed</li>
+          <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> Spaced repetition</li>
         </ul>
         <button disabled className="w-full cursor-not-allowed rounded-full border py-2 text-sm text-gray-600">Current plan</button>
       </div>
@@ -59,8 +59,8 @@ export default function PricingTiers({
         </div>
         <ul className="space-y-2 text-sm mb-6">
           <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> 300 monthly credits</li>
-          <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> Priority generation speed</li>
-          <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> Email support</li>
+          <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> Mind maps + flashcards</li>
+          <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> Spaced repetition</li>
         </ul>
         <button
           onClick={() => onCheckout('student')}
@@ -88,8 +88,8 @@ export default function PricingTiers({
         </div>
         <ul className="space-y-2 text-sm mb-6">
           <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> 1,000 monthly credits</li>
-          <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> Highest priority speed</li>
-          <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> Priority support</li>
+          <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> Mind maps + flashcards</li>
+          <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> Spaced repetition</li>
         </ul>
         <button
           onClick={() => onCheckout('pro')}
