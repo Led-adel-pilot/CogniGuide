@@ -81,7 +81,7 @@ export async function POST(req: NextRequest) {
         });
 
         // Assign credits
-        const credits = plan === process.env.NEXT_PUBLIC_PADDLE_PRICE_ID_STUDENT_MONTH || plan === process.env.NEXT_PUBLIC_PADDLE_PRICE_ID_STUDENT_YEAR ? 100 : 500;
+        const credits = plan === process.env.NEXT_PUBLIC_PADDLE_PRICE_ID_STUDENT_MONTH || plan === process.env.NEXT_PUBLIC_PADDLE_PRICE_ID_STUDENT_YEAR ? 300 : 1000;
         await supabase.from('user_credits').upsert({
           user_id,
           credits,
@@ -114,7 +114,7 @@ export async function POST(req: NextRequest) {
           .eq('paddle_subscription_id', subscription_id);
 
         // Update credits on plan change or renewal
-        const credits = plan === process.env.NEXT_PUBLIC_PADDLE_PRICE_ID_STUDENT_MONTH || plan === process.env.NEXT_PUBLIC_PADDLE_PRICE_ID_STUDENT_YEAR ? 100 : 500;
+        const credits = plan === process.env.NEXT_PUBLIC_PADDLE_PRICE_ID_STUDENT_MONTH || plan === process.env.NEXT_PUBLIC_PADDLE_PRICE_ID_STUDENT_YEAR ? 300 : 1000;
         await supabase.from('user_credits').upsert({
           user_id,
           credits,

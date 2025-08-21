@@ -260,6 +260,11 @@ export default function PricingClient() {
             displayMode: 'overlay',
             variant: 'one-page',
           },
+          eventCallback: function(data: any) {
+            if (data.name === 'checkout.completed') {
+              window.location.reload();
+            }
+          }
         });
       } catch (error: any) {
         console.error('Checkout error:', error?.message || error);
@@ -333,9 +338,9 @@ export default function PricingClient() {
               <div className="text-sm text-muted-foreground">$0 / year</div>
             </div>
             <ul className="space-y-2 text-sm mb-6">
-              <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> 8 monthly credits</li>
-              <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> Mind maps + flashcards</li>
-              <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> One device, standard speed</li>
+              <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> 300 monthly credits</li>
+              <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> Priority generation speed</li>
+              <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> Email support</li>
             </ul>
             <button disabled className="w-full cursor-not-allowed rounded-full border py-2 text-sm text-gray-600">Current plan</button>
           </div>
@@ -355,9 +360,9 @@ export default function PricingClient() {
               </div>
             </div>
             <ul className="space-y-2 text-sm mb-6">
-              <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> 300 monthly credits</li>
-              <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> Priority generation speed</li>
-              <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> Email support</li>
+              <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> 1,000 monthly credits</li>
+              <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> Highest priority speed</li>
+              <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> Priority support</li>
             </ul>
             <button
               onClick={() => handleChoosePlan('student')}
@@ -437,5 +442,3 @@ export default function PricingClient() {
     </section>
   );
 }
-
-
