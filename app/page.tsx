@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { BrainCircuit, Share2, UploadCloud, Zap, Eye, FileText, FileUp } from 'lucide-react';
+import Image from 'next/image';
+import { Share2, UploadCloud, Zap, FileUp } from 'lucide-react';
 import FlashcardIcon from '@/components/FlashcardIcon';
 import Dropzone from '@/components/Dropzone';
 import PromptForm from '@/components/PromptForm';
@@ -11,6 +12,7 @@ import AuthModal from '@/components/AuthModal';
 import { supabase } from '@/lib/supabaseClient';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import CogniGuideLogo from '../CogniGuide_logo.png';
 
 const InteractiveMindMap = () => {
   const viewportRef = useRef<HTMLDivElement>(null);
@@ -802,7 +804,7 @@ export default function Home() {
         <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
           <div className="container h-16 flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <BrainCircuit className="h-7 w-7 text-primary" />
+              <Image src={CogniGuideLogo} alt="CogniGuide Logo" width={40} height={40} className="h-10 w-10 text-primary" />
               <h1 className="text-2xl font-bold font-heading tracking-tighter">CogniGuide</h1>
             </div>
             <div className="flex items-center gap-2">
@@ -967,7 +969,7 @@ export default function Home() {
                 </div>
                 <div className="flex items-start space-x-4 p-6 bg-background rounded-[1.25rem] border border-border/10">
                   <div className="flex-shrink-0 h-10 w-10 flex items-center justify-center rounded-lg bg-primary/10 text-primary">
-                    <BrainCircuit className="h-6 w-6" />
+                    <Zap className="h-6 w-6" />
                   </div>
                   <div>
                     <h3 className="font-bold font-heading text-lg">Deep AI Analysis</h3>
