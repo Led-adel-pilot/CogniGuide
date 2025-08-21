@@ -28,7 +28,11 @@ const PRICE_IDS = {
   },
 };
 
-export default function PricingClient() {
+interface PricingClientProps {
+  onPurchaseComplete?: () => void;
+}
+
+export default function PricingClient({ onPurchaseComplete }: PricingClientProps = {}) {
   const [scriptReady, setScriptReady] = useState(false);
   const [paddleReady, setPaddleReady] = useState(false);
   const [billingCycle, setBillingCycle] = useState<BillingCycle>('month');
@@ -140,8 +144,11 @@ export default function PricingClient() {
       }
       PaddleObj.Initialize({
         token: PADDLE_CLIENT_TOKEN,
-        eventCallback: function (_event: any) {
-          // no-op; available for debugging if needed
+        eventCallback: function (event: any) {
+          if (event?.name === 'checkout.completed' && onPurchaseComplete) {
+            // Call the callback function to refresh credits after successful purchase
+            setTimeout(() => onPurchaseComplete(), 1000); // Small delay to ensure webhook has processed
+          }
         },
       });
       hasInitializedRef.current = true;

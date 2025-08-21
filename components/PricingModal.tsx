@@ -7,9 +7,10 @@ import { X } from 'lucide-react';
 interface PricingModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onPurchaseComplete?: () => void;
 }
 
-export default function PricingModal({ isOpen, onClose }: PricingModalProps) {
+export default function PricingModal({ isOpen, onClose, onPurchaseComplete }: PricingModalProps) {
   if (!isOpen) return null;
 
   return (
@@ -28,7 +29,7 @@ export default function PricingModal({ isOpen, onClose }: PricingModalProps) {
               Upgrade your plan
             </h1>
           </div>
-        <PricingClient />
+        <PricingClient onPurchaseComplete={onPurchaseComplete} />
       </div>
     </div>
   );

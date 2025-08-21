@@ -717,7 +717,15 @@ export default function DashboardClient() {
         dueIndices={dueIndices}
         initialIndex={initialDueIndex}
       />
-      <PricingModal isOpen={isPricingModalOpen} onClose={handleClosePricingModal} />
+      <PricingModal
+        isOpen={isPricingModalOpen}
+        onClose={handleClosePricingModal}
+        onPurchaseComplete={() => {
+          if (user) {
+            loadUserCredits(user.id);
+          }
+        }}
+      />
 
       {spacedOpen && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center" onClick={() => setSpacedOpen(false)}>
