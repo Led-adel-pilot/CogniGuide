@@ -262,9 +262,6 @@ export default function PricingClient() {
           },
           eventCallback: function(data: any) {
             if (data.name === 'checkout.completed') {
-              if (typeof window !== 'undefined') {
-                localStorage.setItem('cogniguide_paddle_checkout_completed', 'true');
-              }
               window.location.reload();
             }
           }
