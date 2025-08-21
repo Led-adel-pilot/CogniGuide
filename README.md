@@ -220,6 +220,12 @@ SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
     - If authenticated: navigates to `/dashboard?upgrade=true` which opens the in‑app pricing modal.
     - If not authenticated: sets `localStorage.cogniguide_upgrade_flow = 'true'` and navigates to `/pricing` to prompt sign‑in then continue checkout.
 
+#### Important Implementation Note: Credit Updates
+
+When handling `subscription.created` and `subscription.updated` webhooks, it is crucial to use an **`upsert`** operation rather than a simple `insert` when updating the `user_credits` table.
+
+A user might already have an entry in the `user_credits` table (e.g., from a previous subscription or a promotional offer). A simple `insert` will fail in such cases due to the unique constraint on the `user_id` column. Using `upsert` (with `onConflict: 'user_id'`) ensures that a new record is created for new users, and the existing record is updated for existing users, preventing errors and ensuring credits are always applied correctly.
+
 Setup steps:
 - Create products and prices in Paddle for Student and Pro (monthly and annual) and copy the price IDs.
 - Create a Client-side Token in Paddle and set it as `NEXT_PUBLIC_PADDLE_CLIENT_TOKEN`.

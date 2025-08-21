@@ -83,6 +83,7 @@ export default function DashboardClient() {
   const [spacedPrefetched, setSpacedPrefetched] = useState(false);
   const prefetchingRef = useRef(false);
   const [totalDueCount, setTotalDueCount] = useState<number>(0);
+  const [creditsUpdated, setCreditsUpdated] = useState(false);
 
   const handleClosePricingModal = () => {
     setIsPricingModalOpen(false);
@@ -117,6 +118,8 @@ export default function DashboardClient() {
   };
 
   useEffect(() => {
+    const channelRef = { current: null as any }; 
+
     const init = async () => {
       const { data } = await supabase.auth.getUser();
       const authed = data.user ? { id: data.user.id, email: data.user.email || undefined } : null;
@@ -128,6 +131,32 @@ export default function DashboardClient() {
       }
       const all = await loadAllHistory(authed.id);
       await loadUserCredits(authed.id);
+
+      channelRef.current = supabase.channel(`user_credits:${authed.id}`);
+      channelRef.current
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'user_credits',
+            filter: `user_id=eq.${authed.id}`,
+          },
+          (payload: any) => {
+            const newCredits = (payload.new as { credits: number })?.credits;
+            if (typeof newCredits === 'number') {
+              setCredits((prevCredits) => {
+                if (newCredits > prevCredits) {
+                  setCreditsUpdated(true);
+                  setTimeout(() => setCreditsUpdated(false), 5000);
+                }
+                return newCredits;
+              });
+            }
+          }
+        )
+        .subscribe();
+
       try { await prefetchSpacedData(all.flashcards); } catch {}
       try {
         const hasUpgradeQuery = Boolean(searchParams.get('upgrade'));
@@ -151,7 +180,12 @@ export default function DashboardClient() {
         router.replace('/');
       }
     });
-    return () => { sub.subscription.unsubscribe(); };
+    return () => {
+      sub.subscription.unsubscribe();
+      if (channelRef.current) {
+        supabase.removeChannel(channelRef.current);
+      }
+    };
   }, [router, searchParams]);
 
   const loadHistory = async (userId: string) => {
@@ -354,10 +388,7 @@ export default function DashboardClient() {
           setIsGenerating(false);
           return;
         }
-        // Deduction occurs server-side at start; refresh credits immediately
-        if (user) {
-          try { await loadUserCredits(user.id); } catch {}
-        }
+        // Deduction occurs server-side at start; credits will refresh via realtime subscription
         setFlashcardsOpen(true);
         if (!res.body) {
           const data = await res.json().catch(() => null);
@@ -474,10 +505,7 @@ export default function DashboardClient() {
           throw new Error('Failed to generate');
         }
       }
-      // Deduction occurs server-side at start; refresh credits immediately
-      if (user) {
-        try { await loadUserCredits(user.id); } catch {}
-      }
+      // Deduction occurs server-side at start; credits will refresh via realtime subscription
       if (!contentType.includes('text/plain')) {
         const result = await res.json();
         const md = (result?.markdown as string | undefined)?.trim();
@@ -620,7 +648,7 @@ export default function DashboardClient() {
               <div className="font-medium line-clamp-1">{user?.email || 'User'}</div>
               <div className="text-xs text-muted-foreground flex items-center gap-1">
                 <Coins className="h-3 w-3" />
-                <span>{(Math.floor(credits * 10) / 10).toFixed(1)} Credits Remaining</span>
+                <span className={`transition-colors duration-300 ${creditsUpdated ? 'text-green-500 font-bold' : ''}`}>{(Math.floor(credits * 10) / 10).toFixed(1)} Credits Remaining</span>
               </div>
             </div>
           </button>
@@ -757,7 +785,7 @@ export default function DashboardClient() {
               <div className="text-sm text-muted-foreground">Credit Balance</div>
               <div className="text-2xl font-bold flex items-center gap-2">
                 <Coins className="h-6 w-6 text-primary" />
-                <span>{(Math.floor(credits * 10) / 10).toFixed(1)}</span>
+                <span className={`transition-colors duration-300 ${creditsUpdated ? 'text-green-500' : ''}`}>{(Math.floor(credits * 10) / 10).toFixed(1)}</span>
               </div>
             </div>
             <nav className="mb-4">
