@@ -29,11 +29,11 @@ export async function POST(req: NextRequest) {
     }
 
     for (const subscription of subscriptions) {
-      if (!subscription.user_credits) {
+      if (!subscription.user_credits || subscription.user_credits.length === 0) {
         console.warn(`User ${subscription.user_id} has an active subscription but no user_credits entry.`);
         continue;
       }
-      const lastRefilledAt = new Date(subscription.user_credits.last_refilled_at);
+      const lastRefilledAt = new Date(subscription.user_credits[0].last_refilled_at);
       const now = new Date();
       const oneMonthAgo = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate());
 
