@@ -1,0 +1,8 @@
+{
+  "crons": [
+    {
+      "path": "/api/refill-credits",
+      "schedule": "0 0 * * *"
+    }
+  ]
+}

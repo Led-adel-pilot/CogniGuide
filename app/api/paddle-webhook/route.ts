@@ -145,11 +145,7 @@ export async function POST(req: NextRequest) {
           .update({ status, updated_at: new Date().toISOString() })
           .eq('paddle_subscription_id', subscription_id);
 
-        // Revoke credits
-        await supabase
-          .from('user_credits')
-          .update({ credits: 0, updated_at: new Date().toISOString() })
-          .eq('user_id', user_id);
+        
         break;
       }
       default:
