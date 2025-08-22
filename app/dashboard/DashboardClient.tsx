@@ -13,6 +13,8 @@ import FlashcardIcon from '@/components/FlashcardIcon';
 import { loadDeckSchedule, saveDeckSchedule, loadDeckScheduleAsync, saveDeckScheduleAsync, loadAllDeckSchedulesAsync, upsertDeckSchedulesBulkAsync, type StoredDeckSchedule } from '@/lib/sr-store';
 import { createInitialSchedule } from '@/lib/spaced-repetition';
 import PricingModal from '@/components/PricingModal';
+import CogniGuideLogo from '../../CogniGuide_logo.png';
+import Image from 'next/image';
 
 type SessionUser = {
   id: string;
@@ -571,7 +573,7 @@ export default function DashboardClient() {
       >
         <div className="flex items-center justify-between gap-2 mb-4">
           <div className="flex items-center gap-2">
-            <BrainCircuit className="h-6 w-6 text-primary" />
+            <Image src={CogniGuideLogo} alt="CogniGuide" width={24} height={24} className="h-6 w-6" />
             <span className="font-bold">Your History</span>
           </div>
           <button onClick={() => setIsSidebarOpen(false)} className="p-1 rounded-full hover:bg-muted md:hidden">
@@ -676,7 +678,7 @@ export default function DashboardClient() {
             <Menu className="h-6 w-6" />
           </button>
           <div className="flex items-center gap-2">
-            <BrainCircuit className="h-6 w-6 text-primary" />
+            <Image src={CogniGuideLogo} alt="CogniGuide" width={24} height={24} className="h-6 w-6" />
             <span className="font-bold">CogniGuide</span>
           </div>
           <div className="w-6" /> {/* Spacer */}

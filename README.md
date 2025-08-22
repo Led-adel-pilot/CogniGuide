@@ -67,6 +67,19 @@ These preferences reflect the current, polished UI and should be used consistent
 - **Optional library**: You may use shadcn/ui components to speed up consistent, reusable UI primitives (e.g., Dialog, Button). Match the shape rules above (pills/circles/rounded panels) and white background.
 - **Accessibility/Feel**: Keep hover states subtle, focus-visible rings on interactive elements, and avoid dark backgrounds/panels.
 
+### Logo Usage Guidelines
+
+For consistent branding across the application, use the `CogniGuide_logo.png` file for all logo displays:
+
+- **Location**: The logo file is located at `/CogniGuide_logo.png` in the project root
+- **Import Pattern**: Use ES6 import syntax: `import CogniGuideLogo from '../CogniGuide_logo.png';`
+- **Component**: Use Next.js `Image` component for optimization: `<Image src={CogniGuideLogo} alt="CogniGuide" width={24} height={24} />`
+- **Consistent Usage**:
+  - Dashboard mobile header (when sidebar is closed)
+  - Dashboard sidebar header (both desktop and mobile)
+  - Landing page hero section
+- **Avoid**: Using generic icons like `BrainCircuit` from Lucide React for logo representation
+
 ### Backend API (`app/api/generate-mindmap/route.ts`)
 *   This is a Next.js API route (`POST` handler) responsible for processing mind map generation requests.
 *   It receives `FormData` which can contain either a `File` object (for document uploads) or a `promptText` string.
@@ -175,6 +188,17 @@ To satisfy Stripe/Lemon Squeezy website verification, the app includes the follo
 - Review and customize all legal text to ensure compliance with local regulations
 - Test all form submissions and links
 
+## SEO & Sitemap
+The application includes a dynamic sitemap (`app/sitemap.ts`) that automatically generates XML sitemaps for search engine crawling. The sitemap includes:
+
+- **Landing Page** (`/`) - High priority, weekly updates
+- **Pricing Page** (`/pricing`) - High priority, weekly updates
+- **Contact Page** (`/contact`) - Medium priority, monthly updates
+- **Dashboard** (`/dashboard`) - High priority, daily updates
+- **Legal Pages** - Terms, Privacy Policy, Refund Policy, Cancellation Policy
+
+The sitemap automatically adapts to different deployment environments and uses appropriate URLs for production, staging, and development.
+
 ## Environment Variables
 Define these in `.env.local` (and on your hosting provider):
 
@@ -190,6 +214,7 @@ NEXT_PUBLIC_PADDLE_PRICE_ID_PRO_MONTH=pri_xxx
 NEXT_PUBLIC_PADDLE_PRICE_ID_PRO_YEAR=pri_xxx
 PADDLE_WEBHOOK_SECRET=your_paddle_webhook_secret
 SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
+NEXT_PUBLIC_BASE_URL=your_production_domain # Optional: defaults to deployment URL
 ```
 
 ### Paddle Billing integration
