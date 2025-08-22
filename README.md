@@ -1,6 +1,6 @@
 # Project Context: CogniGuide
 
-## Overview
+## Overview https://www.cogniguide.app
 CogniGuide comprehensive AI-powered study assistant. It uses an LLM to convert text and images into interactive mind maps, generates study flashcards with spaced-repetition scheduling, supports multimodal inputs (documents and images), to help users learn, review, and retain information more effectively with research backed strategies.
 
 ## Key Features
