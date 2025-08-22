@@ -62,11 +62,9 @@ export default function PromptForm({
   return (
     <form
       onSubmit={handleSubmit}
-      className={`w-full flex items-end gap-2 p-2 bg-background border border-border/50 shadow-sm ${
-        // Avoid animating border-radius to prevent visual lag
-        // Keep subtle transitions for color/shadow only
-        'transition-colors'
-      } ${isTall ? 'rounded-2xl' : 'rounded-full'}`}
+      className={`w-full flex gap-2 p-2 bg-background border border-border/50 shadow-sm transition-colors ${
+        isTall ? 'flex-col rounded-2xl' : 'items-end rounded-full'
+      }`}
     >
       <textarea
         id="prompt-input"
@@ -85,7 +83,9 @@ export default function PromptForm({
       <button
         type="submit"
         disabled={disabled || (filesLength === 0 && prompt.trim().length === 0)}
-        className="flex-shrink-0 inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-primary rounded-full shadow hover:bg-primary/90 transition-colors"
+        className={`flex-shrink-0 inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-primary rounded-full shadow hover:bg-primary/90 transition-colors ${
+          isTall ? 'self-end' : ''
+        }`}
       >
         {isLoading ? (
           <>

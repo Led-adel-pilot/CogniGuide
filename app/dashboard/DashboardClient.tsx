@@ -8,7 +8,7 @@ import Dropzone from '@/components/Dropzone';
 import PromptForm from '@/components/PromptForm';
 import MindMapModal from '@/components/MindMapModal';
 import FlashcardsModal, { Flashcard as FlashcardType } from '@/components/FlashcardsModal';
-import { BrainCircuit, LogOut, Loader2, Map as MapIcon, Coins, Zap, Sparkles, CalendarClock } from 'lucide-react';
+import { BrainCircuit, LogOut, Loader2, Map as MapIcon, Coins, Zap, Sparkles, CalendarClock, Menu, X } from 'lucide-react';
 import FlashcardIcon from '@/components/FlashcardIcon';
 import { loadDeckSchedule, saveDeckSchedule, loadDeckScheduleAsync, saveDeckScheduleAsync, loadAllDeckSchedulesAsync, upsertDeckSchedulesBulkAsync, type StoredDeckSchedule } from '@/lib/sr-store';
 import { createInitialSchedule } from '@/lib/spaced-repetition';
@@ -51,6 +51,7 @@ function removeFirstEmoji(text?: string | null): string {
 export default function DashboardClient() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [user, setUser] = useState<SessionUser | null>(null);
   const [loading, setLoading] = useState(true);
   const [files, setFiles] = useState<File[]>([]);
@@ -556,11 +557,26 @@ export default function DashboardClient() {
 
   return (
     <div className="flex h-screen overflow-hidden bg-background text-foreground">
+      {isSidebarOpen && (
+        <div
+          className="fixed inset-0 z-30 bg-black/50 md:hidden"
+          onClick={() => setIsSidebarOpen(false)}
+        />
+      )}
       {/* Sidebar */}
-      <aside className="w-72 border-r bg-muted/30 p-4 flex flex-col h-screen min-h-0">
-        <div className="flex items-center gap-2 mb-4">
-          <BrainCircuit className="h-6 w-6 text-primary" />
-          <span className="font-bold">Your History</span>
+      <aside
+        className={`fixed inset-y-0 left-0 z-40 w-72 border-r bg-background p-4 flex flex-col h-screen min-h-0 transform transition-transform duration-300 md:relative md:translate-x-0 md:flex ${
+          isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
+        }`}
+      >
+        <div className="flex items-center justify-between gap-2 mb-4">
+          <div className="flex items-center gap-2">
+            <BrainCircuit className="h-6 w-6 text-primary" />
+            <span className="font-bold">Your History</span>
+          </div>
+          <button onClick={() => setIsSidebarOpen(false)} className="p-1 rounded-full hover:bg-muted md:hidden">
+            <X className="h-5 w-5" />
+          </button>
         </div>
         <div className="flex-1 overflow-y-auto space-y-2 pr-1">
           {combinedHistory.length === 0 && (
@@ -654,9 +670,19 @@ export default function DashboardClient() {
       </aside>
 
       {/* Main content */}
-      <main className="flex-1 px-6 pt-2 pb-6 overflow-y-auto min-h-0">
-        <div className="container max-w-3xl mx-auto">
-          <div className="text-center mb-8">
+      <main className="flex-1 overflow-y-auto min-h-0">
+        <header className="md:hidden flex items-center justify-between sticky top-0 bg-background/80 backdrop-blur-sm px-6 py-3 border-b z-10">
+          <button onClick={() => setIsSidebarOpen(true)} className="p-2 -ml-2">
+            <Menu className="h-6 w-6" />
+          </button>
+          <div className="flex items-center gap-2">
+            <BrainCircuit className="h-6 w-6 text-primary" />
+            <span className="font-bold">CogniGuide</span>
+          </div>
+          <div className="w-6" /> {/* Spacer */}
+        </header>
+        <div className="container max-w-3xl mx-auto px-6 pb-6">
+          <div className="text-center my-8">
             <button
               onClick={() => setIsPricingModalOpen(true)}
               className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-full bg-blue-100/50 text-blue-600 hover:bg-blue-200/50 transition-colors"

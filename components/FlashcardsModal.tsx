@@ -268,7 +268,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
           </div>
 
           {hasCards ? (
-            <div className="w-full max-w-3xl mx-auto mt-4 grid grid-cols-1 sm:grid-cols-3 items-center gap-3">
+            <div className="w-full max-w-3xl mx-auto mt-4 grid grid-cols-3 items-center gap-3">
               {!showAnswer ? (
                 <div className="justify-self-start">
                   <button
