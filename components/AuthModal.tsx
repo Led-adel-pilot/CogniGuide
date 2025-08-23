@@ -73,12 +73,12 @@ export default function AuthModal({ open, onClose }: AuthModalProps) {
               placeholder="you@example.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="flex-1 border rounded-full px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-0 flex-grow border rounded-full px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
             <button
               onClick={handleEmailMagicLink}
               disabled={isSending || !email}
-              className="inline-flex items-center gap-2 px-5 py-2 bg-blue-600 text-white rounded-full disabled:opacity-60"
+              className="flex-shrink-0 inline-flex items-center gap-2 px-5 py-2 bg-blue-600 text-white rounded-full disabled:opacity-60"
             >
               <Mail className="h-4 w-4" />
               Email link
@@ -108,5 +108,3 @@ export default function AuthModal({ open, onClose }: AuthModalProps) {
     </div>
   );
 }
-
-
