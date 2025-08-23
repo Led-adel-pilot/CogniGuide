@@ -46,12 +46,17 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
   const [deckExamDate, setDeckExamDate] = React.useState<string>('');
   const [dueList, setDueList] = React.useState<number[]>([]);
   const [predictedDueByGrade, setPredictedDueByGrade] = React.useState<Record<number, string>>({});
+  const [predictedDueDatesByGrade, setPredictedDueDatesByGrade] = React.useState<Record<number, Date>>({});
+  const [hoveredGrade, setHoveredGrade] = React.useState<number | null>(null);
   const current = scheduledCards && scheduledCards[index] ? scheduledCards[index] : null;
 
   React.useEffect(() => {
     if (!open) {
       setIndex(0);
       setShowAnswer(false);
+      setHoveredGrade(null);
+      setPredictedDueByGrade({});
+      setPredictedDueDatesByGrade({});
     }
   }, [open]);
 
@@ -99,18 +104,25 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
 
   // Predict next due labels per grade once the answer is shown
   React.useEffect(() => {
-    if (!showAnswer || !current) { setPredictedDueByGrade({}); return; }
+    if (!showAnswer || !current) {
+      setPredictedDueByGrade({});
+      setPredictedDueDatesByGrade({});
+      return;
+    }
     const now = new Date();
     const base = current.schedule ?? createInitialSchedule();
     const withDeckExam = { ...base, examDate: deckExamDate || base.examDate } as FsrsScheduleState;
     const map: Record<number, string> = {};
+    const dateMap: Record<number, Date> = {};
     const grades = [1, 2, 3, 4] as Grade[];
     for (const g of grades) {
       const s = nextSchedule(withDeckExam, g, now);
       const due = new Date(s.due);
       map[g as number] = formatTimeUntil(due, now);
+      dateMap[g as number] = due;
     }
     setPredictedDueByGrade(map);
+    setPredictedDueDatesByGrade(dateMap);
   }, [showAnswer, current, deckExamDate]);
 
   function formatTimeUntil(dueDate: Date, now: Date = new Date()): string {
@@ -148,6 +160,9 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
       return next;
     });
     setShowAnswer(false);
+    setHoveredGrade(null);
+    setPredictedDueByGrade({});
+    setPredictedDueDatesByGrade({});
     // If studying due-only, remove current index from due list and move to next due
     setDueList((list) => {
       if (!studyDueOnly) return list;
@@ -204,9 +219,14 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
             <div className="text-sm text-gray-600 text-center">{hasCards ? `${index + 1} / ${cards!.length}` : ''}</div>
             <div className="justify-self-start sm:justify-self-end">
               {hasCards && (
-                <label className="inline-flex items-center gap-2 text-xs">
-                  <span className="text-gray-600">Exam date</span>
-                  <input type="date" className="h-8 px-3 rounded-full border border-gray-300 text-gray-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400/50 transition-colors" value={deckExamDate} onChange={(e) => handleSetDeckExamDate(e.target.value)} />
+                <label className="inline-flex items-center gap-2 text-sm">
+                  <span className="text-gray-700 font-medium">Exam date</span>
+                  <input
+                    type="date"
+                    className="h-7 px-2 py-1 text-xs font-semibold rounded-md border border-gray-200 bg-white text-gray-800 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-indigo-400/50 focus-visible:border-indigo-300 hover:border-gray-300 transition-colors"
+                    value={deckExamDate}
+                    onChange={(e) => handleSetDeckExamDate(e.target.value)}
+                  />
                 </label>
               )}
             </div>
@@ -236,9 +256,12 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
                   <div className="bg-white border border-gray-200 rounded-[1.25rem] shadow p-5 sm:p-6 min-h-[180px] sm:min-h-[200px]">
                     <div className="text-gray-900 text-xl sm:text-2xl font-semibold leading-7 sm:leading-8 break-words">{cards![index]?.question}</div>
                     <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-gray-600">
-                      {current?.schedule?.due ? (
+                      {showAnswer && current?.schedule?.due ? (
                         <span className="inline-flex items-center h-6 px-2.5 rounded-full bg-sky-50 text-sky-700 border border-sky-200">
-                          Next due: {new Date(current.schedule.due).toLocaleDateString()}
+                          {hoveredGrade && predictedDueDatesByGrade[hoveredGrade]
+                            ? `Next due: ${predictedDueDatesByGrade[hoveredGrade].toLocaleDateString()} ${predictedDueDatesByGrade[hoveredGrade].toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`
+                            : `Was due: ${new Date(current.schedule.due).toLocaleDateString()} ${new Date(current.schedule.due).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`
+                          }
                         </span>
                       ) : null}
                     </div>
@@ -272,7 +295,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
               {!showAnswer ? (
                 <div className="justify-self-start">
                   <button
-                    onClick={() => { if (!cards) return; setIndex(getPrevIndex()); setShowAnswer(false); }}
+                    onClick={() => { if (!cards) return; setIndex(getPrevIndex()); setShowAnswer(false); setHoveredGrade(null); setPredictedDueByGrade({}); setPredictedDueDatesByGrade({}); }}
                     className="inline-flex items-center h-10 px-4 rounded-full border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400/50 whitespace-nowrap"
                   >
                     <ChevronLeft className="h-5 w-5 mr-2" /> Prev
@@ -284,19 +307,47 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
                   <div className="flex items-end justify-center gap-3 flex-nowrap">
                     <div className="flex flex-col items-center">
                       <span className="text-[11px] text-gray-500 h-4">{predictedDueByGrade[1] || ''}</span>
-                      <button onClick={() => handleGrade(1)} className="h-9 px-3 text-xs rounded-full border border-red-200 bg-red-50 text-red-700 hover:bg-red-100 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-300/50">Again</button>
+                      <button
+                        onClick={() => handleGrade(1)}
+                        onMouseEnter={() => setHoveredGrade(1)}
+                        onMouseLeave={() => setHoveredGrade(null)}
+                        className="h-9 px-3 text-xs rounded-full border border-red-200 bg-red-50 text-red-700 hover:bg-red-100 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-300/50"
+                      >
+                        Again
+                      </button>
                     </div>
                     <div className="flex flex-col items-center">
                       <span className="text-[11px] text-gray-500 h-4">{predictedDueByGrade[2] || ''}</span>
-                      <button onClick={() => handleGrade(2)} className="h-9 px-3 text-xs rounded-full border border-amber-200 bg-amber-50 text-amber-700 hover:bg-amber-100 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-300/50">Hard</button>
+                      <button
+                        onClick={() => handleGrade(2)}
+                        onMouseEnter={() => setHoveredGrade(2)}
+                        onMouseLeave={() => setHoveredGrade(null)}
+                        className="h-9 px-3 text-xs rounded-full border border-amber-200 bg-amber-50 text-amber-700 hover:bg-amber-100 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-300/50"
+                      >
+                        Hard
+                      </button>
                     </div>
                     <div className="flex flex-col items-center">
                       <span className="text-[11px] text-gray-500 h-4">{predictedDueByGrade[3] || ''}</span>
-                      <button onClick={() => handleGrade(3)} className="h-9 px-3 text-xs rounded-full border border-sky-200 bg-sky-50 text-sky-700 hover:bg-sky-100 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-300/50">Good</button>
+                      <button
+                        onClick={() => handleGrade(3)}
+                        onMouseEnter={() => setHoveredGrade(3)}
+                        onMouseLeave={() => setHoveredGrade(null)}
+                        className="h-9 px-3 text-xs rounded-full border border-sky-200 bg-sky-50 text-sky-700 hover:bg-sky-100 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-300/50"
+                      >
+                        Good
+                      </button>
                     </div>
                     <div className="flex flex-col items-center">
                       <span className="text-[11px] text-gray-500 h-4">{predictedDueByGrade[4] || ''}</span>
-                      <button onClick={() => handleGrade(4)} className="h-9 px-3 text-xs rounded-full border border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/50">Easy</button>
+                      <button
+                        onClick={() => handleGrade(4)}
+                        onMouseEnter={() => setHoveredGrade(4)}
+                        onMouseLeave={() => setHoveredGrade(null)}
+                        className="h-9 px-3 text-xs rounded-full border border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/50"
+                      >
+                        Easy
+                      </button>
                     </div>
                   </div>
                 ) : (
@@ -304,14 +355,11 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
                     <Eye className="h-5 w-5 mr-2" /> Show Answer
                   </button>
                 )}
-                {studyDueOnly && (
-                  <span className="text-xs text-gray-500 mt-1 min-w-[80px] text-center">Due left: {dueList.length}</span>
-                )}
               </div>
               {!showAnswer ? (
                 <div className="justify-self-end">
                   <button
-                    onClick={() => { if (!cards) return; setIndex(getNextIndex()); setShowAnswer(false); }}
+                    onClick={() => { if (!cards) return; setIndex(getNextIndex()); setShowAnswer(false); setHoveredGrade(null); setPredictedDueByGrade({}); setPredictedDueDatesByGrade({}); }}
                     className="inline-flex items-center h-10 px-4 rounded-full border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400/50 whitespace-nowrap"
                   >
                     Next <ChevronRight className="h-5 w-5 ml-2" />

@@ -24,21 +24,18 @@ type SessionUser = {
 // Extract the first emoji from a title, if any
 function extractFirstEmoji(text?: string | null): string | null {
   if (!text) return null;
-  // Prefer Unicode property escapes when supported
-  try {
-    const re = new RegExp('\\p{Extended_Pictographic}(?:\\uFE0F|\\uFE0E)?(?:\\u200D\\p{Extended_pictographic}(?:\\uFE0F|\\uFE0E)?)*', 'u');
-    const m = text.match(re);
-    if (m) return m[0];
-  } catch {
-    // ignore if runtime doesn't support Unicode property escapes
+
+  // Comprehensive emoji regex that includes variation selectors and ZWJ sequences
+  const emojiRegex = /([\u{1F600}-\u{1F64F}]|[\u{1F300}-\u{1F5FF}]|[\u{1F680}-\u{1F6FF}]|[\u{1F1E0}-\u{1F1FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]|[\u{1F926}-\u{1F937}]|[\u{10000}-\u{10FFFF}]|[\u{1F1E6}-\u{1F1FF}]|[\u{1F191}-\u{1F19A}]|[\u{1F232}-\u{1F23A}]|[\u{1F250}-\u{1F251}]|[\u{1F910}-\u{1F918}]|[\u{1F980}-\u{1F984}]|[\u{1F9C0}]|[\u{1F9C0}]|[\u{1F9E0}-\u{1F9E6}]|[\u{1F90D}-\u{1F90F}]|[\u{1F9B0}-\u{1F9B3}]|[\u{1F9B8}-\u{1F9B9}]|[\u{1F9D0}-\u{1F9D2}]|[\u{1F9D5}-\u{1F9DD}]|[\u{1F9E7}-\u{1F9FF}]|[\u{1FA70}-\u{1FA73}]|[\u{1FA78}-\u{1FA7A}]|[\u{1FA80}-\u{1FA82}]|[\u{1FA90}-\u{1FA95}])(\u{FE0F})?(\u{200D}[\u{1F600}-\u{1F64F}]|[\u{1F300}-\u{1F5FF}]|[\u{1F680}-\u{1F6FF}]|[\u{1F1E0}-\u{1F1FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]|[\u{1F926}-\u{1F937}]|[\u{10000}-\u{10FFFF}]|[\u{1F1E6}-\u{1F1FF}]|[\u{1F191}-\u{1F19A}]|[\u{1F232}-\u{1F23A}]|[\u{1F250}-\u{1F251}]|[\u{1F910}-\u{1F918}]|[\u{1F980}-\u{1F984}]|[\u{1F9C0}]|[\u{1F9C0}]|[\u{1F9E0}-\u{1F9E6}]|[\u{1F90D}-\u{1F90F}]|[\u{1F9B0}-\u{1F9B3}]|[\u{1F9B8}-\u{1F9B9}]|[\u{1F9D0}-\u{1F9D2}]|[\u{1F9D5}-\u{1F9DD}]|[\u{1F9E7}-\u{1F9FF}]|[\u{1FA70}-\u{1FA73}]|[\u{1FA78}-\u{1FA7A}]|[\u{1FA80}-\u{1FA82}]|[\u{1FA90}-\u{1FA95}])*(\u{FE0F})?/gu;
+
+  const match = text.match(emojiRegex);
+  if (match) {
+    // Normalize the emoji to ensure consistent representation
+    const normalized = match[0].normalize('NFC');
+    return normalized;
   }
-  // Flags (regional indicator pairs) e.g. 🇺🇸
-  const flag = text.match(/(?:\uD83C[\uDDE6-\uDDFF]){2}/);
-  if (flag) return flag[0];
-  // Fallback: common BMP emoji blocks and symbols (kept narrow to avoid false positives)
-  const fallback = /([\u2600-\u26FF]|[\u2700-\u27BF]|[\u2300-\u23FF]|[\u2190-\u21FF]|[\u2B00-\u2BFF]|[\u25A0-\u25FF]|\u24C2|\u3030|\u00AE|\u00A9|\u2122)/;
-  const m2 = text.match(fallback);
-  return m2 ? m2[0] : null;
+
+  return null;
 }
 
 // Remove the first emoji occurrence from a string (used to avoid duplicate icon + title emoji)
@@ -244,9 +241,9 @@ export default function DashboardClient() {
 
   const extractTitle = (md: string): string => {
     const h1 = md.match(/^#\s(.*)/m)?.[1];
-    if (h1) return h1;
+    if (h1) return h1.trim();
     const fm = md.match(/title:\s*(.*)/)?.[1];
-    if (fm) return fm;
+    if (fm) return fm.trim();
     return 'mindmap';
   };
 
@@ -397,7 +394,13 @@ export default function DashboardClient() {
           // Persist generated flashcards for authenticated users and refresh history
           if (user) {
             try {
-              const titleToSave = (typeof data?.title === 'string' && data.title.trim()) ? data.title.trim() : 'flashcards';
+              let titleToSave = (typeof data?.title === 'string' && data.title.trim()) ? data.title.trim() : 'flashcards';
+              // If the user provided a prompt with an emoji and the generated title doesn't have one, preserve it
+              const promptEmoji = prompt.trim() ? extractFirstEmoji(prompt.trim()) : null;
+              if (promptEmoji && !extractFirstEmoji(titleToSave) && titleToSave === 'flashcards') {
+                titleToSave = `${promptEmoji} ${titleToSave}`;
+              }
+
               const { data: ins, error: insErr } = await supabase
                 .from('flashcards')
                 .insert({ user_id: user.id, title: titleToSave, markdown: '', cards })
@@ -449,7 +452,13 @@ export default function DashboardClient() {
           // Persist generated flashcards for authenticated users and refresh history
           if (user) {
             try {
-              const titleToSave = (streamedTitle && streamedTitle.trim()) ? streamedTitle.trim() : 'flashcards';
+              let titleToSave = (streamedTitle && streamedTitle.trim()) ? streamedTitle.trim() : 'flashcards';
+              // If the user provided a prompt with an emoji and the generated title doesn't have one, preserve it
+              const promptEmoji = prompt.trim() ? extractFirstEmoji(prompt.trim()) : null;
+              if (promptEmoji && !extractFirstEmoji(titleToSave) && titleToSave === 'flashcards') {
+                titleToSave = `${promptEmoji} ${titleToSave}`;
+              }
+
               const { data: ins, error: insErr } = await supabase
                 .from('flashcards')
                 .insert({ user_id: user.id, title: titleToSave, markdown: '', cards: accumulated })
@@ -514,7 +523,13 @@ export default function DashboardClient() {
         setMarkdown(md);
         if (user) {
           const title = extractTitle(md);
-          await supabase.from('mindmaps').insert({ user_id: user.id, title, markdown: md });
+          // If the user provided a prompt with an emoji, try to preserve it in the title
+          const promptEmoji = prompt.trim() ? extractFirstEmoji(prompt.trim()) : null;
+          const finalTitle = promptEmoji && title && !extractFirstEmoji(title)
+            ? `${promptEmoji} ${title}`
+            : title;
+
+          await supabase.from('mindmaps').insert({ user_id: user.id, title: finalTitle, markdown: md });
           await loadAllHistory(user.id);
         }
         return;
@@ -534,7 +549,13 @@ export default function DashboardClient() {
       // Save to history after stream completes
       if (user) {
         const title = extractTitle(md);
-        await supabase.from('mindmaps').insert({ user_id: user.id, title, markdown: md });
+        // If the user provided a prompt with an emoji, try to preserve it in the title
+        const promptEmoji = prompt.trim() ? extractFirstEmoji(prompt.trim()) : null;
+        const finalTitle = promptEmoji && title && !extractFirstEmoji(title)
+          ? `${promptEmoji} ${title}`
+          : title;
+
+        await supabase.from('mindmaps').insert({ user_id: user.id, title: finalTitle, markdown: md });
         await loadAllHistory(user.id);
       }
     } catch (e: any) {
