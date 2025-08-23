@@ -158,11 +158,26 @@ REQUIREMENTS:
 - Output strictly as a single JSON object only. No preface, no code fences, no commentary.
 - JSON schema:
   { "title": string, "cards": [ { "question": string, "answer": string, "tags": string[] } ] }
-- Prefer concise questions; avoid yes/no.
-- Prefer atomic, focused answers. Use bullet points when helpful.
+
+### Card Creation Principles
+1.  **Promote Active Recall:** Questions must be open-ended to force the learner to retrieve information from memory.
+    - GOOD: "What are the three core principles of spaced repetition?"
+    - BAD: "Are there three core principles of spaced repetition?"
+
+2.  **Ensure Atomicity:** Each card must focus on ONE SINGLE, ISOLATED CONCEPT. DO NOT combine multiple questions or answers on a single card.
+    - GOOD: Q: "What is the primary benefit of active recall?" A: "It strengthens neural pathways, improving long-term memory."
+    - BAD: Q: "What are active recall and spaced repetition?" A: "Active recall is... and spaced repetition is..."
+
+3.  **Foster Deeper Understanding:** Go beyond simple definitions. Create questions that prompt for explanations, comparisons, or the "why" behind a concept. Use the "context_or_example" field to help the learner connect the information to a practical application or a larger framework.
+
+4.  **Keep Answers Concise:** Answers should be clear, direct, and AS BRIEF AS POSSIBLE while remaining accurate. Use markdown bullet points for lists. Prefer one-word answers if possible.
+    - GOOD: Q: "What is 1+1?" A: "2"
+    - BAD: Q: "What is 1+1?" A: "The result of adding 1 and 1 is 2."
+
 - Include 1-3 short tags per card from the content topics.
-- Create about between 15 and 35 cards depending on the size of the content; vary difficulty.
+- Create about between 15 and 35 cards depending on the size of the content.
 - The flashcards should be in the same language as the content.
+
 ${imagesNote}
 
 Source content:\n---\n${sourceText}\n---`;
@@ -184,8 +199,24 @@ STREAMING OUTPUT FORMAT (STRICT):
   { "type": "card", "question": string, "answer": string, "tags": string[] }
   { "type": "done" }
 - Start with a single meta line, then stream each card as its own line, and end with a single done line.
-- Produce about 15 to 35 cards depending on content size and vary difficulty.
 - Keep each JSON object on ONE LINE. Escape any internal newlines as \n within strings.
+
+### Card Creation Principles
+1.  **Promote Active Recall:** Questions must be open-ended to force the learner to retrieve information from memory.
+    - GOOD: "What are the three core principles of spaced repetition?"
+    - BAD: "Are there three core principles of spaced repetition?"
+
+2.  **Ensure Atomicity:** Each card must focus on ONE SINGLE, ISOLATED CONCEPT. DO NOT combine multiple questions or answers on a single card.
+    - GOOD: Q: "What is the primary benefit of active recall?" A: "It strengthens neural pathways, improving long-term memory."
+    - BAD: Q: "What are active recall and spaced repetition?" A: "Active recall is... and spaced repetition is..."
+
+3.  **Foster Deeper Understanding:** Go beyond simple definitions. Create questions that prompt for explanations, comparisons, or the "why" behind a concept. Use the "context_or_example" field to help the learner connect the information to a practical application or a larger framework.
+
+4.  **Keep Answers Concise:** Answers should be clear, direct, and AS BRIEF AS POSSIBLE while remaining accurate. Use markdownbullet points for lists. Prefer one-word answers if possible.
+    - GOOD: Q: "What is 1+1?" A: "2"
+    - BAD: Q: "What is 1+1?" A: "The result of adding 1 and 1 is 2."
+
+- Produce about 15 to 35 cards depending on content size.
 - The flashcards must be in the same language as the content.
 ${imagesNote}
 
