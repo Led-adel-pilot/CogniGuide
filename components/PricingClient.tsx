@@ -6,6 +6,7 @@ import { Check } from 'lucide-react';
 import { supabase } from '@/lib/supabaseClient';
 import AuthModal from '@/components/AuthModal';
 import { User } from '@supabase/supabase-js';
+import { PAID_PLANS, FREE_PLAN_CREDITS } from '@/lib/plans';
 
 type BillingCycle = 'month' | 'year';
 
@@ -16,17 +17,6 @@ type PricesState = {
 
 const PADDLE_ENV = process.env.NEXT_PUBLIC_PADDLE_ENV || 'sandbox';
 const PADDLE_CLIENT_TOKEN = process.env.NEXT_PUBLIC_PADDLE_CLIENT_TOKEN || '';
-
-const PRICE_IDS = {
-  student: {
-    month: process.env.NEXT_PUBLIC_PADDLE_PRICE_ID_STUDENT_MONTH || '',
-    year: process.env.NEXT_PUBLIC_PADDLE_PRICE_ID_STUDENT_YEAR || '',
-  },
-  pro: {
-    month: process.env.NEXT_PUBLIC_PADDLE_PRICE_ID_PRO_MONTH || '',
-    year: process.env.NEXT_PUBLIC_PADDLE_PRICE_ID_PRO_YEAR || '',
-  },
-};
 
 interface PricingClientProps {
   onPurchaseComplete?: () => void;
@@ -90,10 +80,10 @@ export default function PricingClient({ onPurchaseComplete }: PricingClientProps
   const isConfigured = useMemo(() => {
     return (
       !!PADDLE_CLIENT_TOKEN &&
-      !!PRICE_IDS.student.month &&
-      !!PRICE_IDS.student.year &&
-      !!PRICE_IDS.pro.month &&
-      !!PRICE_IDS.pro.year
+      !!PAID_PLANS.student.priceIds.month &&
+      !!PAID_PLANS.student.priceIds.year &&
+      !!PAID_PLANS.pro.priceIds.month &&
+      !!PAID_PLANS.pro.priceIds.year
     );
   }, []);
 
@@ -167,8 +157,8 @@ export default function PricingClient({ onPurchaseComplete }: PricingClientProps
         if (!PaddleObj || typeof PaddleObj.PricePreview !== 'function') return;
         const request = {
           items: [
-            { quantity: 1, priceId: PRICE_IDS.student[cycle] },
-            { quantity: 1, priceId: PRICE_IDS.pro[cycle] },
+            { quantity: 1, priceId: PAID_PLANS.student.priceIds[cycle] },
+            { quantity: 1, priceId: PAID_PLANS.pro.priceIds[cycle] },
           ],
         } as const;
         const result = await PaddleObj.PricePreview(request);
@@ -177,9 +167,9 @@ export default function PricingClient({ onPurchaseComplete }: PricingClientProps
             const next = { ...prev };
             result.data.details.lineItems.forEach((item: any) => {
               const priceText = item.formattedTotals?.subtotal || '';
-              if (item.price?.id === PRICE_IDS.student[cycle]) {
+              if (item.price?.id === PAID_PLANS.student.priceIds[cycle]) {
                 next.student[cycle] = priceText;
-              } else if (item.price?.id === PRICE_IDS.pro[cycle]) {
+              } else if (item.price?.id === PAID_PLANS.pro.priceIds[cycle]) {
                 next.pro[cycle] = priceText;
               }
             });
@@ -209,10 +199,10 @@ export default function PricingClient({ onPurchaseComplete }: PricingClientProps
     let plan: 'student' | 'pro' | null = null;
     let cycle: BillingCycle | null = null;
     if (priceId) {
-      if (priceId === PRICE_IDS.student.month) { plan = 'student'; cycle = 'month'; }
-      else if (priceId === PRICE_IDS.student.year) { plan = 'student'; cycle = 'year'; }
-      else if (priceId === PRICE_IDS.pro.month) { plan = 'pro'; cycle = 'month'; }
-      else if (priceId === PRICE_IDS.pro.year) { plan = 'pro'; cycle = 'year'; }
+      if (priceId === PAID_PLANS.student.priceIds.month) { plan = 'student'; cycle = 'month'; }
+      else if (priceId === PAID_PLANS.student.priceIds.year) { plan = 'student'; cycle = 'year'; }
+      else if (priceId === PAID_PLANS.pro.priceIds.month) { plan = 'pro'; cycle = 'month'; }
+      else if (priceId === PAID_PLANS.pro.priceIds.year) { plan = 'pro'; cycle = 'year'; }
     }
     const status = subscription?.status || null;
     const isActive = Boolean(status && ['active', 'trialing', 'past_due'].includes(status));
@@ -257,7 +247,7 @@ export default function PricingClient({ onPurchaseComplete }: PricingClientProps
         PaddleObj.Checkout.open({
           items: [
             {
-              priceId: PRICE_IDS[plan][billingCycle],
+              priceId: PAID_PLANS[plan].priceIds[billingCycle],
               quantity: 1,
             },
           ],
@@ -342,7 +332,7 @@ export default function PricingClient({ onPurchaseComplete }: PricingClientProps
               <div className="text-sm text-muted-foreground">$0 / year</div>
             </div>
             <ul className="space-y-2 text-sm mb-6">
-              <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> 8 monthly credits</li>
+              <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> {FREE_PLAN_CREDITS} monthly credits</li>
               <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> Mind maps + flashcards</li>
               <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> Spaced repetition</li>
             </ul>
@@ -364,7 +354,7 @@ export default function PricingClient({ onPurchaseComplete }: PricingClientProps
               </div>
             </div>
             <ul className="space-y-2 text-sm mb-6">
-              <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> 300 monthly credits</li>
+              <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> {PAID_PLANS.student.credits} monthly credits</li>
               <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> Mind maps + flashcards</li>
               <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> Spaced repetition</li>
             </ul>
@@ -393,7 +383,7 @@ export default function PricingClient({ onPurchaseComplete }: PricingClientProps
               </div>
             </div>
             <ul className="space-y-2 text-sm mb-6">
-              <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> 1,000 monthly credits</li>
+              <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> {PAID_PLANS.pro.credits} monthly credits</li>
               <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> Mind maps + flashcards</li>
               <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> Spaced repetition</li>
             </ul>
@@ -416,7 +406,7 @@ export default function PricingClient({ onPurchaseComplete }: PricingClientProps
             A credit is a unit used to process your content with AI, longer text extracts from uploaded documents consume more credits. As a rule of thumb: 1 credit ≈ 10 slides, a 2-page PDF, or 2 images, and each generation consumes at least 1 credit.
           </p>
           <p className="text-sm text-muted-foreground mt-3">
-            With 300 credits per month, you can upload over 600 pages of text!
+            With {PAID_PLANS.student.credits} credits per month, you can upload over {PAID_PLANS.student.credits * 2} pages of text!
           </p>
         </div>
 

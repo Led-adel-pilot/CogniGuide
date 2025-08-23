@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { Readable } from 'stream';
 import crypto from 'crypto';
 import { createClient } from '@supabase/supabase-js';
+import { getCreditsByPriceId } from "@/lib/plans";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
@@ -81,13 +82,18 @@ export async function POST(req: NextRequest) {
         });
 
         // Assign credits
-        const credits = plan === process.env.NEXT_PUBLIC_PADDLE_PRICE_ID_STUDENT_MONTH || plan === process.env.NEXT_PUBLIC_PADDLE_PRICE_ID_STUDENT_YEAR ? 300 : 1000;
-        await supabase.from('user_credits').upsert({
-          user_id,
-          credits,
-          last_refilled_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-        }, { onConflict: 'user_id' });
+        const credits = getCreditsByPriceId(plan);
+
+        if (credits !== null) {
+          await supabase.from('user_credits').upsert({
+            user_id,
+            credits,
+            last_refilled_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          }, { onConflict: 'user_id' });
+        } else {
+          console.error(`Could not find credits for plan: ${plan}`);
+        }
         break;
       }
       case 'subscription.updated': {
@@ -114,13 +120,18 @@ export async function POST(req: NextRequest) {
           .eq('paddle_subscription_id', subscription_id);
 
         // Update credits on plan change or renewal
-        const credits = plan === process.env.NEXT_PUBLIC_PADDLE_PRICE_ID_STUDENT_MONTH || plan === process.env.NEXT_PUBLIC_PADDLE_PRICE_ID_STUDENT_YEAR ? 300 : 1000;
-        await supabase.from('user_credits').upsert({
-          user_id,
-          credits,
-          last_refilled_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-        }, { onConflict: 'user_id' });
+        const credits = getCreditsByPriceId(plan);
+
+        if (credits !== null) {
+          await supabase.from('user_credits').upsert({
+            user_id,
+            credits,
+            last_refilled_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          }, { onConflict: 'user_id' });
+        } else {
+          console.error(`Could not find credits for plan: ${plan}`);
+        }
         break;
       }
       case 'subscription.canceled': {

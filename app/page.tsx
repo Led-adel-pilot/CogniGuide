@@ -808,7 +808,6 @@ export default function Home() {
               <h1 className="text-2xl font-bold font-heading tracking-tighter">CogniGuide</h1>
             </div>
             <div className="flex items-center gap-2">
-              <Link href="/pricing" className="px-4 py-2 text-sm rounded-full border hover:bg-gray-50">Pricing</Link>
               {isAuthed ? (
                 <>
                   <button onClick={() => router.push('/dashboard')} className="px-4 py-2 text-sm rounded-full border hover:bg-gray-50">Dashboard</button>

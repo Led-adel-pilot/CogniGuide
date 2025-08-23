@@ -223,6 +223,10 @@ NEXT_PUBLIC_BASE_URL=your_production_domain # Optional: defaults to deployment U
   - Preview localized prices on the pricing page via `Paddle.PricePreview()`.
   - Open overlay checkout with `Paddle.Checkout.open()`.
 - Integration lives in `components/PricingClient.tsx` and is mounted from `app/pricing/page.tsx`.
+- Centralized plan configuration in `lib/plans.ts` for easy maintenance:
+  - `PAID_PLANS` object defines all plan details (credits, price IDs)
+  - `FREE_PLAN_CREDITS` constant for free tier
+  - Helper functions for plan lookup and credit calculation
 - Webhooks are handled at `app/api/paddle-webhook/route.ts` to manage subscriptions and credit accounting.
 
 ### Webhooks and Credit System

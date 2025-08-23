@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 import { NextRequest, NextResponse } from 'next/server';
+import { getCreditsByPriceId } from '@/lib/plans';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
@@ -38,14 +39,18 @@ export async function POST(req: NextRequest) {
       const oneMonthAgo = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate());
 
       if (lastRefilledAt < oneMonthAgo) {
-        const credits = subscription.plan === process.env.NEXT_PUBLIC_PADDLE_PRICE_ID_STUDENT_MONTH || subscription.plan === process.env.NEXT_PUBLIC_PADDLE_PRICE_ID_STUDENT_YEAR ? 300 : 1000;
+        const credits = getCreditsByPriceId(subscription.plan as string);
 
-        await supabase.from('user_credits').upsert({
-          user_id: subscription.user_id,
-          credits: credits,
-          last_refilled_at: now.toISOString(),
-          updated_at: now.toISOString(),
-        }, { onConflict: 'user_id' });
+        if (credits !== null) {
+          await supabase.from('user_credits').upsert({
+            user_id: subscription.user_id,
+            credits: credits,
+            last_refilled_at: now.toISOString(),
+            updated_at: now.toISOString(),
+          }, { onConflict: 'user_id' });
+        } else {
+          console.error(`Could not find credits for plan: ${subscription.plan}`);
+        }
       }
     }
 

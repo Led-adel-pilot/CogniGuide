@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { FREE_PLAN_CREDITS } from '@/lib/plans';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
@@ -50,7 +51,7 @@ async function ensureInitialOrMonthlyFreeCredits(userId: string): Promise<void> 
   if (!data) {
     await supabaseAdmin.from('user_credits').insert({
       user_id: userId,
-      credits: 8,
+      credits: FREE_PLAN_CREDITS,
       last_refilled_at: nowIso,
     });
     return;
@@ -60,7 +61,7 @@ async function ensureInitialOrMonthlyFreeCredits(userId: string): Promise<void> 
   if (!last || !isSameUtcMonth(last, now)) {
     await supabaseAdmin
       .from('user_credits')
-      .update({ credits: 8, last_refilled_at: nowIso, updated_at: nowIso })
+      .update({ credits: FREE_PLAN_CREDITS, last_refilled_at: nowIso, updated_at: nowIso })
       .eq('user_id', userId);
   }
 }
@@ -79,5 +80,3 @@ export async function POST(req: NextRequest) {
 export async function GET(req: NextRequest) {
   return POST(req);
 }
-
-

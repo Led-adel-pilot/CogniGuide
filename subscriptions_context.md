@@ -3,6 +3,21 @@
 ## Overview
 CogniGuide is a comprehensive AI-powered study assistant that uses a sophisticated subscription and credit-based payment system. The system integrates Paddle.js for payment processing, Supabase for user management and data persistence, and a custom credit system for usage tracking.
 
+## Centralized Plan Management
+
+The application uses a centralized plan configuration system in `lib/plans.ts` that provides a single source of truth for all subscription and credit settings:
+
+- **PAID_PLANS**: Object defining Student and Pro plan details (credits, price IDs)
+- **FREE_PLAN_CREDITS**: Constant for free tier monthly credits (8)
+- **Helper Functions**: `getPlanByPriceId()` and `getCreditsByPriceId()` for plan lookups
+
+This approach eliminates hardcoded values throughout the codebase and makes plan management more maintainable.
+
+**Current Plan Configuration:**
+- **Student Plan**: 300 monthly credits
+- **Pro Plan**: 1000 monthly credits
+- **Free Plan**: 8 monthly credits
+
 ## Core Architecture Components
 
 ### 1. Payment Processing (Paddle.js Integration)
@@ -34,6 +49,7 @@ SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
 - **Subscription Status Tracking**: Monitors current user's subscription status
 - **Upgrade Flow Management**: Handles new user vs existing user upgrade flows
 - **Authentication Integration**: Triggers auth modal for unauthenticated users
+- **Centralized Plan Management**: Uses `PAID_PLANS` from `lib/plans.ts` for configuration
 
 **Billing Cycle Toggle:**
 ```typescript
@@ -46,8 +62,8 @@ const updatePrices = useCallback(async (cycle: BillingCycle) => {
   const PaddleObj = (window as any).Paddle;
   const request = {
     items: [
-      { quantity: 1, priceId: PRICE_IDS.student[cycle] },
-      { quantity: 1, priceId: PRICE_IDS.pro[cycle] },
+      { quantity: 1, priceId: PAID_PLANS.student.priceIds[cycle] },
+      { quantity: 1, priceId: PAID_PLANS.pro.priceIds[cycle] },
     ],
   };
   const result = await PaddleObj.PricePreview(request);
@@ -107,16 +123,18 @@ case 'subscription.created': {
     plan,
   });
 
-  // 4. Provision initial credits
-  const credits = plan === process.env.NEXT_PUBLIC_PADDLE_PRICE_ID_STUDENT_MONTH
-    || plan === process.env.NEXT_PUBLIC_PADDLE_PRICE_ID_STUDENT_YEAR
-    ? 300 : 1000;
-  await supabase.from('user_credits').upsert({
-    user_id,
-    credits,
-    last_refilled_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  }, { onConflict: 'user_id' });
+  // 4. Provision initial credits using centralized plan configuration
+  const credits = getCreditsByPriceId(plan);
+  if (credits !== null) {
+    await supabase.from('user_credits').upsert({
+      user_id,
+      credits,
+      last_refilled_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    }, { onConflict: 'user_id' });
+  } else {
+    console.error(`Could not find credits for plan: ${plan}`);
+  }
   break;
 }
 ```
