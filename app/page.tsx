@@ -4,15 +4,12 @@ import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import { Share2, UploadCloud, Zap, FileUp } from 'lucide-react';
 import FlashcardIcon from '@/components/FlashcardIcon';
-import Dropzone from '@/components/Dropzone';
-import PromptForm from '@/components/PromptForm';
-import MindMapModal from '@/components/MindMapModal';
-import FlashcardsModal, { Flashcard as FlashcardType } from '@/components/FlashcardsModal';
-import AuthModal from '@/components/AuthModal';
-import { supabase } from '@/lib/supabaseClient';
-import { useRouter } from 'next/navigation';
+import Generator from '@/components/Generator';
 import Link from 'next/link';
 import CogniGuideLogo from '../CogniGuide_logo.png';
+import { useRouter } from 'next/navigation';
+import { supabase } from '@/lib/supabaseClient';
+import AuthModal from '@/components/AuthModal';
 
 const InteractiveMindMap = () => {
   const viewportRef = useRef<HTMLDivElement>(null);
@@ -455,7 +452,7 @@ const InteractiveMindMap = () => {
   }, []);
 
   return (
-    <div ref={viewportRef} className="map-viewport h-[500px] md:h-[600px] w-full !bg-transparent cursor-grab active:cursor-grabbing">
+    <div ref={viewportRef} className="map-viewport h-full w-full !bg-transparent cursor-grab active:cursor-grabbing">
       <div ref={containerRef} id="mindmap-container"></div>
     </div>
   );
@@ -463,20 +460,8 @@ const InteractiveMindMap = () => {
 
 
 export default function Home() {
-  const [files, setFiles] = useState<File[]>([]);
-  const [prompt, setPrompt] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [markdown, setMarkdown] = useState<string | null>(null);
   const [showAuth, setShowAuth] = useState(false);
   const [isAuthed, setIsAuthed] = useState(false);
-  const [userId, setUserId] = useState<string | null>(null);
-  const [mode, setMode] = useState<'mindmap' | 'flashcards'>('mindmap');
-  const [flashcardsOpen, setFlashcardsOpen] = useState(false);
-  const [flashcardsTitle, setFlashcardsTitle] = useState<string | null>(null);
-  const [flashcardsCards, setFlashcardsCards] = useState<FlashcardType[] | null>(null);
-  const [flashcardsError, setFlashcardsError] = useState<string | null>(null);
-  const [flashcardsDeckId, setFlashcardsDeckId] = useState<string | undefined>(undefined);
   const router = useRouter();
 
   useEffect(() => {
@@ -484,13 +469,11 @@ export default function Home() {
       const { data } = await supabase.auth.getUser();
       const authed = Boolean(data.user);
       setIsAuthed(authed);
-      setUserId(data.user ? data.user.id : null);
     };
     init();
     const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
       const signedIn = Boolean(session);
       setIsAuthed(signedIn);
-      setUserId(session?.user?.id ?? null);
       if (signedIn) {
         setShowAuth(false);
         router.push('/dashboard');
@@ -499,304 +482,12 @@ export default function Home() {
     return () => { sub.subscription.unsubscribe(); };
   }, [router]);
 
-  const handleFileChange = (selectedFiles: File[]) => {
-    setFiles(selectedFiles);
-    setError(null);
-  };
-
-  const handleSubmit = async () => {
-    if (mode === 'flashcards') {
-      // Require at least one file for file-based flashcards generation
-      if (files.length === 0) {
-        setError('Please upload at least one file to generate flashcards.');
-        return;
-      }
-
-      // Require authentication for all generations
-      if (!isAuthed) {
-        setShowAuth(true);
-        return;
-      }
-
-      setIsLoading(true);
-      setError(null);
-      setMarkdown(null);
-      setFlashcardsError(null);
-      setFlashcardsCards(null);
-      setFlashcardsTitle(null);
-
-      const formData = new FormData();
-      files.forEach((file) => formData.append('files', file));
-      if (prompt.trim()) formData.append('prompt', prompt.trim());
-
-      try {
-        const { data: sessionData } = await supabase.auth.getSession();
-        const accessToken = sessionData?.session?.access_token;
-        const res = await fetch('/api/generate-flashcards?stream=1', {
-          method: 'POST',
-          body: formData,
-          headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : undefined,
-        });
-        // Handle insufficient credits the same way as mind maps: show inline error and do not open modal
-        if (res.status === 402) {
-          let msg = 'Insufficient credits. Please upgrade your plan or top up.';
-          try { const j = await res.json(); msg = j?.error || msg; } catch {}
-          setError(msg);
-          setIsLoading(false);
-          return;
-        }
-        if (!res.ok) {
-          let msg = 'Failed to generate flashcards';
-          try { const j = await res.json(); msg = j?.error || msg; } catch {}
-          setError(msg);
-          setIsLoading(false);
-          return;
-        }
-        // Deduction occurs server-side at start; if signed in, refresh credits and notify listeners
-        if (isAuthed) {
-          try {
-            const { data } = await supabase.auth.getUser();
-            const uid = data.user?.id;
-            if (uid) {
-              const { data: creditsData } = await supabase.from('user_credits').select('credits').eq('user_id', uid).single();
-              const creditsVal = Number(creditsData?.credits ?? 0);
-              const display = Number.isFinite(creditsVal) ? creditsVal.toFixed(1) : '0.0';
-              if (typeof window !== 'undefined') window.dispatchEvent(new CustomEvent('cogniguide:credits-updated', { detail: { credits: creditsVal, display } }));
-            }
-          } catch {}
-        }
-        // Open modal only after successful response
-        setFlashcardsOpen(true);
-
-        if (!res.body) {
-          const data = await res.json().catch(() => null);
-          const cards = Array.isArray(data?.cards) ? data.cards as FlashcardType[] : [];
-          if (cards.length === 0) throw new Error('No cards generated');
-          setFlashcardsCards(cards);
-          setFlashcardsTitle(typeof data?.title === 'string' ? data.title : null);
-          // Persist generated flashcards for authenticated users and set deck id for SR persistence
-          if (isAuthed && userId) {
-            try {
-              const titleToSave = (typeof data?.title === 'string' && data.title.trim()) ? data.title.trim() : 'flashcards';
-              const { data: ins, error: insErr } = await supabase
-                .from('flashcards')
-                .insert({ user_id: userId, title: titleToSave, markdown: '', cards })
-                .select('id')
-                .single();
-              if (!insErr && (ins as any)?.id) {
-                setFlashcardsDeckId((ins as any).id as string);
-              }
-            } catch {}
-          }
-        } else {
-          const reader = res.body.getReader();
-          const decoder = new TextDecoder();
-          let buf = '';
-          let streamedTitle: string | null = null;
-          const accumulated: FlashcardType[] = [];
-          // eslint-disable-next-line no-constant-condition
-          while (true) {
-            // eslint-disable-next-line no-await-in-loop
-            const { value, done } = await reader.read();
-            if (done) break;
-            if (value) buf += decoder.decode(value, { stream: true });
-            let nl;
-            while ((nl = buf.indexOf('\n')) !== -1) {
-              const rawLine = buf.slice(0, nl).trim();
-              buf = buf.slice(nl + 1);
-              if (!rawLine) continue;
-              try {
-                const obj = JSON.parse(rawLine);
-                if (obj?.type === 'meta') {
-                  if (typeof obj.title === 'string' && obj.title.trim()) streamedTitle = obj.title.trim();
-                } else if (obj?.type === 'card') {
-                  const card: FlashcardType = {
-                    question: String(obj.question || ''),
-                    answer: String(obj.answer || ''),
-                    tags: Array.isArray(obj.tags) ? obj.tags.map((t: any) => String(t)) : undefined,
-                  };
-                  accumulated.push(card);
-                  setFlashcardsCards((prev) => prev ? [...prev, card] : [card]);
-                }
-              } catch {
-                // ignore malformed lines
-              }
-            }
-          }
-          setFlashcardsTitle(streamedTitle);
-          if (accumulated.length === 0) throw new Error('No cards generated');
-          // Persist generated flashcards for authenticated users and set deck id for SR persistence
-          if (isAuthed && userId) {
-            try {
-              const titleToSave = (streamedTitle && streamedTitle.trim()) ? streamedTitle.trim() : 'flashcards';
-              const { data: ins, error: insErr } = await supabase
-                .from('flashcards')
-                .insert({ user_id: userId, title: titleToSave, markdown: '', cards: accumulated })
-                .select('id')
-                .single();
-              if (!insErr && (ins as any)?.id) {
-                setFlashcardsDeckId((ins as any).id as string);
-              }
-            } catch {}
-          }
-        }
-
-        if (!isAuthed) { setShowAuth(true); }
-      } catch (err) {
-        const errorMessage = err instanceof Error ? err.message : 'Failed to generate flashcards.';
-        console.error(errorMessage);
-        setError(errorMessage);
-      } finally {
-        setIsLoading(false);
-      }
-      return;
-    }
-
-    if (files.length === 0 && !prompt.trim()) {
-      setError('Please upload at least one file or enter a text prompt to generate a mind map.');
-      return;
-    }
-
-    // Require authentication for all generations
-    if (!isAuthed) {
-      setShowAuth(true);
-      return;
-    }
-
-    setIsLoading(true);
-    setError(null);
-    setMarkdown(null);
-
-    const formData = new FormData();
-    if (files.length > 0) {
-      files.forEach(file => {
-        formData.append('files', file);
-      });
-    }
-    if (prompt.trim()) formData.append('prompt', prompt.trim());
-
-    try {
-      const { data: sessionData } = await supabase.auth.getSession();
-      const accessToken = sessionData?.session?.access_token;
-      const response = await fetch('/api/generate-mindmap', {
-        method: 'POST',
-        body: formData,
-        headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : undefined,
-      });
-      const contentType = response.headers.get('content-type') || '';
-      if (!response.ok) {
-        if (contentType.includes('application/json')) {
-          let errorMsg = 'Failed to generate mind map.';
-          try { const j = await response.json(); errorMsg = j.error || errorMsg; } catch {}
-          throw new Error(errorMsg);
-        } else {
-          throw new Error('Failed to generate mind map.');
-        }
-      }
-      // Deduction occurs server-side at start; if signed in, refresh credits and notify listeners
-      if (isAuthed) {
-        try {
-          const { data } = await supabase.auth.getUser();
-          const uid = data.user?.id;
-          if (uid) {
-            const { data: creditsData } = await supabase.from('user_credits').select('credits').eq('user_id', uid).single();
-            const creditsVal = Number(creditsData?.credits ?? 0);
-            const display = Number.isFinite(creditsVal) ? creditsVal.toFixed(1) : '0.0';
-            if (typeof window !== 'undefined') window.dispatchEvent(new CustomEvent('cogniguide:credits-updated', { detail: { credits: creditsVal, display } }));
-          }
-        } catch {}
-      }
-      if (!contentType.includes('text/plain')) {
-        // Non-stream fallback
-        const result = await response.json();
-        const md = (result?.markdown as string | undefined)?.trim();
-        if (!md) throw new Error('Empty result from AI.');
-        setMarkdown(md);
-        if (isAuthed && userId) {
-          const title = (() => {
-            const h1 = md.match(/^#\s(.*)/m)?.[1];
-            if (h1) return h1;
-            const fm = md.match(/title:\s*(.*)/)?.[1];
-            if (fm) return fm;
-            return 'mindmap';
-          })();
-          try { await supabase.from('mindmaps').insert({ user_id: userId, title, markdown: md }); } catch {}
-        }
-        if (!isAuthed) { setShowAuth(true); }
-        return;
-      }
-      const reader = response.body?.getReader();
-      const decoder = new TextDecoder();
-      let accumulated = '';
-      let receivedAny = false;
-      if (!reader) throw new Error('No response stream.');
-      // Open modal immediately on first token
-      const pump = async () => {
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) break;
-          const chunk = decoder.decode(value, { stream: true });
-          if (!chunk) continue;
-          accumulated += chunk;
-          if (!receivedAny && accumulated.trim().length > 0) {
-            receivedAny = true;
-          }
-          setMarkdown(accumulated);
-        }
-      };
-      await pump();
-
-      const md = accumulated.trim();
-      if (!md) throw new Error('Empty result from AI.');
-
-      // Save for authed users after stream completes
-      if (isAuthed && userId) {
-        const title = (() => {
-          const h1 = md.match(/^#\s(.*)/m)?.[1];
-          if (h1) return h1;
-          const fm = md.match(/title:\s*(.*)/)?.[1];
-          if (fm) return fm;
-          return 'mindmap';
-        })();
-        try { await supabase.from('mindmaps').insert({ user_id: userId, title, markdown: md }); } catch {}
-      }
-      // Require sign-in for all generations
-      if (!isAuthed) {
-        setShowAuth(true);
-      }
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to generate mind map.';
-      console.error(errorMessage);
-      setError(errorMessage);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleCloseModal = () => setMarkdown(null);
-  const handleCloseFlashcards = () => { setFlashcardsOpen(false); setFlashcardsCards(null); setFlashcardsError(null); setFlashcardsDeckId(undefined); };
   const handleScrollToGenerator = () => {
     document.getElementById('generator')?.scrollIntoView({ behavior: 'smooth' });
   };
-  const handleUpgradeClick = () => {
-    try {
-      if (isAuthed) {
-        router.push('/dashboard?upgrade=true');
-      } else {
-        if (typeof window !== 'undefined') {
-          localStorage.setItem('cogniguide_upgrade_flow', 'true');
-        }
-        router.push('/pricing');
-      }
-    } catch {}
-  };
-
-  const isDisabled = isLoading || markdown !== null || flashcardsOpen;
 
   return (
     <>
-      <MindMapModal markdown={markdown} onClose={handleCloseModal} />
-      <FlashcardsModal open={flashcardsOpen} title={flashcardsTitle} cards={flashcardsCards} isGenerating={isLoading && mode==='flashcards'} error={flashcardsError} onClose={handleCloseFlashcards} deckId={flashcardsDeckId} />
       <AuthModal open={showAuth} onClose={() => setShowAuth(false)} />
       <div className="flex flex-col min-h-screen font-sans bg-background text-foreground">
         
@@ -822,6 +513,7 @@ export default function Home() {
           {/* Hero Section */}
           <section className="relative text-center py-20 md:py-32 overflow-hidden">
             <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[40rem] h-[40rem] bg-primary/10 rounded-full blur-3xl -z-10"></div>
             <div className="container relative z-10">
               <h1 className="text-4xl md:text-6xl font-extrabold font-heading tracking-tighter mb-6 leading-tight">
                 From Notes to Mind Maps & Flashcards.
@@ -829,12 +521,13 @@ export default function Home() {
                 <span className="text-primary">Instantly, with AI.</span>
               </h1>
               <p className="max-w-3xl mx-auto text-lg md:text-xl text-muted-foreground mb-10">
-                Stop drowning in dense documents and complex textbooks. CogniGuide’s AI analyzes your study materials and generates clear, interactive mind maps and adaptive flashcards that use an advanced spaced repetition algorithm. Helping you learn faster and remember longer.              </p>
+                Stop drowning in dense documents and complex textbooks. CogniGuide’s AI analyzes your study materials and generates clear, interactive mind maps and adaptive flashcards that use an advanced spaced repetition algorithm. Helping you learn faster and remember longer.
+              </p>
               <button 
                 onClick={handleScrollToGenerator}
-                className="flex items-center justify-center gap-2 mx-auto px-8 py-2 text-base font-bold text-white bg-primary rounded-full shadow-2xl shadow-primary/30 hover:bg-primary/90 transition-all duration-300 ease-in-out transform hover:scale-105"
+                className="group flex items-center justify-center gap-2 mx-auto px-8 py-3 text-base font-bold text-white bg-primary rounded-full shadow-lg shadow-primary/20 hover:bg-primary/90 transition-all duration-300 ease-in-out transform hover:scale-105"
               >
-                <Zap className="h-6 w-6" />
+                <Zap className="h-5 w-5 transition-transform group-hover:-rotate-12" />
                 Open Generator
               </button>
             </div>
@@ -845,102 +538,58 @@ export default function Home() {
             <div className="container">
               <div className="text-center mb-16">
                 <h2 className="text-3xl md:text-4xl font-bold font-heading tracking-tight">The Science of Smarter Learning</h2>
-                <p className="text-muted-foreground mt-3 max-w-2xl mx-auto">CogniGuide integrates two powerful, research-backed learning methods. Visual mind maps help you grasp the big picture and connect ideas, while our intelligent Spaced Repetition flashcards ensure knowledge is locked into your long-term memory. It's the most effective way to learn.</p>
+                <p className="text-muted-foreground mt-3 max-w-3xl mx-auto">CogniGuide integrates two powerful, research-backed learning methods. Visual mind maps help you grasp the big picture, while our intelligent Spaced Repetition flashcards lock knowledge into your long-term memory.</p>
               </div>
-              <InteractiveMindMap />
-            </div>
-          </section>
-
-          {/* Generator Section */}
-          <section id="generator" className="py-20">
-            <div className="container">
-              <div className="text-center mb-12">
-                <h2 className="text-3xl md:text-4xl font-bold font-heading tracking-tight">Generate Mind Map or Flashcards</h2>
-                <p className="text-muted-foreground mt-2">Upload a document or simply describe your topic. Choose your output.</p>
-              </div>
-              <div className="relative w-full max-w-3xl mx-auto bg-background rounded-[2rem] border border-border/20 shadow-[0_0_16px_rgba(0,0,0,0.12)] hover:shadow-[0_0_20px_rgba(0,0,0,0.16)] transition-shadow duration-300">
-                <div className="absolute -top-2 -left-2 w-24 h-24 bg-primary/10 rounded-full blur-2xl -z-10"></div>
-                <div className="absolute -bottom-4 -right-4 w-32 h-32 bg-accent/10 rounded-full blur-3xl -z-10"></div>
-                <div className="p-6 sm:p-8 space-y-6">
-                  <div className="flex items-center justify-center">
-                    <div className="inline-flex p-1 rounded-full border bg-white">
-                      <button
-                        onClick={() => setMode('mindmap')}
-                        className={`px-4 py-1.5 text-sm rounded-full ${mode==='mindmap' ? 'bg-primary text-white' : 'text-gray-700 hover:bg-gray-50'}`}
-                      >Mind Map</button>
-                      <button
-                        onClick={() => setMode('flashcards')}
-                        className={`px-4 py-1.5 text-sm rounded-full ${mode==='flashcards' ? 'bg-primary text-white' : 'text-gray-700 hover:bg-gray-50'}`}
-                      >Flashcards</button>
-                    </div>
-                  </div>
-                  <Dropzone onFileChange={handleFileChange} disabled={isDisabled} />
-                  <PromptForm
-                    onSubmit={handleSubmit}
-                    isLoading={isLoading}
-                    prompt={prompt}
-                    setPrompt={setPrompt}
-                    disabled={isDisabled}
-                    filesLength={files.length}
-                    ctaLabel={mode==='flashcards' ? 'Generate Flashcards' : 'Generate Mind Map'}
-                  />                  
-                  {error && (
-                    <div className="mt-4 text-center p-3 bg-blue-100/50 border border-blue-400/50 text-blue-700 rounded-[1rem]">
-                      <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-                        <p className="sm:mr-2">{error}</p>
-                        {typeof error === 'string' && error.toLowerCase().includes('insufficient credits') && (
-                          <button
-                            type="button"
-                            onClick={handleUpgradeClick}
-                            className="px-4 py-1.5 text-sm rounded-full bg-primary text-white hover:bg-primary/90"
-                          >
-                            Upgrade Plan
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                  )}
+              <div className="relative bg-white rounded-[2rem] border shadow-xl shadow-slate-200/50 overflow-hidden">
+                <div className="h-[500px] md:h-[600px] w-full">
+                  <InteractiveMindMap />
                 </div>
               </div>
             </div>
           </section>
 
+          <Generator redirectOnAuth />
+
           {/* How It Works Section */}
           <section className="py-20 bg-muted/30 border-y">
             <div className="container">
               <div className="text-center mb-16">
-                <h2 className="text-3xl md:text-4xl font-bold font-heading tracking-tight">From Chaos to Clarity in Seconds</h2>
+                <h2 className="text-3xl md:text-4xl font-bold font-heading tracking-tight">From Chaos to Clarity in 3 Simple Steps</h2>
               </div>
-              <div className="relative">
-                <div className="space-y-16 md:space-y-0 md:grid grid-cols-3 gap-8">
-                  <div className="flex flex-col items-center text-center">
-                    <div className="flex items-center justify-center h-16 w-16 rounded-full bg-primary text-white mb-4 border-4 border-background shadow-lg">
-                      <span className="text-2xl font-bold">1</span>
+              <div className="relative max-w-4xl mx-auto">
+                <div className="absolute top-1/2 left-0 w-full h-px bg-border -translate-y-1/2 hidden md:block"></div>
+                <div className="relative grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+                  
+                  <div className="flex flex-col items-center">
+                    <div className="flex items-center justify-center h-12 w-12 rounded-full bg-primary text-white mb-6 border-4 border-muted/30 ring-4 ring-primary/20">
+                      <span className="text-xl font-bold">1</span>
                     </div>
-                    <div className="p-6 bg-background rounded-[1.25rem] shadow-md border border-border/10">
+                    <div className="p-6 bg-background rounded-[1.25rem] shadow-md border">
                       <UploadCloud className="h-8 w-8 text-primary mx-auto mb-3" />
-                      <h3 className="text-xl font-bold font-heading mb-2">Input</h3>
-                      <p className="text-muted-foreground">Upload a document (PDF, DOCX, TXT) or type a prompt.</p>
+                      <h3 className="text-xl font-bold font-heading mb-2">Upload or Prompt</h3>
+                      <p className="text-muted-foreground text-sm">Provide a document (PDF, DOCX, etc.), an image, or simply describe your topic.</p>
                     </div>
                   </div>
-                  <div className="flex flex-col items-center text-center">
-                    <div className="flex items-center justify-center h-16 w-16 rounded-full bg-primary text-white mb-4 border-4 border-background shadow-lg">
-                      <span className="text-2xl font-bold">2</span>
+                  
+                  <div className="flex flex-col items-center">
+                     <div className="flex items-center justify-center h-12 w-12 rounded-full bg-primary text-white mb-6 border-4 border-muted/30 ring-4 ring-primary/20">
+                      <span className="text-xl font-bold">2</span>
                     </div>
-                    <div className="p-6 bg-background rounded-[1.25rem] shadow-md border border-border/10">
+                    <div className="p-6 bg-background rounded-[1.25rem] shadow-md border">
                       <Zap className="h-8 w-8 text-primary mx-auto mb-3" />
-                      <h3 className="text-xl font-bold font-heading mb-2">Generate</h3>
-                      <p className="text-muted-foreground">Our AI analyzes your content, identifies key concepts, and builds a logical mind map and study‑ready flashcards in seconds.</p>
+                      <h3 className="text-xl font-bold font-heading mb-2">AI Generation</h3>
+                      <p className="text-muted-foreground text-sm">Our AI analyzes your content, extracts key concepts, and builds your learning tools in seconds.</p>
                     </div>
                   </div>
-                  <div className="flex flex-col items-center text-center">
-                    <div className="flex items-center justify-center h-16 w-16 rounded-full bg-primary text-white mb-4 border-4 border-background shadow-lg">
-                      <span className="text-2xl font-bold">3</span>
+
+                  <div className="flex flex-col items-center">
+                     <div className="flex items-center justify-center h-12 w-12 rounded-full bg-primary text-white mb-6 border-4 border-muted/30 ring-4 ring-primary/20">
+                      <span className="text-xl font-bold">3</span>
                     </div>
-                    <div className="p-6 bg-background rounded-[1.25rem] shadow-md border border-border/10">
+                    <div className="p-6 bg-background rounded-[1.25rem] shadow-md border">
                       <Share2 className="h-8 w-8 text-primary mx-auto mb-3" />
-                      <h3 className="text-xl font-bold font-heading mb-2">Interact</h3>
-                      <p className="text-muted-foreground">Explore your map and study with generated flashcards — download or save to your dashboard.</p>
+                      <h3 className="text-xl font-bold font-heading mb-2">Learn & Retain</h3>
+                      <p className="text-muted-foreground text-sm">Interact with your mind map, study with flashcards, and export your materials in multiple formats.</p>
                     </div>
                   </div>
                 </div>
@@ -955,8 +604,8 @@ export default function Home() {
                 <h2 className="text-3xl md:text-4xl font-bold font-heading tracking-tight">An Intelligent Partner for Your Brain</h2>
                 <p className="text-muted-foreground mt-2">Features designed to make you smarter, faster, and more creative.</p>
               </div>
-              <div className="grid md:grid-cols-2 lg:grid-cols-2 gap-8 max-w-4xl mx-auto">
-                 <div className="flex items-start space-x-4 p-6 bg-background rounded-[1.25rem] border border-border/10">
+              <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+                 <div className="flex items-start space-x-4 p-6 bg-background rounded-[1.25rem] border hover:border-primary/50 hover:shadow-lg transition-all">
                   <div className="flex-shrink-0 h-10 w-10 flex items-center justify-center rounded-lg bg-primary/10 text-primary">
                     <FileUp className="h-6 w-6" />
                   </div>
@@ -965,7 +614,7 @@ export default function Home() {
                     <p className="text-muted-foreground text-sm mt-1">Supports PDF, DOCX, PPTX, TXT files and images, extracting key information automatically.</p>
                   </div>
                 </div>
-                <div className="flex items-start space-x-4 p-6 bg-background rounded-[1.25rem] border border-border/10">
+                <div className="flex items-start space-x-4 p-6 bg-background rounded-[1.25rem] border hover:border-primary/50 hover:shadow-lg transition-all">
                   <div className="flex-shrink-0 h-10 w-10 flex items-center justify-center rounded-lg bg-primary/10 text-primary">
                     <Zap className="h-6 w-6" />
                   </div>
@@ -974,7 +623,7 @@ export default function Home() {
                     <p className="text-muted-foreground text-sm mt-1">Goes beyond summarization to create logical, hierarchical mind maps.</p>
                   </div>
                 </div>
-                <div className="flex items-start space-x-4 p-6 bg-background rounded-[1.25rem] border border-border/10">
+                <div className="flex items-start space-x-4 p-6 bg-background rounded-[1.25rem] border hover:border-primary/50 hover:shadow-lg transition-all">
                   <div className="flex-shrink-0 h-10 w-10 flex items-center justify-center rounded-lg bg-primary/10 text-primary">
                     <FlashcardIcon className="h-6 w-6" />
                   </div>
@@ -983,7 +632,7 @@ export default function Home() {
                     <p className="text-muted-foreground text-sm mt-1">Master your subjects with flashcards that adapt to you. Our spaced repetition system schedules reviews at the right time to move information from short-term to long-term memory, ensuring you never forget.</p>
                   </div>
                 </div>
-                <div className="flex items-start space-x-4 p-6 bg-background rounded-[1.25rem] border border-border/10">
+                <div className="flex items-start space-x-4 p-6 bg-background rounded-[1.25rem] border hover:border-primary/50 hover:shadow-lg transition-all">
                   <div className="flex-shrink-0 h-10 w-10 flex items-center justify-center rounded-lg bg-primary/10 text-primary">
                     <Zap className="h-6 w-6" />
                   </div>
@@ -995,6 +644,28 @@ export default function Home() {
               </div>
             </div>
           </section>
+
+          {/* Final CTA Section */}
+          <section className="py-20">
+            <div className="container">
+              <div className="relative text-center bg-primary/10 rounded-[2rem] p-10 md:p-16 overflow-hidden">
+                <div className="absolute top-0 left-0 w-32 h-32 bg-primary/20 rounded-full blur-3xl"></div>
+                <div className="absolute bottom-0 right-0 w-32 h-32 bg-primary/20 rounded-full blur-3xl"></div>
+                <div className="relative z-10">
+                    <h2 className="text-3xl md:text-4xl font-bold font-heading tracking-tight text-primary">Ready to Revolutionize Your Learning?</h2>
+                    <p className="max-w-xl mx-auto text-muted-foreground mt-4 mb-8">Stop wasting time with inefficient study methods. Start creating, learning, and retaining with the power of AI today.</p>
+                    <button 
+                      onClick={handleScrollToGenerator}
+                      className="group flex items-center justify-center gap-2 mx-auto px-8 py-3 text-base font-bold text-white bg-primary rounded-full shadow-lg shadow-primary/30 hover:bg-primary/90 transition-all duration-300 ease-in-out transform hover:scale-105"
+                    >
+                      <Zap className="h-5 w-5 transition-transform group-hover:-rotate-12" />
+                      Get Started Now
+                    </button>
+                </div>
+              </div>
+            </div>
+          </section>
+
         </main>
 
         <footer className="border-t">

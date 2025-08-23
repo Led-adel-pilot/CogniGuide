@@ -4,8 +4,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { supabase, MindmapRecord, FlashcardsRecord } from '@/lib/supabaseClient';
-import Dropzone from '@/components/Dropzone';
-import PromptForm from '@/components/PromptForm';
+import Generator from '@/components/Generator';
 import MindMapModal from '@/components/MindMapModal';
 import FlashcardsModal, { Flashcard as FlashcardType } from '@/components/FlashcardsModal';
 import { BrainCircuit, LogOut, Loader2, Map as MapIcon, Coins, Zap, Sparkles, CalendarClock, Menu, X } from 'lucide-react';
@@ -53,10 +52,6 @@ export default function DashboardClient() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [user, setUser] = useState<SessionUser | null>(null);
   const [loading, setLoading] = useState(true);
-  const [files, setFiles] = useState<File[]>([]);
-  const [prompt, setPrompt] = useState('');
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [markdown, setMarkdown] = useState<string | null>(null);
   const [history, setHistory] = useState<MindmapRecord[]>([]);
   const [flashcardsHistory, setFlashcardsHistory] = useState<FlashcardsRecord[]>([]);
@@ -64,7 +59,6 @@ export default function DashboardClient() {
     | { type: 'mindmap'; id: string; title: string | null; created_at: string; markdown: string }
     | { type: 'flashcards'; id: string; title: string | null; created_at: string; cards: FlashcardType[] }
   >>([]);
-  const [mode, setMode] = useState<'mindmap' | 'flashcards'>('mindmap');
   const [flashcardsOpen, setFlashcardsOpen] = useState(false);
   const [flashcardsTitle, setFlashcardsTitle] = useState<string | null>(null);
   const [flashcardsCards, setFlashcardsCards] = useState<FlashcardType[] | null>(null);
@@ -129,6 +123,12 @@ export default function DashboardClient() {
       const all = await loadAllHistory(authed.id);
       await loadUserCredits(authed.id);
       try { await prefetchSpacedData(all.flashcards); } catch {}
+      const handleGenerationComplete = () => {
+        if (authed.id) {
+          loadAllHistory(authed.id);
+        }
+      };
+      window.addEventListener('cogniguide:generation-complete', handleGenerationComplete);
       try {
         const hasUpgradeQuery = Boolean(searchParams.get('upgrade'));
         const hasLocalFlag = typeof window !== 'undefined' && (
@@ -174,8 +174,9 @@ export default function DashboardClient() {
           }
         )
         .subscribe();
-      return () => {
+    return () => {
         supabase.removeChannel(channel);
+        window.removeEventListener('cogniguide:generation-complete', () => {});
       };
     }
   }, [user]);
@@ -232,11 +233,6 @@ export default function DashboardClient() {
     const combined = [...mmItems, ...fcItems].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
     setCombinedHistory(combined);
     return { mindmaps: mmArr, flashcards: fcArr };
-  };
-
-  const handleFileChange = (selectedFiles: File[]) => {
-    setFiles(selectedFiles);
-    setError(null);
   };
 
   const extractTitle = (md: string): string => {
@@ -339,231 +335,6 @@ export default function DashboardClient() {
       setTotalDueCount(total);
     } catch {}
   }, [spacedPrefetched, flashcardsHistory]);
-
-  const handleSubmit = async () => {
-    if (mode === 'flashcards') {
-      if (files.length === 0) {
-        setError('Please upload at least one file to generate flashcards.');
-        return;
-      }
-      setIsGenerating(true);
-      setError(null);
-      setMarkdown(null);
-      setFlashcardsError(null);
-      setFlashcardsCards(null);
-      setFlashcardsTitle(null);
-
-      const formData = new FormData();
-      files.forEach((f) => formData.append('files', f));
-      if (prompt.trim()) formData.append('prompt', prompt.trim());
-
-      try {
-        const { data: sessionData } = await supabase.auth.getSession();
-        const accessToken = sessionData?.session?.access_token;
-        const res = await fetch('/api/generate-flashcards?stream=1', {
-          method: 'POST',
-          body: formData,
-          headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : undefined,
-        });
-        // Mirror mindmap behavior: block modal and show inline notice on insufficient credits
-        if (res.status === 402) {
-          let msg = 'Insufficient credits. Please upgrade your plan or top up.';
-          try { const j = await res.json(); msg = j?.error || msg; } catch {}
-          setError(msg);
-          setIsGenerating(false);
-          return;
-        }
-        if (!res.ok) {
-          let msg = 'Failed to generate flashcards';
-          try { const j = await res.json(); msg = j?.error || msg; } catch {}
-          setError(msg);
-          setIsGenerating(false);
-          return;
-        }
-        // Deduction occurs server-side at start; refresh credits immediately
-        if (user) {
-          try { await loadUserCredits(user.id); } catch {}
-        }
-        setFlashcardsOpen(true);
-        if (!res.body) {
-          const data = await res.json().catch(() => null);
-          const cards = Array.isArray(data?.cards) ? data.cards as FlashcardType[] : [];
-          if (cards.length === 0) throw new Error('No cards generated');
-          setFlashcardsCards(cards);
-          setFlashcardsTitle(typeof data?.title === 'string' ? data.title : null);
-          // Persist generated flashcards for authenticated users and refresh history
-          if (user) {
-            try {
-              let titleToSave = (typeof data?.title === 'string' && data.title.trim()) ? data.title.trim() : 'flashcards';
-              // If the user provided a prompt with an emoji and the generated title doesn't have one, preserve it
-              const promptEmoji = prompt.trim() ? extractFirstEmoji(prompt.trim()) : null;
-              if (promptEmoji && !extractFirstEmoji(titleToSave) && titleToSave === 'flashcards') {
-                titleToSave = `${promptEmoji} ${titleToSave}`;
-              }
-
-              const { data: ins, error: insErr } = await supabase
-                .from('flashcards')
-                .insert({ user_id: user.id, title: titleToSave, markdown: '', cards })
-                .select('id')
-                .single();
-              if (!insErr && (ins as any)?.id) {
-                setActiveDeckId((ins as any).id as string);
-              }
-              const all2 = await loadAllHistory(user.id);
-              try { await prefetchSpacedData(all2.flashcards); } catch {}
-            } catch {
-              // ignore persistence errors in UI flow
-            }
-          }
-        } else {
-          const reader = res.body.getReader();
-          const decoder = new TextDecoder();
-          let buf = '';
-          let streamedTitle: string | null = null;
-          const accumulated: FlashcardType[] = [];
-          while (true) {
-            // eslint-disable-next-line no-await-in-loop
-            const { value, done } = await reader.read();
-            if (done) break;
-            if (value) buf += decoder.decode(value, { stream: true });
-            let nl;
-            while ((nl = buf.indexOf('\n')) !== -1) {
-              const rawLine = buf.slice(0, nl).trim();
-              buf = buf.slice(nl + 1);
-              if (!rawLine) continue;
-              try {
-                const obj = JSON.parse(rawLine);
-                if (obj?.type === 'meta') {
-                  if (typeof obj.title === 'string' && obj.title.trim()) streamedTitle = obj.title.trim();
-                } else if (obj?.type === 'card') {
-                  const card: FlashcardType = {
-                    question: String(obj.question || ''),
-                    answer: String(obj.answer || ''),
-                    tags: Array.isArray(obj.tags) ? obj.tags.map((t: any) => String(t)) : undefined,
-                  };
-                  accumulated.push(card);
-                  setFlashcardsCards((prev) => prev ? [...prev, card] : [card]);
-                }
-              } catch {}
-            }
-          }
-          setFlashcardsTitle(streamedTitle);
-          if (accumulated.length === 0) throw new Error('No cards generated');
-          // Persist generated flashcards for authenticated users and refresh history
-          if (user) {
-            try {
-              let titleToSave = (streamedTitle && streamedTitle.trim()) ? streamedTitle.trim() : 'flashcards';
-              // If the user provided a prompt with an emoji and the generated title doesn't have one, preserve it
-              const promptEmoji = prompt.trim() ? extractFirstEmoji(prompt.trim()) : null;
-              if (promptEmoji && !extractFirstEmoji(titleToSave) && titleToSave === 'flashcards') {
-                titleToSave = `${promptEmoji} ${titleToSave}`;
-              }
-
-              const { data: ins, error: insErr } = await supabase
-                .from('flashcards')
-                .insert({ user_id: user.id, title: titleToSave, markdown: '', cards: accumulated })
-                .select('id')
-                .single();
-              if (!insErr && (ins as any)?.id) {
-                setActiveDeckId((ins as any).id as string);
-              }
-              const all2 = await loadAllHistory(user.id);
-              try { await prefetchSpacedData(all2.flashcards); } catch {}
-            } catch {
-              // ignore persistence errors in UI flow
-            }
-          }
-        }
-      } catch (e: any) {
-        setError(e?.message || 'Failed to generate flashcards');
-      } finally {
-        setIsGenerating(false);
-      }
-      return;
-    }
-
-    if (files.length === 0 && !prompt.trim()) {
-      setError('Please upload at least one file or enter a text prompt.');
-      return;
-    }
-    setIsGenerating(true);
-    setError(null);
-    setMarkdown(null);
-
-    const formData = new FormData();
-    if (files.length > 0) files.forEach((f) => formData.append('files', f));
-    if (prompt.trim()) formData.append('prompt', prompt.trim());
-
-    try {
-      const { data: sessionData } = await supabase.auth.getSession();
-      const accessToken = sessionData?.session?.access_token;
-      const res = await fetch('/api/generate-mindmap', {
-        method: 'POST',
-        body: formData,
-        headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : undefined,
-      });
-      const contentType = res.headers.get('content-type') || '';
-      if (!res.ok) {
-        if (contentType.includes('application/json')) {
-          let msg = 'Failed to generate';
-          try { const j = await res.json(); msg = j.error || msg; } catch {}
-          throw new Error(msg);
-        } else {
-          throw new Error('Failed to generate');
-        }
-      }
-      // Deduction occurs server-side at start; refresh credits immediately
-      if (user) {
-        try { await loadUserCredits(user.id); } catch {}
-      }
-      if (!contentType.includes('text/plain')) {
-        const result = await res.json();
-        const md = (result?.markdown as string | undefined)?.trim();
-        if (!md) throw new Error('Empty result');
-        setMarkdown(md);
-        if (user) {
-          const title = extractTitle(md);
-          // If the user provided a prompt with an emoji, try to preserve it in the title
-          const promptEmoji = prompt.trim() ? extractFirstEmoji(prompt.trim()) : null;
-          const finalTitle = promptEmoji && title && !extractFirstEmoji(title)
-            ? `${promptEmoji} ${title}`
-            : title;
-
-          await supabase.from('mindmaps').insert({ user_id: user.id, title: finalTitle, markdown: md });
-          await loadAllHistory(user.id);
-        }
-        return;
-      }
-      const reader = res.body?.getReader();
-      const decoder = new TextDecoder();
-      if (!reader) throw new Error('No response stream');
-      let accumulated = '';
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        accumulated += decoder.decode(value, { stream: true });
-        setMarkdown(accumulated);
-      }
-      const md = accumulated.trim();
-      if (!md) throw new Error('Empty result');
-      // Save to history after stream completes
-      if (user) {
-        const title = extractTitle(md);
-        // If the user provided a prompt with an emoji, try to preserve it in the title
-        const promptEmoji = prompt.trim() ? extractFirstEmoji(prompt.trim()) : null;
-        const finalTitle = promptEmoji && title && !extractFirstEmoji(title)
-          ? `${promptEmoji} ${title}`
-          : title;
-
-        await supabase.from('mindmaps').insert({ user_id: user.id, title: finalTitle, markdown: md });
-        await loadAllHistory(user.id);
-      }
-    } catch (e: any) {
-      setError(e?.message || 'Failed to generate');
-    } finally {
-      setIsGenerating(false);
-    }
-  };
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
@@ -704,8 +475,8 @@ export default function DashboardClient() {
           </div>
           <div className="w-6" /> {/* Spacer */}
         </header>
-        <div className="container max-w-3xl mx-auto px-6 pb-6">
-          <div className="text-center my-8">
+        <div className="container mx-auto px-6 pb-6 mt-12">
+          <div className="text-center mt-2 mb-8">
             <button
               onClick={() => setIsPricingModalOpen(true)}
               className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-full bg-blue-100/50 text-blue-600 hover:bg-blue-200/50 transition-colors"
@@ -714,42 +485,7 @@ export default function DashboardClient() {
               <span>Upgrade your Plan</span>
             </button>
           </div>
-          <div className="relative w-full bg-background rounded-[2rem] border border-border/20 shadow-[0_0_16px_rgba(0,0,0,0.12)] hover:shadow-[0_0_20px_rgba(0,0,0,0.16)] transition-shadow duration-300">
-            <div className="p-6 sm:p-8 space-y-6">
-              <div className="flex items-center justify-center">
-                <div className="inline-flex p-1 rounded-full border bg-white">
-                  <button onClick={() => setMode('mindmap')} className={`px-4 py-1.5 text-sm rounded-full ${mode==='mindmap' ? 'bg-primary text-white' : 'text-gray-700 hover:bg-gray-50'}`}>Mind Map</button>
-                  <button onClick={() => setMode('flashcards')} className={`px-4 py-1.5 text-sm rounded-full ${mode==='flashcards' ? 'bg-primary text-white' : 'text-gray-700 hover:bg-gray-50'}`}>Flashcards</button>
-                </div>
-              </div>
-              <Dropzone onFileChange={setFiles} disabled={isGenerating || markdown !== null || flashcardsOpen} />
-              <PromptForm
-                onSubmit={handleSubmit}
-                isLoading={isGenerating}
-                prompt={prompt}
-                setPrompt={setPrompt}
-                disabled={isGenerating || markdown !== null || flashcardsOpen}
-                filesLength={files.length}
-                ctaLabel={mode==='flashcards' ? 'Generate Flashcards' : 'Generate Mind Map'}
-              />
-              {error && (
-                <div className="mt-2 text-center p-3 bg-blue-100/50 border border-blue-400/50 text-blue-700 rounded-[1rem]">
-                  <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-                    <span className="sm:mr-2">{error}</span>
-                    {typeof error === 'string' && error.toLowerCase().includes('insufficient credits') && (
-                      <button
-                        type="button"
-                        onClick={() => setIsPricingModalOpen(true)}
-                        className="px-4 py-1.5 text-sm rounded-full bg-primary text-white hover:bg-primary/90"
-                      >
-                        Upgrade Plan
-                      </button>
-                    )}
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
+          <Generator showTitle={false} />
         </div>
       </main>
 
@@ -758,7 +494,7 @@ export default function DashboardClient() {
         open={flashcardsOpen}
         title={flashcardsTitle}
         cards={flashcardsCards}
-        isGenerating={isGenerating && mode==='flashcards'}
+        isGenerating={false}
         error={flashcardsError}
         onClose={() => { setFlashcardsOpen(false); setFlashcardsCards(null); setFlashcardsError(null); setStudyDueOnly(false); setDueIndices(undefined); setInitialDueIndex(undefined); }}
         deckId={activeDeckId || (flashcardsCards as any)?.__deckId}

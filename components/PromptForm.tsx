@@ -1,6 +1,7 @@
+// PromptForm.tsx
 'use client';
 
-import { useRef, useLayoutEffect, useState } from 'react';
+import { useRef, useLayoutEffect } from 'react';
 import { ArrowUp } from 'lucide-react';
 
 interface PromptFormProps {
@@ -20,10 +21,10 @@ export default function PromptForm({
   setPrompt,
   disabled,
   filesLength,
-  ctaLabel
+  ctaLabel,
 }: PromptFormProps) {
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const [isTall, setIsTall] = useState(false);
+  const textareaRef = useRef<HTMLTextAreaElement | null>(null);
+  const formRef = useRef<HTMLFormElement | null>(null);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -32,22 +33,24 @@ export default function PromptForm({
     }
   };
 
-  // Measure and update height + shape synchronously before paint
+  // Measure and update height + shape synchronously before paint.
+  // We avoid React state for the "isTall" flag to prevent a render flicker.
   useLayoutEffect(() => {
     const el = textareaRef.current;
-    if (!el) return;
+    const formEl = formRef.current;
+    if (!el || !formEl) return;
 
-    // Reset to auto to measure natural content height
+    // Reset height to measure natural content height
     el.style.height = 'auto';
+    const scrollH = el.scrollHeight || 0;
 
-    const scrollH = el.scrollHeight;
+    // Cap the height at 200px
     const newHeight = Math.min(scrollH, 200);
-
-    // Apply the new height
     el.style.height = `${newHeight}px`;
 
-    // Use the rendered height to decide the shape so it updates in the same frame
-    setIsTall(newHeight > 60);
+    // Synchronously set the border radius so there's no pill -> rectangle animation flicker.
+    // Use instant change (no transition on borderRadius) while keeping color/shadow transitions.
+    formEl.style.borderRadius = newHeight > 44 ? '1rem' /* rounded-2xl */ : '9999px' /* rounded-full */;
   }, [prompt]);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -61,10 +64,12 @@ export default function PromptForm({
 
   return (
     <form
+      ref={formRef}
       onSubmit={handleSubmit}
-      className={`w-full flex gap-2 p-2 bg-background border border-border/50 shadow-sm transition-colors ${
-        isTall ? 'flex-col rounded-2xl' : 'items-end rounded-full'
-      }`}
+      // Note: we avoid `transition-all` to prevent animating border-radius/size.
+      className="w-full flex items-end gap-2 p-2 bg-background border border-border/50 shadow-sm transition-colors duration-150"
+      // provide an initial radius so first paint is consistent
+      style={{ borderRadius: '9999px' }}
     >
       <textarea
         id="prompt-input"
@@ -75,17 +80,17 @@ export default function PromptForm({
         placeholder="e.g., 'Create a mind map about the history of AI'"
         className="flex-1 px-3 py-2 bg-transparent border-none resize-none focus:outline-none text-sm leading-relaxed overflow-y-auto"
         style={{
-          maxHeight: '200px'
+          maxHeight: '200px',
         }}
         rows={1}
         disabled={disabled}
+        aria-label="Prompt input"
       />
       <button
         type="submit"
         disabled={disabled || (filesLength === 0 && prompt.trim().length === 0)}
-        className={`flex-shrink-0 inline-flex items-center justify-center w-10 h-10 text-white bg-primary rounded-full shadow hover:bg-primary/90 transition-colors ${
-          isTall ? 'self-end' : ''
-        }`}
+        className="flex-shrink-0 inline-flex items-center justify-center w-10 h-10 text-white bg-primary rounded-full shadow hover:bg-primary/90 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+        aria-label={ctaLabel ?? 'Send prompt'}
       >
         {isLoading ? (
           <svg
@@ -93,6 +98,8 @@ export default function PromptForm({
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
             viewBox="0 0 24 24"
+            role="img"
+            aria-hidden="false"
           >
             <circle
               className="opacity-25"
@@ -105,9 +112,7 @@ export default function PromptForm({
             <path
               className="opacity-75"
               fill="currentColor"
-              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2
-              5.291A7.962 7.962 0 014 12H0c0 3.042
-              1.135 5.824 3 7.938l3-2.647z"
+              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
             ></path>
           </svg>
         ) : (
