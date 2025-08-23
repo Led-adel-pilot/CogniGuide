@@ -14,7 +14,7 @@ CogniGuide comprehensive AI-powered study assistant. It uses an LLM to convert t
 *   **Flashcards Generation (Two ways):**
     - From Mind Map: After a mind map is generated, users can generate study flashcards from the Markmap markdown and switch between the mind map view and a flashcards study mode.
     - Direct from Files: On the generator, a selector lets users choose “Flashcards” to generate flashcards directly from uploaded documents/images (without first creating a mind map). The backend accepts `FormData` uploads and streams NDJSON lines for incremental flashcards.
-*   **Auth & History:** One free generation without sign-in; afterwards, users are prompted to sign up (Email magic link or Google). Signed-in users get a dashboard with a unified reverse-chronological history of both mind maps and flashcards. Items show lucide icons (map vs card). Mind maps are stored as Markmap markdown; flashcards are stored as a JSON array (and may omit markdown when generated directly from files/prompts).
+*   **Auth & History:** Users must sign in (Email magic link or Google) to generate mind maps or flashcards. Signed-in users get a dashboard with a unified reverse-chronological history of both mind maps and flashcards. Items show lucide icons (map vs card). Mind maps are stored as Markmap markdown; flashcards are stored as a JSON array (and may omit markdown when generated directly from files/prompts).
 
 ## Technology Stack
 *   **Framework:** Next.js (React) for building the web application.
@@ -35,7 +35,7 @@ CogniGuide comprehensive AI-powered study assistant. It uses an LLM to convert t
 ## Project Structure Highlights
 
 ### Frontend (`app/page.tsx` and `components/`)
-*   `app/page.tsx`: The main client-side page (`'use client'`). It serves as the orchestrator for the application's UI and logic. It manages the core state (selected file, prompt text, loading status, errors, generated markdown) and handles the submission process to the backend API. It also includes the hero section, "Why Mind Maps" section, "Generator" section, "How It Works" section, and "Features" section, providing a comprehensive user experience. Implements one-free-generation gating using `localStorage.freeGenerationUsed`; after the first successful generation without auth, it opens the sign-up modal and blocks further generations until sign-in. When signed in, it saves the generated markdown to Supabase.
+*   `app/page.tsx`: The main client-side page (`'use client'`). It serves as the orchestrator for the application's UI and logic. It manages the core state (selected file, prompt text, loading status, errors, generated markdown) and handles the submission process to the backend API. It also includes the hero section, "Why Mind Maps" section, "Generator" section, "How It Works" section, and "Features" section, providing a comprehensive user experience. Requires user authentication before allowing any generations - when users click generate without signing in, it opens the sign-up modal. When signed in, it saves the generated markdown to Supabase.
 *   `components/Dropzone.tsx`: A React component that provides a drag-and-drop area for file uploads. It supports PDF, DOCX, PPTX, TXT, and MD file types. It displays the selected file's name and size, and allows users to remove the file. It manages drag-and-drop states and visually indicates when a file is being dragged over.
 *   `components/PromptForm.tsx`: A React component for users to input text prompts. It includes a `textarea` that auto-resizes and a "Generate Mind Map" button with a loading spinner. It handles form submission and passes the prompt text to the parent component.
 *   `components/MindMapModal.tsx`: A modal component that displays the generated mind map. It integrates the custom Markmap renderer (`initializeMindMap` from `lib/markmap-renderer.ts`) to visualize the markdown. It provides functionality to download the mind map in HTML, SVG, PNG, and PDF formats. The HTML export includes the full renderer script for a standalone interactive map. It also handles the modal's open/close state and cleanup of event listeners.
@@ -44,7 +44,7 @@ CogniGuide comprehensive AI-powered study assistant. It uses an LLM to convert t
     * Spaced repetition with FSRS‑6 (Supabase‑backed): The dashboard has a "Spaced repetition" button that shows only decks with cards due now. Clicking a deck opens a due‑only session in the flashcards modal with grading buttons (Again/Hard/Good/Easy). A deck‑level Exam date in the modal header constrains future dues to not overshoot that day. Scheduling uses TS‑FSRS (FSRS‑6) with recency‑weighted adaptation. Per‑card schedule state (difficulty, stability, reps, lapses, last_review, due, etc.) and the deck Exam date are persisted in Supabase (`flashcards_schedule`) keyed by `(user_id, deck_id)` so due status syncs across devices; localStorage is used as a fallback when not authenticated.
     * Performance: Spaced repetition data is now prefetched on dashboard load via a single bulk query to `flashcards_schedule`, normalized to the current deck size, and stored in an in‑memory cache mirrored to `localStorage`. The "Spaced repetition" button uses this prefetched data so the due list appears instantly; a cache‑only recompute path ensures it’s snappy even when offline. After generating new flashcards or when history refreshes, the prefetch runs again to keep dues up‑to‑date.
     * UI polish: Gradient progress bar indicates session position, the Show/Hide Answer control is a vibrant gradient pill, and rating buttons are color‑coded (red/amber/sky/emerald). Internal FSRS metrics like stability are hidden for a cleaner interface.
-*   `components/AuthModal.tsx`: A modal for authentication that supports email magic-link sign-in and Google OAuth. Triggered after the first free generation on the landing page or via header "Sign in". On success, redirects to the dashboard.
+*   `components/AuthModal.tsx`: A modal for authentication that supports email magic-link sign-in and Google OAuth. Triggered when users attempt to generate content without signing in on the landing page or via header "Sign in". On success, redirects to the dashboard.
 
 ### Design System & UI Preferences
 
@@ -118,8 +118,8 @@ For consistent branding across the application, use the `CogniGuide_logo.png` fi
     - If the network is unavailable, due lists are recomputed from the cache to maintain responsiveness.
     - When new flashcards are created, history reloads and the prefetch runs again to refresh dues.
 
-### Gating Logic (One Free Generation)
-*   On the landing page, if a generation succeeds while the user is not signed in, the app sets `localStorage.freeGenerationUsed = 'true'` and automatically opens the sign-up modal. Subsequent attempts without signing in will prompt sign-up instead of calling the API.
+### Authentication Requirements
+*   On the landing page, users must sign in before they can generate any mind maps or flashcards. When they click the generate button without being authenticated, the app opens the sign-up modal.
 *   Once signed in, users can generate without limits (subject to any backend quotas you impose) and results are persisted to their Supabase history.
 
 ### Flashcards Persistence (Supabase)

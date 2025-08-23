@@ -512,8 +512,8 @@ export default function Home() {
         return;
       }
 
-      const freeUsed = typeof window !== 'undefined' ? localStorage.getItem('freeGenerationUsed') === 'true' : false;
-      if (!isAuthed && freeUsed) {
+      // Require authentication for all generations
+      if (!isAuthed) {
         setShowAuth(true);
         return;
       }
@@ -641,7 +641,7 @@ export default function Home() {
           }
         }
 
-        if (!isAuthed) { localStorage.setItem('freeGenerationUsed', 'true'); setShowAuth(true); }
+        if (!isAuthed) { setShowAuth(true); }
       } catch (err) {
         const errorMessage = err instanceof Error ? err.message : 'Failed to generate flashcards.';
         console.error(errorMessage);
@@ -657,8 +657,8 @@ export default function Home() {
       return;
     }
 
-    const freeUsed = typeof window !== 'undefined' ? localStorage.getItem('freeGenerationUsed') === 'true' : false;
-    if (!isAuthed && freeUsed) {
+    // Require authentication for all generations
+    if (!isAuthed) {
       setShowAuth(true);
       return;
     }
@@ -722,7 +722,7 @@ export default function Home() {
           })();
           try { await supabase.from('mindmaps').insert({ user_id: userId, title, markdown: md }); } catch {}
         }
-        if (!isAuthed) { localStorage.setItem('freeGenerationUsed', 'true'); setShowAuth(true); }
+        if (!isAuthed) { setShowAuth(true); }
         return;
       }
       const reader = response.body?.getReader();
@@ -760,9 +760,8 @@ export default function Home() {
         })();
         try { await supabase.from('mindmaps').insert({ user_id: userId, title, markdown: md }); } catch {}
       }
-      // Mark free usage if not authed and prompt signup notice
+      // Require sign-in for all generations
       if (!isAuthed) {
-        localStorage.setItem('freeGenerationUsed', 'true');
         setShowAuth(true);
       }
     } catch (err) {
