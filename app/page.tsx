@@ -120,7 +120,7 @@ export default function Home() {
                   </div>
                 </div>
                 <div className="bg-white rounded-[2rem] border shadow-xl shadow-slate-200/50 overflow-hidden">
-                  <div className="h-[500px] md:h-[600px] w-full">
+                  <div className={`w-full ${view === 'mindmap' ? 'h-[500px] md:h-[600px]' : 'h-[65vh] md:h-[600px]'}`}>
                     {view === 'mindmap' ? <InteractiveMindMap /> : <EmbeddedFlashcards />}
                   </div>
                 </div>
