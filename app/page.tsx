@@ -11,9 +11,10 @@ import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabaseClient';
 import AuthModal from '@/components/AuthModal';
 import EmbeddedMindMap from '@/components/EmbeddedMindMap';
+import EmbeddedFlashcards from '@/components/EmbeddedFlashcards';
 
 const InteractiveMindMap = () => {
-  const markdownData = "# CogniGuide 🧠🗺️\n- **The Problem: Drowning in Text 😩**\n  - Dense, complex documents 📚\n  - Time-consuming reading ⏳\n  - Poor knowledge retention 📉\n- **Our Solution: The Ultimate AI Tool 🤖**\n  - Exceptional Accuracy in analysis 🎯\n  - Transforms any text into a mind map 🗺️\n  - Automatically extracts key insights 🔑\n  - Effortlessly grasp complex topics ✅\n- **Science-Backed Efficiency 🔬**\n  - Faster comprehension ⚡\n  - Boost long-term recall 🧠💾\n  - Enhances creative thinking & problem-solving 🤔\n- **Powerful Features & Benefits ✨**\n  - **Save Dozens of Hours** per week ⏰\n  - **Achieve Higher Grades** & better outcomes 🏆\n  - **Accelerate Your Research** & learning ⚡";
+  const markdownData = "# Immune System 🛡️\n- **Function 🎯**\n  - Protects organism from diseases\n  - Detects and responds to pathogens, cancer cells, foreign objects\n  - Distinguishes self from non-self\n- **Major Subsystems 🧬**\n  - Innate Immune System (Non-specific) 🛡️\n  - Adaptive Immune System (Specific) 🎯\n- **Dysfunctions 🤒**\n  - Immunodeficiency 📉: Less active immune system (e.g., HIV/AIDS, SCID)\n  - Autoimmunity 💥: Hyperactive system attacks normal tissues (e.g., Hashimoto's, Rheumatoid Arthritis, Type 1 Diabetes)\n  - Hypersensitivity 🤧: Immune response damages own tissues (e.g., allergies)\n  - Idiopathic Inflammation❓: Inflammation without known cause\n- **Modulation ⚙️**\n  - Immunosuppression 💊: Drugs to control autoimmunity, inflammation, transplant rejection\n  - Vaccination 💉: Induces active immunity, develops memory without disease\n  - Cancer Immunotherapy ♋: Stimulates immune system to attack tumors\n- **Physiological Regulation ⚖️**\n  - Hormones 🧬: Estrogen (immunostimulator), testosterone (immunosuppressive)\n  - Vitamin D ☀️: May reduce autoimmune disease risk\n  - Sleep and Rest 😴: Deprivation detrimental; deep sleep supports immune function\n  - Physical Exercise 🏃: Positive effect, transient immunodepression post-intense exercise\n- **Pathogen Evasion 🏃‍♂️**\n  - Hide within host cells\n  - Secrete immune-inhibiting compounds\n  - Antigenic variation (e.g., HIV)\n  - Masking antigens with host molecules";
 
   return <EmbeddedMindMap markdown={markdownData} />;
 };
@@ -22,6 +23,7 @@ const InteractiveMindMap = () => {
 export default function Home() {
   const [showAuth, setShowAuth] = useState(false);
   const [isAuthed, setIsAuthed] = useState(false);
+  const [view, setView] = useState('mindmap');
   const router = useRouter();
 
   useEffect(() => {
@@ -94,15 +96,33 @@ export default function Home() {
           </section>
 
           {/* Why Mind Maps Section */}
-          <section className="py-20 bg-muted/30 border-y">
+          <section className="pt-10 md:pt-12 pb-10 bg-muted/30 border-y">
             <div className="container">
-              <div className="text-center mb-16">
+              <div className="text-center mb-8">
                 <h2 className="text-3xl md:text-4xl font-bold font-heading tracking-tight">The Science of Smarter Learning</h2>
                 <p className="text-muted-foreground mt-3 max-w-3xl mx-auto">CogniGuide integrates two powerful, research-backed learning methods. Visual mind maps help you grasp the big picture, while our intelligent Spaced Repetition flashcards lock knowledge into your long-term memory.</p>
               </div>
-              <div className="relative bg-white rounded-[2rem] border shadow-xl shadow-slate-200/50 overflow-hidden">
-                <div className="h-[500px] md:h-[600px] w-full">
-                  <InteractiveMindMap />
+              <div className="relative">
+                <div className="flex justify-center mb-4">
+                  <div className="inline-flex p-1 rounded-full border bg-muted/50">
+                    <button
+                      onClick={() => setView('mindmap')}
+                      className={`px-4 py-1.5 text-sm font-semibold rounded-full transition-colors ${view === 'mindmap' ? 'bg-white text-primary shadow' : 'text-muted-foreground hover:text-primary'}`}
+                    >
+                      Mind Map
+                    </button>
+                    <button
+                      onClick={() => setView('flashcards')}
+                      className={`px-4 py-1.5 text-sm font-semibold rounded-full transition-colors ${view === 'flashcards' ? 'bg-white text-primary shadow' : 'text-muted-foreground hover:text-primary'}`}
+                    >
+                      Flashcards
+                    </button>
+                  </div>
+                </div>
+                <div className="bg-white rounded-[2rem] border shadow-xl shadow-slate-200/50 overflow-hidden">
+                  <div className="h-[500px] md:h-[600px] w-full">
+                    {view === 'mindmap' ? <InteractiveMindMap /> : <EmbeddedFlashcards />}
+                  </div>
                 </div>
               </div>
             </div>
