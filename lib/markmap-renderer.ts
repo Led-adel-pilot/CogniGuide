@@ -1,8 +1,7 @@
 /**
  * CogniGuide: Custom Mind Map Renderer
  *
- * This module is adapted from the standalone `Markdown-to-MindMap.html` prototype.
- * It handles parsing custom markdown, laying out the node tree, rendering the mind map
+ * This module handles parsing custom markdown, laying out the node tree, rendering the mind map
  * with SVG connectors, and managing user interactions like panning, zooming, and
  * node collapsing/expanding with animations.
  */
@@ -65,8 +64,13 @@ let viewport: HTMLElement;
 let svg: SVGSVGElement;
 
 // Pan and Zoom State
-let scale = 1, panX = 0, panY = 0, isPanning = false, startX = 0, startY = 0;
+let scale = 1, panX = 0, panY = 0;
 let userHasInteracted = false; // Track if user has manually panned or zoomed
+// Mouse panning state
+let isPanning = false, startX = 0, startY = 0;
+// Touch gesture state
+let isPinching = false, initialDistance = 0;
+let lastTouchX = 0, lastTouchY = 0; // For single-finger panning
 
 // Initial pan offset state (can be overridden via initialize options)
 let initialPanXOffset = INITIAL_PAN_X_OFFSET;
@@ -650,6 +654,73 @@ function handleMouseMove(e: MouseEvent) {
     applyTransform();
 }
 
+// ============== TOUCH EVENT HANDLERS (for Mobile) ==============
+
+function getDistance(touches: TouchList): number {
+    const [touch1, touch2] = [touches[0], touches[1]];
+    return Math.sqrt(Math.pow(touch2.clientX - touch1.clientX, 2) + Math.pow(touch2.clientY - touch1.clientY, 2));
+}
+
+function getMidpoint(touches: TouchList): { x: number, y: number } {
+    const [touch1, touch2] = [touches[0], touches[1]];
+    return {
+        x: (touch1.clientX + touch2.clientX) / 2,
+        y: (touch1.clientY + touch2.clientY) / 2,
+    };
+}
+
+function handleTouchStart(e: TouchEvent) {
+    if ((e.target as HTMLElement).closest('.mindmap-node')) return;
+    e.preventDefault();
+    userHasInteracted = true;
+
+    if (e.touches.length === 2) {
+        isPinching = true;
+        isPanning = false; // Ensure mouse panning is off
+        initialDistance = getDistance(e.touches);
+    } else if (e.touches.length === 1) {
+        isPanning = true;
+        isPinching = false;
+        lastTouchX = e.touches[0].clientX;
+        lastTouchY = e.touches[0].clientY;
+    }
+}
+
+function handleTouchMove(e: TouchEvent) {
+    if (!isPanning && !isPinching) return;
+    e.preventDefault();
+
+    if (isPinching && e.touches.length === 2) { // Zooming
+        const newDistance = getDistance(e.touches);
+        const oldScale = scale;
+        const scaleFactor = newDistance / initialDistance;
+        scale = Math.max(0.1, Math.min(oldScale * scaleFactor, 5));
+        initialDistance = newDistance; // Update for next move event
+
+        const rect = viewport.getBoundingClientRect();
+        const midpoint = getMidpoint(e.touches);
+        const midpointX = midpoint.x - rect.left;
+        const midpointY = midpoint.y - rect.top;
+
+        panX = midpointX - (midpointX - panX) * (scale / oldScale);
+        panY = midpointY - (midpointY - panY) * (scale / oldScale);
+
+    } else if (isPanning && e.touches.length === 1) { // Panning
+        const touch = e.touches[0];
+        panX += touch.clientX - lastTouchX;
+        panY += touch.clientY - lastTouchY;
+        lastTouchX = touch.clientX;
+        lastTouchY = touch.clientY;
+    }
+
+    applyTransform();
+}
+
+function handleTouchEnd(e: TouchEvent) {
+    if (e.touches.length < 2) isPinching = false;
+    if (e.touches.length < 1) isPanning = false;
+}
+
 // ============== PUBLIC API ==============
 
 /**
@@ -693,6 +764,10 @@ export function initializeMindMap(
         viewport.addEventListener('mousedown', handleMouseDown);
         window.addEventListener('mouseup', handleMouseUp);
         window.addEventListener('mousemove', handleMouseMove);
+        // Add touch event listeners for mobile
+        viewport.addEventListener('touchstart', handleTouchStart, { passive: false });
+        viewport.addEventListener('touchmove', handleTouchMove, { passive: false });
+        window.addEventListener('touchend', handleTouchEnd);
 
     } catch (error) {
         console.error("Error rendering mind map:", error);
@@ -727,9 +802,12 @@ export function cleanup() {
     if (viewport) {
         viewport.removeEventListener('wheel', handleWheel);
         viewport.removeEventListener('mousedown', handleMouseDown);
+        viewport.removeEventListener('touchstart', handleTouchStart);
+        viewport.removeEventListener('touchmove', handleTouchMove);
     }
     window.removeEventListener('mouseup', handleMouseUp);
     window.removeEventListener('mousemove', handleMouseMove);
+    window.removeEventListener('touchend', handleTouchEnd);
 }
 
 /**

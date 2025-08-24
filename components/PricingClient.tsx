@@ -410,27 +410,7 @@ export default function PricingClient({ onPurchaseComplete }: PricingClientProps
           </p>
         </div>
 
-        {/* Compliance summary */}
-        <div className="mt-12 grid gap-6 md:grid-cols-2">
-          <div className="rounded-[1.25rem] border bg-white p-6 shadow-sm">
-            <h3 className="text-lg font-bold font-heading mb-2">About CogniGuide (Business & Service)</h3>
-            <ul className="text-sm text-muted-foreground list-disc pl-5 space-y-1">
-              <li><strong>Business name:</strong> CogniGuide</li>
-              <li><strong>Service:</strong> AI study guide that converts notes and documents into interactive mind maps and exam‑ready flashcards.</li>
-              <li><strong>What you receive:</strong> Access to our web app with monthly credits to generate study materials.</li>
-            </ul>
-          </div>
-          <div className="rounded-[1.25rem] border bg-white p-6 shadow-sm">
-            <h3 className="text-lg font-bold font-heading mb-2">Policies & Contact</h3>
-            <ul className="text-sm text-muted-foreground list-disc pl-5 space-y-1">
-              <li><a className="underline" href="/contact">Customer support contact</a></li>
-              <li><a className="underline" href="/legal/refund-policy">Refund & dispute policy</a></li>
-              <li><a className="underline" href="/legal/cancellation-policy">Cancellation policy</a></li>
-              <li><a className="underline" href="/legal/terms">Terms of Service</a></li>
-              <li><a className="underline" href="/legal/privacy-policy">Privacy Policy</a></li>
-            </ul>
-          </div>
-        </div>
+
       </div>
       <AuthModal open={authModalOpen} onClose={() => setAuthModalOpen(false)} />
     </section>
