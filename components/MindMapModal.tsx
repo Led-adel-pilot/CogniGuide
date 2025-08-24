@@ -1,13 +1,12 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
 import { initializeMindMap, cleanup, getFullMindMapBounds, updateMindMap, recommendPrintScaleMultiplier, getPrintZoomBias } from '@/lib/markmap-renderer';
-import { Download, X, FileImage, Sparkles, Loader2, ChevronLeft, ChevronRight, Eye, EyeOff, RotateCw, Printer } from 'lucide-react';
+import { Download, X, FileImage, Loader2, Printer, Map as MapIcon } from 'lucide-react';
+import FlashcardIcon from '@/components/FlashcardIcon';
+import FlashcardsModal from '@/components/FlashcardsModal';
 import domtoimage from 'dom-to-image-more';
 import { supabase } from '@/lib/supabaseClient';
-import { nextSchedule, createInitialSchedule, type FsrsScheduleState, type Grade } from '@/lib/spaced-repetition';
 import { loadDeckSchedule, saveDeckSchedule, loadDeckScheduleAsync, saveDeckScheduleAsync } from '@/lib/sr-store';
 
 interface MindMapModalProps {
@@ -307,26 +306,16 @@ body { margin: 0; background: #ffffff; ${computedFontFamily ? `font-family: ${co
 
   // Flashcards state
   type Flashcard = { question: string; answer: string; tags?: string[] };
-  type CardWithSchedule = Flashcard & { schedule?: FsrsScheduleState };
   const [viewMode, setViewMode] = useState<'map' | 'flashcards'>('map');
   const [flashcards, setFlashcards] = useState<Flashcard[] | null>(null);
   const [isGeneratingFlashcards, setIsGeneratingFlashcards] = useState(false);
   const [flashcardIndex, setFlashcardIndex] = useState(0);
-  const [showAnswer, setShowAnswer] = useState(false);
   const [generationError, setGenerationError] = useState<string | null>(null);
   const flashcardsCacheRef = useRef<Map<string, Flashcard[]>>(new Map());
   const [userId, setUserId] = useState<string | null>(null);
   const [isSavingFlashcards, setIsSavingFlashcards] = useState(false);
   const [flashcardsSavedId, setFlashcardsSavedId] = useState<string | null>(null);
   const [isCheckingFlashcards, setIsCheckingFlashcards] = useState(false);
-  const [scheduledCards, setScheduledCards] = useState<CardWithSchedule[] | null>(null);
-  const [deckExamDate, setDeckExamDate] = useState<string>('');
-  const [predictedDueByGrade, setPredictedDueByGrade] = useState<Record<number, string>>({});
-
-  const resetFlashcardSession = () => {
-    setFlashcardIndex(0);
-    setShowAnswer(false);
-  };
 
   const handleGenerateFlashcards = async () => {
     if (!markdown) return;
@@ -338,7 +327,6 @@ body { margin: 0; background: #ffffff; ${computedFontFamily ? `font-family: ${co
       const cached = flashcardsCacheRef.current.get(markdown);
       if (cached && Array.isArray(cached) && cached.length > 0) {
         setFlashcards(cached);
-        resetFlashcardSession();
         setViewMode('flashcards');
         return;
       }
@@ -378,7 +366,6 @@ body { margin: 0; background: #ffffff; ${computedFontFamily ? `font-family: ${co
         if (cards.length === 0) throw new Error('No cards generated');
         flashcardsCacheRef.current.set(markdown, cards);
         setFlashcards(cards);
-        resetFlashcardSession();
         setViewMode('flashcards');
         // Persist locally by markdown hash for instantaneous future lookups
         try {
@@ -462,7 +449,6 @@ body { margin: 0; background: #ffffff; ${computedFontFamily ? `font-family: ${co
               return next;
             });
             if (!firstCardShown) {
-              resetFlashcardSession();
               firstCardShown = true;
             }
           } else if (obj?.type === 'done') {
@@ -519,84 +505,7 @@ body { margin: 0; background: #ffffff; ${computedFontFamily ? `font-family: ${co
     }
   };
 
-  const handleRegenerateFlashcards = async () => {
-    await handleGenerateFlashcards();
-  };
 
-  const handlePrev = () => {
-    if (!flashcards) return;
-    setFlashcardIndex((idx) => (idx - 1 + flashcards.length) % flashcards.length);
-    setShowAnswer(false);
-  };
-  const handleNext = () => {
-    if (!flashcards) return;
-    setFlashcardIndex((idx) => (idx + 1) % flashcards.length);
-    setShowAnswer(false);
-  };
-
-  // Initialize scheduled cards when flashcards (and optional deck id) are available
-  useEffect(() => {
-    if (!flashcards || flashcards.length === 0) { setScheduledCards(null); return; }
-    const init = async () => {
-      if (flashcardsSavedId) {
-        const stored = (await loadDeckScheduleAsync(flashcardsSavedId)) || loadDeckSchedule(flashcardsSavedId);
-        if (stored && Array.isArray(stored.schedules) && stored.schedules.length === flashcards.length) {
-          setDeckExamDate(stored.examDate || '');
-          setScheduledCards(flashcards.map((c, i) => ({ ...c, schedule: stored.schedules[i] || createInitialSchedule() })));
-          return;
-        }
-      }
-      setScheduledCards(flashcards.map((c) => ({ ...c, schedule: createInitialSchedule() })));
-    };
-    init();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [flashcards, flashcardsSavedId]);
-
-  // Persist schedules when changed and we have a saved deck id
-  useEffect(() => {
-    if (!flashcardsSavedId || !scheduledCards) return;
-    const payload = { examDate: deckExamDate || undefined, schedules: scheduledCards.map((c) => c.schedule) };
-    saveDeckSchedule(flashcardsSavedId, payload);
-    saveDeckScheduleAsync(flashcardsSavedId, payload).catch(() => {});
-  }, [flashcardsSavedId, scheduledCards, deckExamDate]);
-
-  function formatTimeUntil(dueDate: Date, now: Date = new Date()): string {
-    const ms = Math.max(0, dueDate.getTime() - now.getTime());
-    const minute = 60_000;
-    const hour = 3_600_000;
-    const day = 86_400_000;
-    if (ms < minute) return '<1m';
-    if (ms < hour) return `<${Math.ceil(ms / minute)}m`;
-    if (ms < day) return `<${Math.ceil(ms / hour)}h`;
-    const days = Math.ceil(ms / day);
-    if (days < 30) return `${days}d`;
-    const months = Math.ceil(days / 30);
-    if (months < 12) return `${months}mo`;
-    const years = Math.ceil(months / 12);
-    return `${years}y`;
-  }
-
-  const handleSetDeckExamDate = (value: string) => {
-    setDeckExamDate(value);
-    setScheduledCards((prev) => prev ? prev.map((c) => ({ ...c, schedule: { ...(c.schedule ?? createInitialSchedule()), examDate: value || undefined } })) : prev);
-  };
-
-  // Predict next due labels per grade once the answer is shown
-  useEffect(() => {
-    if (!showAnswer || !scheduledCards || !scheduledCards[flashcardIndex]) { setPredictedDueByGrade({}); return; }
-    const now = new Date();
-    const base = scheduledCards[flashcardIndex].schedule ?? createInitialSchedule();
-    const withDeckExam = { ...base, examDate: deckExamDate || base.examDate } as FsrsScheduleState;
-    const map: Record<number, string> = {};
-    const grades = [1, 2, 3, 4] as Grade[];
-    for (const g of grades) {
-      const s = nextSchedule(withDeckExam, g, now);
-      const due = new Date(s.due);
-      map[g as number] = formatTimeUntil(due, now);
-    }
-    setPredictedDueByGrade(map);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [showAnswer, flashcardIndex, deckExamDate, scheduledCards]);
 
   useEffect(() => {
     if (!viewportRef.current || !containerRef.current) return;
@@ -669,7 +578,6 @@ body { margin: 0; background: #ffffff; ${computedFontFamily ? `font-family: ${co
     setViewMode('map');
     setGenerationError(null);
     setFlashcardIndex(0);
-    setShowAnswer(false);
     const cached = flashcardsCacheRef.current.get(markdown);
     setFlashcards(cached ?? null);
     setFlashcardsSavedId(null);
@@ -743,21 +651,15 @@ body { margin: 0; background: #ffffff; ${computedFontFamily ? `font-family: ${co
               <>
                 <button
                   onClick={flashcards ? () => setViewMode('flashcards') : handleGenerateFlashcards}
-                  className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 text-sm focus:outline-none"
+                  className="inline-flex items-center gap-1 px-4 py-1.5 rounded-full border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 text-sm focus:outline-none min-w-[44px]"
                   disabled={isGeneratingFlashcards || isCheckingFlashcards}
                 >
                   {isGeneratingFlashcards ? (
-                    <>
-                      <Loader2 className="h-4 w-4 mr-1 animate-spin" /> Generating
-                    </>
+                    <Loader2 className="h-4 w-4 animate-spin" />
                   ) : isCheckingFlashcards ? (
-                    <>
-                      <Loader2 className="h-4 w-4 mr-1 animate-spin" /> Loading
-                    </>
+                    <Loader2 className="h-4 w-4 animate-spin" />
                   ) : (
-                    <>
-                      <Sparkles className="h-4 w-4 mr-1" /> {flashcards ? 'Flashcards' : 'Generate'}
-                    </>
+                    <FlashcardIcon className="h-4 w-4" />
                   )}
                 </button>
 
@@ -768,21 +670,20 @@ body { margin: 0; background: #ffffff; ${computedFontFamily ? `font-family: ${co
                   >
                     <button
                       onClick={() => setDropdownOpen(!isDropdownOpen)}
-                      className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 text-sm focus:outline-none"
+                      className="inline-flex items-center gap-1 px-4 py-1.5 rounded-full border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 text-sm focus:outline-none min-w-[44px]"
                       aria-haspopup="menu"
                       aria-expanded={isDropdownOpen}
                     >
                       <Download className="h-4 w-4" />
-                      Download
                       <svg className="h-4 w-4 ml-1 -mr-0.5" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" /></svg>
                     </button>
                   </div>
 
                   {isDropdownOpen && (
                     <div
-                      className="absolute left-0 mt-2 bg-white rounded-3xl shadow-sm z-20 border border-gray-200 p-2"
+                      className="absolute right-0 mt-2 bg-white rounded-3xl shadow-sm z-20 border border-gray-200 p-2 min-w-[120px]"
                       role="menu"
-                      style={{ width: dropdownWidth }}
+                      style={{ width: Math.max(dropdownWidth || 0, 120) }}
                     >
                       <div className="flex flex-col gap-1.5">
                         <button
@@ -815,9 +716,10 @@ body { margin: 0; background: #ffffff; ${computedFontFamily ? `font-family: ${co
               <>
                 <button
                   onClick={() => setViewMode('map')}
-                  className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 text-sm focus:outline-none"
+                  className="inline-flex items-center justify-center w-8 h-8 rounded-full border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 focus:outline-none"
+                  aria-label="Back to Map"
                 >
-                  Back to Map
+                  <MapIcon className="h-4 w-4" />
                 </button>
               </>
             )}
@@ -844,226 +746,18 @@ body { margin: 0; background: #ffffff; ${computedFontFamily ? `font-family: ${co
           >
             <div ref={containerRef} id="mindmap-container" />
           </div>
-          <div
-            className={`w-full h-full relative grid grid-rows-[auto,auto,1fr,auto] bg-white p-4 sm:p-6 ${viewMode === 'flashcards' ? 'z-20' : 'hidden'}`}
-          >
-            {/* Header */}
-            <div className="w-full max-w-5xl mx-auto grid grid-cols-1 sm:grid-cols-3 items-center gap-3">
-              <div className="text-left text-sm font-medium truncate bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-emerald-600">
-                {markdown ? getTitle(markdown) : 'Flashcards'}
-              </div>
-              <div className="text-sm text-gray-600 text-center">
-                {flashcards ? `${flashcardIndex + 1} / ${flashcards.length}` : ''}
-              </div>
-              <div className="justify-self-start sm:justify-self-end">
-                {flashcards ? (
-                  <label className="inline-flex items-center gap-2 text-xs">
-                    <span className="text-gray-600">Exam date</span>
-                    <input
-                      type="date"
-                      className="h-8 px-3 rounded-full border border-gray-300 text-gray-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400/50 transition-colors"
-                      value={deckExamDate}
-                      onChange={(e) => handleSetDeckExamDate(e.target.value)}
-                    />
-                  </label>
-                ) : null}
-              </div>
-            </div>
-
-            {/* Progress */}
-            {flashcards ? (
-              <div className="w-full max-w-5xl mx-auto mt-2">
-                <div className="h-1.5 rounded-full bg-gray-100 overflow-hidden">
-                  <div
-                    className="h-full bg-gradient-to-r from-indigo-500 via-sky-500 to-emerald-500"
-                    style={{ width: `${((flashcardIndex + 1) / flashcards.length) * 100}%` }}
-                  />
-                </div>
-              </div>
-            ) : null}
-
-            {/* Content */}
-            <div className="w-full max-w-3xl mx-auto overflow-auto flex items-center justify-center py-2">
-              {generationError ? (
-                <div className="w-full text-sm text-red-600">{generationError}</div>
-              ) : !flashcards ? (
-                <div className="flex flex-col items-center justify-center text-center gap-4">
-                  <p className="text-gray-600">Generate flashcards from this mind map.</p>
-                  <button
-                    onClick={handleGenerateFlashcards}
-                    disabled={isGeneratingFlashcards}
-                    className="inline-flex items-center px-5 py-3 rounded-full border border-gray-300 shadow-sm bg-white text-gray-700 hover:bg-gray-50"
-                  >
-                    {isGeneratingFlashcards ? <Loader2 className="h-5 w-5 mr-2 animate-spin" /> : <Sparkles className="h-5 w-5 mr-2" />} Generate Flashcards
-                  </button>
-                </div>
-              ) : (
-                <div className="w-full">
-                  <div className="relative mx-auto rounded-[1.35rem] p-[1.5px] bg-gradient-to-br from-indigo-200 via-sky-200 to-emerald-200">
-                    <div className="bg-white border border-gray-200 rounded-[1.25rem] shadow p-5 sm:p-6 min-h-[180px] sm:min-h-[200px]">
-                      <div className="text-gray-900 text-xl sm:text-2xl font-semibold leading-7 sm:leading-8 break-words">
-                        {flashcards[flashcardIndex]?.question}
-                      </div>
-                      <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-gray-600">
-                        {scheduledCards && scheduledCards[flashcardIndex]?.schedule?.due ? (
-                          <span className="inline-flex items-center h-6 px-2.5 rounded-full bg-sky-50 text-sky-700 border border-sky-200">
-                            Next due: {new Date(scheduledCards[flashcardIndex]!.schedule!.due!).toLocaleDateString()}
-                          </span>
-                        ) : null}
-                        {userId && isSavingFlashcards ? (
-                          <span className="inline-flex items-center h-6 px-2.5 rounded-full bg-gray-50 text-gray-600 border border-gray-200">
-                            <Loader2 className="h-3 w-3 mr-1 animate-spin" /> Saving…
-                          </span>
-                        ) : null}
-                      </div>
-                      {showAnswer && (
-                        <div className="mt-4 text-gray-700">
-                          <div className="h-px bg-gray-200 mb-4" />
-                          <div className="max-h-[45vh] overflow-y-auto text-sm text-gray-700">
-                            <ReactMarkdown remarkPlugins={[remarkGfm]} components={{
-                              ul: ({ node, ...props }) => (
-                                <ul className="list-disc list-inside pl-4 my-2 space-y-1" {...props} />
-                              ),
-                              ol: ({ node, ...props }) => (
-                                <ol className="list-decimal list-inside pl-4 my-2 space-y-1" {...props} />
-                              ),
-                              li: ({ node, ...props }) => (
-                                <li className="leading-6" {...props} />
-                              ),
-                              p: ({ node, ...props }) => (
-                                <p className="my-2 leading-6" {...props} />
-                              ),
-                            }}>
-                              {flashcards[flashcardIndex]?.answer || ''}
-                            </ReactMarkdown>
-                          </div>
-                          {flashcards[flashcardIndex]?.tags?.length ? (
-                            <div className="mt-3 flex flex-wrap gap-2">
-                              {flashcards[flashcardIndex].tags!.map((t, i) => (
-                                <span key={i} className="text-xs px-2 py-1 rounded-full border border-gray-200 text-gray-600 bg-gray-50">
-                                  {t}
-                                </span>
-                              ))}
-                            </div>
-                          ) : null}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Footer / Navigation */}
-            {flashcards ? (
-              <div className="w-full max-w-3xl mx-auto mt-4 grid grid-cols-1 sm:grid-cols-3 items-center gap-3">
-                {!showAnswer ? (
-                  <div className="justify-self-start">
-                    <button
-                      onClick={handlePrev}
-                      className="inline-flex items-center h-10 px-4 rounded-full border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400/50 whitespace-nowrap"
-                    >
-                      <ChevronLeft className="h-5 w-5 mr-2" /> Prev
-                    </button>
-                  </div>
-                ) : <div />}
-                <div className="justify-self-center flex flex-col items-center gap-2">
-                  {showAnswer ? (
-                    <div className="flex items-end justify-center gap-3 flex-nowrap">
-                      <div className="flex flex-col items-center">
-                        <span className="text-[11px] text-gray-500 h-4">{predictedDueByGrade[1] || ''}</span>
-                        <button onClick={() => {
-                          if (!scheduledCards) return;
-                          setScheduledCards((prev) => {
-                            if (!prev) return prev;
-                            const next = [...prev];
-                            const item = { ...next[flashcardIndex] };
-                            const base = item.schedule ?? createInitialSchedule();
-                            const withDeckExam = { ...base, examDate: deckExamDate || base.examDate } as FsrsScheduleState;
-                            item.schedule = nextSchedule(withDeckExam, 1 as Grade, new Date());
-                            next[flashcardIndex] = item;
-                            return next;
-                          });
-                          setShowAnswer(false);
-                          setFlashcardIndex((i) => (i + 1) % flashcards.length);
-                        }} className="h-9 px-3 text-xs rounded-full border border-red-200 bg-red-50 text-red-700 hover:bg-red-100 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-300/50">Again</button>
-                      </div>
-                      <div className="flex flex-col items-center">
-                        <span className="text-[11px] text-gray-500 h-4">{predictedDueByGrade[2] || ''}</span>
-                        <button onClick={() => {
-                          if (!scheduledCards) return;
-                          setScheduledCards((prev) => {
-                            if (!prev) return prev;
-                            const next = [...prev];
-                            const item = { ...next[flashcardIndex] };
-                            const base = item.schedule ?? createInitialSchedule();
-                            const withDeckExam = { ...base, examDate: deckExamDate || base.examDate } as FsrsScheduleState;
-                            item.schedule = nextSchedule(withDeckExam, 2 as Grade, new Date());
-                            next[flashcardIndex] = item;
-                            return next;
-                          });
-                          setShowAnswer(false);
-                          setFlashcardIndex((i) => (i + 1) % flashcards.length);
-                        }} className="h-9 px-3 text-xs rounded-full border border-amber-200 bg-amber-50 text-amber-700 hover:bg-amber-100 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-300/50">Hard</button>
-                      </div>
-                      <div className="flex flex-col items-center">
-                        <span className="text-[11px] text-gray-500 h-4">{predictedDueByGrade[3] || ''}</span>
-                        <button onClick={() => {
-                          if (!scheduledCards) return;
-                          setScheduledCards((prev) => {
-                            if (!prev) return prev;
-                            const next = [...prev];
-                            const item = { ...next[flashcardIndex] };
-                            const base = item.schedule ?? createInitialSchedule();
-                            const withDeckExam = { ...base, examDate: deckExamDate || base.examDate } as FsrsScheduleState;
-                            item.schedule = nextSchedule(withDeckExam, 3 as Grade, new Date());
-                            next[flashcardIndex] = item;
-                            return next;
-                          });
-                          setShowAnswer(false);
-                          setFlashcardIndex((i) => (i + 1) % flashcards.length);
-                        }} className="h-9 px-3 text-xs rounded-full border border-sky-200 bg-sky-50 text-sky-700 hover:bg-sky-100 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-300/50">Good</button>
-                      </div>
-                      <div className="flex flex-col items-center">
-                        <span className="text-[11px] text-gray-500 h-4">{predictedDueByGrade[4] || ''}</span>
-                        <button onClick={() => {
-                          if (!scheduledCards) return;
-                          setScheduledCards((prev) => {
-                            if (!prev) return prev;
-                            const next = [...prev];
-                            const item = { ...next[flashcardIndex] };
-                            const base = item.schedule ?? createInitialSchedule();
-                            const withDeckExam = { ...base, examDate: deckExamDate || base.examDate } as FsrsScheduleState;
-                            item.schedule = nextSchedule(withDeckExam, 4 as Grade, new Date());
-                            next[flashcardIndex] = item;
-                            return next;
-                          });
-                          setShowAnswer(false);
-                          setFlashcardIndex((i) => (i + 1) % flashcards.length);
-                        }} className="h-9 px-3 text-xs rounded-full border border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/50">Easy</button>
-                      </div>
-                    </div>
-                  ) : (
-                    <button onClick={() => setShowAnswer(true)} className="inline-flex items-center h-10 px-5 rounded-full text-white bg-gradient-to-r from-blue-600 via-cyan-500 to-teal-500 shadow-sm hover:opacity-90 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/50 whitespace-nowrap">
-                      <Eye className="h-5 w-5 mr-2" /> Show Answer
-                    </button>
-                  )}
-                </div>
-                {!showAnswer ? (
-                  <div className="justify-self-end">
-                    <button
-                      onClick={handleNext}
-                      className="inline-flex items-center h-10 px-4 rounded-full border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400/50 whitespace-nowrap"
-                    >
-                      Next <ChevronRight className="h-5 w-5 ml-2" />
-                    </button>
-                  </div>
-                ) : <div />}
-              </div>
-            ) : (
-              <div />
-            )}
-          </div>
+          {viewMode === 'flashcards' && (
+            <FlashcardsModal
+              open={true}
+              title={getTitle(markdown) || undefined}
+              cards={flashcards}
+              isGenerating={isGeneratingFlashcards}
+              error={generationError || undefined}
+              onClose={() => setViewMode('map')}
+              deckId={flashcardsSavedId || undefined}
+              initialIndex={flashcardIndex}
+            />
+          )}
         </div>
       </div>
     </div>
