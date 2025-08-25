@@ -166,8 +166,9 @@ export async function POST(req: NextRequest) {
     console.log('Received Paddle webhook:', event);
 
     return NextResponse.json({ received: true });
-  } catch (error: any) {
-    console.error('Error handling Paddle webhook:', error.message);
-    return new NextResponse('Webhook Error', { status: 400 });
+  } catch (error) {
+    console.error('Error handling Paddle webhook:', error);
+    const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred.';
+    return NextResponse.json({ error: 'Webhook handler failed.', details: errorMessage }, { status: 500 });
   }
 }

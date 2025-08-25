@@ -72,8 +72,10 @@ export async function POST(req: NextRequest) {
     if (!userId) return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 });
     await ensureInitialOrMonthlyFreeCredits(userId);
     return NextResponse.json({ ok: true });
-  } catch (e) {
-    return NextResponse.json({ ok: false }, { status: 500 });
+  } catch (error) {
+    console.error('Error in ensure-credits API:', error);
+    const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred.';
+    return NextResponse.json({ ok: false, error: 'An internal server error occurred.', details: errorMessage }, { status: 500 });
   }
 }
 

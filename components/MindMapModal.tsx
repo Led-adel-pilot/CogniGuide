@@ -159,6 +159,7 @@ export default function MindMapModal({ markdown, onClose }: MindMapModalProps) {
         }
     } catch (error) {
         console.error('Download failed:', error);
+        alert('Failed to download mind map. Please try again.');
     } finally {
         // Restore all original styles
         container.style.transform = originalTransform;
@@ -359,7 +360,9 @@ body { margin: 0; background: #ffffff; ${computedFontFamily ? `font-family: ${co
           const { data: creditsData } = await supabase.from('user_credits').select('credits').eq('user_id', uid).single();
           if (typeof window !== 'undefined') window.dispatchEvent(new CustomEvent('cogniguide:credits-updated', { detail: { credits: creditsData?.credits } }));
         }
-      } catch {}
+      } catch (error) {
+        console.error('Failed to get user session:', error);
+      }
 
       // If the environment does not support streaming, fall back to JSON body
       if (!res.body) {
@@ -399,7 +402,8 @@ body { margin: 0; background: #ffffff; ${computedFontFamily ? `font-family: ${co
                 }
               } catch {}
             }
-          } catch {
+          } catch (err: any) {
+            console.error('Failed to save flashcards to Supabase:', err);
           } finally {
             setIsSavingFlashcards(false);
           }
@@ -492,14 +496,14 @@ body { margin: 0; background: #ffffff; ${computedFontFamily ? `font-family: ${co
               }
             } catch {}
           }
-        } catch {
-          // ignore persistence errors
+        } catch (err: any) {
+          console.error('Failed to save flashcards to Supabase:', err);
         } finally {
           setIsSavingFlashcards(false);
         }
       }
-    } catch (e) {
-      const msg = e instanceof Error ? e.message : 'Failed to generate flashcards';
+    } catch (err: any) {
+      const msg = err.message || 'Failed to generate flashcards';
       setGenerationError(msg);
     } finally {
       setIsGeneratingFlashcards(false);
@@ -543,7 +547,8 @@ body { margin: 0; background: #ffffff; ${computedFontFamily ? `font-family: ${co
         const { data } = await supabase.auth.getUser();
         if (!isMounted) return;
         setUserId(data.user ? data.user.id : null);
-      } catch {
+      } catch (error) {
+        console.error('Failed to get user session:', error);
         if (!isMounted) return;
         setUserId(null);
       }
@@ -630,8 +635,8 @@ body { margin: 0; background: #ffffff; ${computedFontFamily ? `font-family: ${co
             } catch {}
           }
         }
-      } catch {
-        // ignore retrieval errors silently
+      } catch (dbError) {
+        console.error('Failed to retrieve flashcards from database:', dbError);
       } finally {
         setIsCheckingFlashcards(false);
       }

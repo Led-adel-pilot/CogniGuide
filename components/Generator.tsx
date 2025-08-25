@@ -249,7 +249,9 @@ export default function Generator({ redirectOnAuth = false, showTitle = true }: 
           try { const j = await response.json(); errorMsg = j.error || errorMsg; } catch {}
           throw new Error(errorMsg);
         } else {
-          throw new Error('Failed to generate mind map.');
+          let errorMsg = `Failed to generate mind map. Server returned ${response.status} ${response.statusText}.`;
+          try { const text = await response.text(); errorMsg = `${errorMsg} ${text}`; } catch {}
+          throw new Error(errorMsg);
         }
       }
       // Deduction occurs server-side at start; if signed in, refresh credits and notify listeners

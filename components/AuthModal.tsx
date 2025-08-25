@@ -37,8 +37,8 @@ export default function AuthModal({ open, onClose }: AuthModalProps) {
       });
       if (signInError) throw signInError;
       setMessage('Check your email for the sign-in link.');
-    } catch (e: any) {
-      setError(e?.message || 'Failed to send magic link');
+    } catch (error: any) {
+      setError(error.message || 'Failed to send magic link');
     } finally {
       setIsSending(false);
     }

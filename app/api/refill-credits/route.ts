@@ -55,8 +55,9 @@ export async function POST(req: NextRequest) {
     }
 
     return NextResponse.json({ success: true });
-  } catch (error: any) {
-    console.error('Error refilling credits:', error.message);
-    return new NextResponse('Internal Server Error', { status: 500 });
+  } catch (error) {
+    console.error('Error refilling credits:', error);
+    const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred.';
+    return NextResponse.json({ success: false, error: 'Failed to refill credits.', details: errorMessage }, { status: 500 });
   }
 }

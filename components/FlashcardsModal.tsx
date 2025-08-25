@@ -101,7 +101,9 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
     const payload = { examDate: deckExamDate || undefined, schedules: scheduledCards.map((c) => c.schedule) };
     // Save remotely when possible; always mirror to local as fallback
     saveDeckSchedule(deckId, payload);
-    saveDeckScheduleAsync(deckId, payload).catch(() => {});
+    saveDeckScheduleAsync(deckId, payload).catch((err) => {
+      console.error(`Failed to save deck schedule async for deck ${deckId}:`, err);
+    });
   }, [deckId, scheduledCards, deckExamDate]);
 
   // Predict next due labels per grade once the answer is shown

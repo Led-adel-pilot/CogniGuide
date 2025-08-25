@@ -485,7 +485,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ title: parsed.title || null, cards });
   } catch (error) {
     console.error('Error in generate-flashcards API:', error);
-    const message = error instanceof Error ? error.message : 'Unknown error';
-    return NextResponse.json({ error: 'An internal server error occurred.', details: message }, { status: 500 });
+    const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred.';
+    return NextResponse.json({ error: 'An internal server error occurred.', details: errorMessage }, { status: 500 });
   }
 }

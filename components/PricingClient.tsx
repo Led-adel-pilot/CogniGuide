@@ -62,8 +62,8 @@ export default function PricingClient({ onPurchaseComplete }: PricingClientProps
             }
           }
         }
-      } catch (_) {
-        // no-op
+      } catch (redirectError) {
+        console.error('Error handling redirect after auth:', redirectError);
       }
     });
 
@@ -112,7 +112,8 @@ export default function PricingClient({ onPurchaseComplete }: PricingClientProps
         } else {
           setSubscription(null);
         }
-      } catch {
+      } catch (dbError) {
+        console.error('Failed to load subscription:', dbError);
         setSubscription(null);
       }
     };
@@ -147,7 +148,7 @@ export default function PricingClient({ onPurchaseComplete }: PricingClientProps
     } catch (err) {
       console.error('Paddle init error', err);
     }
-  }, []);
+  }, [onPurchaseComplete]);
 
   const updatePrices = useCallback(
     async (cycle: BillingCycle) => {
@@ -189,7 +190,7 @@ export default function PricingClient({ onPurchaseComplete }: PricingClientProps
       await updatePrices('month');
       await updatePrices('year');
     } catch (e) {
-      // Any unexpected error is already handled inside updatePrices, but keep a guard
+      console.error('An unexpected error occurred while updating prices:', e);
     }
   }, [updatePrices]);
 
