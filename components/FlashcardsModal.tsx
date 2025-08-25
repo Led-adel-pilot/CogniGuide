@@ -7,6 +7,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import type { Components } from 'react-markdown';
 import { ChevronLeft, ChevronRight, Eye, EyeOff, Loader2, X } from 'lucide-react';
+import posthog from 'posthog-js';
 
 export type Flashcard = { question: string; answer: string; tags?: string[] };
 type CardWithSchedule = Flashcard & { schedule?: FsrsScheduleState };
@@ -156,8 +157,18 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
       const base = item.schedule ?? createInitialSchedule();
       // Ensure deck-level examDate is applied
       const withDeckExam = { ...base, examDate: deckExamDate || base.examDate } as FsrsScheduleState;
-      item.schedule = nextSchedule(withDeckExam, g, new Date());
+      const newSchedule = nextSchedule(withDeckExam, g, new Date());
+      item.schedule = newSchedule;
       next[index] = item;
+
+      posthog.capture('flashcard_graded', {
+        deckId: deckId,
+        card_index: index,
+        grade: g,
+        study_due_only: studyDueOnly,
+        next_due_date: newSchedule.due,
+      });
+
       return next;
     });
     setShowAnswer(false);
@@ -354,7 +365,14 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
                   </div>
                 </div>
               ) : (
-                <button onClick={() => setShowAnswer(true)} className="inline-flex items-center h-10 px-5 rounded-full text-white bg-gradient-to-r from-blue-600 via-cyan-500 to-teal-500 shadow-sm hover:opacity-90 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/50 whitespace-nowrap">
+                <button onClick={() => {
+                  posthog.capture('flashcard_answer_shown', {
+                    deckId: deckId,
+                    card_index: index,
+                    study_due_only: studyDueOnly,
+                  });
+                  setShowAnswer(true);
+                }} className="inline-flex items-center h-10 px-5 rounded-full text-white bg-gradient-to-r from-blue-600 via-cyan-500 to-teal-500 shadow-sm hover:opacity-90 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/50 whitespace-nowrap">
                   <Eye className="h-5 w-5 mr-2" /> Show Answer
                 </button>
               )}

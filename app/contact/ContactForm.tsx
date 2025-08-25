@@ -1,11 +1,16 @@
 'use client';
 
+import posthog from 'posthog-js';
 import { Send } from 'lucide-react';
 
 export default function ContactForm() {
   return (
     <form
-      onSubmit={(e) => { e.preventDefault(); alert('This is a UI placeholder. Hook up your form handler.'); }}
+      onSubmit={(e) => { 
+        e.preventDefault(); 
+        posthog.capture('contact_form_submitted');
+        alert('This is a UI placeholder. Hook up your form handler.'); 
+      }}
       className="space-y-4"
     >
       <div>

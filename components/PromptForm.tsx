@@ -1,6 +1,7 @@
 // PromptForm.tsx
 'use client';
 
+import posthog from 'posthog-js';
 import { useRef, useLayoutEffect } from 'react';
 import { ArrowUp } from 'lucide-react';
 
@@ -29,6 +30,11 @@ export default function PromptForm({
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!isLoading && !disabled) {
+      posthog.capture('prompt-submitted', {
+        prompt_character_count: prompt.length,
+        files_count: filesLength,
+        submission_method: 'click',
+      });
       onSubmit(prompt);
     }
   };
@@ -57,6 +63,11 @@ export default function PromptForm({
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       if (prompt.trim()) {
+        posthog.capture('prompt-submitted', {
+          prompt_character_count: prompt.length,
+          files_count: filesLength,
+          submission_method: 'enter_key',
+        });
         onSubmit(prompt);
       }
     }

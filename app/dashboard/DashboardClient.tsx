@@ -14,6 +14,7 @@ import { createInitialSchedule } from '@/lib/spaced-repetition';
 import PricingModal from '@/components/PricingModal';
 import CogniGuideLogo from '../../CogniGuide_logo.png';
 import Image from 'next/image';
+import posthog from 'posthog-js';
 
 type SessionUser = {
   id: string;
@@ -337,6 +338,7 @@ export default function DashboardClient() {
   }, [spacedPrefetched, flashcardsHistory]);
 
   const handleSignOut = async () => {
+    posthog.capture('user_signed_out');
     await supabase.auth.signOut();
     router.replace('/');
   };
@@ -380,6 +382,10 @@ export default function DashboardClient() {
             <button
               key={`${item.type}:${item.id}`}
               onClick={() => {
+                posthog.capture('history_item_opened', {
+                  type: item.type,
+                  item_id: item.id,
+                });
                 if (item.type === 'mindmap') {
                   setMarkdown(item.markdown);
                 } else {
@@ -543,9 +549,13 @@ export default function DashboardClient() {
                     <button
                       className="px-3 py-1.5 text-xs rounded-full border bg-white hover:bg-gray-50"
                       onClick={() => {
+                        const list = (dueMap[f.id] as number[]) || [];
+                        posthog.capture('spaced_repetition_deck_studied', {
+                          deck_id: f.id,
+                          due_card_count: list.length,
+                        });
                         const arr = f.cards as any; (arr as any).__deckId = f.id; setActiveDeckId(f.id);
                         setStudyDueOnly(true);
-                        const list = (dueMap[f.id] as number[]) || [];
                         setDueIndices(list);
                         setInitialDueIndex(list[0] ?? 0);
                         setSpacedOpen(false);

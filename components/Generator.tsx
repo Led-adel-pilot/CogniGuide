@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import posthog from 'posthog-js';
 import Dropzone from '@/components/Dropzone';
 import PromptForm from '@/components/PromptForm';
 import MindMapModal from '@/components/MindMapModal';
@@ -54,6 +55,11 @@ export default function Generator({ redirectOnAuth = false, showTitle = true }: 
   };
 
   const handleSubmit = async () => {
+    posthog.capture('generation_submitted', {
+      mode: mode,
+      file_count: files.length,
+      has_prompt: !!prompt.trim(),
+    });
     if (mode === 'flashcards') {
       // Require at least one file for file-based flashcards generation
       if (files.length === 0) {
@@ -334,6 +340,10 @@ export default function Generator({ redirectOnAuth = false, showTitle = true }: 
   const handleCloseFlashcards = () => { setFlashcardsOpen(false); setFlashcardsCards(null); setFlashcardsError(null); setFlashcardsDeckId(undefined); };
   
   const handleUpgradeClick = () => {
+    posthog.capture('upgrade_clicked', {
+      source: 'generator_insufficient_credits',
+      is_authed: isAuthed,
+    });
     try {
       if (isAuthed) {
         router.push('/dashboard?upgrade=true');
@@ -368,11 +378,17 @@ export default function Generator({ redirectOnAuth = false, showTitle = true }: 
               <div className="flex items-center justify-center">
                 <div className="inline-flex p-1 rounded-full border bg-muted/50">
                   <button
-                    onClick={() => setMode('mindmap')}
+                    onClick={() => {
+                      posthog.capture('generation_mode_changed', { new_mode: 'mindmap' });
+                      setMode('mindmap');
+                    }}
                     className={`px-4 py-1.5 text-sm font-semibold rounded-full transition-colors ${mode==='mindmap' ? 'bg-white text-primary shadow' : 'text-muted-foreground hover:text-primary'}`}
                   >Mind Map</button>
                   <button
-                    onClick={() => setMode('flashcards')}
+                    onClick={() => {
+                      posthog.capture('generation_mode_changed', { new_mode: 'flashcards' });
+                      setMode('flashcards');
+                    }}
                     className={`px-4 py-1.5 text-sm font-semibold rounded-full transition-colors ${mode==='flashcards' ? 'bg-white text-primary shadow' : 'text-muted-foreground hover:text-primary'}`}
                   >Flashcards</button>
                 </div>

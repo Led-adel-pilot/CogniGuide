@@ -8,6 +8,7 @@ import FlashcardsModal from '@/components/FlashcardsModal';
 import domtoimage from 'dom-to-image-more';
 import { supabase } from '@/lib/supabaseClient';
 import { loadDeckSchedule, saveDeckSchedule, loadDeckScheduleAsync, saveDeckScheduleAsync } from '@/lib/sr-store';
+import posthog from 'posthog-js';
 
 interface MindMapModalProps {
   markdown: string | null;
@@ -319,6 +320,7 @@ body { margin: 0; background: #ffffff; ${computedFontFamily ? `font-family: ${co
 
   const handleGenerateFlashcards = async () => {
     if (!markdown) return;
+    posthog.capture('flashcards_generation_requested', { markdown_length: markdown.length });
     try {
       setIsGeneratingFlashcards(true);
       setGenerationError(null);
@@ -688,21 +690,21 @@ body { margin: 0; background: #ffffff; ${computedFontFamily ? `font-family: ${co
                       <div className="flex flex-col gap-1.5">
                         <button
                           type="button"
-                          onClick={() => { handleDownload('svg'); setDropdownOpen(false); }}
+                          onClick={() => { posthog.capture('mindmap_exported', { format: 'svg' }); handleDownload('svg'); setDropdownOpen(false); }}
                           className="w-full flex items-center gap-2 px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-100 rounded-xl focus:outline-none"
                         >
                           <FileImage className="h-4 w-4" /> SVG
                         </button>
                         <button
                           type="button"
-                          onClick={() => { handleDownload('png'); setDropdownOpen(false); }}
+                          onClick={() => { posthog.capture('mindmap_exported', { format: 'png' }); handleDownload('png'); setDropdownOpen(false); }}
                           className="w-full flex items-center gap-2 px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-100 rounded-xl focus:outline-none"
                         >
                           <FileImage className="h-4 w-4" /> PNG
                         </button>
                         <button
                           type="button"
-                          onClick={() => { handlePrintPdf(); setDropdownOpen(false); }}
+                          onClick={() => { posthog.capture('mindmap_exported', { format: 'pdf' }); handlePrintPdf(); setDropdownOpen(false); }}
                           className="w-full flex items-center gap-2 px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-100 rounded-xl focus:outline-none"
                         >
                           <Printer className="h-4 w-4" /> PDF (Print)

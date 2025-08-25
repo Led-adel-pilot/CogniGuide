@@ -1,5 +1,6 @@
 'use client';
 
+import posthog from 'posthog-js';
 import { useState, useCallback, useMemo, useEffect, useRef } from 'react';
 import { UploadCloud, File, X } from 'lucide-react';
 
@@ -44,6 +45,12 @@ export default function Dropzone({ onFileChange, disabled = false }: DropzonePro
     const droppedFiles = e.dataTransfer.files;
     if (droppedFiles && droppedFiles.length > 0) {
       const newFiles = Array.from(droppedFiles);
+      posthog.capture('files_added', {
+        method: 'drag-and-drop',
+        file_count: newFiles.length,
+        file_types: newFiles.map(f => f.type),
+        total_size_kb: newFiles.reduce((sum, f) => sum + f.size, 0) / 1024,
+      });
       setFiles(prevFiles => {
         const merged = [...prevFiles, ...newFiles];
         const seen = new Set<string>();
@@ -62,6 +69,12 @@ export default function Dropzone({ onFileChange, disabled = false }: DropzonePro
     const selectedFiles = e.target.files;
     if (selectedFiles && selectedFiles.length > 0) {
       const newFiles = Array.from(selectedFiles);
+      posthog.capture('files_added', {
+        method: 'file-selector',
+        file_count: newFiles.length,
+        file_types: newFiles.map(f => f.type),
+        total_size_kb: newFiles.reduce((sum, f) => sum + f.size, 0) / 1024,
+      });
       setFiles(prevFiles => {
         const merged = [...prevFiles, ...newFiles];
         const seen = new Set<string>();
@@ -82,6 +95,11 @@ export default function Dropzone({ onFileChange, disabled = false }: DropzonePro
   };
   
   const handleRemoveFile = (fileToRemove: File) => {
+    posthog.capture('file_removed', {
+      file_name: fileToRemove.name,
+      file_type: fileToRemove.type,
+      file_size_kb: fileToRemove.size / 1024,
+    });
     setFiles(prevFiles => prevFiles.filter(file => file !== fileToRemove));
   }
 
