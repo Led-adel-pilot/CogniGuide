@@ -13,6 +13,7 @@ interface PromptFormProps {
   disabled: boolean;
   filesLength: number;
   ctaLabel?: string;
+  onInteract?: () => void;
 }
 
 export default function PromptForm({
@@ -23,6 +24,7 @@ export default function PromptForm({
   disabled,
   filesLength,
   ctaLabel,
+  onInteract,
 }: PromptFormProps) {
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const formRef = useRef<HTMLFormElement | null>(null);
@@ -86,7 +88,13 @@ export default function PromptForm({
         id="prompt-input"
         ref={textareaRef}
         value={prompt}
-        onChange={(e) => setPrompt(e.target.value)}
+        onChange={(e) => {
+          // Fire interaction hook when the user starts typing
+          try {
+            if (onInteract && !prompt && e.target.value) onInteract();
+          } catch {}
+          setPrompt(e.target.value);
+        }}
         onKeyDown={handleKeyDown}
         placeholder="e.g., 'Create a mind map about the history of AI'"
         className="flex-1 px-3 py-2 bg-transparent border-none resize-none focus:outline-none text-sm leading-relaxed overflow-y-auto"
@@ -96,6 +104,10 @@ export default function PromptForm({
         rows={1}
         disabled={disabled}
         aria-label="Prompt input"
+        onFocus={() => {
+          // Optionally fire on focus as well, harmless if it opens once
+          try { onInteract && onInteract(); } catch {}
+        }}
       />
       <button
         type="submit"

@@ -25,6 +25,7 @@ export default function Generator({ redirectOnAuth = false, showTitle = true }: 
   const [flashcardsCards, setFlashcardsCards] = useState<FlashcardType[] | null>(null);
   const [flashcardsError, setFlashcardsError] = useState<string | null>(null);
   const [flashcardsDeckId, setFlashcardsDeckId] = useState<string | undefined>(undefined);
+  const [authChecked, setAuthChecked] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -33,12 +34,14 @@ export default function Generator({ redirectOnAuth = false, showTitle = true }: 
       const authed = Boolean(data.user);
       setIsAuthed(authed);
       setUserId(data.user ? data.user.id : null);
+      setAuthChecked(true);
     };
     init();
     const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
       const signedIn = Boolean(session);
       setIsAuthed(signedIn);
       setUserId(session?.user?.id ?? null);
+      setAuthChecked(true);
       if (signedIn) {
         setShowAuth(false);
         if (redirectOnAuth) {
@@ -392,7 +395,18 @@ export default function Generator({ redirectOnAuth = false, showTitle = true }: 
                   >Flashcards</button>
                 </div>
               </div>
-              <Dropzone onFileChange={handleFileChange} disabled={isDisabled} />
+              <Dropzone
+                onFileChange={handleFileChange}
+                disabled={isDisabled}
+                onOpen={() => {
+                  if (!authChecked) return false;
+                  if (!isAuthed) {
+                    setShowAuth(true);
+                    return false; // block file dialog for unauth users
+                  }
+                  return true;
+                }}
+              />
               <PromptForm
                 onSubmit={handleSubmit}
                 isLoading={isLoading}
@@ -401,6 +415,10 @@ export default function Generator({ redirectOnAuth = false, showTitle = true }: 
                 disabled={isDisabled}
                 filesLength={files.length}
                 ctaLabel={mode==='flashcards' ? 'Generate Flashcards' : 'Generate Mind Map'}
+                onInteract={() => {
+                  if (!authChecked) return;
+                  if (!isAuthed) setShowAuth(true);
+                }}
               />                  
               {error && (
                 <div className="mt-4 text-center p-4 bg-red-50 border border-red-200 text-red-700 rounded-[1.25rem]">

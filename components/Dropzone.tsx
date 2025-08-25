@@ -7,9 +7,11 @@ import { UploadCloud, File, X } from 'lucide-react';
 interface DropzoneProps {
   onFileChange: (files: File[]) => void;
   disabled?: boolean;
+  // Return false to block opening the file dialog
+  onOpen?: () => boolean | void;
 }
 
-export default function Dropzone({ onFileChange, disabled = false }: DropzoneProps) {
+export default function Dropzone({ onFileChange, disabled = false, onOpen }: DropzoneProps) {
   const [dragIsOver, setDragIsOver] = useState(false);
   const [files, setFiles] = useState<File[]>([]);
   const inputRef = useRef<HTMLInputElement | null>(null);
@@ -115,6 +117,18 @@ export default function Dropzone({ onFileChange, disabled = false }: DropzonePro
       <label
         htmlFor="dropzone-file"
         className={dropzoneClassName}
+        onClick={(e) => {
+          if (disabled) return;
+          // Trigger early auth prompt hook when user attempts to open file dialog
+          try {
+            const proceed = onOpen ? onOpen() : true;
+            if (proceed === false) {
+              e.preventDefault();
+              e.stopPropagation();
+              return;
+            }
+          } catch {}
+        }}
         onDragEnter={handleDragEnter}
         onDragLeave={handleDragLeave}
         onDragOver={handleDragOver}
