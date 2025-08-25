@@ -104,60 +104,51 @@ async function refundCredits(userId: string, amount: number): Promise<void> {
 interface Flashcard {
   question: string;
   answer: string;
-  tags?: string[];
 }
 
-function constructFlashcardPromptFromMarkmap(markmapMarkdown: string, numCards?: number) {
-  const targetCount = numCards && numCards > 0 ? numCards : 18;
-  return `You are an expert instructional designer.
-You will be given a mind map described in Markmap-compatible Markdown. Generate high-quality active-recall flashcards that help a learner master the content.
+function buildFlashcardPrompt(opts: {
+  mode: 'stream' | 'json';
+  sourceType: 'markmap' | 'text';
+  sourceContent: string;
+  userInstruction?: string;
+  imagesCount?: number;
+  numCards?: number;
+}): string {
+  const { mode, sourceType, sourceContent, userInstruction, imagesCount } = opts;
+  const userLine = userInstruction ? `\nAdditional user instruction: ${userInstruction}` : '';
+  const imagesNote = imagesCount && imagesCount > 0
+    ? `You are also provided ${imagesCount} image(s). Carefully read text inside the images (OCR) and analyze diagrams to extract key concepts.`
+    : '';
 
-REQUIREMENTS:
-- Output strictly as a single JSON object only. No preface, no code fences, no commentary.
-- JSON schema:
-  { "title": string, "cards": [ { "question": string, "answer": string, "tags": string[] } ] }
-- Prefer concise questions; avoid yes/no.
-- Prefer atomic, focused answers. Use bullet points when helpful.
-- Include 1-3 short tags per card from node labels.
-- Create about between 15 and 35 cards depending on the size of the mind map; vary difficulty.
-- The flashcards should be in the same language as the mind map.
-
-Mind map (Markmap Markdown):\n---\n${markmapMarkdown}\n---`;
-}
-
-// Streaming variant: require NDJSON with meta/card/done lines
-function constructFlashcardStreamingPromptFromMarkmap(markmapMarkdown: string, numCards?: number) {
-  return `You are an expert instructional designer.
-You will be given a mind map described in Markmap-compatible Markdown. Generate high-quality active-recall flashcards that help a learner master the content.
-
-STREAMING OUTPUT FORMAT (STRICT):
+  const outputFormat = mode === 'stream'
+    ? `STREAMING OUTPUT FORMAT (STRICT):
 - Emit your response as newline-delimited JSON (NDJSON), one JSON object per line.
 - Do NOT wrap in an array, do NOT include any text outside the JSON objects, and do NOT use code fences.
 - Use exactly these object shapes (one per line):
   { "type": "meta", "title": string }
-  { "type": "card", "question": string, "answer": string, "tags": string[] }
+  { "type": "card", "question": string, "answer": string }
   { "type": "done" }
 - Start with a single meta line, then stream each card as its own line, and end with a single done line.
-- Produce about 15 to 35 cards depending on content size and vary difficulty.
-- Keep each JSON object on ONE LINE. Escape any internal newlines as \n within strings.
-- The flashcards must be in the same language as the mind map.
-
-Mind map (Markmap Markdown):\n---\n${markmapMarkdown}\n---`;
-}
-
-function constructFlashcardPromptFromText(sourceText: string, userInstruction?: string, numCards?: number, imagesCount?: number) {
-  const targetCount = numCards && numCards > 0 ? numCards : 18;
-  const imagesNote = imagesCount && imagesCount > 0
-    ? `You are also provided ${imagesCount} image(s). Carefully read text inside the images (OCR) and analyze diagrams to extract key concepts.`
-    : '';
-  const userLine = userInstruction ? `\nAdditional user instruction: ${userInstruction}` : '';
-  return `You are an expert instructional designer.
-You will be given source content. Generate high-quality active-recall flashcards that help a learner master the content.${userLine}
-
-REQUIREMENTS:
+- Keep each JSON object on ONE LINE. Escape any internal newlines as \n within strings.`
+    : `OUTPUT FORMAT (STRICT):
 - Output strictly as a single JSON object only. No preface, no code fences, no commentary.
 - JSON schema:
-  { "title": string, "cards": [ { "question": string, "answer": string, "tags": string[] } ] }
+  { "title": string, "cards": [ { "question": string, "answer": string } ] }`;
+
+  const scopeLine = sourceType === 'markmap'
+    ? `You will be given a mind map described in Markmap-compatible Markdown. Generate high-quality active-recall flashcards that help a learner master the content.`
+    : `You will be given source content. Generate high-quality active-recall flashcards that help a learner master the content.`;
+
+  const languageAndCount = sourceType === 'markmap'
+    ? `- Produce about 15 to 35 cards depending on content size, NEVER MORE THAN 45.
+- The flashcards must be in the same language as the mind map.`
+    : `- Produce about 15 to 35 cards depending on content size, NEVER MORE THAN 45.
+- The flashcards must be in the same language as the content.`;
+
+  const body = `You are an expert instructional designer.
+${scopeLine}${userLine}
+
+${outputFormat}
 
 ### Card Creation Principles
 1.  **Promote Active Recall:** Questions must be open-ended to force the learner to retrieve information from memory.
@@ -168,59 +159,18 @@ REQUIREMENTS:
     - GOOD: Q: "What is the primary benefit of active recall?" A: "It strengthens neural pathways, improving long-term memory."
     - BAD: Q: "What are active recall and spaced repetition?" A: "Active recall is... and spaced repetition is..."
 
-3.  **Foster Deeper Understanding:** Go beyond simple definitions. Create questions that prompt for explanations, comparisons, or the "why" behind a concept. Use the "context_or_example" field to help the learner connect the information to a practical application or a larger framework.
+3.  **Foster Deeper Understanding:** Go beyond simple definitions. Create questions that prompt for explanations, comparisons, or the "why" behind a concept.
 
 4.  **Keep Answers Concise:** Answers should be clear, direct, and AS BRIEF AS POSSIBLE while remaining accurate. Use markdown bullet points for lists. Prefer one-word answers if possible.
     - GOOD: Q: "What is 1+1?" A: "2"
     - BAD: Q: "What is 1+1?" A: "The result of adding 1 and 1 is 2."
 
-- Include 1-3 short tags per card from the content topics.
-- Create about between 15 and 35 cards depending on the size of the content.
-- The flashcards should be in the same language as the content.
+${languageAndCount}
+${imagesNote ? `- ${imagesNote}` : ''}
 
-${imagesNote}
+${sourceType === 'markmap' ? 'Mind map (Markmap Markdown):' : 'Source content:'}\n---\n${sourceContent}\n---`;
 
-Source content:\n---\n${sourceText}\n---`;
-}
-
-function constructFlashcardStreamingPromptFromText(sourceText: string, userInstruction?: string, numCards?: number, imagesCount?: number) {
-  const imagesNote = imagesCount && imagesCount > 0
-    ? `You are also provided ${imagesCount} image(s). Carefully read text inside the images (OCR) and analyze diagrams to extract key concepts.`
-    : '';
-  const userLine = userInstruction ? `\nAdditional user instruction: ${userInstruction}` : '';
-  return `You are an expert instructional designer.
-You will be given source content. Generate high-quality active-recall flashcards that help a learner master the content.${userLine}
-
-STREAMING OUTPUT FORMAT (STRICT):
-- Emit your response as newline-delimited JSON (NDJSON), one JSON object per line.
-- Do NOT wrap in an array, do NOT include any text outside the JSON objects, and do NOT use code fences.
-- Use exactly these object shapes (one per line):
-  { "type": "meta", "title": string }
-  { "type": "card", "question": string, "answer": string, "tags": string[] }
-  { "type": "done" }
-- Start with a single meta line, then stream each card as its own line, and end with a single done line.
-- Keep each JSON object on ONE LINE. Escape any internal newlines as \n within strings.
-
-### Card Creation Principles
-1.  **Promote Active Recall:** Questions must be open-ended to force the learner to retrieve information from memory.
-    - GOOD: "What are the three core principles of spaced repetition?"
-    - BAD: "Are there three core principles of spaced repetition?"
-
-2.  **Ensure Atomicity:** Each card must focus on ONE SINGLE, ISOLATED CONCEPT. DO NOT combine multiple questions or answers on a single card.
-    - GOOD: Q: "What is the primary benefit of active recall?" A: "It strengthens neural pathways, improving long-term memory."
-    - BAD: Q: "What are active recall and spaced repetition?" A: "Active recall is... and spaced repetition is..."
-
-3.  **Foster Deeper Understanding:** Go beyond simple definitions. Create questions that prompt for explanations, comparisons, or the "why" behind a concept. Use the "context_or_example" field to help the learner connect the information to a practical application or a larger framework.
-
-4.  **Keep Answers Concise:** Answers should be clear, direct, and AS BRIEF AS POSSIBLE while remaining accurate. Use markdownbullet points for lists. Prefer one-word answers if possible.
-    - GOOD: Q: "What is 1+1?" A: "2"
-    - BAD: Q: "What is 1+1?" A: "The result of adding 1 and 1 is 2."
-
-- Produce about 15 to 35 cards depending on content size.
-- The flashcards must be in the same language as the content.
-${imagesNote}
-
-Source content:\n---\n${sourceText}\n---`;
+  return body;
 }
 
 // Attempt to extract a JSON object from a possibly-noisy string
@@ -259,12 +209,19 @@ export async function POST(req: NextRequest) {
       });
 
       let anyChunkSent = false;
+      let anyCardSent = false;
       let buffer = '';
       let pendingLine: string | null = null;
 
       const readable = new ReadableStream<Uint8Array>({
         async start(controller) {
           try {
+            // Emit an immediate meta line so the client can render instantly
+            try {
+              const earlyMeta = JSON.stringify({ type: 'meta', title: 'flashcards' }) + '\n';
+              controller.enqueue(encoder.encode(earlyMeta));
+              anyChunkSent = true; // do not count as card
+            } catch {}
             for await (const chunk of stream as any) {
               const token: string = chunk?.choices?.[0]?.delta?.content || '';
               if (!token) continue;
@@ -281,9 +238,10 @@ export async function POST(req: NextRequest) {
                   pendingLine = null;
                 }
                 try {
-                  JSON.parse(line);
+                  const obj = JSON.parse(line);
                   controller.enqueue(encoder.encode(line + '\n'));
                   anyChunkSent = true;
+                  if (obj && obj.type === 'card') anyCardSent = true;
                 } catch {
                   pendingLine = line;
                 }
@@ -291,14 +249,15 @@ export async function POST(req: NextRequest) {
             }
             if (pendingLine) {
               try {
-                JSON.parse(pendingLine);
+                const obj = JSON.parse(pendingLine);
                 controller.enqueue(encoder.encode(pendingLine + '\n'));
                 anyChunkSent = true;
+                if (obj && obj.type === 'card') anyCardSent = true;
               } catch {}
             }
             controller.close();
           } catch (err) {
-            if (!anyChunkSent) {
+            if (!anyCardSent) {
               if (refundInfo && refundInfo.credits > 0) {
                 try { await refundCredits(refundInfo.userId, refundInfo.credits); } catch {}
               }
@@ -335,11 +294,21 @@ export async function POST(req: NextRequest) {
         if (!ok) return NextResponse.json({ error: 'Insufficient credits. Please upgrade your plan or top up.' }, { status: 402 });
       }
       if (shouldStream) {
-        const streamingPrompt = constructFlashcardStreamingPromptFromMarkmap(body.markdown, body.numCards);
+        const streamingPrompt = buildFlashcardPrompt({
+          mode: 'stream',
+          sourceType: 'markmap',
+          sourceContent: body.markdown,
+          numCards: body.numCards,
+        });
         const userIdForRefund = await getUserIdFromAuthHeader(req);
         return streamNdjson(streamingPrompt, (userIdForRefund && creditsNeeded > 0) ? { userId: userIdForRefund, credits: creditsNeeded } : undefined);
       }
-      const prompt = constructFlashcardPromptFromMarkmap(body.markdown, body.numCards);
+      const prompt = buildFlashcardPrompt({
+        mode: 'json',
+        sourceType: 'markmap',
+        sourceContent: body.markdown,
+        numCards: body.numCards,
+      });
       const completion = await openai.chat.completions.create({
         model: 'gemini-2.5-flash',
         // @ts-ignore
@@ -417,12 +386,13 @@ export async function POST(req: NextRequest) {
     }
 
     if (shouldStream) {
-      const prompt = constructFlashcardStreamingPromptFromText(
-        extractedText || 'No text provided. Analyze the attached image(s) only and build flashcards from their content.',
-        promptText,
-        undefined,
-        imageParts.length,
-      );
+      const prompt = buildFlashcardPrompt({
+        mode: 'stream',
+        sourceType: 'text',
+        sourceContent: extractedText || 'No text provided. Analyze the attached image(s) only and build flashcards from their content.',
+        userInstruction: promptText,
+        imagesCount: imageParts.length,
+      });
       const userContent: any = imageParts.length > 0
         ? [{ type: 'text', text: prompt }, ...imageParts]
         : prompt;
@@ -436,6 +406,7 @@ export async function POST(req: NextRequest) {
         stream: true,
       });
       let anyChunkSent = false;
+      let anyCardSent = false;
       let buffer = '';
       let pendingLine: string | null = null;
       const reservedForUserId = userId || null;
@@ -443,6 +414,12 @@ export async function POST(req: NextRequest) {
       const readable = new ReadableStream<Uint8Array>({
         async start(controller) {
           try {
+            // Emit an immediate meta line so the client can render instantly
+            try {
+              const earlyMeta = JSON.stringify({ type: 'meta', title: 'flashcards' }) + '\n';
+              controller.enqueue(encoder.encode(earlyMeta));
+              anyChunkSent = true; // do not count as card
+            } catch {}
             for await (const chunk of stream as any) {
               const token: string = (chunk?.choices?.[0]?.delta?.content || '');
               if (!token) continue;
@@ -454,18 +431,28 @@ export async function POST(req: NextRequest) {
                 newlineIndex = buffer.indexOf('\n');
                 if (!line) continue;
                 if (pendingLine) { line = pendingLine + line; pendingLine = null; }
-                try { JSON.parse(line); controller.enqueue(encoder.encode(line + '\n')); anyChunkSent = true; } catch { pendingLine = line; }
+                try {
+                  const obj = JSON.parse(line);
+                  controller.enqueue(encoder.encode(line + '\n'));
+                  anyChunkSent = true;
+                  if (obj && obj.type === 'card') anyCardSent = true;
+                } catch { pendingLine = line; }
               }
             }
             if (pendingLine) {
-              try { JSON.parse(pendingLine); controller.enqueue(encoder.encode(pendingLine + '\n')); anyChunkSent = true; } catch {}
+              try {
+                const obj = JSON.parse(pendingLine);
+                controller.enqueue(encoder.encode(pendingLine + '\n'));
+                anyChunkSent = true;
+                if (obj && obj.type === 'card') anyCardSent = true;
+              } catch {}
             }
             controller.close();
           } catch (err) {
-            if (!anyChunkSent && reservedForUserId && reservedCredits > 0) {
+            if (!anyCardSent && reservedForUserId && reservedCredits > 0) {
               try { await refundCredits(reservedForUserId, reservedCredits); } catch {}
             }
-            if (!anyChunkSent) controller.error(err); else { try { controller.close(); } catch {} }
+            if (!anyCardSent) controller.error(err); else { try { controller.close(); } catch {} }
           }
         }
       });
@@ -473,12 +460,13 @@ export async function POST(req: NextRequest) {
     }
 
     // Non-streaming JSON
-    const prompt = constructFlashcardPromptFromText(
-      extractedText || 'No text provided. Analyze the attached image(s) only and build flashcards from their content.',
-      promptText,
-      undefined,
-      imageParts.length,
-    );
+    const prompt = buildFlashcardPrompt({
+      mode: 'json',
+      sourceType: 'text',
+      sourceContent: extractedText || 'No text provided. Analyze the attached image(s) only and build flashcards from their content.',
+      userInstruction: promptText,
+      imagesCount: imageParts.length,
+    });
     const userContent: any = imageParts.length > 0 ? [{ type: 'text', text: prompt }, ...imageParts] : prompt;
     const completion = await openai.chat.completions.create({
       model: 'gemini-2.5-flash',

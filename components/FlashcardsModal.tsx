@@ -9,7 +9,7 @@ import type { Components } from 'react-markdown';
 import { ChevronLeft, ChevronRight, Eye, EyeOff, Loader2, X } from 'lucide-react';
 import posthog from 'posthog-js';
 
-export type Flashcard = { question: string; answer: string; tags?: string[] };
+export type Flashcard = { question: string; answer: string };
 type CardWithSchedule = Flashcard & { schedule?: FsrsScheduleState };
 
 const markdownComponents: Components = {
@@ -286,15 +286,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
                           {cards![index]?.answer || ''}
                         </ReactMarkdown>
                       </div>
-                      {cards![index]?.tags?.length ? (
-                        <div className="mt-3 flex flex-wrap gap-2">
-                          {cards![index].tags!.map((t, i) => (
-                            <span key={i} className="text-xs px-2 py-1 rounded-full border border-gray-200 text-gray-600 bg-gray-50">
-                              {t}
-                            </span>
-                          ))}
-                        </div>
-                      ) : null}
+                      
                     </div>
                   )}
                 </div>
