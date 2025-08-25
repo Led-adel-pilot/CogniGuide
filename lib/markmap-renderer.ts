@@ -20,6 +20,7 @@ export interface MindMapNode {
     isAnimating?: boolean;
     parent: MindMapNode | null;
     color: string | null;
+    textColor?: string | null;
     // Properties calculated during layout
     width: number;
     height: number;
@@ -49,7 +50,28 @@ const HORIZONTAL_SPACING = 150;
 const VERTICAL_SPACING = 10;
 const PADDING = 50;
 const ANIMATION_DURATION = 350;
-const COLOR_PALETTE = ['#e2b8ffff', '#fcf88cff', '#acff97', '#ffbc97ff', '#9fc9ffff', '#ffc197ff', '#ffc2d1', '#bde0fe', '#a1ccff', '#f6a6b3'];
+const NODE_COLOR_PALETTE = [
+    '#f6e7dfff',
+    '#edf6dfff',
+    '#f6e9dfff',
+    '#dfecf6ff', 
+    '#dff6ecff',
+    '#f6dfe6ff',
+    '#f0dff6ff',
+    '#f9f6dcff',
+    '#f9edebff'
+];
+// Text/border colors are derived from the node colors for good contrast
+const TEXT_COLOR_PALETTE = [
+    '#bd4828ff', 
+    '#6aa210ff', 
+    '#bd780aff', 
+    '#1269b5ff', 
+    '#10a277ff', 
+    '#a91e4aff', 
+    '#861ea9ff', 
+    '#c1b010ff', 
+    '#b51222ff'];
 // Optional initial pan offsets applied on first render/initialization
 const INITIAL_PAN_X_OFFSET = -400;
 const INITIAL_PAN_Y_OFFSET = 0;
@@ -141,14 +163,6 @@ function varyHue(color: string, amount: number): string {
     return rgbToHex(newR, newG, newB);
 }
 
-function varyLightness(color: string, amount: number): string {
-    const { r, g, b } = hexToRgb(color);
-    let { h, s, l } = rgbToHsl(r, g, b);
-    l = Math.max(0, Math.min(1, l + amount));
-    const { r: newR, g: newG, b: newB } = hslToRgb(h, s, l);
-    return rgbToHex(newR, newG, newB);
-}
-
 function darkenColor(color: string, percent: number): string {
     if (!color) return '#000000';
     let { r, g, b } = hexToRgb(color);
@@ -196,19 +210,19 @@ function applyColorVariations(node: MindMapNode) {
     if (node.color && childrenWithSubtrees.length >= 2) {
         const n = childrenWithSubtrees.length;
         const HUE_VARIATION = 0.03;
-        const LIGHTNESS_VARIATION = 0;
         const baseColor = node.color;
+        const baseTextColor = node.textColor ?? (baseColor ? darkenColor(baseColor, 70) : null);
         childrenWithSubtrees.forEach((childNode, index) => {
             const variationStep = n === 1 ? 0 : (index / (n - 1)) * 2 - 1;
             const hueShift = HUE_VARIATION * variationStep;
-            const lightnessShift = LIGHTNESS_VARIATION * variationStep * (index % 2 === 0 ? 1 : -1);
-            let variedColor = varyHue(baseColor, hueShift);
-            variedColor = varyLightness(variedColor, lightnessShift);
-            function setSubtreeColor(subtreeNode: MindMapNode, color: string) {
+            const variedColor = varyHue(baseColor, hueShift);
+            const variedTextColor = baseTextColor ? varyHue(baseTextColor, hueShift) : null;
+            function setSubtreeStyle(subtreeNode: MindMapNode, color: string, textColor: string | null) {
                 subtreeNode.color = color;
-                subtreeNode.children.forEach(child => setSubtreeColor(child, color));
+                if (textColor) subtreeNode.textColor = textColor;
+                subtreeNode.children.forEach(child => setSubtreeStyle(child, color, textColor));
             }
-            setSubtreeColor(childNode, variedColor);
+            setSubtreeStyle(childNode, variedColor, variedTextColor);
         });
     }
     node.children.forEach(applyColorVariations);
@@ -226,9 +240,10 @@ function parseMarkmap(markdown: string): MindMapNode {
         rootText = lines[h1Index].trim().substring(2);
         lines.splice(h1Index, 1);
     }
+    const rootBaseColor = '#dfecf6ff';
     const root: MindMapNode = {
         id: 'node-0', text: rootText, html: renderMarkdownToHTML(rootText),
-        children: [], level: 0, isRoot: true, color: '#8cb8fe', parent: null,
+        children: [], level: 0, isRoot: true, color: rootBaseColor, textColor: TEXT_COLOR_PALETTE[3], parent: null,
         width: 0, height: 0, x: 0, y: 0
     };
     const parentStack = [root];
@@ -268,7 +283,16 @@ function parseMarkmap(markdown: string): MindMapNode {
             parentStack.pop();
         }
         const parent = parentStack[parentStack.length - 1];
-        let nodeColor = parent.isRoot ? COLOR_PALETTE[colorIndex++ % COLOR_PALETTE.length] : parent.color;
+        let nodeColor: string | null;
+        let nodeTextColor: string | null;
+        if (parent.isRoot) {
+            const idx = colorIndex++ % NODE_COLOR_PALETTE.length;
+            nodeColor = NODE_COLOR_PALETTE[idx];
+            nodeTextColor = TEXT_COLOR_PALETTE[idx] ?? darkenColor(nodeColor, 70);
+        } else {
+            nodeColor = parent.color;
+            nodeTextColor = parent.textColor ?? (nodeColor ? darkenColor(nodeColor, 70) : null);
+        }
         const newNode: MindMapNode = {
             id: `node-${nodeCounter++}`, text: text, html: renderMarkdownToHTML(text),
             children: [],
@@ -277,6 +301,7 @@ function parseMarkmap(markdown: string): MindMapNode {
             level: level,
             parent: parent,
             color: nodeColor,
+            textColor: nodeTextColor,
             width: 0, height: 0, x: 0, y: 0
         };
         parent.children.push(newNode);
@@ -302,9 +327,9 @@ function autoFitView(markdown: string) {
     const viewportWidth = viewport.clientWidth;
     const viewportHeight = viewport.clientHeight;
 
-    // Use 90% of viewport to leave a margin
-    const effectiveWidth = viewportWidth * 0.9;
-    const effectiveHeight = viewportHeight * 0.9;
+    // Use 99.5% of viewport to leave a smaller margin
+    const effectiveWidth = viewportWidth * 0.995;
+    const effectiveHeight = viewportHeight * 0.995;
 
     const contentWidth = bounds.width + PADDING * 2;
     const contentHeight = bounds.height + PADDING * 2;
@@ -391,9 +416,9 @@ function drawConnector(parent: MindMapNode, child: MindMapNode, svgEl: SVGSVGEle
         path.style.opacity = '0';
         requestAnimationFrame(() => { path.style.opacity = '1'; });
     }
-    if (child.color) {
-        path.style.stroke = saturateColor(darkenColor(child.color, 25), 60);
-    }
+    // Match connector color to the node's text color for visual consistency
+    const connectorStroke = child.textColor ?? (child.color ? darkenColor(child.color, 70) : '#000000');
+    path.style.stroke = connectorStroke;
     const p1 = { x: parent.x + parent.width + xOffset, y: parent.y + parent.height / 2 + yOffset };
     const p2 = { x: child.x + xOffset, y: child.y + child.height / 2 + yOffset };
     const d = `M ${p1.x} ${p1.y} C ${p1.x + (p2.x - p1.x) / 2} ${p1.y}, ${p1.x + (p2.x - p1.x) / 2} ${p2.y}, ${p2.x} ${p2.y}`;
@@ -430,17 +455,17 @@ function renderNodeAndChildren(node: MindMapNode, container: HTMLElement, svgEl:
     }
     
     if (node.color) {
-        const borderColor = saturateColor(darkenColor(node.color, 25), 60);
+        const borderColor = node.textColor ?? saturateColor(darkenColor(node.color, 25), 60);
         nodeEl.style.backgroundColor = node.color;
         nodeEl.style.borderColor = borderColor;
-        nodeEl.style.color = darkenColor(node.color, 70);
+        nodeEl.style.color = node.textColor ?? darkenColor(node.color, 70);
         nodeEl.style.setProperty('--indicator-border-color', borderColor);
         nodeEl.style.setProperty('--collapsed-indicator-color', node.color);
     }
     if (node.isRoot) {
         nodeEl.classList.add('root');
-        // Use the node's assigned color for text color as well, for consistency
-        nodeEl.style.color = darkenColor(node.color || '#b5d9ffff', 70);
+        // Use explicit text color if provided, otherwise derive from background
+        nodeEl.style.color = node.textColor ?? darkenColor(node.color || '#b5d9ffff', 70);
     }
     if (node.children.length > 0) nodeEl.classList.add('has-children');
     if (node.isCollapsed) nodeEl.classList.add('collapsed');

@@ -22,7 +22,7 @@ const InteractiveMindMap = () => {
 export default function Home() {
   const [showAuth, setShowAuth] = useState(false);
   const [isAuthed, setIsAuthed] = useState(false);
-  const [view, setView] = useState('mindmap');
+  const [view, setView] = useState('flashcards');
   const router = useRouter();
 
   useEffect(() => {
