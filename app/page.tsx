@@ -97,7 +97,9 @@ export default function Home() {
             <div className="container">
               <div className="text-center mb-8">
                 <h2 className="text-3xl md:text-4xl font-bold font-heading tracking-tight">The Science of Smarter Learning</h2>
-                <p className="text-muted-foreground mt-3 max-w-3xl mx-auto">CogniGuide integrates two powerful, research-backed learning methods. Visual mind maps reduce cognitive load and help you grasp the big picture, while our intelligent Spaced Repetition flashcards lock knowledge into your long-term memory.</p>
+                <p className="text-muted-foreground mt-3 max-w-3xl mx-auto">
+                  CogniGuide combines research-backed methods: visual <span className="font-semibold">  mind maps</span> to reduce cognitive load, <span className="font-semibold">active recall</span> with flashcards and <span className="font-semibold">spaced repetition</span> to secure long-term memory.
+                </p>
               </div>
               <div className="relative">
                 <div className="flex justify-center mb-4">
