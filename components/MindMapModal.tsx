@@ -306,7 +306,7 @@ body { margin: 0; background: #ffffff; ${computedFontFamily ? `font-family: ${co
   const initializedRef = useRef(false);
 
   // Flashcards state
-  type Flashcard = { question: string; answer: string; tags?: string[] };
+  type Flashcard = { question: string; answer: string };
   const [viewMode, setViewMode] = useState<'map' | 'flashcards'>('map');
   const [flashcards, setFlashcards] = useState<Flashcard[] | null>(null);
   const [isGeneratingFlashcards, setIsGeneratingFlashcards] = useState(false);
@@ -443,7 +443,6 @@ body { margin: 0; background: #ffffff; ${computedFontFamily ? `font-family: ${co
             const card: Flashcard = {
               question: String(obj.question || ''),
               answer: String(obj.answer || ''),
-              tags: Array.isArray(obj.tags) ? obj.tags.map((t: any) => String(t)) : undefined,
             };
             accumulated.push(card);
             setFlashcards(prev => {

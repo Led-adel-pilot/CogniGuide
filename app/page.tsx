@@ -2,8 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
-import { Share2, UploadCloud, Zap, FileUp } from 'lucide-react';
-import FlashcardIcon from '@/components/FlashcardIcon';
+import { Share2, UploadCloud, Zap } from 'lucide-react';
 import Generator from '@/components/Generator';
 import Link from 'next/link';
 import CogniGuideLogo from '../CogniGuide_logo.png';
@@ -177,53 +176,7 @@ export default function Home() {
             </div>
           </section>
 
-          {/* Features Section */}
-          <section className="py-20">
-            <div className="container">
-              <div className="text-center mb-12">
-                <h2 className="text-3xl md:text-4xl font-bold font-heading tracking-tight">An Intelligent Partner for Your Brain</h2>
-                <p className="text-muted-foreground mt-2">Features designed to make you smarter, faster, and more creative.</p>
-              </div>
-              <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-                 <div className="flex items-start space-x-4 p-6 bg-background rounded-[1.25rem] border hover:border-primary/50 hover:shadow-lg transition-all">
-                  <div className="flex-shrink-0 h-10 w-10 flex items-center justify-center rounded-lg bg-primary/10 text-primary">
-                    <FileUp className="h-6 w-6" />
-                  </div>
-                  <div>
-                    <h3 className="font-bold font-heading text-lg">Versatile Document Support</h3>
-                    <p className="text-muted-foreground text-sm mt-1">Supports PDF, DOCX, PPTX, TXT files and images, extracting key information automatically.</p>
-                  </div>
-                </div>
-                <div className="flex items-start space-x-4 p-6 bg-background rounded-[1.25rem] border hover:border-primary/50 hover:shadow-lg transition-all">
-                  <div className="flex-shrink-0 h-10 w-10 flex items-center justify-center rounded-lg bg-primary/10 text-primary">
-                    <Zap className="h-6 w-6" />
-                  </div>
-                  <div>
-                    <h3 className="font-bold font-heading text-lg">Deep AI Analysis</h3>
-                    <p className="text-muted-foreground text-sm mt-1">Goes beyond summarization to create logical, hierarchical mind maps.</p>
-                  </div>
-                </div>
-                <div className="flex items-start space-x-4 p-6 bg-background rounded-[1.25rem] border hover:border-primary/50 hover:shadow-lg transition-all">
-                  <div className="flex-shrink-0 h-10 w-10 flex items-center justify-center rounded-lg bg-primary/10 text-primary">
-                    <FlashcardIcon className="h-6 w-6" />
-                  </div>
-                  <div>
-                    <h3 className="font-bold font-heading text-lg">Intelligent Spaced Repetition</h3>
-                    <p className="text-muted-foreground text-sm mt-1">Master your subjects with flashcards that adapt to you. Our spaced repetition system schedules reviews at the right time to move information from short-term to long-term memory, ensuring you never forget.</p>
-                  </div>
-                </div>
-                <div className="flex items-start space-x-4 p-6 bg-background rounded-[1.25rem] border hover:border-primary/50 hover:shadow-lg transition-all">
-                  <div className="flex-shrink-0 h-10 w-10 flex items-center justify-center rounded-lg bg-primary/10 text-primary">
-                    <Zap className="h-6 w-6" />
-                  </div>
-                  <div>
-                    <h3 className="font-bold font-heading text-lg">Instant Generation</h3>
-                    <p className="text-muted-foreground text-sm mt-1">Save hours of manual work. Our AI processes content and builds maps in seconds, not minutes.</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </section>
+          
 
           {/* Final CTA Section */}
           <section className="py-20">

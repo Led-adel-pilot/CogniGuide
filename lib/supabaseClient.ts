@@ -27,7 +27,7 @@ export type FlashcardsRecord = {
   user_id: string;
   title: string | null;
   markdown: string; // source mindmap markdown snapshot
-  cards: Array<{ question: string; answer: string; tags?: string[] }>; // stored as jsonb
+  cards: Array<{ question: string; answer: string }>; // stored as jsonb
   created_at: string;
 };
 

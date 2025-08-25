@@ -98,7 +98,7 @@ For consistent branding across the application, use the `CogniGuide_logo.png` fi
 *   Two input modes:
     - JSON POST with `{ markdown: string, numCards?: number }` (existing behavior) to synthesize flashcards from Markmap markdown. Streaming supported when `?stream=1` and emits NDJSON lines.
     - `FormData` POST with one or more `files` and optional `prompt` to generate flashcards directly from uploaded content (PDF/DOCX/PPTX/TXT/MD and images). Documents are parsed with `lib/document-parser.ts`; images are attached for multimodal OCR/diagram understanding. Streaming supported via NDJSON.
-*   Returns `{ title?: string, cards: { question: string, answer: string, tags?: string[] }[] }`.
+*   Returns `{ title?: string, cards: { question: string, answer: string }[] }`.
 *   The prompt instructs the model to emit a strict JSON object; the handler defensively extracts a JSON object from the response.
 *   Saving: when a user is authenticated, the UI saves generated flashcards to Supabase with the original mind map markdown snapshot, derived title, and the JSON array of cards.
 *   Retrieval: when `MindMapModal` opens for a given markdown, it first looks in an in-memory cache; if not found, it checks `localStorage` using a SHA‑256 hash of the markdown for an instant hit; if still not found and the user is signed in, it queries Supabase (`flashcards`) by `user_id` and `title` only (newest `created_at`) to avoid sending the full markdown over the network. On success, it mirrors the deck into `localStorage` and updates it with the Supabase `id` after save.
@@ -131,7 +131,7 @@ For consistent branding across the application, use the `CogniGuide_logo.png` fi
        - `user_id`: the authenticated user's id
        - `title`: extracted from `#` heading or `title:` in frontmatter
        - `markdown`: the source Markmap markdown snapshot at the time of generation
-       - `cards`: an array of `{ question, answer, tags? }` (stored as `jsonb`)
+       - `cards`: an array of `{ question, answer }` (stored as `jsonb`)
     2) From Dashboard (files/prompts without a mind map): inserts into `flashcards` with:
        - `user_id`
        - `title`: derived or fallback "flashcards"

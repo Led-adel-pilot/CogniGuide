@@ -169,7 +169,6 @@ export default function Generator({ redirectOnAuth = false, showTitle = true }: 
                   const card: FlashcardType = {
                     question: String(obj.question || ''),
                     answer: String(obj.answer || ''),
-                    tags: Array.isArray(obj.tags) ? obj.tags.map((t: any) => String(t)) : undefined,
                   };
                   accumulated.push(card);
                   setFlashcardsCards((prev) => prev ? [...prev, card] : [card]);
