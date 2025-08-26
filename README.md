@@ -26,7 +26,12 @@ CogniGuide comprehensive AI-powered study assistant. It uses an LLM to convert t
 *   `mammoth`: Used in `lib/document-parser.ts` via `getTextFromDocx` to convert DOCX files to plain text.
 *   `pptx-text-parser`: Used in `lib/document-parser.ts` via `getTextFromPptx` to extract text from PPTX files. This involves writing the buffer to a temporary file and then parsing it.
 *   Markdown/TXT: `.md` and `.txt` files are treated as plain text and read directly.
-*   **Content Limits for Non-Authenticated Users**: All document parsing functions (`getTextFromPdf`, `getTextFromDocx`, `getTextFromPptx`) automatically limit extracted content to 1 credit worth (3,800 characters) for non-authenticated users. Content exceeding this limit is truncated at word boundaries with a message indicating the user should sign up for unlimited access.
+*   **Content Limits by User Tier**: All document parsing functions (`getTextFromPdf`, `getTextFromDocx`, `getTextFromPptx`) automatically limit extracted content based on user tier:
+    *   **Non-authenticated users**: 1 credit worth (3,800 characters)
+    *   **Free plan users**: 5 credits worth (19,000 characters)
+    *   **Paid plan users**: 30 credits worth (114,000 characters)
+    Content exceeding tier limits is truncated at word boundaries with a message indicating the user should sign up or upgrade for unlimited access.
+    *   **Performance Optimization**: User tier information is cached in memory for 5 minutes to avoid repeated database queries, ensuring fast response times for logged-in users.
  *   **Mind Map Rendering:** The application uses a custom Markmap-like renderer implemented in `lib/markmap-renderer.ts` (and embedded within `components/MindMapModal.tsx` for HTML export). This renderer handles parsing markdown, measuring node sizes, laying out the tree, and drawing SVG connectors and HTML nodes. It includes logic for color variations, node collapsing/expanding, and pan/zoom functionality. It now features an intelligent **auto-fit-to-view** that centers and scales the mind map to be fully visible on initial load and during streaming. This behavior stops once the user interacts with the map.
     *   **Touch Support:** The renderer now includes comprehensive touch event handling for mobile devices, enabling single-finger panning and two-finger pinch-to-zoom gestures for intuitive navigation.
     *   **Incremental Updates:** The renderer exposes an `updateMindMap(markdown: string)` function to support incremental re-rendering while the model is streaming output, enabling smooth progressive visualization.
