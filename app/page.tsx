@@ -64,7 +64,10 @@ export default function Home() {
                   <button onClick={() => router.push('/dashboard')} className="px-4 py-2 text-sm rounded-full border hover:bg-gray-50">Dashboard</button>
                 </>
               ) : (
-                <button onClick={() => setShowAuth(true)} className="px-4 py-2 text-sm rounded-full bg-primary text-white hover:bg-primary/90 transition-colors">Sign up</button>
+                <div className="flex items-center gap-2">
+                  <span className="text-sm text-muted-foreground">Try 5 generations free!</span>
+                  <button onClick={() => setShowAuth(true)} className="px-4 py-2 text-sm rounded-full bg-primary text-white hover:bg-primary/90 transition-colors">Sign up</button>
+                </div>
               )}
             </div>
           </div>

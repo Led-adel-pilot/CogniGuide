@@ -30,6 +30,7 @@ export default function Generator({ redirectOnAuth = false, showTitle = true }: 
   const [flashcardsError, setFlashcardsError] = useState<string | null>(null);
   const [flashcardsDeckId, setFlashcardsDeckId] = useState<string | undefined>(undefined);
   const [authChecked, setAuthChecked] = useState(false);
+  const [freeGenerationsLeft, setFreeGenerationsLeft] = useState<number>(5);
   const router = useRouter();
 
   useEffect(() => {
@@ -38,6 +39,14 @@ export default function Generator({ redirectOnAuth = false, showTitle = true }: 
       const authed = Boolean(data.user);
       setIsAuthed(authed);
       setUserId(data.user ? data.user.id : null);
+
+      // Load free generations count for unauthenticated users
+      if (!authed && typeof window !== 'undefined') {
+        const stored = localStorage.getItem('cogniguide_free_generations');
+        const used = stored ? parseInt(stored, 10) : 0;
+        setFreeGenerationsLeft(Math.max(0, 5 - used));
+      }
+
       setAuthChecked(true);
     };
     init();
@@ -108,9 +117,9 @@ export default function Generator({ redirectOnAuth = false, showTitle = true }: 
         return;
       }
 
-      // Require authentication for all generations
-      if (!isAuthed) {
-        setShowAuth(true);
+      // Check free generations for unauthenticated users
+      if (!isAuthed && freeGenerationsLeft <= 0) {
+        setError('You\'ve used all 5 free generations. Please sign up to continue generating flashcards!');
         return;
       }
 
@@ -170,6 +179,15 @@ export default function Generator({ redirectOnAuth = false, showTitle = true }: 
             }
           } catch {}
         }
+        // Increment free generation counter for unauthenticated users
+        if (!isAuthed && typeof window !== 'undefined') {
+          const stored = localStorage.getItem('cogniguide_free_generations');
+          const used = stored ? parseInt(stored, 10) : 0;
+          const newUsed = used + 1;
+          localStorage.setItem('cogniguide_free_generations', newUsed.toString());
+          setFreeGenerationsLeft(Math.max(0, 5 - newUsed));
+        }
+
         // Open modal only after successful response
         setFlashcardsOpen(true);
 
@@ -247,7 +265,7 @@ export default function Generator({ redirectOnAuth = false, showTitle = true }: 
           }
         }
 
-        if (!isAuthed) { setShowAuth(true); }
+        // No longer require sign-in after successful generation
       } catch (err) {
         const errorMessage = err instanceof Error ? err.message : 'Failed to generate flashcards.';
         setError(errorMessage);
@@ -262,9 +280,9 @@ export default function Generator({ redirectOnAuth = false, showTitle = true }: 
       return;
     }
 
-    // Require authentication for all generations
-    if (!isAuthed) {
-      setShowAuth(true);
+    // Check free generations for unauthenticated users
+    if (!isAuthed && freeGenerationsLeft <= 0) {
+      setError('You\'ve used all 5 free generations. Please sign up to continue generating mind maps!');
       return;
     }
 
@@ -337,7 +355,7 @@ export default function Generator({ redirectOnAuth = false, showTitle = true }: 
             if (typeof window !== 'undefined') window.dispatchEvent(new CustomEvent('cogniguide:generation-complete'));
           } catch {}
         }
-        if (!isAuthed) { setShowAuth(true); }
+        // No longer require sign-in after successful generation
         return;
       }
       const reader = response.body?.getReader();
@@ -364,6 +382,15 @@ export default function Generator({ redirectOnAuth = false, showTitle = true }: 
       const md = accumulated.trim();
       if (!md) throw new Error('Empty result from AI.');
 
+      // Increment free generation counter for unauthenticated users
+      if (!isAuthed && typeof window !== 'undefined') {
+        const stored = localStorage.getItem('cogniguide_free_generations');
+        const used = stored ? parseInt(stored, 10) : 0;
+        const newUsed = used + 1;
+        localStorage.setItem('cogniguide_free_generations', newUsed.toString());
+        setFreeGenerationsLeft(Math.max(0, 5 - newUsed));
+      }
+
       // Save for authed users after stream completes
       if (isAuthed && userId) {
         const title = (() => {
@@ -378,10 +405,7 @@ export default function Generator({ redirectOnAuth = false, showTitle = true }: 
           if (typeof window !== 'undefined') window.dispatchEvent(new CustomEvent('cogniguide:generation-complete'));
         } catch {}
       }
-      // Require sign-in for all generations
-      if (!isAuthed) {
-        setShowAuth(true);
-      }
+      // No longer require sign-in after successful generation
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to generate mind map.';
       setError(errorMessage);
@@ -453,9 +477,9 @@ export default function Generator({ redirectOnAuth = false, showTitle = true }: 
                 isPreParsing={isPreParsing}
                 onOpen={() => {
                   if (!authChecked) return false;
-                  if (!isAuthed) {
+                  if (!isAuthed && freeGenerationsLeft <= 0) {
                     setShowAuth(true);
-                    return false; // block file dialog for unauth users
+                    return false; // block file dialog if no free generations left
                   }
                   return true;
                 }}
@@ -471,7 +495,7 @@ export default function Generator({ redirectOnAuth = false, showTitle = true }: 
                 mode={mode}
                 onInteract={() => {
                   if (!authChecked) return;
-                  if (!isAuthed) setShowAuth(true);
+                  if (!isAuthed && freeGenerationsLeft <= 0) setShowAuth(true);
                 }}
               />                  
               {error && (
@@ -489,6 +513,38 @@ export default function Generator({ redirectOnAuth = false, showTitle = true }: 
                       </button>
                     )}
                   </div>
+                </div>
+              )}
+
+              {!isAuthed && freeGenerationsLeft > 0 && freeGenerationsLeft < 5 && (
+                <div className="mt-4 text-center p-3 bg-green-50 border border-green-200 text-green-700 rounded-[1.25rem]">
+                  <p className="text-sm font-medium">
+                    {freeGenerationsLeft} free {freeGenerationsLeft === 1 ? 'generation' : 'generations'} remaining.{' '}
+                    <button
+                      type="button"
+                      onClick={() => setShowAuth(true)}
+                      className="underline hover:no-underline font-semibold"
+                    >
+                      Sign up
+                    </button>{' '}
+                    for unlimited generations!
+                  </p>
+                </div>
+              )}
+
+              {!isAuthed && freeGenerationsLeft === 5 && (
+                <div className="mt-4 text-center p-3 bg-blue-50 border border-blue-200 text-blue-700 rounded-[1.25rem]">
+                  <p className="text-sm font-medium">
+                    You have 5 free generations!{' '}
+                    <button
+                      type="button"
+                      onClick={() => setShowAuth(true)}
+                      className="underline hover:no-underline font-semibold"
+                    >
+                      Sign up
+                    </button>{' '}
+                    for unlimited generations.
+                  </p>
                 </div>
               )}
             </div>

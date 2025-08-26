@@ -19,7 +19,7 @@ CogniGuide comprehensive AI-powered study assistant. It uses an LLM to convert t
 ## Technology Stack
 *   **Framework:** Next.js (React) for building the web application.
 *   **Styling:** Tailwind CSS for utility-first styling.
-*   **AI Integration:** OpenAI API (configured to use Google's Gemini API) for generating mind map content from text and images. The `GEMINI_API_KEY` environment variable is used for authentication. The `gemini-2.5-flash` model is specifically used for generating the Markmap Markdown and supports multimodal inputs.
+*   **AI Integration:** OpenAI API (configured to use Google's Gemini API) for generating mind map content from text and images. The `GEMINI_API_KEY` environment variable is used for authentication. The `gemini-2.5-flash-lite` model is specifically used for generating the Markmap Markdown and supports multimodal inputs.
     *   **Streaming Support:** When available, the API uses streaming (token-by-token) to forward model output to the client as a `text/plain` stream. The frontend consumes partial markdown and progressively updates the renderer to reduce perceived latency.
 *   **Document Parsing:**
 *   `pdf-parse`: Used in `lib/document-parser.ts` via `getTextFromPdf` to extract text from PDF files.
@@ -29,9 +29,78 @@ CogniGuide comprehensive AI-powered study assistant. It uses an LLM to convert t
  *   **Mind Map Rendering:** The application uses a custom Markmap-like renderer implemented in `lib/markmap-renderer.ts` (and embedded within `components/MindMapModal.tsx` for HTML export). This renderer handles parsing markdown, measuring node sizes, laying out the tree, and drawing SVG connectors and HTML nodes. It includes logic for color variations, node collapsing/expanding, and pan/zoom functionality. It now features an intelligent **auto-fit-to-view** that centers and scales the mind map to be fully visible on initial load and during streaming. This behavior stops once the user interacts with the map.
     *   **Touch Support:** The renderer now includes comprehensive touch event handling for mobile devices, enabling single-finger panning and two-finger pinch-to-zoom gestures for intuitive navigation.
     *   **Incremental Updates:** The renderer exposes an `updateMindMap(markdown: string)` function to support incremental re-rendering while the model is streaming output, enabling smooth progressive visualization.
- *   **Authentication & DB:** Supabase is used for authentication (email magic link and Google OAuth) and to persist user mind map history (only markdown is stored).
+*   **Spaced Repetition:** TS-FSRS (Free Spaced Repetition Scheduler) algorithm implementation for optimal flashcard scheduling. The `ts-fsrs` library provides FSRS-6 algorithm with configurable parameters for difficulty, stability, and optimal review timing.
+*   **Analytics & Event Tracking:** PostHog integration for comprehensive user behavior analytics, feature flag management, and A/B testing capabilities.
+*   **Authentication & DB:** Supabase is used for authentication (email magic link and Google OAuth) and to persist user mind map history and flashcard data (only markdown is stored for mind maps, full flashcard data with scheduling state).
 *   **Image Generation:** `dom-to-image-more` is used in `components/MindMapModal.tsx` to convert the rendered mind map (a DOM element) into SVG or PNG images for export.
  *   **PDF Generation:** Users can export to PDF via the browser's print dialog directly from `components/MindMapModal.tsx`. The modal opens a print-friendly window that clones the live HTML+SVG mind map, auto-fits and centers it to the page, so the resulting PDF preserves selectable text and vector connectors (no rasterization). Default scale is 180% of best fit; you can override per mind map by adding frontmatter `print_scale: <number>` (e.g., `print_scale: 1.2` for 120%).
+
+## PostHog Analytics Integration
+
+CogniGuide includes comprehensive PostHog integration for user behavior analytics, feature flag management, and A/B testing. The integration provides valuable insights into user engagement and feature usage.
+
+### Key Features
+*   **Event Tracking:** Automatic tracking of user interactions across the application
+*   **Feature Flags:** Dynamic feature toggling and experimentation capabilities
+*   **Error Tracking:** Client-side error monitoring and reporting
+*   **User Analytics:** Detailed user journey analysis and retention metrics
+
+### Tracked Events
+The application tracks numerous user interactions including:
+- File uploads and removals
+- Generation submissions (mind maps and flashcards)
+- Authentication events (sign-ups, sign-outs)
+- Modal interactions and navigation
+- Export actions (SVG, PNG, PDF)
+- Flashcard study sessions and grading
+- Contact form submissions
+- Pricing page interactions
+
+### Configuration
+PostHog is configured in `instrumentation-client.ts` with:
+- API host pointing to `/ingest` for Next.js API route proxying
+- UI host set to `https://us.posthog.com`
+- Automatic exception capturing
+- Development mode debugging
+
+### Environment Variables
+```env
+NEXT_PUBLIC_POSTHOG_KEY=your_posthog_project_api_key
+```
+
+## TS-FSRS Spaced Repetition Algorithm
+
+CogniGuide implements the advanced TS-FSRS (Free Spaced Repetition Scheduler) algorithm for optimal flashcard scheduling and retention. This research-backed algorithm provides superior long-term retention compared to traditional spaced repetition methods.
+
+### Key Features
+*   **FSRS-6 Algorithm:** Latest version of the Free Spaced Repetition Scheduler
+*   **Adaptive Scheduling:** Dynamically adjusts review intervals based on individual card performance
+*   **Difficulty Tracking:** Maintains difficulty scores for each flashcard
+*   **Stability Metrics:** Tracks memory stability over time
+*   **Exam Date Constraints:** Prevents review scheduling beyond specified exam dates
+*   **Cross-Device Synchronization:** Maintains scheduling state across devices via Supabase
+
+### Implementation Details
+*   **Library:** Uses the `ts-fsrs` package for FSRS-6 implementation
+*   **Configuration:** Custom parameters optimized for educational content
+*   **Persistence:** Stores scheduling state in Supabase `flashcards_schedule` table
+*   **Caching:** In-memory and localStorage caching for instant loading
+*   **Offline Support:** Continues functioning without network connectivity
+
+### Scheduling Parameters
+Each flashcard tracks:
+- **Difficulty:** How hard the card is to remember (1-10 scale)
+- **Stability:** How stable the memory is (in days)
+- **Reps:** Number of successful reviews
+- **Lapses:** Number of forgotten responses
+- **Learning Steps:** Progress through initial learning phase
+- **Due Date:** Next scheduled review time
+
+### Grading System
+- **Again (1):** Complete blackout, immediate review
+- **Hard (2):** Significant difficulty, longer interval
+- **Good (3):** Moderate effort, standard interval
+- **Easy (4):** Effortless recall, extended interval
 
 ## Project Structure Highlights
 
@@ -88,7 +157,7 @@ For consistent branding across the application, use the `CogniGuide_logo.png` fi
 *   It receives `FormData` which can contain either a `File` object (for document uploads) or a `promptText` string.
 *   **Document/Image Processing:** It intelligently determines the file type and uses helper functions from `lib/document-parser.ts` (`getTextFromPdf`, `getTextFromDocx`, `getTextFromPptx`) to extract raw text content from uploaded documents. It also supports plain text and Markdown (`text/markdown`, `.md`) files directly by reading their contents as UTF-8. For images (`image/*`), it attaches them to the multimodal request so the model can perform OCR and diagram understanding; when only images are provided, the API instructs the model to build a mind map from image content alone.
 *   **Prompt Engineering:** The `constructPrompt` function is crucial for guiding the AI. It builds a detailed prompt that instructs the AI to generate a structured, hierarchical mind map in Markmap Markdown format, adhering to specific rules (root node, parent/child nodes, no extra text). It also incorporates any custom user instructions.
-*   **AI Interaction:** It initializes the OpenAI client (configured to use Google's Gemini API) and sends the `finalPrompt` to the `gemini-2.5-flash` model.
+*   **AI Interaction:** It initializes the OpenAI client (configured to use Google's Gemini API) and sends the `finalPrompt` to the `gemini-2.5-flash-lite` model.
 *   **Response Handling:** It extracts the markdown content from the AI's response, logs it, and returns it as a JSON response to the client. Comprehensive error handling is implemented for unsupported file types, missing input, and AI generation failures.
 
 ### Utility Libraries (`lib/`)
@@ -102,6 +171,40 @@ For consistent branding across the application, use the `CogniGuide_logo.png` fi
 *   The prompt instructs the model to emit a strict JSON object; the handler defensively extracts a JSON object from the response.
 *   Saving: when a user is authenticated, the UI saves generated flashcards to Supabase with the original mind map markdown snapshot, derived title, and the JSON array of cards.
 *   Retrieval: when `MindMapModal` opens for a given markdown, it first looks in an in-memory cache; if not found, it checks `localStorage` using a SHA‑256 hash of the markdown for an instant hit; if still not found and the user is signed in, it queries Supabase (`flashcards`) by `user_id` and `title` only (newest `created_at`) to avoid sending the full markdown over the network. On success, it mirrors the deck into `localStorage` and updates it with the Supabase `id` after save.
+
+### Credit Management APIs
+
+#### Ensure Credits API (`app/api/ensure-credits/route.ts`)
+*   **Purpose:** Ensures users have the correct credit allocation based on their subscription status
+*   **Method:** POST/GET
+*   **Authentication:** Required (Bearer token in Authorization header)
+*   **Functionality:**
+    - Checks for active subscription status
+    - For free users: Grants initial credits and handles monthly refills
+    - For paid users: Skips credit management (handled via webhooks)
+    - Prevents duplicate credit entries using upsert operations
+    - Tracks last refill date to manage monthly cycles
+
+#### Refill Credits API (`app/api/refill-credits/route.ts`)
+*   **Purpose:** Cron job endpoint for monthly credit refills for paid subscribers
+*   **Method:** POST
+*   **Authentication:** Cron secret token required
+*   **Functionality:**
+    - Queries all active subscriptions
+    - Checks if monthly refill is due (based on last_refilled_at)
+    - Refills credits according to plan (Student: 300, Pro: 1000)
+    - Updates user_credits table with new balances
+
+#### Preparse API (`app/api/preparse/route.ts`)
+*   **Purpose:** Pre-processes uploaded files to extract text and prepare content for generation
+*   **Method:** POST
+*   **Content-Type:** multipart/form-data
+*   **Functionality:**
+    - Accepts multiple file uploads (PDF, DOCX, PPTX, TXT, MD, images)
+    - Extracts text content using `lib/document-parser.ts`
+    - Converts images to base64 data URLs for multimodal processing
+    - Returns combined text and image data for efficient processing
+    - Provides character count for credit calculation
 
 *   `lib/supabaseClient.ts`: Initializes the Supabase browser client using `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY`. Also exports the `MindmapRecord` type used for dashboard history.
 
@@ -217,6 +320,8 @@ NEXT_PUBLIC_PADDLE_PRICE_ID_PRO_MONTH=pri_xxx
 NEXT_PUBLIC_PADDLE_PRICE_ID_PRO_YEAR=pri_xxx
 PADDLE_WEBHOOK_SECRET=your_paddle_webhook_secret
 SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
+NEXT_PUBLIC_POSTHOG_KEY=your_posthog_project_api_key
+CRON_SECRET=your_cron_job_secret_for_credit_refills
 NEXT_PUBLIC_BASE_URL=your_production_domain # Optional: defaults to deployment URL
 ```
 
@@ -239,6 +344,9 @@ NEXT_PUBLIC_BASE_URL=your_production_domain # Optional: defaults to deployment U
 - **Credit Accounting**:
   - Monthly credits are granted based on the user’s plan. Tables used: `customers`, `subscriptions`, and `user_credits` in Supabase.
   - Events handled: `subscription.created`, `subscription.updated`, `subscription.canceled` to provision/update/revoke credits automatically.
+  - **Free Plan**: Users receive 20 credits monthly (configured via `FREE_PLAN_CREDITS` in `lib/plans.ts`)
+  - **Student Plan**: 300 credits monthly
+  - **Pro Plan**: 1000 credits monthly
   - **Per‑request deduction (server‑side enforced)**:
     - 1 credit = 3,800 characters of text.
     - For document uploads, the backend extracts text (PDF/DOCX/PPTX/TXT/MD) and counts characters from the extracted text plus any prompt provided.
@@ -246,6 +354,11 @@ NEXT_PUBLIC_BASE_URL=your_production_domain # Optional: defaults to deployment U
     - For prompt‑only requests (no file uploads), a minimum of 1 credit is charged; if the pasted prompt exceeds 3,800 characters, credits are calculated proportionally to the text length.
     - Deduction happens at the start of generation. If streaming fails before any data is sent, the reserved credits are refunded automatically.
     - Applies to both endpoints: `POST /api/generate-mindmap` and `POST /api/generate-flashcards` (JSON and multipart modes).
+  - **Automated Credit Management**:
+    - **Ensure Credits API** (`/api/ensure-credits`): Ensures users have correct credit allocation, handles free plan monthly refills
+    - **Refill Credits API** (`/api/refill-credits`): Cron job endpoint for paid subscriber monthly credit refills
+    - **Preparse API** (`/api/preparse`): Pre-processes files to calculate credit costs before generation
+    - Monthly refills are tracked via `last_refilled_at` timestamp to prevent duplicate credits
   - **Auth requirement for deduction**: Requests must include a valid Supabase access token in the `Authorization: Bearer <token>` header so the server can identify `user_id` and deduct from `user_credits`.
     - The app’s client code automatically attaches this header when a user is signed in.
   - **Insufficient credits UX**: When the server returns `402` with the message "Insufficient credits. Upload a smaller file or", the client shows this error inline with an adjacent "Upgrade Plan" button (same behavior as the Upgrade button on the landing page).

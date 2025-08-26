@@ -124,6 +124,7 @@ Your task is to analyze the provided text and generate a mind map in Markmap Mar
 
 *   **Use Emojis as Visual Cues:** Add emojis to branches to visually categorize themes, add emphasis, and improve recall, mimicking the use of color and images.
 
+The mind map MUST be in the same language as the content.
 The output MUST be ONLY the Markdown code compatible with Markmap. Do not include any other text, explanations, or code fences like \`\`\`markdown.
 
 `;
@@ -180,7 +181,7 @@ export async function POST(req: NextRequest) {
       const imageParts = images.map((url) => ({ type: 'image_url', image_url: { url } }));
       const userContent: any = imageParts.length > 0 ? [{ type: 'text', text: finalPrompt }, ...imageParts] : finalPrompt;
       const stream = await openai.chat.completions.create({
-        model: 'gemini-2.5-flash',
+        model: 'gemini-2.5-flash-lite',
         // @ts-ignore
         reasoning_effort: 'none',
         messages: [{ role: 'user', content: userContent }],

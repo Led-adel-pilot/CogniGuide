@@ -201,7 +201,7 @@ export async function POST(req: NextRequest) {
     const streamNdjson = async (promptContent: any, refundInfo?: { userId: string; credits: number }) => {
       const encoder = new TextEncoder();
       const stream = await openai.chat.completions.create({
-        model: 'gemini-2.5-flash',
+        model: 'gemini-2.5-flash-lite',
         // @ts-ignore
         reasoning_effort: 'none',
         messages: [{ role: 'user', content: promptContent }],
@@ -306,7 +306,7 @@ export async function POST(req: NextRequest) {
         }
         const prompt = buildFlashcardPrompt({ mode: 'json', sourceType: 'markmap', sourceContent: body.markdown!, numCards: body.numCards });
         const completion = await openai.chat.completions.create({
-          model: 'gemini-2.5-flash',
+          model: 'gemini-2.5-flash-lite',
           // @ts-ignore
           reasoning_effort: 'none',
           messages: [{ role: 'user', content: prompt }],
@@ -341,7 +341,7 @@ export async function POST(req: NextRequest) {
       }
       const userContent: any = images.length > 0 ? [{ type: 'text', text: streamingPrompt }, ...images.map((url) => ({ type: 'image_url', image_url: { url } }))] : streamingPrompt;
       const completion = await openai.chat.completions.create({
-        model: 'gemini-2.5-flash',
+        model: 'gemini-2.5-flash-lite',
         // @ts-ignore
         reasoning_effort: 'none',
         messages: [{ role: 'user', content: userContent }],
@@ -430,7 +430,7 @@ export async function POST(req: NextRequest) {
       // Wrap stream to refund credits on complete failure before first line
       const encoder = new TextEncoder();
       const stream = await openai.chat.completions.create({
-        model: 'gemini-2.5-flash',
+        model: 'gemini-2.5-flash-lite',
         // @ts-ignore
         reasoning_effort: 'none',
         messages: [{ role: 'user', content: userContent }],
@@ -500,7 +500,7 @@ export async function POST(req: NextRequest) {
     });
     const userContent: any = imageParts.length > 0 ? [{ type: 'text', text: prompt }, ...imageParts] : prompt;
     const completion = await openai.chat.completions.create({
-      model: 'gemini-2.5-flash',
+      model: 'gemini-2.5-flash-lite',
       // @ts-ignore
       reasoning_effort: 'none',
       messages: [{ role: 'user', content: userContent }],
