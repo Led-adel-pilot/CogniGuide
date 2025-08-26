@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabaseClient';
 import { X, Mail, LogIn } from 'lucide-react';
+import posthog from 'posthog-js';
 
 interface AuthModalProps {
   open: boolean;
@@ -37,6 +38,11 @@ export default function AuthModal({ open, onClose }: AuthModalProps) {
       });
       if (signInError) throw signInError;
       setMessage('Check your email for the sign-in link.');
+
+      // Track user signup event
+      posthog.capture('user_signed_up', {
+        method: 'email'
+      });
     } catch (error: any) {
       setError(error.message || 'Failed to send magic link');
     } finally {
@@ -45,6 +51,11 @@ export default function AuthModal({ open, onClose }: AuthModalProps) {
   };
 
   const handleGoogleSignIn = async () => {
+    // Track user signup event
+    posthog.capture('user_signed_up', {
+      method: 'google'
+    });
+
     const upgrade = typeof window !== 'undefined' && localStorage.getItem('cogniguide_upgrade_flow') === 'true';
     await supabase.auth.signInWithOAuth({
       provider: 'google',

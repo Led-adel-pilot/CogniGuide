@@ -44,6 +44,10 @@ This document lists all PostHog events that have been automatically added to you
 
 - **prompt-submitted**: Tracks when a user submits a prompt, either by clicking the send button or pressing the Enter key. Properties include the prompt length, number of files, and submission method ('click' or 'enter_key').
 
+### components\AuthModal.tsx
+
+- **user_signed_up**: Tracks when a user successfully signs up through email magic link or Google OAuth. Properties include the signup method ('email' or 'google').
+
 
 ## Events still awaiting implementation
 - (human: you can fill these in)
