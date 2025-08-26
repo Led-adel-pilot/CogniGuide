@@ -3,7 +3,7 @@
 
 import posthog from 'posthog-js';
 import { useRef, useLayoutEffect } from 'react';
-import { ArrowUp } from 'lucide-react';
+import { Send } from 'lucide-react';
 
 interface PromptFormProps {
   onSubmit: (promptText: string) => void;
@@ -139,7 +139,7 @@ export default function PromptForm({
             ></path>
           </svg>
         ) : (
-          <ArrowUp className="h-4 w-4" />
+          <Send className="h-4 w-4" />
         )}
       </button>
     </form>

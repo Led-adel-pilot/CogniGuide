@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import posthog from 'posthog-js';
 import Dropzone from '@/components/Dropzone';
@@ -13,6 +13,9 @@ import { Sparkles } from 'lucide-react';
 
 export default function Generator({ redirectOnAuth = false, showTitle = true }: { redirectOnAuth?: boolean, showTitle?: boolean }) {
   const [files, setFiles] = useState<File[]>([]);
+  const [preParsed, setPreParsed] = useState<{ text: string; images: string[] } | null>(null);
+  const [isPreParsing, setIsPreParsing] = useState(false);
+  const lastPreparseKeyRef = useRef<string | null>(null);
   const [prompt, setPrompt] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -53,11 +56,44 @@ export default function Generator({ redirectOnAuth = false, showTitle = true }: 
     return () => { sub.subscription.unsubscribe(); };
   }, [router, redirectOnAuth]);
 
-  const handleFileChange = (selectedFiles: File[]) => {
+  const handleFileChange = useCallback(async (selectedFiles: File[]) => {
     setFiles(selectedFiles);
     // Don't clear errors when files change - let specific actions handle error clearing
     // setError(null);
-  };
+    if (!selectedFiles || selectedFiles.length === 0) return;
+    const newKey = selectedFiles.map(f => `${f.name}|${f.size}|${(f as any).lastModified ?? ''}`).join('||');
+    if (lastPreparseKeyRef.current && newKey === lastPreparseKeyRef.current) {
+      return;
+    }
+    // Only reset preParsed when the file selection actually changes
+    setPreParsed(null);
+    try {
+      setIsPreParsing(true);
+      lastPreparseKeyRef.current = newKey;
+      const formData = new FormData();
+      selectedFiles.forEach((f) => formData.append('files', f));
+      const { data: sessionData } = await supabase.auth.getSession();
+      const accessToken = sessionData?.session?.access_token;
+      const res = await fetch('/api/preparse', {
+        method: 'POST',
+        body: formData,
+        headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : undefined,
+      });
+      if (!res.ok) {
+        // Non-fatal; generation will fallback to legacy upload path
+        try { const j = await res.json(); setError(j?.error || 'Failed to prepare files.'); } catch {}
+        return;
+      }
+      const j = await res.json();
+      const text = typeof j?.text === 'string' ? j.text : '';
+      const images = Array.isArray(j?.images) ? j.images as string[] : [];
+      setPreParsed({ text, images });
+    } catch {
+      // Non-fatal
+    } finally {
+      setIsPreParsing(false);
+    }
+  }, []);
 
   const handleSubmit = async () => {
     posthog.capture('generation_submitted', {
@@ -85,18 +121,27 @@ export default function Generator({ redirectOnAuth = false, showTitle = true }: 
       setFlashcardsCards(null);
       setFlashcardsTitle(null);
 
-      const formData = new FormData();
-      files.forEach((file) => formData.append('files', file));
-      if (prompt.trim()) formData.append('prompt', prompt.trim());
-
       try {
         const { data: sessionData } = await supabase.auth.getSession();
         const accessToken = sessionData?.session?.access_token;
-        const res = await fetch('/api/generate-flashcards?stream=1', {
-          method: 'POST',
-          body: formData,
-          headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : undefined,
-        });
+        let res: Response;
+        if (preParsed) {
+          const payload = { text: preParsed.text || '', images: preParsed.images || [], prompt: prompt.trim() || '' };
+          res = await fetch('/api/generate-flashcards?stream=1', {
+            method: 'POST',
+            body: JSON.stringify(payload),
+            headers: { 'Content-Type': 'application/json', ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}) },
+          });
+        } else {
+          const formData = new FormData();
+          files.forEach((file) => formData.append('files', file));
+          if (prompt.trim()) formData.append('prompt', prompt.trim());
+          res = await fetch('/api/generate-flashcards?stream=1', {
+            method: 'POST',
+            body: formData,
+            headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : undefined,
+          });
+        }
         // Handle insufficient credits the same way as mind maps: show inline error and do not open modal
         if (res.status === 402) {
           let msg = 'Insufficient credits. Upload a smaller file or';
@@ -227,22 +272,27 @@ export default function Generator({ redirectOnAuth = false, showTitle = true }: 
     setError(null);
     setMarkdown(null);
 
-    const formData = new FormData();
-    if (files.length > 0) {
-      files.forEach(file => {
-        formData.append('files', file);
-      });
-    }
-    if (prompt.trim()) formData.append('prompt', prompt.trim());
-
     try {
       const { data: sessionData } = await supabase.auth.getSession();
       const accessToken = sessionData?.session?.access_token;
-      const response = await fetch('/api/generate-mindmap', {
-        method: 'POST',
-        body: formData,
-        headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : undefined,
-      });
+      let response: Response;
+      if (preParsed) {
+        const payload = { text: preParsed.text || '', images: preParsed.images || [], prompt: prompt.trim() || '' };
+        response = await fetch('/api/generate-mindmap', {
+          method: 'POST',
+          body: JSON.stringify(payload),
+          headers: { 'Content-Type': 'application/json', ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}) },
+        });
+      } else {
+        const formData = new FormData();
+        if (files.length > 0) { files.forEach(file => { formData.append('files', file); }); }
+        if (prompt.trim()) formData.append('prompt', prompt.trim());
+        response = await fetch('/api/generate-mindmap', {
+          method: 'POST',
+          body: formData,
+          headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : undefined,
+        });
+      }
       const contentType = response.headers.get('content-type') || '';
       if (!response.ok) {
         if (contentType.includes('application/json')) {
@@ -360,7 +410,7 @@ export default function Generator({ redirectOnAuth = false, showTitle = true }: 
     } catch {}
   };
 
-  const isDisabled = isLoading || markdown !== null || flashcardsOpen;
+  const canSubmit = (!isLoading && !isPreParsing && markdown === null && !flashcardsOpen);
 
   return (
     <>
@@ -399,7 +449,8 @@ export default function Generator({ redirectOnAuth = false, showTitle = true }: 
               </div>
               <Dropzone
                 onFileChange={handleFileChange}
-                disabled={isDisabled}
+                disabled={isLoading || markdown !== null || flashcardsOpen}
+                isPreParsing={isPreParsing}
                 onOpen={() => {
                   if (!authChecked) return false;
                   if (!isAuthed) {
@@ -414,7 +465,7 @@ export default function Generator({ redirectOnAuth = false, showTitle = true }: 
                 isLoading={isLoading}
                 prompt={prompt}
                 setPrompt={setPrompt}
-                disabled={isDisabled}
+                disabled={!canSubmit}
                 filesLength={files.length}
                 ctaLabel={mode==='flashcards' ? 'Generate Flashcards' : 'Generate Mind Map'}
                 onInteract={() => {
@@ -433,7 +484,7 @@ export default function Generator({ redirectOnAuth = false, showTitle = true }: 
                         className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-full bg-blue-100/50 text-blue-700 hover:bg-blue-200/50 border border-blue-200 transition-colors"
                       >
                         <Sparkles className="h-4 w-4" />
-                        <span>Upgrade Plan</span>
+                        <span>Upload your Plan</span>
                       </button>
                     )}
                   </div>

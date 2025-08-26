@@ -145,138 +145,112 @@ ${text}
 
 export async function POST(req: NextRequest) {
   try {
+    const contentType = req.headers.get('content-type') || '';
+
+    async function respondWithStream(opts: { text: string; prompt: string; images: string[]; userId: string | null }) {
+      const { text, prompt, images, userId } = opts;
+      const multimodalPreamble = images.length > 0
+        ? `In addition to any text provided below, you are also given ${images.length} image(s). Carefully read text inside the images (OCR) and analyze diagrams to extract key concepts and relationships. Integrate insights from both text and images into a single coherent mind map.`
+        : '';
+      const textToProcess = text || prompt;
+      if (!textToProcess && images.length === 0) {
+        return NextResponse.json({ error: 'No content provided. Please upload a file (document or image) or enter a text prompt.' }, { status: 400 });
+      }
+      const finalPrompt = constructPrompt(
+        textToProcess || 'No text provided. Analyze the attached image(s) only and build the mind map from their content.',
+        prompt || ''
+      ) + (multimodalPreamble ? `\n\n${multimodalPreamble}` : '');
+
+      // Credits
+      const ONE_CREDIT_CHARS = 3800;
+      const totalRawChars = (text?.length || 0) + (prompt?.length || 0);
+      let creditsNeeded = totalRawChars > 0 ? (totalRawChars / ONE_CREDIT_CHARS) : 0;
+      const isPromptOnly = (!text && images.length === 0 && !!(prompt && prompt.trim().length > 0));
+      if (images.length > 0 && creditsNeeded < 0.5) creditsNeeded = 0.5;
+      if (isPromptOnly && creditsNeeded < 1) creditsNeeded = 1;
+
+      const userIdResolved = userId || await getUserIdFromAuthHeader(req);
+      if (userIdResolved) { try { await ensureFreeMonthlyCredits(userIdResolved); } catch {} }
+      if (userIdResolved && creditsNeeded > 0) {
+        const ok = await deductCredits(userIdResolved, creditsNeeded);
+        if (!ok) return NextResponse.json({ error: 'Insufficient credits. Upload a smaller file or' }, { status: 402 });
+      }
+
+      const encoder = new TextEncoder();
+      const imageParts = images.map((url) => ({ type: 'image_url', image_url: { url } }));
+      const userContent: any = imageParts.length > 0 ? [{ type: 'text', text: finalPrompt }, ...imageParts] : finalPrompt;
+      const stream = await openai.chat.completions.create({
+        model: 'gemini-2.5-flash',
+        // @ts-ignore
+        reasoning_effort: 'none',
+        messages: [{ role: 'user', content: userContent }],
+        stream: true,
+      });
+      let anyTokenSent = false;
+      const reservedForUserId = userIdResolved || null;
+      const reservedCredits = creditsNeeded;
+      const readable = new ReadableStream<Uint8Array>({
+        async start(controller) {
+          try {
+            for await (const chunk of stream as any) {
+              const token: string = chunk?.choices?.[0]?.delta?.content || '';
+              if (!token) continue;
+              anyTokenSent = true;
+              controller.enqueue(encoder.encode(token));
+            }
+            controller.close();
+          } catch (err) {
+            if (!anyTokenSent) {
+              if (reservedForUserId && reservedCredits > 0) {
+                try { await refundCredits(reservedForUserId, reservedCredits); } catch {}
+              }
+              controller.error(err);
+            } else {
+              try { controller.close(); } catch {}
+            }
+          }
+        }
+      });
+      return new Response(readable, { headers: { 'Content-Type': 'text/plain; charset=utf-8', 'Cache-Control': 'no-cache' } });
+    }
+
+    if (contentType.includes('application/json')) {
+      const body = await req.json().catch(() => null) as { text?: string; images?: string[]; prompt?: string } | null;
+      const text = (body?.text || '').toString();
+      const prompt = (body?.prompt || '').toString();
+      const images = Array.isArray(body?.images) ? (body!.images as string[]) : [];
+      const userId = await getUserIdFromAuthHeader(req);
+      return await respondWithStream({ text, prompt, images, userId });
+    }
+
+    // Fallback: multipart (legacy)
     const formData = await req.formData();
     const files = formData.getAll('files') as File[];
-    const promptText = formData.get('prompt') as string | null;
-
-    let documentText = '';
+    const promptText = (formData.get('prompt') as string | null) || '';
+    const images: string[] = [];
     const extractedTexts: string[] = [];
-    const imageParts: { type: 'image_url'; image_url: { url: string } }[] = [];
-    let totalRawChars = 0;
-
-    if (files.length > 0) {
-      for (const file of files) {
-        const buffer = Buffer.from(await file.arrayBuffer());
-        let text = '';
-        if (file.type === 'application/pdf') {
-          text = await getTextFromPdf(buffer);
-        } else if (file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
-          text = await getTextFromDocx(buffer);
-        } else if (file.type === 'application/vnd.openxmlformats-officedocument.presentationml.presentation') {
-          text = await getTextFromPptx(buffer);
-        } else if (file.type === 'text/plain') {
-          text = buffer.toString('utf-8');
-        } else if (file.type === 'text/markdown' || file.name.toLowerCase().endsWith('.md') || file.name.toLowerCase().endsWith('.markdown')) {
-          text = buffer.toString('utf-8');
-        } else if (file.type.startsWith('image/')) {
-          try {
-            const base64 = buffer.toString('base64');
-            const dataUrl = `data:${file.type};base64,${base64}`;
-            imageParts.push({ type: 'image_url', image_url: { url: dataUrl } });
-            // Skip text extraction for images; they will be provided to the model directly
-            continue;
-          } catch (e) {
-            console.warn(`Failed to process image file: ${file.name}`);
-            continue;
-          }
-        } else {
-          // Silently ignore unsupported files for now, or collect errors
-          console.warn(`Unsupported file type skipped: ${file.name} (${file.type})`);
-          continue;
-        }
-        if (text) totalRawChars += text.length;
-        extractedTexts.push(`--- START OF FILE: ${file.name} ---\n\n${text}\n\n--- END OF FILE: ${file.name} ---`);
-      }
-      documentText = extractedTexts.join('\n\n');
-    }
-
-    const textToProcess = documentText || promptText;
-    if (promptText) totalRawChars += promptText.length;
-
-    if (!textToProcess && imageParts.length === 0) {
-      return NextResponse.json({ error: 'No content provided. Please upload a file (document or image) or enter a text prompt.' }, { status: 400 });
-    }
-
-    // Build a multimodal-friendly prompt that also mentions images if provided
-    const multimodalPreamble = imageParts.length > 0
-      ? `In addition to any text provided below, you are also given ${imageParts.length} image(s). Carefully read text inside the images (OCR) and analyze diagrams to extract key concepts and relationships. Integrate insights from both text and images into a single coherent mind map.`
-      : '';
-
-    const finalPrompt = constructPrompt(
-      textToProcess || 'No text provided. Analyze the attached image(s) only and build the mind map from their content.',
-      promptText || ''
-    ) + (multimodalPreamble ? `\n\n${multimodalPreamble}` : '');
-
-    // Compute and reserve credits: 1 credit = 3800 characters (fractional allowed)
-    const ONE_CREDIT_CHARS = 3800;
-    const creditsRaw = totalRawChars > 0 ? (totalRawChars / ONE_CREDIT_CHARS) : 0;
-    let creditsNeeded = creditsRaw;
-    const isPromptOnly = (files.length === 0) && (imageParts.length === 0) && !!(promptText && promptText.trim().length > 0);
-    // Enforce minimum credit for: image-only requests (0.5) OR prompt-only requests with short text (1)
-    if (imageParts.length > 0 && creditsNeeded < 0.5) creditsNeeded = 0.5;
-    if (isPromptOnly && creditsNeeded < 1) creditsNeeded = 1;
-
-    const userId = await getUserIdFromAuthHeader(req);
-    // Provision monthly free credits (8) for non-subscribers before any deduction
-    if (userId) {
-      try { await ensureFreeMonthlyCredits(userId); } catch {}
-    }
-    if (userId && creditsNeeded > 0) {
-      const ok = await deductCredits(userId, creditsNeeded);
-      if (!ok) {
-        return NextResponse.json({ error: 'Insufficient credits. Upload a smaller file or' }, { status: 402 });
-      }
-    }
-
-    // Stream tokens back to the client as they arrive
-    const encoder = new TextEncoder();
-    const userContent: any = imageParts.length > 0
-      ? [{ type: 'text', text: finalPrompt }, ...imageParts]
-      : finalPrompt;
-
-    const stream = await openai.chat.completions.create({
-      model: 'gemini-2.5-flash',
-      // @ts-ignore
-      reasoning_effort: 'none',
-      messages: [{ role: 'user', content: userContent }],
-      stream: true,
-    });
-
-    let anyTokenSent = false;
-    const reservedForUserId = userId || null;
-    const reservedCredits = creditsNeeded;
-
-    const readable = new ReadableStream<Uint8Array>({
-      async start(controller) {
+    for (const file of files) {
+      const buffer = Buffer.from(await file.arrayBuffer());
+      if (file.type.startsWith('image/')) {
         try {
-          for await (const chunk of stream as any) {
-            const token: string = chunk?.choices?.[0]?.delta?.content || '';
-            if (!token) continue;
-            anyTokenSent = true;
-            controller.enqueue(encoder.encode(token));
-          }
-          controller.close();
-        } catch (err) {
-          // If streaming failed before sending anything, fall back to error JSON
-          if (!anyTokenSent) {
-            if (reservedForUserId && reservedCredits > 0) {
-              try { await refundCredits(reservedForUserId, reservedCredits); } catch {}
-            }
-            controller.error(err);
-          } else {
-            // If some data was already sent, just close the stream
-            try { controller.close(); } catch {}
-          }
-        }
+          const base64 = buffer.toString('base64');
+          const dataUrl = `data:${file.type};base64,${base64}`;
+          images.push(dataUrl);
+          continue;
+        } catch { continue; }
       }
-    });
-
-    return new Response(readable, {
-      headers: {
-        'Content-Type': 'text/plain; charset=utf-8',
-        'Cache-Control': 'no-cache',
-      },
-    });
+      let text = '';
+      if (file.type === 'application/pdf') text = await getTextFromPdf(buffer);
+      else if (file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') text = await getTextFromDocx(buffer);
+      else if (file.type === 'application/vnd.openxmlformats-officedocument.presentationml.presentation') text = await getTextFromPptx(buffer);
+      else if (file.type === 'text/plain') text = buffer.toString('utf-8');
+      else if (file.type === 'text/markdown' || file.name.toLowerCase().endsWith('.md') || file.name.toLowerCase().endsWith('.markdown')) text = buffer.toString('utf-8');
+      else continue;
+      extractedTexts.push(`--- START OF FILE: ${file.name} ---\n\n${text}\n\n--- END OF FILE: ${file.name} ---`);
+    }
+    const combined = extractedTexts.join('\n\n');
+    const userId = await getUserIdFromAuthHeader(req);
+    return await respondWithStream({ text: combined, prompt: promptText, images, userId });
 
   } catch (error) {
     console.error('Error in generate-mindmap API:', error);

@@ -9,9 +9,11 @@ interface DropzoneProps {
   disabled?: boolean;
   // Return false to block opening the file dialog
   onOpen?: () => boolean | void;
+  // Show loading state for pre-parsing
+  isPreParsing?: boolean;
 }
 
-export default function Dropzone({ onFileChange, disabled = false, onOpen }: DropzoneProps) {
+export default function Dropzone({ onFileChange, disabled = false, onOpen, isPreParsing = false }: DropzoneProps) {
   const [dragIsOver, setDragIsOver] = useState(false);
   const [files, setFiles] = useState<File[]>([]);
   const inputRef = useRef<HTMLInputElement | null>(null);
@@ -142,7 +144,7 @@ export default function Dropzone({ onFileChange, disabled = false, onOpen }: Dro
                   <File className="w-10 h-10 text-primary mb-2" />
                   <p className="text-sm font-semibold text-foreground truncate w-28" title={file.name}>{file.name}</p>
                   <p className="text-xs text-muted-foreground">({(file.size / 1024).toFixed(2)} KB)</p>
-                  <button 
+                  <button
                     onClick={(e) => {
                       e.preventDefault();
                       e.stopPropagation();
@@ -153,6 +155,12 @@ export default function Dropzone({ onFileChange, disabled = false, onOpen }: Dro
                   >
                     <X className="w-3 h-3" />
                   </button>
+                  {isPreParsing && (
+                    <div className="absolute inset-0 bg-background/80 backdrop-blur-sm rounded-[1.25rem] flex flex-col items-center justify-center z-20">
+                      <div className="animate-spin rounded-full h-6 w-6 border-2 border-primary border-t-transparent mb-2"></div>
+                      <p className="text-xs text-muted-foreground font-medium">Uploading...</p>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>

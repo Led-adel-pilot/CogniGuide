@@ -32,7 +32,7 @@ This document lists all PostHog events that have been automatically added to you
 ### components\Generator.tsx
 
 - **generation_submitted**: Fired when the user clicks the button to generate a mind map or flashcards.
-- **upgrade_clicked**: Fired when the user clicks the 'Upgrade Plan' button after receiving an 'insufficient credits' error.
+- **upgrade_clicked**: Fired when the user clicks the 'Upload your Plan' button after receiving an 'insufficient credits' error.
 - **generation_mode_changed**: Fired when the user switches between 'Mind Map' and 'Flashcards' generation modes.
 
 ### components\MindMapModal.tsx

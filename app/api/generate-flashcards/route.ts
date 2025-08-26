@@ -278,42 +278,73 @@ export async function POST(req: NextRequest) {
     };
 
     if (contentType.includes('application/json')) {
-      // Original JSON path: expects markdown
-      const body = await req.json().catch(() => null) as { markdown?: string; numCards?: number } | null;
-      if (!body || !body.markdown || typeof body.markdown !== 'string') {
-        return NextResponse.json({ error: 'Missing required field: markdown' }, { status: 400 });
+      // Enhanced JSON path: supports either { markdown } OR { text, images?, prompt?, numCards? }
+      const body = await req.json().catch(() => null) as { markdown?: string; numCards?: number; text?: string; images?: string[]; prompt?: string } | null;
+      if (!body) return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
+
+      const hasMarkdown = typeof body.markdown === 'string' && body.markdown.trim().length > 0;
+      const hasTextPayload = (typeof body.text === 'string' && body.text.length > 0) || (Array.isArray(body.images) && body.images.length > 0) || (typeof body.prompt === 'string' && body.prompt.trim().length > 0);
+
+      if (!hasMarkdown && !hasTextPayload) {
+        return NextResponse.json({ error: 'Provide either markdown or text/images/prompt' }, { status: 400 });
       }
-      // Compute credits from markdown length (fractional allowed)
+
       const ONE_CREDIT_CHARS = 3800;
-      const totalRawChars = body.markdown.length;
-      const creditsNeeded = totalRawChars > 0 ? (totalRawChars / ONE_CREDIT_CHARS) : 0;
-      const userId = await getUserIdFromAuthHeader(req);
-      if (userId) { try { await ensureFreeMonthlyCredits(userId); } catch {} }
-      if (userId && creditsNeeded > 0) {
-        const ok = await deductCredits(userId, creditsNeeded);
+      const userIdForCredits = await getUserIdFromAuthHeader(req);
+      if (userIdForCredits) { try { await ensureFreeMonthlyCredits(userIdForCredits); } catch {} }
+
+      if (hasMarkdown) {
+        const totalRawChars = body.markdown!.length;
+        const creditsNeeded = totalRawChars > 0 ? (totalRawChars / ONE_CREDIT_CHARS) : 0;
+        if (userIdForCredits && creditsNeeded > 0) {
+          const ok = await deductCredits(userIdForCredits, creditsNeeded);
+          if (!ok) return NextResponse.json({ error: 'Insufficient credits. Upload a smaller file or' }, { status: 402 });
+        }
+        if (shouldStream) {
+          const streamingPrompt = buildFlashcardPrompt({ mode: 'stream', sourceType: 'markmap', sourceContent: body.markdown!, numCards: body.numCards });
+          return streamNdjson(streamingPrompt, (userIdForCredits && creditsNeeded > 0) ? { userId: userIdForCredits, credits: creditsNeeded } : undefined);
+        }
+        const prompt = buildFlashcardPrompt({ mode: 'json', sourceType: 'markmap', sourceContent: body.markdown!, numCards: body.numCards });
+        const completion = await openai.chat.completions.create({
+          model: 'gemini-2.5-flash',
+          // @ts-ignore
+          reasoning_effort: 'none',
+          messages: [{ role: 'user', content: prompt }],
+          stream: false,
+          // @ts-ignore
+          response_format: { type: 'json_object' },
+        });
+        const content = completion.choices?.[0]?.message?.content ?? '';
+        if (!content) return NextResponse.json({ error: 'No content returned from model' }, { status: 502 });
+        const parsed = extractJsonObject(content);
+        const cards: Flashcard[] = Array.isArray(parsed?.cards) ? parsed.cards : [];
+        if (cards.length === 0) return NextResponse.json({ error: 'Failed to generate flashcards' }, { status: 502 });
+        return NextResponse.json({ title: parsed.title || null, cards });
+      }
+
+      // Text/images/prompt path (pre-parsed input)
+      const text = (body.text || '').toString();
+      const promptText = (body.prompt || '').toString();
+      const images = Array.isArray(body.images) ? body.images as string[] : [];
+      const creditsRaw = (text?.length || 0) + (promptText?.length || 0);
+      let creditsNeeded = creditsRaw > 0 ? (creditsRaw / ONE_CREDIT_CHARS) : 0;
+      if (images.length > 0 && creditsNeeded < 0.5) creditsNeeded = 0.5;
+      if (!text && images.length === 0 && promptText && creditsNeeded < 1) creditsNeeded = 1;
+      if (userIdForCredits && creditsNeeded > 0) {
+        const ok = await deductCredits(userIdForCredits, creditsNeeded);
         if (!ok) return NextResponse.json({ error: 'Insufficient credits. Upload a smaller file or' }, { status: 402 });
       }
+      const streamingPrompt = buildFlashcardPrompt({ mode: shouldStream ? 'stream' : 'json', sourceType: 'text', sourceContent: text || 'No text provided. Analyze the attached image(s) only and build flashcards from their content.', userInstruction: promptText, imagesCount: images.length, numCards: body.numCards });
       if (shouldStream) {
-        const streamingPrompt = buildFlashcardPrompt({
-          mode: 'stream',
-          sourceType: 'markmap',
-          sourceContent: body.markdown,
-          numCards: body.numCards,
-        });
-        const userIdForRefund = await getUserIdFromAuthHeader(req);
-        return streamNdjson(streamingPrompt, (userIdForRefund && creditsNeeded > 0) ? { userId: userIdForRefund, credits: creditsNeeded } : undefined);
+        const userContent: any = images.length > 0 ? [{ type: 'text', text: streamingPrompt }, ...images.map((url) => ({ type: 'image_url', image_url: { url } }))] : streamingPrompt;
+        return streamNdjson(userContent, (userIdForCredits && creditsNeeded > 0) ? { userId: userIdForCredits, credits: creditsNeeded } : undefined);
       }
-      const prompt = buildFlashcardPrompt({
-        mode: 'json',
-        sourceType: 'markmap',
-        sourceContent: body.markdown,
-        numCards: body.numCards,
-      });
+      const userContent: any = images.length > 0 ? [{ type: 'text', text: streamingPrompt }, ...images.map((url) => ({ type: 'image_url', image_url: { url } }))] : streamingPrompt;
       const completion = await openai.chat.completions.create({
         model: 'gemini-2.5-flash',
         // @ts-ignore
         reasoning_effort: 'none',
-        messages: [{ role: 'user', content: prompt }],
+        messages: [{ role: 'user', content: userContent }],
         stream: false,
         // @ts-ignore
         response_format: { type: 'json_object' },
