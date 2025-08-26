@@ -224,7 +224,7 @@ export async function POST(req: NextRequest) {
     if (userId && creditsNeeded > 0) {
       const ok = await deductCredits(userId, creditsNeeded);
       if (!ok) {
-        return NextResponse.json({ error: 'Insufficient credits. Please upgrade your plan or top up.' }, { status: 402 });
+        return NextResponse.json({ error: 'Insufficient credits. Upload a smaller file or' }, { status: 402 });
       }
     }
 

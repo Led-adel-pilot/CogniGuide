@@ -9,6 +9,7 @@ import MindMapModal from '@/components/MindMapModal';
 import FlashcardsModal, { Flashcard as FlashcardType } from '@/components/FlashcardsModal';
 import AuthModal from '@/components/AuthModal';
 import { supabase } from '@/lib/supabaseClient';
+import { Sparkles } from 'lucide-react';
 
 export default function Generator({ redirectOnAuth = false, showTitle = true }: { redirectOnAuth?: boolean, showTitle?: boolean }) {
   const [files, setFiles] = useState<File[]>([]);
@@ -98,7 +99,7 @@ export default function Generator({ redirectOnAuth = false, showTitle = true }: 
         });
         // Handle insufficient credits the same way as mind maps: show inline error and do not open modal
         if (res.status === 402) {
-          let msg = 'Insufficient credits. Please upgrade your plan or top up.';
+          let msg = 'Insufficient credits. Upload a smaller file or';
           try { const j = await res.json(); msg = j?.error || msg; } catch {}
           setError(msg);
           setIsLoading(false);
@@ -422,16 +423,17 @@ export default function Generator({ redirectOnAuth = false, showTitle = true }: 
                 }}
               />                  
               {error && (
-                <div className="mt-4 text-center p-4 bg-red-50 border border-red-200 text-red-700 rounded-[1.25rem]">
+                <div className="mt-4 text-center p-4 bg-blue-50 border border-blue-200 text-blue-700 rounded-[1.25rem]">
                   <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
                     <p className="font-medium">{error}</p>
                     {typeof error === 'string' && error.toLowerCase().includes('insufficient credits') && (
                       <button
                         type="button"
                         onClick={handleUpgradeClick}
-                        className="px-4 py-1.5 text-sm font-semibold rounded-full bg-primary text-white hover:bg-primary/90 transition-colors"
+                        className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-full bg-blue-100/50 text-blue-700 hover:bg-blue-200/50 border border-blue-200 transition-colors"
                       >
-                        Upgrade Plan
+                        <Sparkles className="h-4 w-4" />
+                        <span>Upgrade Plan</span>
                       </button>
                     )}
                   </div>

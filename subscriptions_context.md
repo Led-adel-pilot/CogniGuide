@@ -328,7 +328,7 @@ localStorage.removeItem('cogniguide_upgrade_flow');
 ### 7. Error Handling & User Experience
 
 #### Insufficient Credits Flow
-- **API Response**: `402 Insufficient credits. Please upgrade your plan or top up.`
+- **API Response**: `402 Insufficient credits. Upload a smaller file or`
 - **UI Response**: 
   - Inline error message with upgrade button
   - Different behavior for auth vs non-auth users

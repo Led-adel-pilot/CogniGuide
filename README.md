@@ -248,7 +248,7 @@ NEXT_PUBLIC_BASE_URL=your_production_domain # Optional: defaults to deployment U
     - Applies to both endpoints: `POST /api/generate-mindmap` and `POST /api/generate-flashcards` (JSON and multipart modes).
   - **Auth requirement for deduction**: Requests must include a valid Supabase access token in the `Authorization: Bearer <token>` header so the server can identify `user_id` and deduct from `user_credits`.
     - The app’s client code automatically attaches this header when a user is signed in.
-  - **Insufficient credits UX**: When the server returns `402` with the message "Insufficient credits. Please upgrade your plan or top up.", the client shows this error inline with an adjacent "Upgrade Plan" button (same behavior as the Upgrade button on the landing page).
+  - **Insufficient credits UX**: When the server returns `402` with the message "Insufficient credits. Upload a smaller file or", the client shows this error inline with an adjacent "Upgrade Plan" button (same behavior as the Upgrade button on the landing page).
     - If authenticated: navigates to `/dashboard?upgrade=true` which opens the in‑app pricing modal.
     - If not authenticated: sets `localStorage.cogniguide_upgrade_flow = 'true'` and navigates to `/pricing` to prompt sign‑in then continue checkout.
 
