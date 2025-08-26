@@ -468,6 +468,7 @@ export default function Generator({ redirectOnAuth = false, showTitle = true }: 
                 disabled={!canSubmit}
                 filesLength={files.length}
                 ctaLabel={mode==='flashcards' ? 'Generate Flashcards' : 'Generate Mind Map'}
+                mode={mode}
                 onInteract={() => {
                   if (!authChecked) return;
                   if (!isAuthed) setShowAuth(true);

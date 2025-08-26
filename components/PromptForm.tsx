@@ -13,6 +13,7 @@ interface PromptFormProps {
   disabled: boolean;
   filesLength: number;
   ctaLabel?: string;
+  mode?: 'mindmap' | 'flashcards';
   onInteract?: () => void;
 }
 
@@ -24,10 +25,27 @@ export default function PromptForm({
   disabled,
   filesLength,
   ctaLabel,
+  mode = 'mindmap',
   onInteract,
 }: PromptFormProps) {
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const formRef = useRef<HTMLFormElement | null>(null);
+
+  const getPlaceholder = () => {
+    const hasFiles = filesLength > 0;
+
+    if (mode === 'flashcards') {
+      if (hasFiles) {
+        return "e.g., 'Only make flashcards about the first and third chapters'";
+      }
+      return "e.g., 'Only make flashcards about the first and third chapters'";
+    }
+
+    if (hasFiles) {
+      return "e.g., 'Focus on chapter summaries and key arguments'";
+    }
+    return "e.g., 'Make a mind map about the fundamentals of quantum computing'";
+  };
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -96,7 +114,7 @@ export default function PromptForm({
           setPrompt(e.target.value);
         }}
         onKeyDown={handleKeyDown}
-        placeholder="e.g., 'Create a mind map about the history of AI'"
+        placeholder={getPlaceholder()}
         className="flex-1 px-3 py-2 bg-transparent border-none resize-none focus:outline-none text-sm leading-relaxed overflow-y-auto"
         style={{
           maxHeight: '200px',
