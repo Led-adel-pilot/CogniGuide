@@ -54,7 +54,8 @@ export default function Generator({ redirectOnAuth = false, showTitle = true }: 
 
   const handleFileChange = (selectedFiles: File[]) => {
     setFiles(selectedFiles);
-    setError(null);
+    // Don't clear errors when files change - let specific actions handle error clearing
+    // setError(null);
   };
 
   const handleSubmit = async () => {
@@ -203,7 +204,6 @@ export default function Generator({ redirectOnAuth = false, showTitle = true }: 
         if (!isAuthed) { setShowAuth(true); }
       } catch (err) {
         const errorMessage = err instanceof Error ? err.message : 'Failed to generate flashcards.';
-        console.error(errorMessage);
         setError(errorMessage);
       } finally {
         setIsLoading(false);
@@ -333,7 +333,6 @@ export default function Generator({ redirectOnAuth = false, showTitle = true }: 
       }
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to generate mind map.';
-      console.error(errorMessage);
       setError(errorMessage);
     } finally {
       setIsLoading(false);
