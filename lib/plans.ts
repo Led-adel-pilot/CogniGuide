@@ -17,7 +17,8 @@ export const PAID_PLANS = {
   },
 };
 
-export const FREE_PLAN_CREDITS = 20;
+export const FREE_PLAN_CREDITS = 50;
+export const NON_AUTH_FREE_LIMIT = 3;
 
 export type Plan = keyof typeof PAID_PLANS;
 

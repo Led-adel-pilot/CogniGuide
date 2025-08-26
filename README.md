@@ -225,8 +225,9 @@ For consistent branding across the application, use the `CogniGuide_logo.png` fi
     - When new flashcards are created, history reloads and the prefetch runs again to refresh dues.
 
 ### Authentication Requirements
-*   On the landing page, users must sign in before they can generate any mind maps or flashcards. When they click the generate button without being authenticated, the app opens the sign-up modal.
-*   Once signed in, users can generate without limits (subject to any backend quotas you impose) and results are persisted to their Supabase history.
+*   **Non-authenticated users**: Can generate mind maps and flashcards with a limited quota (configured via `NON_AUTH_FREE_LIMIT` in `lib/plans.ts`, default: 3 generations). Generations are tracked via localStorage and do not persist across devices.
+*   **Authenticated users**: Can generate without generation limits (subject to credit availability) and results are persisted to their Supabase history. When they click the generate button without being authenticated, the app opens the sign-up modal.
+*   Once signed in, users receive monthly credit allocations based on their plan and can access their generation history.
 
 ### Flashcards Persistence (Supabase)
 *   Two save paths:
@@ -333,7 +334,8 @@ NEXT_PUBLIC_BASE_URL=your_production_domain # Optional: defaults to deployment U
 - Integration lives in `components/PricingClient.tsx` and is mounted from `app/pricing/page.tsx`.
 - Centralized plan configuration in `lib/plans.ts` for easy maintenance:
   - `PAID_PLANS` object defines all plan details (credits, price IDs)
-  - `FREE_PLAN_CREDITS` constant for free tier
+  - `FREE_PLAN_CREDITS` constant for authenticated free tier users
+  - `NON_AUTH_FREE_LIMIT` constant for non-authenticated users (generation limit)
   - Helper functions for plan lookup and credit calculation
 - Webhooks are handled at `app/api/paddle-webhook/route.ts` to manage subscriptions and credit accounting.
 
@@ -341,10 +343,11 @@ NEXT_PUBLIC_BASE_URL=your_production_domain # Optional: defaults to deployment U
 
 - **Webhook Endpoint**: The application exposes a webhook endpoint at `/api/paddle-webhook` to receive notifications from Paddle.
 - **Signature Verification**: All incoming webhooks are verified using HMAC-SHA256 to ensure they originate from Paddle.
-- **Credit Accounting**:
-  - Monthly credits are granted based on the user’s plan. Tables used: `customers`, `subscriptions`, and `user_credits` in Supabase.
+  - **Credit Accounting**:
+  - Monthly credits are granted based on the authenticated user's plan. Tables used: `customers`, `subscriptions`, and `user_credits` in Supabase.
+  - **Non-authenticated users**: Do not use the credit system but have generation limits instead (see `NON_AUTH_FREE_LIMIT` in `lib/plans.ts`).
   - Events handled: `subscription.created`, `subscription.updated`, `subscription.canceled` to provision/update/revoke credits automatically.
-  - **Free Plan**: Users receive 20 credits monthly (configured via `FREE_PLAN_CREDITS` in `lib/plans.ts`)
+  - **Free Plan**: Users receive 50 credits monthly (configured via `FREE_PLAN_CREDITS` in `lib/plans.ts`)
   - **Student Plan**: 300 credits monthly
   - **Pro Plan**: 1000 credits monthly
   - **Per‑request deduction (server‑side enforced)**:

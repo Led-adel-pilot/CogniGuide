@@ -141,9 +141,9 @@ function buildFlashcardPrompt(opts: {
 
   const languageAndCount = sourceType === 'markmap'
     ? `- Produce about 15 to 35 cards depending on content size, NEVER MORE THAN 45.
-- The flashcards must be in the same language as the mind map.`
+- The flashcards MUST be in the same language as the mind map.`
     : `- Produce about 15 to 35 cards depending on content size, NEVER MORE THAN 45.
-- The flashcards must be in the same language as the content.`;
+- The flashcards MUST be in the same language as the source content.`;
 
   const body = `You are an expert instructional designer.
 ${scopeLine}${userLine}

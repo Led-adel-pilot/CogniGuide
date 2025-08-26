@@ -72,7 +72,7 @@ export default function AuthModal({ open, onClose }: AuthModalProps) {
           <X className="h-5 w-5" />
         </button>
         <h2 className="text-xl font-bold mb-2">Create a free account</h2>
-        <p className="text-sm text-gray-600 mb-4">Sign up to continue generating mind maps and save your history.</p>
+        <p className="text-sm text-gray-600 mb-4">Sign up to continue generating and save your history.</p>
 
         {message && <div className="mb-3 text-sm text-green-700 bg-green-50 border border-green-200 rounded p-2">{message}</div>}
         {error && <div className="mb-3 text-sm text-red-700 bg-red-50 border border-red-200 rounded p-2">{error}</div>}

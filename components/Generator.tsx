@@ -9,6 +9,7 @@ import MindMapModal from '@/components/MindMapModal';
 import FlashcardsModal, { Flashcard as FlashcardType } from '@/components/FlashcardsModal';
 import AuthModal from '@/components/AuthModal';
 import { supabase } from '@/lib/supabaseClient';
+import { NON_AUTH_FREE_LIMIT } from '@/lib/plans';
 import { Sparkles } from 'lucide-react';
 
 export default function Generator({ redirectOnAuth = false, showTitle = true }: { redirectOnAuth?: boolean, showTitle?: boolean }) {
@@ -30,7 +31,7 @@ export default function Generator({ redirectOnAuth = false, showTitle = true }: 
   const [flashcardsError, setFlashcardsError] = useState<string | null>(null);
   const [flashcardsDeckId, setFlashcardsDeckId] = useState<string | undefined>(undefined);
   const [authChecked, setAuthChecked] = useState(false);
-  const [freeGenerationsLeft, setFreeGenerationsLeft] = useState<number>(5);
+  const [freeGenerationsLeft, setFreeGenerationsLeft] = useState<number>(NON_AUTH_FREE_LIMIT);
   const router = useRouter();
 
   useEffect(() => {
@@ -44,7 +45,7 @@ export default function Generator({ redirectOnAuth = false, showTitle = true }: 
       if (!authed && typeof window !== 'undefined') {
         const stored = localStorage.getItem('cogniguide_free_generations');
         const used = stored ? parseInt(stored, 10) : 0;
-        setFreeGenerationsLeft(Math.max(0, 5 - used));
+        setFreeGenerationsLeft(Math.max(0, NON_AUTH_FREE_LIMIT - used));
       }
 
       setAuthChecked(true);
@@ -119,10 +120,11 @@ export default function Generator({ redirectOnAuth = false, showTitle = true }: 
 
       // Check free generations for unauthenticated users
       if (!isAuthed && freeGenerationsLeft <= 0) {
-        setError('You\'ve used all 5 free generations. Please sign up to continue generating flashcards!');
+        setError(`You've used all ${NON_AUTH_FREE_LIMIT} no-signup generations. Please sign up to continue generating`);
         return;
       }
 
+      // Only clear error and start loading if we pass the validation checks
       setIsLoading(true);
       setError(null);
       setMarkdown(null);
@@ -160,11 +162,16 @@ export default function Generator({ redirectOnAuth = false, showTitle = true }: 
           return;
         }
         if (!res.ok) {
-          let msg = 'Failed to generate flashcards';
-          try { const j = await res.json(); msg = j?.error || msg; } catch {}
-          setError(msg);
-          setIsLoading(false);
-          return;
+          const contentType = res.headers.get('content-type') || '';
+          if (contentType.includes('application/json')) {
+            let errorMsg = 'Failed to generate flashcards.';
+            try { const j = await res.json(); errorMsg = j.error || errorMsg; } catch {}
+            throw new Error(errorMsg);
+          } else {
+            let errorMsg = `Failed to generate flashcards. Server returned ${res.status} ${res.statusText}.`;
+            try { const text = await res.text(); errorMsg = `${errorMsg} ${text}`; } catch {}
+            throw new Error(errorMsg);
+          }
         }
         // Deduction occurs server-side at start; if signed in, refresh credits and notify listeners
         if (isAuthed) {
@@ -185,7 +192,7 @@ export default function Generator({ redirectOnAuth = false, showTitle = true }: 
           const used = stored ? parseInt(stored, 10) : 0;
           const newUsed = used + 1;
           localStorage.setItem('cogniguide_free_generations', newUsed.toString());
-          setFreeGenerationsLeft(Math.max(0, 5 - newUsed));
+          setFreeGenerationsLeft(Math.max(0, NON_AUTH_FREE_LIMIT - newUsed));
         }
 
         // Open modal only after successful response
@@ -282,10 +289,11 @@ export default function Generator({ redirectOnAuth = false, showTitle = true }: 
 
     // Check free generations for unauthenticated users
     if (!isAuthed && freeGenerationsLeft <= 0) {
-      setError('You\'ve used all 5 free generations. Please sign up to continue generating mind maps!');
+      setError(`You've used all ${NON_AUTH_FREE_LIMIT} no-signup generations. Please sign up to continue generating!`);
       return;
     }
 
+    // Only clear error and start loading if we pass the validation checks
     setIsLoading(true);
     setError(null);
     setMarkdown(null);
@@ -388,7 +396,7 @@ export default function Generator({ redirectOnAuth = false, showTitle = true }: 
         const used = stored ? parseInt(stored, 10) : 0;
         const newUsed = used + 1;
         localStorage.setItem('cogniguide_free_generations', newUsed.toString());
-        setFreeGenerationsLeft(Math.max(0, 5 - newUsed));
+        setFreeGenerationsLeft(Math.max(0, NON_AUTH_FREE_LIMIT - newUsed));
       }
 
       // Save for authed users after stream completes
@@ -501,25 +509,57 @@ export default function Generator({ redirectOnAuth = false, showTitle = true }: 
               {error && (
                 <div className="mt-4 text-center p-4 bg-blue-50 border border-blue-200 text-blue-700 rounded-[1.25rem]">
                   <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-                    <p className="font-medium">{error}</p>
                     {typeof error === 'string' && error.toLowerCase().includes('insufficient credits') && (
-                      <button
-                        type="button"
-                        onClick={handleUpgradeClick}
-                        className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-full bg-blue-100/50 text-blue-700 hover:bg-blue-200/50 border border-blue-200 transition-colors"
-                      >
-                        <Sparkles className="h-4 w-4" />
-                        <span>Upload your Plan</span>
-                      </button>
+                      <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+                        <p className="font-medium">{error}</p>
+                        <button
+                          type="button"
+                          onClick={handleUpgradeClick}
+                          className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-full bg-blue-100/50 text-blue-700 hover:bg-blue-200/50 border border-blue-200 transition-colors"
+                        >
+                          <Sparkles className="h-4 w-4" />
+                          <span>Upload your Plan</span>
+                        </button>
+                      </div>
+                    )}
+                    {typeof error === 'string' && error.toLowerCase().includes('no-signup generations') && (
+                      <p className="font-medium text-center">
+                        {error.includes('!') ? (
+                          <>You've used all {NON_AUTH_FREE_LIMIT} no-signup generations. Please{' '}
+                          <button
+                            type="button"
+                            onClick={() => setShowAuth(true)}
+                            className="underline hover:no-underline font-semibold"
+                          >
+                            sign up
+                          </button>{' '}
+                          to continue generating!</>
+                        ) : (
+                          <>You've used all {NON_AUTH_FREE_LIMIT} no-signup generations. Please{' '}
+                          <button
+                            type="button"
+                            onClick={() => setShowAuth(true)}
+                            className="underline hover:no-underline font-semibold"
+                          >
+                            sign up
+                          </button>{' '}
+                          to continue generating.</>
+                        )}
+                      </p>
+                    )}
+                    {typeof error === 'string' &&
+                     !error.toLowerCase().includes('insufficient credits') &&
+                     !error.toLowerCase().includes('no-signup generations') && (
+                      <p className="font-medium">{error}</p>
                     )}
                   </div>
                 </div>
               )}
 
-              {!isAuthed && freeGenerationsLeft > 0 && freeGenerationsLeft < 5 && (
+              {!isAuthed && freeGenerationsLeft > 0 && freeGenerationsLeft < NON_AUTH_FREE_LIMIT && (
                 <div className="mt-4 text-center p-3 bg-green-50 border border-green-200 text-green-700 rounded-[1.25rem]">
                   <p className="text-sm font-medium">
-                    {freeGenerationsLeft} free {freeGenerationsLeft === 1 ? 'generation' : 'generations'} remaining.{' '}
+                    {freeGenerationsLeft} no-signup {freeGenerationsLeft === 1 ? 'generation' : 'generations'} remaining.{' '}
                     <button
                       type="button"
                       onClick={() => setShowAuth(true)}
@@ -527,15 +567,15 @@ export default function Generator({ redirectOnAuth = false, showTitle = true }: 
                     >
                       Sign up
                     </button>{' '}
-                    for unlimited generations!
+                    for more!
                   </p>
                 </div>
               )}
 
-              {!isAuthed && freeGenerationsLeft === 5 && (
+              {!isAuthed && freeGenerationsLeft === NON_AUTH_FREE_LIMIT && (
                 <div className="mt-4 text-center p-3 bg-blue-50 border border-blue-200 text-blue-700 rounded-[1.25rem]">
                   <p className="text-sm font-medium">
-                    You have 5 free generations!{' '}
+                    You have {NON_AUTH_FREE_LIMIT} no-signup generations!{' '}
                     <button
                       type="button"
                       onClick={() => setShowAuth(true)}
@@ -543,7 +583,7 @@ export default function Generator({ redirectOnAuth = false, showTitle = true }: 
                     >
                       Sign up
                     </button>{' '}
-                    for unlimited generations.
+                    for more.
                   </p>
                 </div>
               )}

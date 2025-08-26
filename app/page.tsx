@@ -64,10 +64,7 @@ export default function Home() {
                   <button onClick={() => router.push('/dashboard')} className="px-4 py-2 text-sm rounded-full border hover:bg-gray-50">Dashboard</button>
                 </>
               ) : (
-                <div className="flex items-center gap-2">
-                  <span className="text-sm text-muted-foreground">Try 5 generations free!</span>
-                  <button onClick={() => setShowAuth(true)} className="px-4 py-2 text-sm rounded-full bg-primary text-white hover:bg-primary/90 transition-colors">Sign up</button>
-                </div>
+                <button onClick={() => setShowAuth(true)} className="px-4 py-2 text-sm rounded-full bg-primary text-white hover:bg-primary/90 transition-colors">Sign up</button>
               )}
             </div>
           </div>
@@ -90,7 +87,7 @@ export default function Home() {
                 className="group flex items-center justify-center gap-2 mx-auto px-8 py-3 text-base font-bold text-white bg-primary rounded-full shadow-lg shadow-primary/20 hover:bg-primary/90 transition-all duration-300 ease-in-out transform hover:scale-105"
               >
                 <Zap className="h-5 w-5 transition-transform group-hover:-rotate-12" />
-                Open Generator
+                Start Generating - No signup
               </button>
             </div>
           </section>
