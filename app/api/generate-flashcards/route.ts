@@ -365,6 +365,9 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Please upload at least one file' }, { status: 400 });
     }
 
+    const userId = await getUserIdFromAuthHeader(req);
+    const isNonAuthUser = !userId;
+
     let extractedText = '';
     const extractedParts: string[] = [];
     const imageParts: { type: 'image_url'; image_url: { url: string } }[] = [];
@@ -373,11 +376,11 @@ export async function POST(req: NextRequest) {
       const buffer = Buffer.from(await file.arrayBuffer());
       let text = '';
       if (file.type === 'application/pdf') {
-        text = await getTextFromPdf(buffer);
+        text = await getTextFromPdf(buffer, isNonAuthUser);
       } else if (file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
-        text = await getTextFromDocx(buffer);
+        text = await getTextFromDocx(buffer, isNonAuthUser);
       } else if (file.type === 'application/vnd.openxmlformats-officedocument.presentationml.presentation') {
-        text = await getTextFromPptx(buffer);
+        text = await getTextFromPptx(buffer, isNonAuthUser);
       } else if (file.type === 'text/plain') {
         text = buffer.toString('utf-8');
       } else if (file.type === 'text/markdown' || file.name.toLowerCase().endsWith('.md') || file.name.toLowerCase().endsWith('.markdown')) {
@@ -409,7 +412,6 @@ export async function POST(req: NextRequest) {
     const ONE_CREDIT_CHARS = 3800;
     let creditsNeeded = totalRawChars > 0 ? (totalRawChars / ONE_CREDIT_CHARS) : 0;
     if (imageParts.length > 0 && creditsNeeded < 0.5) creditsNeeded = 0.5;
-    const userId = await getUserIdFromAuthHeader(req);
     if (userId) { try { await ensureFreeMonthlyCredits(userId); } catch {} }
     if (userId && creditsNeeded > 0) {
       const ok = await deductCredits(userId, creditsNeeded);

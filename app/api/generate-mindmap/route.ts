@@ -230,6 +230,8 @@ export async function POST(req: NextRequest) {
     const promptText = (formData.get('prompt') as string | null) || '';
     const images: string[] = [];
     const extractedTexts: string[] = [];
+    const userId = await getUserIdFromAuthHeader(req);
+    const isNonAuthUser = !userId;
     for (const file of files) {
       const buffer = Buffer.from(await file.arrayBuffer());
       if (file.type.startsWith('image/')) {
@@ -241,17 +243,16 @@ export async function POST(req: NextRequest) {
         } catch { continue; }
       }
       let text = '';
-      if (file.type === 'application/pdf') text = await getTextFromPdf(buffer);
-      else if (file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') text = await getTextFromDocx(buffer);
-      else if (file.type === 'application/vnd.openxmlformats-officedocument.presentationml.presentation') text = await getTextFromPptx(buffer);
+      if (file.type === 'application/pdf') text = await getTextFromPdf(buffer, isNonAuthUser);
+      else if (file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') text = await getTextFromDocx(buffer, isNonAuthUser);
+      else if (file.type === 'application/vnd.openxmlformats-officedocument.presentationml.presentation') text = await getTextFromPptx(buffer, isNonAuthUser);
       else if (file.type === 'text/plain') text = buffer.toString('utf-8');
       else if (file.type === 'text/markdown' || file.name.toLowerCase().endsWith('.md') || file.name.toLowerCase().endsWith('.markdown')) text = buffer.toString('utf-8');
       else continue;
       extractedTexts.push(`--- START OF FILE: ${file.name} ---\n\n${text}\n\n--- END OF FILE: ${file.name} ---`);
     }
     const combined = extractedTexts.join('\n\n');
-    const userId = await getUserIdFromAuthHeader(req);
-    return await respondWithStream({ text: combined, prompt: promptText, images, userId });
+    return await respondWithStream({ text: combined, prompt: promptText, images, userId: userId });
 
   } catch (error) {
     console.error('Error in generate-mindmap API:', error);

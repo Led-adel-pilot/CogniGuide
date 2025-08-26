@@ -1,5 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getTextFromDocx, getTextFromPdf, getTextFromPptx } from '@/lib/document-parser';
+import { createClient } from '@supabase/supabase-js';
+
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
+const supabaseAdmin = (supabaseUrl && supabaseServiceKey)
+  ? createClient(supabaseUrl, supabaseServiceKey)
+  : null;
+
+async function getUserIdFromAuthHeader(req: NextRequest): Promise<string | null> {
+  try {
+    const authHeader = req.headers.get('authorization') || '';
+    const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : '';
+    if (!token || !supabaseAdmin) return null;
+    const { data } = await supabaseAdmin.auth.getUser(token);
+    return data.user?.id || null;
+  } catch {
+    return null;
+  }
+}
 
 export async function POST(req: NextRequest) {
   try {
@@ -14,6 +33,9 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'No files uploaded' }, { status: 400 });
     }
 
+    const userId = await getUserIdFromAuthHeader(req);
+    const isNonAuthUser = !userId;
+
     const extractedParts: string[] = [];
     const imageDataUrls: string[] = [];
     let totalRawChars = 0;
@@ -22,11 +44,11 @@ export async function POST(req: NextRequest) {
       const buffer = Buffer.from(await file.arrayBuffer());
       let text = '';
       if (file.type === 'application/pdf') {
-        text = await getTextFromPdf(buffer);
+        text = await getTextFromPdf(buffer, isNonAuthUser);
       } else if (file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
-        text = await getTextFromDocx(buffer);
+        text = await getTextFromDocx(buffer, isNonAuthUser);
       } else if (file.type === 'application/vnd.openxmlformats-officedocument.presentationml.presentation') {
-        text = await getTextFromPptx(buffer);
+        text = await getTextFromPptx(buffer, isNonAuthUser);
       } else if (file.type === 'text/plain') {
         text = buffer.toString('utf-8');
       } else if (
