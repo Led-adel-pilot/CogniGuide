@@ -6,6 +6,14 @@ import { tmpdir } from 'os';
 import { join } from 'path';
 import Pptx from 'pptx-text-parser/lib/node-pptx';
 
+// Constants for tier-based limits
+const CHARS_PER_CREDIT = 3800;
+const TIER_LIMITS = {
+  'non-auth': 1 * CHARS_PER_CREDIT, // 3,800 characters
+  'free': 5 * CHARS_PER_CREDIT,     // 19,000 characters
+  'paid': 30 * CHARS_PER_CREDIT     // 114,000 characters
+} as const;
+
 /**
  * Extracts text content from a DOCX file buffer.
  * @param buffer The buffer containing the DOCX file data.
@@ -89,16 +97,7 @@ export function getTextFromPlainText(buffer: Buffer, userTier: 'non-auth' | 'fre
  * @returns The truncated or original text with appropriate limits applied.
  */
 function truncateByUserTier(text: string, userTier: 'non-auth' | 'free' | 'paid'): string {
-  const CHARS_PER_CREDIT = 3800;
-
-  // Define limits for each tier
-  const tierLimits = {
-    'non-auth': 1 * CHARS_PER_CREDIT, // 3,800 characters
-    'free': 5 * CHARS_PER_CREDIT,     // 19,000 characters
-    'paid': 30 * CHARS_PER_CREDIT     // 114,000 characters
-  };
-
-  const maxChars = tierLimits[userTier];
+  const maxChars = TIER_LIMITS[userTier];
 
   // Check if content is within tier limits
   if (text.length <= maxChars) {
@@ -163,19 +162,10 @@ export interface MultiFileProcessResult {
  * @returns MultiFileProcessResult with success status and extracted content or error
  */
 export async function processMultipleFiles(
-  files: File[], 
+  files: File[],
   userTier: 'non-auth' | 'free' | 'paid' = 'non-auth'
 ): Promise<MultiFileProcessResult> {
-  const CHARS_PER_CREDIT = 3800;
-
-  // Define limits for each tier
-  const tierLimits = {
-    'non-auth': 1 * CHARS_PER_CREDIT, // 3,800 characters
-    'free': 5 * CHARS_PER_CREDIT,     // 19,000 characters
-    'paid': 5 * CHARS_PER_CREDIT     // 114,000 characters
-  };
-
-  const maxChars = tierLimits[userTier];
+  const maxChars = TIER_LIMITS[userTier];
   const extractedParts: string[] = [];
   const imageDataUrls: string[] = [];
   const includedFiles: { name: string; size: number }[] = [];
