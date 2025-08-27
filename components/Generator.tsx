@@ -91,17 +91,6 @@ export default function Generator({ redirectOnAuth = false, showTitle = true }: 
         headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : undefined,
       });
       if (!res.ok) {
-        // Handle file overflow specifically
-        if (res.status === 413) {
-          try {
-            const j = await res.json();
-            const errorMsg = j?.error || 'Files exceed your tier limit.';
-            setError(errorMsg);
-          } catch {
-            setError('Files exceed your tier limit.');
-          }
-          return;
-        }
         // Non-fatal; generation will fallback to legacy upload path
         try { const j = await res.json(); setError(j?.error || 'Failed to prepare files.'); } catch {}
         return;
@@ -195,21 +184,6 @@ export default function Generator({ redirectOnAuth = false, showTitle = true }: 
           return;
         }
         if (!res.ok) {
-          // Handle file overflow specifically
-          if (res.status === 413) {
-            const contentType = res.headers.get('content-type') || '';
-            if (contentType.includes('application/json')) {
-              try {
-                const j = await res.json();
-                const errorMsg = j?.error || 'Files exceed your tier limit.';
-                throw new Error(errorMsg);
-              } catch (parseError) {
-                throw new Error('Files exceed your tier limit.');
-              }
-            }
-            throw new Error('Files exceed your tier limit.');
-          }
-          
           const contentType = res.headers.get('content-type') || '';
           if (contentType.includes('application/json')) {
             let errorMsg = 'Failed to generate flashcards.';
@@ -369,20 +343,6 @@ export default function Generator({ redirectOnAuth = false, showTitle = true }: 
       }
       const contentType = response.headers.get('content-type') || '';
       if (!response.ok) {
-        // Handle file overflow specifically
-        if (response.status === 413) {
-          if (contentType.includes('application/json')) {
-            try {
-              const j = await response.json();
-              const errorMsg = j?.error || 'Files exceed your tier limit.';
-              throw new Error(errorMsg);
-            } catch (parseError) {
-              throw new Error('Files exceed your tier limit.');
-            }
-          }
-          throw new Error('Files exceed your tier limit.');
-        }
-        
         if (contentType.includes('application/json')) {
           let errorMsg = 'Failed to generate mind map.';
           try { const j = await response.json(); errorMsg = j.error || errorMsg; } catch {}
