@@ -10,6 +10,7 @@ CogniGuide comprehensive AI-powered study assistant. It uses an LLM to convert t
 *   **Instant Generation:** Processes content and generates mind maps rapidly, saving users hours of manual work.
 *   **Interactive Mind Maps:** The generated mind maps are visual and interactive, enhancing comprehension and retention. On first load, the entire map is zoomed to fit the screen, giving a 'big picture' overview. Standard interactions like zooming, panning, and node collapsing/expanding are supported.
 *   **Realtime Streaming Rendering:** The backend can stream model output token-by-token and the frontend progressively renders the Markmap markdown as tokens arrive so the mind map begins appearing immediately instead of waiting for the full generation to finish.
+*   **Smart File Caching:** Advanced caching system prevents redundant file processing when users add/remove files. Uses content-based hashing to ensure consistent caching across different environments (localhost/production) and browsers. Only changed file combinations trigger re-processing, significantly improving performance for multi-file uploads.
 *   **Multiple Export Options:** Users can download the generated mind maps in various formats including HTML, SVG, PNG, and PDF.
 *   **Flashcards Generation (Two ways):**
     - From Mind Map: After a mind map is generated, users can generate study flashcards from the Markmap markdown and switch between the mind map view and a flashcards study mode.
@@ -32,6 +33,15 @@ CogniGuide comprehensive AI-powered study assistant. It uses an LLM to convert t
     *   **Paid plan users**: 30 credits worth (114,000 characters)
     Content exceeding tier limits is truncated at word boundaries with a message indicating the user should sign up or upgrade for unlimited access.
     *   **Performance Optimization**: User tier information is cached in memory for 5 minutes to avoid repeated database queries, ensuring fast response times for logged-in users.
+    *   **Smart File Processing Cache**: The frontend implements intelligent file set caching to prevent redundant document processing. When users upload multiple files, the system:
+        - Generates a unique key using content-based hashing (first 512 bytes of each file) combined with file metadata (name, size, type)
+        - Ensures consistent caching across different environments (localhost/production) and browsers
+        - Caches complete processing results for each unique file combination
+        - Only re-processes when the file set actually changes (files added/removed/modified)
+        - Maintains cache validity for 5 minutes to handle edge cases
+        - Automatically cleans up old cache entries (keeps last 10) to prevent memory issues
+        - Includes development-mode debug logging for production troubleshooting
+        - Instantly serves cached results for identical file combinations, dramatically improving performance for iterative workflows
  *   **Mind Map Rendering:** The application uses a custom Markmap-like renderer implemented in `lib/markmap-renderer.ts` (and embedded within `components/MindMapModal.tsx` for HTML export). This renderer handles parsing markdown, measuring node sizes, laying out the tree, and drawing SVG connectors and HTML nodes. It includes logic for color variations, node collapsing/expanding, and pan/zoom functionality. It now features an intelligent **auto-fit-to-view** that centers and scales the mind map to be fully visible on initial load and during streaming. This behavior stops once the user interacts with the map.
     *   **Touch Support:** The renderer now includes comprehensive touch event handling for mobile devices, enabling single-finger panning and two-finger pinch-to-zoom gestures for intuitive navigation.
     *   **Incremental Updates:** The renderer exposes an `updateMindMap(markdown: string)` function to support incremental re-rendering while the model is streaming output, enabling smooth progressive visualization.
@@ -122,6 +132,8 @@ Each flashcard tracks:
     * **Spaced Repetition**: Implements FSRS-6 algorithm with Supabase-backed persistence. Includes deck-level exam date constraints, per-card scheduling (difficulty, stability, reps, lapses, last_review, due), and cross-device synchronization via Supabase (`flashcards_schedule`) table.
     * **Performance Optimizations**: Uses prefetched scheduling data cached in memory and localStorage for instant loading. Includes cache-only recompute paths for offline functionality.
     * **Clean Interface**: Hides internal FSRS metrics while maintaining powerful spaced repetition capabilities.
+*   `components/Generator.tsx`: The core file upload and generation component that powers both mind map and flashcard creation. Features intelligent file processing with smart caching to prevent redundant re-processing when users add/remove files. Handles file validation, pre-processing via the `/api/preparse` endpoint, credit checking, and orchestrates the generation workflow for both mind maps and flashcards.
+    * **Smart File Caching**: Implements robust file set caching with content-based hashing to ensure consistent caching across different environments (localhost/production) and browsers. Caches complete processing results for each unique combination of files, dramatically improving performance for iterative multi-file workflows. Includes development-mode debug logging for production troubleshooting.
 *   `components/AuthModal.tsx`: A modal for authentication that supports email magic-link sign-in and Google OAuth. Triggered when users attempt to generate content without signing in on the landing page or via header "Sign in". On success, redirects to the dashboard.
 
 ### Design System & UI Preferences
@@ -211,6 +223,7 @@ For consistent branding across the application, use the `CogniGuide_logo.png` fi
     - Converts images to base64 data URLs for multimodal processing
     - Returns combined text and image data for efficient processing
     - Provides character count for credit calculation
+    - **Smart Caching Integration:** Frontend implements robust file set caching with content-based hashing to avoid redundant API calls. Ensures consistent caching across different environments (localhost/production) and browsers. Only processes when file combinations actually change, significantly improving performance for iterative workflows. Includes development-mode debug logging for production troubleshooting.
 
 *   `lib/supabaseClient.ts`: Initializes the Supabase browser client using `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY`. Also exports the `MindmapRecord` type used for dashboard history.
 

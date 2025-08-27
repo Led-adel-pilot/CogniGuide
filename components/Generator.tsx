@@ -19,6 +19,14 @@ export default function Generator({ redirectOnAuth = false, showTitle = true }: 
   const lastPreparseKeyRef = useRef<string | null>(null);
   // Cache for file set processing results (keyed by file set combination)
   const processedFileSetsCache = useRef<Map<string, { result: any; processedAt: number }>>(new Map());
+
+  // Debug logging in development
+  const isDevelopment = process.env.NODE_ENV === 'development';
+  const debugLog = useCallback((message: string, ...args: any[]) => {
+    if (isDevelopment) {
+      console.log(`[FileCache] ${message}`, ...args);
+    }
+  }, [isDevelopment]);
   const [prompt, setPrompt] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -70,9 +78,37 @@ export default function Generator({ redirectOnAuth = false, showTitle = true }: 
   }, [router, redirectOnAuth]);
 
   // Helper function to generate a unique key for a file
-  const getFileKey = useCallback((file: File) => {
-    return `${file.name}|${file.size}|${(file as any).lastModified ?? ''}`;
-  }, []);
+  const getFileKey = useCallback(async (file: File): Promise<string> => {
+    // Create a more robust key that works consistently across environments
+    // Use file name, size, and type for basic identification
+    const baseKey = `${file.name}|${file.size}|${file.type || 'unknown'}`;
+
+    // Add a simple hash of the file content for uniqueness (first 1KB)
+    try {
+      const slice = file.slice(0, 1024);
+      const arrayBuffer = await slice.arrayBuffer();
+      const bytes = new Uint8Array(arrayBuffer);
+      let hash = 0;
+      for (let i = 0; i < Math.min(bytes.length, 512); i++) { // Limit to 512 bytes for performance
+        hash = ((hash << 5) - hash) + bytes[i];
+        hash = hash & hash; // Convert to 32-bit integer
+      }
+      const contentHash = Math.abs(hash).toString(36);
+      const finalKey = `${baseKey}|${contentHash}`;
+      debugLog(`Generated file key: ${finalKey}`);
+      return finalKey;
+    } catch (error) {
+      // Fallback to base key if hashing fails
+      debugLog(`Hashing failed for ${baseKey}, using fallback:`, error);
+      return baseKey;
+    }
+  }, [debugLog]);
+
+  // Helper function to generate a file set key from multiple files
+  const getFileSetKey = useCallback(async (files: File[]): Promise<string> => {
+    const fileKeys = await Promise.all(files.map(f => getFileKey(f)));
+    return fileKeys.sort().join('||');
+  }, [getFileKey]);
 
   const handleFileChange = useCallback(async (selectedFiles: File[]) => {
     setFiles(selectedFiles);
@@ -87,12 +123,19 @@ export default function Generator({ redirectOnAuth = false, showTitle = true }: 
     }
 
     // Generate a key for the current file set
-    const fileSetKey = selectedFiles.map(f => getFileKey(f)).sort().join('||');
+    const fileSetKey = await getFileSetKey(selectedFiles);
 
     // Check if we have a cached result for this exact file set
     const cachedResult = processedFileSetsCache.current.get(fileSetKey);
-    if (cachedResult && (Date.now() - cachedResult.processedAt) < 5 * 60 * 1000) {
+    const cacheAge = cachedResult ? Date.now() - cachedResult.processedAt : 0;
+    const isCacheValid = cachedResult && cacheAge < 5 * 60 * 1000;
+
+    debugLog(`File set key: ${fileSetKey}`);
+    debugLog(`Cache hit: ${!!cachedResult}, Cache age: ${Math.round(cacheAge / 1000)}s, Valid: ${isCacheValid}`);
+
+    if (isCacheValid) {
       // Use cached result
+      debugLog('Using cached result');
       const j = cachedResult.result;
       const isAuthedFromApi = Boolean(j?.isAuthed);
       const text = typeof j?.text === 'string' ? j.text : '';
@@ -123,6 +166,8 @@ export default function Generator({ redirectOnAuth = false, showTitle = true }: 
 
       lastPreparseKeyRef.current = fileSetKey;
       return;
+    } else {
+      debugLog('Cache miss or expired, processing files');
     }
 
     // No valid cache, need to process all files
@@ -154,6 +199,8 @@ export default function Generator({ redirectOnAuth = false, showTitle = true }: 
         processedAt: Date.now()
       });
 
+      debugLog(`Cached result for key: ${fileSetKey}, Cache size: ${processedFileSetsCache.current.size}`);
+
       // Clean up old cache entries (keep only last 10 to prevent memory issues)
       if (processedFileSetsCache.current.size > 10) {
         const entries = Array.from(processedFileSetsCache.current.entries());
@@ -162,6 +209,7 @@ export default function Generator({ redirectOnAuth = false, showTitle = true }: 
         entries.slice(0, 10).forEach(([key, value]) => {
           processedFileSetsCache.current.set(key, value);
         });
+        debugLog(`Cleaned up cache, new size: ${processedFileSetsCache.current.size}`);
       }
 
       const isAuthedFromApi = Boolean(j?.isAuthed);
