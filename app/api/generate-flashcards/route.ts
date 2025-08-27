@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
-import { getTextFromDocx, getTextFromPdf, getTextFromPptx } from '@/lib/document-parser';
+import { getTextFromDocx, getTextFromPdf, getTextFromPptx, getTextFromPlainText, processMultipleFiles } from '@/lib/document-parser';
 import { createClient } from '@supabase/supabase-js';
 
 const openai = new OpenAI({
@@ -339,9 +339,22 @@ export async function POST(req: NextRequest) {
         }
         if (shouldStream) {
           const streamingPrompt = buildFlashcardPrompt({ mode: 'stream', sourceType: 'markmap', sourceContent: body.markdown!, numCards: body.numCards });
+
+          // Log the total text after truncation sent to LLM and its character count
+          console.log('=== FLASHCARDS MARKDOWN STREAMING LLM INPUT ===');
+          console.log('Character count:', streamingPrompt.length);
+          console.log('Text content preview:', streamingPrompt.substring(0, 200) + (streamingPrompt.length > 200 ? '...' : ''));
+          console.log('===============================================');
+
           return streamNdjson(streamingPrompt, (userIdForCredits && creditsNeeded > 0) ? { userId: userIdForCredits, credits: creditsNeeded } : undefined);
         }
         const prompt = buildFlashcardPrompt({ mode: 'json', sourceType: 'markmap', sourceContent: body.markdown!, numCards: body.numCards });
+
+        // Log the total text after truncation sent to LLM and its character count
+        console.log('=== FLASHCARDS MARKDOWN NON-STREAMING LLM INPUT ===');
+        console.log('Character count:', prompt.length);
+        console.log('Text content preview:', prompt.substring(0, 200) + (prompt.length > 200 ? '...' : ''));
+        console.log('==================================================');
         const completion = await openai.chat.completions.create({
           model: 'gemini-2.5-flash-lite',
           // @ts-ignore
@@ -363,7 +376,9 @@ export async function POST(req: NextRequest) {
       const text = (body.text || '').toString();
       const promptText = (body.prompt || '').toString();
       const images = Array.isArray(body.images) ? body.images as string[] : [];
-      const creditsRaw = (text?.length || 0) + (promptText?.length || 0);
+      const rawCharCount = typeof (body as any)?.rawCharCount === 'number' ? (body as any).rawCharCount as number : undefined;
+      // If rawCharCount is provided (from preparse), bill ONLY on truncated file text; exclude prompt length
+      const creditsRaw = rawCharCount !== undefined ? rawCharCount : ((text?.length || 0) + (promptText?.length || 0));
       let creditsNeeded = creditsRaw > 0 ? (creditsRaw / ONE_CREDIT_CHARS) : 0;
       if (images.length > 0 && creditsNeeded < 0.5) creditsNeeded = 0.5;
       if (!text && images.length === 0 && promptText && creditsNeeded < 1) creditsNeeded = 1;
@@ -372,6 +387,13 @@ export async function POST(req: NextRequest) {
         if (!ok) return NextResponse.json({ error: 'Insufficient credits. Upload a smaller file or' }, { status: 402 });
       }
       const streamingPrompt = buildFlashcardPrompt({ mode: shouldStream ? 'stream' : 'json', sourceType: 'text', sourceContent: text || 'No text provided. Analyze the attached image(s) only and build flashcards from their content.', userInstruction: promptText, imagesCount: images.length, numCards: body.numCards });
+
+      // Log the total text after truncation sent to LLM and its character count
+      console.log('=== FLASHCARDS PRE-PARSED LLM INPUT ===');
+      console.log('Character count:', streamingPrompt.length);
+      console.log('Text content preview:', streamingPrompt.substring(0, 200) + (streamingPrompt.length > 200 ? '...' : ''));
+      console.log('=====================================');
+
       if (shouldStream) {
         const userContent: any = images.length > 0 ? [{ type: 'text', text: streamingPrompt }, ...images.map((url) => ({ type: 'image_url', image_url: { url } }))] : streamingPrompt;
         return streamNdjson(userContent, (userIdForCredits && creditsNeeded > 0) ? { userId: userIdForCredits, credits: creditsNeeded } : undefined);
@@ -405,41 +427,16 @@ export async function POST(req: NextRequest) {
     const userId = await getUserIdFromAuthHeader(req);
     const userTier = await getUserTier(userId);
 
-    let extractedText = '';
-    const extractedParts: string[] = [];
-    const imageParts: { type: 'image_url'; image_url: { url: string } }[] = [];
-    let totalRawChars = 0;
-    for (const file of files) {
-      const buffer = Buffer.from(await file.arrayBuffer());
-      let text = '';
-      if (file.type === 'application/pdf') {
-        text = await getTextFromPdf(buffer, userTier);
-      } else if (file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
-        text = await getTextFromDocx(buffer, userTier);
-      } else if (file.type === 'application/vnd.openxmlformats-officedocument.presentationml.presentation') {
-        text = await getTextFromPptx(buffer, userTier);
-      } else if (file.type === 'text/plain') {
-        text = buffer.toString('utf-8');
-      } else if (file.type === 'text/markdown' || file.name.toLowerCase().endsWith('.md') || file.name.toLowerCase().endsWith('.markdown')) {
-        text = buffer.toString('utf-8');
-      } else if (file.type.startsWith('image/')) {
-        try {
-          const base64 = buffer.toString('base64');
-          const dataUrl = `data:${file.type};base64,${base64}`;
-          imageParts.push({ type: 'image_url', image_url: { url: dataUrl } });
-          continue;
-        } catch {
-          continue;
-        }
-      } else {
-        // skip unsupported types silently
-        continue;
-      }
-      if (text) totalRawChars += text.length;
-      extractedParts.push(`--- START OF FILE: ${file.name} ---\n\n${text}\n\n--- END OF FILE: ${file.name} ---`);
-    }
-    extractedText = extractedParts.join('\n\n');
-    if (promptText) totalRawChars += promptText.length;
+    // Use the new cumulative file processing logic
+    const result = await processMultipleFiles(files, userTier);
+
+    const extractedText = result.extractedParts.join('\n\n');
+    const imageParts: { type: 'image_url'; image_url: { url: string } }[] = result.imageDataUrls.map(url => ({
+      type: 'image_url' as const,
+      image_url: { url }
+    }));
+    // Bill ONLY on truncated file text; do not include prompt length
+    let totalRawChars = result.totalRawChars;
 
     if (!extractedText && imageParts.length === 0) {
       return NextResponse.json({ error: 'Could not read any supported content from the uploaded files.' }, { status: 400 });
@@ -466,6 +463,13 @@ export async function POST(req: NextRequest) {
       const userContent: any = imageParts.length > 0
         ? [{ type: 'text', text: prompt }, ...imageParts]
         : prompt;
+
+      // Log the total text after truncation sent to LLM and its character count
+      console.log('=== FLASHCARDS STREAMING LLM INPUT ===');
+      console.log('Character count:', prompt.length);
+      console.log('Text content preview:', prompt.substring(0, 200) + (prompt.length > 200 ? '...' : ''));
+      console.log('=====================================');
+
       // Wrap stream to refund credits on complete failure before first line
       const encoder = new TextEncoder();
       const stream = await openai.chat.completions.create({
@@ -538,6 +542,13 @@ export async function POST(req: NextRequest) {
       imagesCount: imageParts.length,
     });
     const userContent: any = imageParts.length > 0 ? [{ type: 'text', text: prompt }, ...imageParts] : prompt;
+
+    // Log the total text after truncation sent to LLM and its character count
+    console.log('=== FLASHCARDS NON-STREAMING LLM INPUT ===');
+    console.log('Character count:', prompt.length);
+    console.log('Text content preview:', prompt.substring(0, 200) + (prompt.length > 200 ? '...' : ''));
+    console.log('==========================================');
+
     const completion = await openai.chat.completions.create({
       model: 'gemini-2.5-flash-lite',
       // @ts-ignore

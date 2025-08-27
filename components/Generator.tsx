@@ -14,7 +14,7 @@ import { Sparkles } from 'lucide-react';
 
 export default function Generator({ redirectOnAuth = false, showTitle = true }: { redirectOnAuth?: boolean, showTitle?: boolean }) {
   const [files, setFiles] = useState<File[]>([]);
-  const [preParsed, setPreParsed] = useState<{ text: string; images: string[] } | null>(null);
+  const [preParsed, setPreParsed] = useState<{ text: string; images: string[]; rawCharCount?: number } | null>(null);
   const [isPreParsing, setIsPreParsing] = useState(false);
   const lastPreparseKeyRef = useRef<string | null>(null);
   const [prompt, setPrompt] = useState('');
@@ -32,6 +32,7 @@ export default function Generator({ redirectOnAuth = false, showTitle = true }: 
   const [flashcardsDeckId, setFlashcardsDeckId] = useState<string | undefined>(undefined);
   const [authChecked, setAuthChecked] = useState(false);
   const [freeGenerationsLeft, setFreeGenerationsLeft] = useState<number>(NON_AUTH_FREE_LIMIT);
+  const [allowedNameSizes, setAllowedNameSizes] = useState<{ name: string; size: number }[] | undefined>(undefined);
   const router = useRouter();
 
   useEffect(() => {
@@ -90,6 +91,17 @@ export default function Generator({ redirectOnAuth = false, showTitle = true }: 
         headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : undefined,
       });
       if (!res.ok) {
+        // Handle file overflow specifically
+        if (res.status === 413) {
+          try {
+            const j = await res.json();
+            const errorMsg = j?.error || 'Files exceed your tier limit.';
+            setError(errorMsg);
+          } catch {
+            setError('Files exceed your tier limit.');
+          }
+          return;
+        }
         // Non-fatal; generation will fallback to legacy upload path
         try { const j = await res.json(); setError(j?.error || 'Failed to prepare files.'); } catch {}
         return;
@@ -97,7 +109,24 @@ export default function Generator({ redirectOnAuth = false, showTitle = true }: 
       const j = await res.json();
       const text = typeof j?.text === 'string' ? j.text : '';
       const images = Array.isArray(j?.images) ? j.images as string[] : [];
-      setPreParsed({ text, images });
+      const rawCharCount = typeof j?.totalRawChars === 'number' ? j.totalRawChars as number : undefined;
+      setPreParsed({ text, images, rawCharCount });
+
+      // Handle cumulative pruning feedback
+      const limitExceeded = Boolean(j?.limitExceeded);
+      const includedFiles = Array.isArray(j?.includedFiles) ? j.includedFiles as { name: string; size: number }[] : [];
+      const excludedFiles = Array.isArray(j?.excludedFiles) ? j.excludedFiles as { name: string; size: number }[] : [];
+      const partialFile = j?.partialFile as { name: string; size: number; includedChars: number } | null;
+      if (limitExceeded) {
+        setAllowedNameSizes(includedFiles);
+        const keptNames = includedFiles.map(f => f.name);
+        const removedNames = excludedFiles.map(f => f.name);
+        const partialNote = partialFile && partialFile.name ? ` and partially included "${partialFile.name}"` : '';
+        const removedNote = removedNames.length > 0 ? ` Removed: ${removedNames.join(', ')}.` : '';
+        setError(`Content exceeds the lengthlimit for your current plan. ${keptNames.length} file(s) have been retained${partialNote}.${removedNote}`);
+      } else {
+        setAllowedNameSizes(undefined);
+      }
     } catch {
       // Non-fatal
     } finally {
@@ -137,7 +166,7 @@ export default function Generator({ redirectOnAuth = false, showTitle = true }: 
         const accessToken = sessionData?.session?.access_token;
         let res: Response;
         if (preParsed) {
-          const payload = { text: preParsed.text || '', images: preParsed.images || [], prompt: prompt.trim() || '' };
+          const payload = { text: preParsed.text || '', images: preParsed.images || [], prompt: prompt.trim() || '', rawCharCount: preParsed.rawCharCount };
           res = await fetch('/api/generate-flashcards?stream=1', {
             method: 'POST',
             body: JSON.stringify(payload),
@@ -162,6 +191,21 @@ export default function Generator({ redirectOnAuth = false, showTitle = true }: 
           return;
         }
         if (!res.ok) {
+          // Handle file overflow specifically
+          if (res.status === 413) {
+            const contentType = res.headers.get('content-type') || '';
+            if (contentType.includes('application/json')) {
+              try {
+                const j = await res.json();
+                const errorMsg = j?.error || 'Files exceed your tier limit.';
+                throw new Error(errorMsg);
+              } catch (parseError) {
+                throw new Error('Files exceed your tier limit.');
+              }
+            }
+            throw new Error('Files exceed your tier limit.');
+          }
+          
           const contentType = res.headers.get('content-type') || '';
           if (contentType.includes('application/json')) {
             let errorMsg = 'Failed to generate flashcards.';
@@ -303,7 +347,7 @@ export default function Generator({ redirectOnAuth = false, showTitle = true }: 
       const accessToken = sessionData?.session?.access_token;
       let response: Response;
       if (preParsed) {
-        const payload = { text: preParsed.text || '', images: preParsed.images || [], prompt: prompt.trim() || '' };
+        const payload = { text: preParsed.text || '', images: preParsed.images || [], prompt: prompt.trim() || '', rawCharCount: preParsed.rawCharCount };
         response = await fetch('/api/generate-mindmap', {
           method: 'POST',
           body: JSON.stringify(payload),
@@ -321,6 +365,20 @@ export default function Generator({ redirectOnAuth = false, showTitle = true }: 
       }
       const contentType = response.headers.get('content-type') || '';
       if (!response.ok) {
+        // Handle file overflow specifically
+        if (response.status === 413) {
+          if (contentType.includes('application/json')) {
+            try {
+              const j = await response.json();
+              const errorMsg = j?.error || 'Files exceed your tier limit.';
+              throw new Error(errorMsg);
+            } catch (parseError) {
+              throw new Error('Files exceed your tier limit.');
+            }
+          }
+          throw new Error('Files exceed your tier limit.');
+        }
+        
         if (contentType.includes('application/json')) {
           let errorMsg = 'Failed to generate mind map.';
           try { const j = await response.json(); errorMsg = j.error || errorMsg; } catch {}
@@ -483,6 +541,7 @@ export default function Generator({ redirectOnAuth = false, showTitle = true }: 
                 onFileChange={handleFileChange}
                 disabled={isLoading || markdown !== null || flashcardsOpen}
                 isPreParsing={isPreParsing}
+                allowedNameSizes={allowedNameSizes}
                 onOpen={() => {
                   if (!authChecked) return false;
                   if (!isAuthed && freeGenerationsLeft <= 0) {
@@ -549,8 +608,22 @@ export default function Generator({ redirectOnAuth = false, showTitle = true }: 
                     )}
                     {typeof error === 'string' &&
                      !error.toLowerCase().includes('insufficient credits') &&
-                     !error.toLowerCase().includes('no-signup generations') && (
+                     !error.toLowerCase().includes('no-signup generations') &&
+                     !error.toLowerCase().includes('exceed') && (
                       <p className="font-medium">{error}</p>
+                    )}
+                    {typeof error === 'string' && error.toLowerCase().includes('exceed') && (
+                      <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+                        <p className="font-medium text-center">{error}</p>
+                        <button
+                          type="button"
+                          onClick={handleUpgradeClick}
+                          className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-full bg-blue-100/50 text-blue-700 hover:bg-blue-200/50 border border-blue-200 transition-colors"
+                        >
+                          <Sparkles className="h-4 w-4" />
+                          <span>Upgrade Plan</span>
+                        </button>
+                      </div>
                     )}
                   </div>
                 </div>

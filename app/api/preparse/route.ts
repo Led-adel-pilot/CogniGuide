@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getTextFromDocx, getTextFromPdf, getTextFromPptx } from '@/lib/document-parser';
+import { processMultipleFiles, MultiFileProcessResult } from '@/lib/document-parser';
 import { createClient } from '@supabase/supabase-js';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
@@ -73,49 +73,19 @@ export async function POST(req: NextRequest) {
     const userId = await getUserIdFromAuthHeader(req);
     const userTier = await getUserTier(userId);
 
-    const extractedParts: string[] = [];
-    const imageDataUrls: string[] = [];
-    let totalRawChars = 0;
+    // Use the new cumulative file processing logic
+    const result = await processMultipleFiles(files, userTier);
 
-    for (const file of files) {
-      const buffer = Buffer.from(await file.arrayBuffer());
-      let text = '';
-      if (file.type === 'application/pdf') {
-        text = await getTextFromPdf(buffer, userTier);
-      } else if (file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
-        text = await getTextFromDocx(buffer, userTier);
-      } else if (file.type === 'application/vnd.openxmlformats-officedocument.presentationml.presentation') {
-        text = await getTextFromPptx(buffer, userTier);
-      } else if (file.type === 'text/plain') {
-        text = buffer.toString('utf-8');
-      } else if (
-        file.type === 'text/markdown' ||
-        file.name.toLowerCase().endsWith('.md') ||
-        file.name.toLowerCase().endsWith('.markdown')
-      ) {
-        text = buffer.toString('utf-8');
-      } else if (file.type.startsWith('image/')) {
-        try {
-          const base64 = buffer.toString('base64');
-          const dataUrl = `data:${file.type};base64,${base64}`;
-          imageDataUrls.push(dataUrl);
-          continue;
-        } catch {
-          continue;
-        }
-      } else {
-        // Unsupported type; skip
-        continue;
-      }
-      if (text) totalRawChars += text.length;
-      extractedParts.push(`--- START OF FILE: ${file.name} ---\n\n${text}\n\n--- END OF FILE: ${file.name} ---`);
-    }
-
-    const textCombined = extractedParts.join('\n\n');
+    const textCombined = result.extractedParts.join('\n\n');
     return NextResponse.json({
       text: textCombined,
-      images: imageDataUrls,
-      totalRawChars,
+      images: result.imageDataUrls,
+      totalRawChars: result.totalRawChars,
+      maxChars: result.maxChars,
+      limitExceeded: result.limitExceeded,
+      includedFiles: result.includedFiles,
+      excludedFiles: result.excludedFiles,
+      partialFile: result.partialFile || null,
     });
   } catch (error) {
     console.error('Error in preparse API:', error);

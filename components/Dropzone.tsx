@@ -11,9 +11,11 @@ interface DropzoneProps {
   onOpen?: () => boolean | void;
   // Show loading state for pre-parsing
   isPreParsing?: boolean;
+  // Optional whitelist of files to keep by name+size (used to prune overflow files)
+  allowedNameSizes?: { name: string; size: number }[];
 }
 
-export default function Dropzone({ onFileChange, disabled = false, onOpen, isPreParsing = false }: DropzoneProps) {
+export default function Dropzone({ onFileChange, disabled = false, onOpen, isPreParsing = false, allowedNameSizes }: DropzoneProps) {
   const [dragIsOver, setDragIsOver] = useState(false);
   const [files, setFiles] = useState<File[]>([]);
   const inputRef = useRef<HTMLInputElement | null>(null);
@@ -22,6 +24,18 @@ export default function Dropzone({ onFileChange, disabled = false, onOpen, isPre
   useEffect(() => {
     onFileChange(files);
   }, [files, onFileChange]);
+
+  // Prune files when an allowed list is provided
+  useEffect(() => {
+    if (!allowedNameSizes || allowedNameSizes.length === 0) return;
+    setFiles(prev => {
+      const allowedSet = new Set(allowedNameSizes.map(a => `${a.name}|${a.size}`));
+      const next = prev.filter(f => allowedSet.has(`${f.name}|${f.size}`));
+      return next;
+    });
+    // do not include allowedNameSizes in onFileChange deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [allowedNameSizes?.length]);
 
   const handleDragEnter = useCallback((e: React.DragEvent<HTMLLabelElement>) => {
     e.preventDefault();

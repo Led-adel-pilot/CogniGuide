@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
-import { getTextFromDocx, getTextFromPdf, getTextFromPptx } from '@/lib/document-parser';
+import { getTextFromDocx, getTextFromPdf, getTextFromPptx, getTextFromPlainText, processMultipleFiles } from '@/lib/document-parser';
 import { createClient } from '@supabase/supabase-js';
 
 const openai = new OpenAI({
@@ -185,8 +185,8 @@ export async function POST(req: NextRequest) {
   try {
     const contentType = req.headers.get('content-type') || '';
 
-    async function respondWithStream(opts: { text: string; prompt: string; images: string[]; userId: string | null }) {
-      const { text, prompt, images, userId } = opts;
+    async function respondWithStream(opts: { text: string; prompt: string; images: string[]; userId: string | null; rawCharCount?: number }) {
+      const { text, prompt, images, userId, rawCharCount } = opts;
       const multimodalPreamble = images.length > 0
         ? `In addition to any text provided below, you are also given ${images.length} image(s). Carefully read text inside the images (OCR) and analyze diagrams to extract key concepts and relationships. Integrate insights from both text and images into a single coherent mind map.`
         : '';
@@ -199,9 +199,11 @@ export async function POST(req: NextRequest) {
         prompt || ''
       ) + (multimodalPreamble ? `\n\n${multimodalPreamble}` : '');
 
-      // Credits
+      // Credits - use rawCharCount if provided (file-based), otherwise calculate from text
       const ONE_CREDIT_CHARS = 3800;
-      const totalRawChars = (text?.length || 0) + (prompt?.length || 0);
+      const totalRawChars = rawCharCount !== undefined 
+        ? rawCharCount // exclude prompt length for file-based billing
+        : (text?.length || 0) + (prompt?.length || 0);
       let creditsNeeded = totalRawChars > 0 ? (totalRawChars / ONE_CREDIT_CHARS) : 0;
       const isPromptOnly = (!text && images.length === 0 && !!(prompt && prompt.trim().length > 0));
       if (images.length > 0 && creditsNeeded < 0.5) creditsNeeded = 0.5;
@@ -217,6 +219,13 @@ export async function POST(req: NextRequest) {
       const encoder = new TextEncoder();
       const imageParts = images.map((url) => ({ type: 'image_url', image_url: { url } }));
       const userContent: any = imageParts.length > 0 ? [{ type: 'text', text: finalPrompt }, ...imageParts] : finalPrompt;
+
+      // Log the total text after truncation sent to LLM and its character count
+      console.log('=== MINDMAP LLM INPUT ===');
+      console.log('Character count:', finalPrompt.length);
+      console.log('Text content preview:', finalPrompt.substring(0, 200) + (finalPrompt.length > 200 ? '...' : ''));
+      console.log('=======================');
+
       const stream = await openai.chat.completions.create({
         model: 'gemini-2.5-flash-lite',
         // @ts-ignore
@@ -265,31 +274,16 @@ export async function POST(req: NextRequest) {
     const formData = await req.formData();
     const files = formData.getAll('files') as File[];
     const promptText = (formData.get('prompt') as string | null) || '';
-    const images: string[] = [];
     const extractedTexts: string[] = [];
     const userId = await getUserIdFromAuthHeader(req);
     const userTier = await getUserTier(userId);
-    for (const file of files) {
-      const buffer = Buffer.from(await file.arrayBuffer());
-      if (file.type.startsWith('image/')) {
-        try {
-          const base64 = buffer.toString('base64');
-          const dataUrl = `data:${file.type};base64,${base64}`;
-          images.push(dataUrl);
-          continue;
-        } catch { continue; }
-      }
-      let text = '';
-      if (file.type === 'application/pdf') text = await getTextFromPdf(buffer, userTier);
-      else if (file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') text = await getTextFromDocx(buffer, userTier);
-      else if (file.type === 'application/vnd.openxmlformats-officedocument.presentationml.presentation') text = await getTextFromPptx(buffer, userTier);
-      else if (file.type === 'text/plain') text = buffer.toString('utf-8');
-      else if (file.type === 'text/markdown' || file.name.toLowerCase().endsWith('.md') || file.name.toLowerCase().endsWith('.markdown')) text = buffer.toString('utf-8');
-      else continue;
-      extractedTexts.push(`--- START OF FILE: ${file.name} ---\n\n${text}\n\n--- END OF FILE: ${file.name} ---`);
-    }
-    const combined = extractedTexts.join('\n\n');
-    return await respondWithStream({ text: combined, prompt: promptText, images, userId: userId });
+    
+    // Use the new cumulative file processing logic
+    const result = await processMultipleFiles(files, userTier);
+
+    const combined = result.extractedParts.join('\n\n');
+    const images = result.imageDataUrls;
+    return await respondWithStream({ text: combined, prompt: promptText, images, userId: userId, rawCharCount: result.totalRawChars });
 
   } catch (error) {
     console.error('Error in generate-mindmap API:', error);
