@@ -17,8 +17,8 @@ export default function Generator({ redirectOnAuth = false, showTitle = true }: 
   const [preParsed, setPreParsed] = useState<{ text: string; images: string[]; rawCharCount?: number } | null>(null);
   const [isPreParsing, setIsPreParsing] = useState(false);
   const lastPreparseKeyRef = useRef<string | null>(null);
-  // Cache for individual file processing results
-  const processedFilesCache = useRef<Map<string, { text: string; images: string[]; rawCharCount: number; processedAt: number }>>(new Map());
+  // Cache for file set processing results (keyed by file set combination)
+  const processedFileSetsCache = useRef<Map<string, { result: any; processedAt: number }>>(new Map());
   const [prompt, setPrompt] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -80,125 +80,123 @@ export default function Generator({ redirectOnAuth = false, showTitle = true }: 
     // setError(null);
     if (!selectedFiles || selectedFiles.length === 0) {
       // Clear cache and pre-parsed results when no files selected
-      processedFilesCache.current.clear();
+      processedFileSetsCache.current.clear();
       setPreParsed(null);
       lastPreparseKeyRef.current = null;
       return;
     }
 
-    // Generate keys for current files
-    const currentFileKeys = new Set(selectedFiles.map(f => getFileKey(f)));
+    // Generate a key for the current file set
+    const fileSetKey = selectedFiles.map(f => getFileKey(f)).sort().join('||');
 
-    // Remove cache entries for files that are no longer selected
-    for (const [key] of processedFilesCache.current) {
-      if (!currentFileKeys.has(key)) {
-        processedFilesCache.current.delete(key);
+    // Check if we have a cached result for this exact file set
+    const cachedResult = processedFileSetsCache.current.get(fileSetKey);
+    if (cachedResult && (Date.now() - cachedResult.processedAt) < 5 * 60 * 1000) {
+      // Use cached result
+      const j = cachedResult.result;
+      const isAuthedFromApi = Boolean(j?.isAuthed);
+      const text = typeof j?.text === 'string' ? j.text : '';
+      const images = Array.isArray(j?.images) ? j.images as string[] : [];
+      const rawCharCount = typeof j?.totalRawChars === 'number' ? j.totalRawChars as number : undefined;
+
+      setPreParsed({ text, images, rawCharCount });
+
+      // Handle cumulative pruning feedback from cached result
+      const limitExceeded = Boolean(j?.limitExceeded);
+      const includedFiles = Array.isArray(j?.includedFiles) ? j.includedFiles as { name: string; size: number }[] : [];
+      const excludedFiles = Array.isArray(j?.excludedFiles) ? j.excludedFiles as { name: string; size: number }[] : [];
+      const partialFile = j?.partialFile as { name: string; size: number; includedChars: number } | null;
+
+      if (limitExceeded) {
+        setAllowedNameSizes(includedFiles);
+        const keptNames = includedFiles.map(f => f.name);
+        const removedNames = excludedFiles.map(f => f.name);
+        const partialNote = partialFile && partialFile.name ? ` and partially included "${partialFile.name}"` : '';
+        const removedNote = removedNames.length > 0 ? ` Removed: ${removedNames.join(', ')}.` : '';
+        // Only show the plan-specific error message for authenticated users (from API or client state)
+        if (isAuthedFromApi || isAuthed) {
+          setError(`Content exceeds the length limit for your current plan. the content has been truncated.`);
+        }
+      } else {
+        setAllowedNameSizes(undefined);
       }
-    }
 
-    // Check which files need processing (new or changed files)
-    const filesToProcess = selectedFiles.filter(file => {
-      const key = getFileKey(file);
-      const cached = processedFilesCache.current.get(key);
-      // Process if not cached or if file was modified recently (within last 5 minutes to handle edge cases)
-      return !cached || (Date.now() - cached.processedAt) > 5 * 60 * 1000;
-    });
-
-    // If no files need processing and we have cached results, combine them
-    if (filesToProcess.length === 0 && processedFilesCache.current.size > 0) {
-      const cachedEntries = Array.from(processedFilesCache.current.values());
-      const combinedText = cachedEntries.map(entry => entry.text).join('\n\n');
-      const combinedImages = cachedEntries.flatMap(entry => entry.images);
-      const totalChars = cachedEntries.reduce((sum, entry) => sum + entry.rawCharCount, 0);
-
-      setPreParsed({
-        text: combinedText,
-        images: combinedImages,
-        rawCharCount: totalChars
-      });
-      setAllowedNameSizes(undefined);
+      lastPreparseKeyRef.current = fileSetKey;
       return;
     }
 
-    // If we have files to process, only process those
-    if (filesToProcess.length > 0) {
-      try {
-        setIsPreParsing(true);
-        const formData = new FormData();
-        filesToProcess.forEach((f) => formData.append('files', f));
+    // No valid cache, need to process all files
+    try {
+      setIsPreParsing(true);
+      const formData = new FormData();
+      selectedFiles.forEach((f) => formData.append('files', f));
 
-        const { data: sessionData } = await supabase.auth.getSession();
-        const accessToken = sessionData?.session?.access_token;
+      const { data: sessionData } = await supabase.auth.getSession();
+      const accessToken = sessionData?.session?.access_token;
 
-        const res = await fetch('/api/preparse', {
-          method: 'POST',
-          body: formData,
-          headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : undefined,
-        });
+      const res = await fetch('/api/preparse', {
+        method: 'POST',
+        body: formData,
+        headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : undefined,
+      });
 
-        if (!res.ok) {
-          // Non-fatal; generation will fallback to legacy upload path
-          try { const j = await res.json(); setError(j?.error || 'Failed to prepare files.'); } catch {}
-          return;
-        }
-
-        const j = await res.json();
-
-        // Cache the results for newly processed files
-        filesToProcess.forEach(file => {
-          const key = getFileKey(file);
-          // Extract individual file results from the response
-          // Note: This is a simplified approach - in a production app you might want
-          // the API to return results per file for better caching
-          processedFilesCache.current.set(key, {
-            text: j.text || '',
-            images: j.images || [],
-            rawCharCount: j.totalRawChars || 0,
-            processedAt: Date.now()
-          });
-        });
-
-        // Now combine all cached results (old + new)
-        const allCachedEntries = Array.from(processedFilesCache.current.values());
-        const combinedText = allCachedEntries.map(entry => entry.text).join('\n\n');
-        const combinedImages = allCachedEntries.flatMap(entry => entry.images);
-        const totalChars = allCachedEntries.reduce((sum, entry) => sum + entry.rawCharCount, 0);
-
-        setPreParsed({
-          text: combinedText,
-          images: combinedImages,
-          rawCharCount: totalChars
-        });
-
-        // Handle cumulative pruning feedback
-        const limitExceeded = Boolean(j?.limitExceeded);
-        const includedFiles = Array.isArray(j?.includedFiles) ? j.includedFiles as { name: string; size: number }[] : [];
-        const excludedFiles = Array.isArray(j?.excludedFiles) ? j.excludedFiles as { name: string; size: number }[] : [];
-        const partialFile = j?.partialFile as { name: string; size: number; includedChars: number } | null;
-        const isAuthedFromApi = Boolean(j?.isAuthed);
-
-        if (limitExceeded) {
-          setAllowedNameSizes(includedFiles);
-          const keptNames = includedFiles.map(f => f.name);
-          const removedNames = excludedFiles.map(f => f.name);
-          const partialNote = partialFile && partialFile.name ? ` and partially included "${partialFile.name}"` : '';
-          const removedNote = removedNames.length > 0 ? ` Removed: ${removedNames.join(', ')}.` : '';
-          // Only show the plan-specific error message for authenticated users (from API or client state)
-          if (isAuthedFromApi || isAuthed) {
-            setError(`Content exceeds the length limit for your current plan. the content has been truncated.`);
-          }
-        } else {
-          setAllowedNameSizes(undefined);
-        }
-
-        // Update the last processed key to reflect current file set
-        lastPreparseKeyRef.current = selectedFiles.map(f => getFileKey(f)).join('||');
-
-      } catch {
-        // Non-fatal
-      } finally {
-        setIsPreParsing(false);
+      if (!res.ok) {
+        // Non-fatal; generation will fallback to legacy upload path
+        try { const j = await res.json(); setError(j?.error || 'Failed to prepare files.'); } catch {}
+        return;
       }
+
+      const j = await res.json();
+
+      // Cache the complete result for this file set
+      processedFileSetsCache.current.set(fileSetKey, {
+        result: j,
+        processedAt: Date.now()
+      });
+
+      // Clean up old cache entries (keep only last 10 to prevent memory issues)
+      if (processedFileSetsCache.current.size > 10) {
+        const entries = Array.from(processedFileSetsCache.current.entries());
+        entries.sort((a, b) => b[1].processedAt - a[1].processedAt);
+        processedFileSetsCache.current.clear();
+        entries.slice(0, 10).forEach(([key, value]) => {
+          processedFileSetsCache.current.set(key, value);
+        });
+      }
+
+      const isAuthedFromApi = Boolean(j?.isAuthed);
+      const text = typeof j?.text === 'string' ? j.text : '';
+      const images = Array.isArray(j?.images) ? j.images as string[] : [];
+      const rawCharCount = typeof j?.totalRawChars === 'number' ? j.totalRawChars as number : undefined;
+
+      setPreParsed({ text, images, rawCharCount });
+
+      // Handle cumulative pruning feedback
+      const limitExceeded = Boolean(j?.limitExceeded);
+      const includedFiles = Array.isArray(j?.includedFiles) ? j.includedFiles as { name: string; size: number }[] : [];
+      const excludedFiles = Array.isArray(j?.excludedFiles) ? j.excludedFiles as { name: string; size: number }[] : [];
+      const partialFile = j?.partialFile as { name: string; size: number; includedChars: number } | null;
+
+      if (limitExceeded) {
+        setAllowedNameSizes(includedFiles);
+        const keptNames = includedFiles.map(f => f.name);
+        const removedNames = excludedFiles.map(f => f.name);
+        const partialNote = partialFile && partialFile.name ? ` and partially included "${partialFile.name}"` : '';
+        const removedNote = removedNames.length > 0 ? ` Removed: ${removedNames.join(', ')}.` : '';
+        // Only show the plan-specific error message for authenticated users (from API or client state)
+        if (isAuthedFromApi || isAuthed) {
+          setError(`Content exceeds the length limit for your current plan. the content has been truncated.`);
+        }
+      } else {
+        setAllowedNameSizes(undefined);
+      }
+
+      lastPreparseKeyRef.current = fileSetKey;
+
+    } catch {
+      // Non-fatal
+    } finally {
+      setIsPreParsing(false);
     }
   }, [getFileKey, isAuthed]);
 
