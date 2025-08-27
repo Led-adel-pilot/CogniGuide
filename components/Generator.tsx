@@ -123,7 +123,7 @@ export default function Generator({ redirectOnAuth = false, showTitle = true }: 
         const removedNames = excludedFiles.map(f => f.name);
         const partialNote = partialFile && partialFile.name ? ` and partially included "${partialFile.name}"` : '';
         const removedNote = removedNames.length > 0 ? ` Removed: ${removedNames.join(', ')}.` : '';
-        setError(`Content exceeds the lengthlimit for your current plan. ${keptNames.length} file(s) have been retained${partialNote}.${removedNote}`);
+        setError(`Content exceeds the length limit for your current plan. the content has been truncated.`);
       } else {
         setAllowedNameSizes(undefined);
       }
