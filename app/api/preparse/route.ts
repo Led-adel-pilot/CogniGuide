@@ -86,6 +86,7 @@ export async function POST(req: NextRequest) {
       includedFiles: result.includedFiles,
       excludedFiles: result.excludedFiles,
       partialFile: result.partialFile || null,
+      isAuthed: userTier !== 'non-auth',
     });
   } catch (error) {
     console.error('Error in preparse API:', error);

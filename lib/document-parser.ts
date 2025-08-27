@@ -172,7 +172,7 @@ export async function processMultipleFiles(
   const tierLimits = {
     'non-auth': 1 * CHARS_PER_CREDIT, // 3,800 characters
     'free': 5 * CHARS_PER_CREDIT,     // 19,000 characters
-    'paid': 30 * CHARS_PER_CREDIT     // 114,000 characters
+    'paid': 5 * CHARS_PER_CREDIT     // 114,000 characters
   };
 
   const maxChars = tierLimits[userTier];

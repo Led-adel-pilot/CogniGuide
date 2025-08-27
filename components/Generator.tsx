@@ -107,6 +107,7 @@ export default function Generator({ redirectOnAuth = false, showTitle = true }: 
         return;
       }
       const j = await res.json();
+      const isAuthedFromApi = Boolean(j?.isAuthed);
       const text = typeof j?.text === 'string' ? j.text : '';
       const images = Array.isArray(j?.images) ? j.images as string[] : [];
       const rawCharCount = typeof j?.totalRawChars === 'number' ? j.totalRawChars as number : undefined;
@@ -123,7 +124,10 @@ export default function Generator({ redirectOnAuth = false, showTitle = true }: 
         const removedNames = excludedFiles.map(f => f.name);
         const partialNote = partialFile && partialFile.name ? ` and partially included "${partialFile.name}"` : '';
         const removedNote = removedNames.length > 0 ? ` Removed: ${removedNames.join(', ')}.` : '';
-        setError(`Content exceeds the length limit for your current plan. the content has been truncated.`);
+        // Only show the plan-specific error message for authenticated users (from API or client state)
+        if (isAuthedFromApi || isAuthed) {
+          setError(`Content exceeds the length limit for your current plan. the content has been truncated.`);
+        }
       } else {
         setAllowedNameSizes(undefined);
       }
@@ -613,17 +617,7 @@ export default function Generator({ redirectOnAuth = false, showTitle = true }: 
                       <p className="font-medium">{error}</p>
                     )}
                     {typeof error === 'string' && error.toLowerCase().includes('exceed') && (
-                      <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-                        <p className="font-medium text-center">{error}</p>
-                        <button
-                          type="button"
-                          onClick={handleUpgradeClick}
-                          className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-full bg-blue-100/50 text-blue-700 hover:bg-blue-200/50 border border-blue-200 transition-colors"
-                        >
-                          <Sparkles className="h-4 w-4" />
-                          <span>Upgrade Plan</span>
-                        </button>
-                      </div>
+                      <p className="font-medium">{error}</p>
                     )}
                   </div>
                 </div>
@@ -645,7 +639,7 @@ export default function Generator({ redirectOnAuth = false, showTitle = true }: 
                 </div>
               )}
 
-              {!isAuthed && freeGenerationsLeft === NON_AUTH_FREE_LIMIT && (
+              {!isAuthed && freeGenerationsLeft === NON_AUTH_FREE_LIMIT && (files.length > 0 || prompt.trim()) && (
                 <div className="mt-4 text-center p-3 bg-blue-50 border border-blue-200 text-blue-700 rounded-[1.25rem]">
                   <p className="text-sm font-medium">
                     You have {NON_AUTH_FREE_LIMIT} no-signup generations!{' '}
