@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
-import { Share2, UploadCloud, Zap } from 'lucide-react';
+import { Share2, UploadCloud } from 'lucide-react';
 import Generator from '@/components/Generator';
 import Link from 'next/link';
 import CogniGuideLogo from '../CogniGuide_logo.png';
@@ -57,6 +57,7 @@ export default function Home() {
             <div className="flex items-center gap-2">
               <Image src={CogniGuideLogo} alt="CogniGuide Logo" width={40} height={40} className="h-10 w-10 text-primary" />
               <h1 className="text-2xl font-bold font-heading tracking-tighter">CogniGuide</h1>
+              <Link href="/pricing" className="text-sm text-muted-foreground hover:underline">Pricing</Link>
             </div>
             <div className="flex items-center gap-2">
               {isAuthed ? (
@@ -82,11 +83,25 @@ export default function Home() {
               <p className="max-w-3xl mx-auto text-lg md:text-xl text-muted-foreground mb-10">
                 Upload your PDFs, slides, or documents. Our AI creates clear mind maps and smart, spaced-repetition flashcards to help you learn faster.
               </p>
-              <button 
+              <button
                 onClick={handleScrollToGenerator}
                 className="group flex items-center justify-center gap-2 mx-auto px-8 py-3 text-base font-bold text-white bg-primary rounded-full shadow-lg shadow-primary/20 hover:bg-primary/90 transition-all duration-300 ease-in-out transform hover:scale-105"
               >
-                <Zap className="h-5 w-5 transition-transform group-hover:-rotate-12" />
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="h-5 w-5 transition-transform group-hover:translate-y-1 animate-bounce"
+                  aria-hidden="true"
+                >
+                  <path d="M7 10L12 15L17 10" />
+                </svg>
                 Start Generating - No signup
               </button>
             </div>

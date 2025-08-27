@@ -35,6 +35,7 @@ export default function PricingClient({ onPurchaseComplete }: PricingClientProps
   const [user, setUser] = useState<User | null>(null);
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [subscription, setSubscription] = useState<{ status: string | null; plan: string | null } | null>(null);
+  const [isLoadingAuth, setIsLoadingAuth] = useState(true);
 
   useEffect(() => {
     // This effect runs on mount and checks if Paddle was already loaded by another component.
@@ -47,6 +48,7 @@ export default function PricingClient({ onPurchaseComplete }: PricingClientProps
     mountedRef.current = true;
     const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
+      setIsLoadingAuth(false);
       // If user just authenticated from the pricing page upgrade flow, redirect once to the dashboard
       try {
         if (session?.user && typeof window !== 'undefined') {
@@ -69,6 +71,7 @@ export default function PricingClient({ onPurchaseComplete }: PricingClientProps
 
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
+      setIsLoadingAuth(false);
     });
 
     return () => {
@@ -289,6 +292,19 @@ export default function PricingClient({ onPurchaseComplete }: PricingClientProps
     }
   }, [paddleReady, updateBothCycles]);
 
+  // Show loading state while determining authentication
+  if (isLoadingAuth) {
+    return (
+      <section className="py-4 pb-16">
+        <div className="container">
+          <div className="flex items-center justify-center py-12">
+            <div className="text-muted-foreground">Loading...</div>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section className="py-4 pb-16">
       {/* Load Paddle.js */}
@@ -326,7 +342,7 @@ export default function PricingClient({ onPurchaseComplete }: PricingClientProps
         <div className="grid gap-6 md:grid-cols-3">
           {/* Free */}
           <div className="relative rounded-[1.25rem] border bg-white p-6 shadow-sm">
-            <h3 className="text-xl font-bold font-heading mb-1">Free</h3>
+            <h3 className="text-xl font-bold font-heading mb-1">{user ? 'Free' : 'Free forever'}</h3>
             <p className="text-muted-foreground mb-6">Get started and try the core experience.</p>
             <div className="mb-6">
               <div className="text-3xl font-extrabold">$0</div>
@@ -337,7 +353,19 @@ export default function PricingClient({ onPurchaseComplete }: PricingClientProps
               <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> Mind maps + flashcards</li>
               <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> Spaced repetition</li>
             </ul>
-            <button disabled className="w-full cursor-not-allowed rounded-full border py-2 text-sm text-gray-600">Current plan</button>
+            {user ? (
+              <button disabled className="w-full cursor-not-allowed rounded-full border py-2 text-sm text-gray-600">Current plan</button>
+            ) : (
+              <button
+                onClick={() => {
+                  localStorage.setItem('cogniguide_upgrade_flow', 'true');
+                  setAuthModalOpen(true);
+                }}
+                className="w-full rounded-full bg-primary py-2 text-sm font-semibold text-white shadow transition hover:bg-primary/90"
+              >
+                Sign up
+              </button>
+            )}
           </div>
 
           {/* Student (Most Popular) */}
