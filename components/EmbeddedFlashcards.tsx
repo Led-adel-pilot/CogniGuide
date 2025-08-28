@@ -4,68 +4,44 @@ import FlashcardsModal, { type Flashcard } from '@/components/FlashcardsModal';
 
 const sampleFlashcards: Flashcard[] = [
     {
-        "question": "What are the three primary functions of the immune system?",
-        "answer": "1. Protects from diseases.\n2. Detects and responds to pathogens, cancer cells, and foreign objects.\n3. Distinguishes self from non-self."
+        "question": "What is Active Recall?",
+        "answer": "A learning method where you actively stimulate your memory for a piece of information, rather than passively reviewing it."
     },
     {
-        "question": "What are the two major subsystems of the immune system?",
-        "answer": "Innate (non-specific) and Adaptive (specific) immune systems."
+        "question": "How does Active Recall improve learning?",
+        "answer": "It strengthens memory traces and makes them easier to retrieve in the future. It's more effective than passive review."
     },
     {
-        "question": "Which immune subsystem provides a non-specific defense?",
-        "answer": "The innate immune system."
+        "question": "Give an example of Active Recall.",
+        "answer": "Trying to remember the answer to a question without looking at your notes, or using flashcards."
     },
     {
-        "question": "Which immune subsystem provides a specific, targeted response to pathogens?",
-        "answer": "The adaptive immune system."
+        "question": "What is Spaced Repetition?",
+        "answer": "A learning technique that involves reviewing information at increasing intervals over time."
     },
     {
-        "question": "What is the term for an immune dysfunction characterized by a less active immune system?",
-        "answer": "Immunodeficiency (e.g., HIV/AIDS)."
+        "question": "What is the 'spacing effect'?",
+        "answer": "The psychological phenomenon that underpins Spaced Repetition, where learning is greater when studying is spread out over time."
     },
     {
-        "question": "What is autoimmunity?",
-        "answer": "An immune dysfunction where a hyperactive system attacks the body's normal tissues (e.g., Rheumatoid Arthritis)."
+        "question": "How does Spaced Repetition help with long-term memory?",
+        "answer": "By reviewing information just as you're about to forget it, it strengthens long-term memory consolidation."
     },
     {
-        "question": "What is hypersensitivity in the context of the immune system?",
-        "answer": "An immune dysfunction where the immune response itself damages the body's own tissues (e.g., allergies)."
+        "question": "What is a common tool for implementing Spaced Repetition?",
+        "answer": "Spaced Repetition System (SRS) software, like Anki or Quizlet, or physical flashcard systems like the Leitner system."
     },
     {
-        "question": "What is the term for inflammation that occurs without a known cause?",
-        "answer": "Idiopathic inflammation."
+        "question": "How do Active Recall and Spaced Repetition work together?",
+        "answer": "They are a powerful combination. You use Active Recall to test yourself on flashcards, and a Spaced Repetition schedule determines when you see each card."
     },
     {
-        "question": "What is the purpose of immunosuppression as a medical intervention?",
-        "answer": "To use drugs to control autoimmunity, inflammation, or transplant rejection."
+        "question": "What is a major benefit of using Active Recall and Spaced Repetition for studying?",
+        "answer": "It leads to more efficient and effective learning, resulting in better long-term retention of information compared to cramming."
     },
     {
-        "question": "How does vaccination modulate the immune system?",
-        "answer": "It induces active immunity and develops immunological memory without causing the disease."
-    },
-    {
-        "question": "What is the goal of cancer immunotherapy?",
-        "answer": "To stimulate the patient's own immune system to attack tumors."
-    },
-    {
-        "question": "How do the hormones estrogen and testosterone differentially affect the immune system?",
-        "answer": "Estrogen acts as an immunostimulator, while testosterone is immunosuppressive."
-    },
-    {
-        "question": "What is a potential benefit of Vitamin D for the immune system?",
-        "answer": "It may reduce the risk of autoimmune diseases."
-    },
-    {
-        "question": "How does sleep and rest impact immune function?",
-        "answer": "Deprivation is detrimental, while deep sleep supports immune function."
-    },
-    {
-        "question": "What is the general effect of physical exercise on the immune system?",
-        "answer": "It has a positive effect, though intense exercise can cause transient immunodepression."
-    },
-    {
-        "question": "List four strategies pathogens use to evade the immune system.",
-        "answer": "- Hide within host cells\n- Secrete immune-inhibiting compounds\n- Antigenic variation (e.g., HIV)\n- Masking antigens with host molecules"
+        "question": "Why is rereading notes considered a less effective study method?",
+        "answer": "It's a passive activity that doesn't engage active recall, leading to an illusion of competence without deep learning."
     }
 ];
 
