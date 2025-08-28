@@ -91,14 +91,53 @@ export default function DashboardClient() {
   };
 
   const loadUserCredits = async (userId: string) => {
+    // Check localStorage cache first (for faster loads on same session)
+    try {
+      if (typeof window !== 'undefined') {
+        const cachedCredits = localStorage.getItem(`cogniguide_credits_${userId}`);
+        const cachedTime = localStorage.getItem(`cogniguide_credits_time_${userId}`);
+        const now = Date.now();
+
+        // Use cache if it's less than 5 minutes old
+        if (cachedCredits && cachedTime && (now - parseInt(cachedTime)) < 5 * 60 * 1000) {
+          setCredits(parseFloat(cachedCredits));
+          // Still refresh in background for accuracy
+          setTimeout(() => loadUserCreditsFromAPI(userId), 100);
+          return;
+        }
+      }
+    } catch {}
+
+    // Load from API
+    await loadUserCreditsFromAPI(userId);
+  };
+
+  const loadUserCreditsFromAPI = async (userId: string) => {
     // Ensure initial/monthly free credits for non-subscribers on dashboard load
     try {
       const { data: sessionData } = await supabase.auth.getSession();
       const accessToken = sessionData?.session?.access_token;
       if (accessToken) {
-        await fetch('/api/ensure-credits', { method: 'POST', headers: { Authorization: `Bearer ${accessToken}` } });
+        const response = await fetch('/api/ensure-credits', {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${accessToken}` }
+        });
+        const result = await response.json();
+        if (result.ok && typeof result.credits === 'number') {
+          setCredits(result.credits);
+          // Cache the result
+          try {
+            if (typeof window !== 'undefined') {
+              localStorage.setItem(`cogniguide_credits_${userId}`, result.credits.toString());
+              localStorage.setItem(`cogniguide_credits_time_${userId}`, Date.now().toString());
+            }
+          } catch {}
+          return; // Successfully loaded credits from API response
+        }
       }
     } catch {}
+
+    // Fallback: fetch credits directly from database if API call failed
     const { data, error } = await supabase
       .from('user_credits')
       .select('credits')
@@ -107,7 +146,15 @@ export default function DashboardClient() {
 
     if (data) {
       const val = Number((data as any).credits ?? 0);
-      setCredits(Number.isFinite(val) ? val : 0);
+      const finalCredits = Number.isFinite(val) ? val : 0;
+      setCredits(finalCredits);
+      // Cache the fallback result too
+      try {
+        if (typeof window !== 'undefined') {
+          localStorage.setItem(`cogniguide_credits_${userId}`, finalCredits.toString());
+          localStorage.setItem(`cogniguide_credits_time_${userId}`, Date.now().toString());
+        }
+      } catch {}
     }
   };
 
@@ -121,15 +168,34 @@ export default function DashboardClient() {
         router.replace('/');
         return;
       }
+      // Load credits immediately (no dependency on history loading)
+      loadUserCredits(authed.id);
+
+      // Load history in parallel
       const all = await loadAllHistory(authed.id);
-      await loadUserCredits(authed.id);
       try { await prefetchSpacedData(all.flashcards); } catch {}
       const handleGenerationComplete = () => {
         if (authed.id) {
           loadAllHistory(authed.id);
         }
       };
+
+      const handleCreditsUpdated = (event: CustomEvent) => {
+        const { credits } = event.detail;
+        if (typeof credits === 'number') {
+          setCredits(credits);
+          // Also update cache
+          try {
+            if (typeof window !== 'undefined') {
+              localStorage.setItem(`cogniguide_credits_${authed.id}`, credits.toString());
+              localStorage.setItem(`cogniguide_credits_time_${authed.id}`, Date.now().toString());
+            }
+          } catch {}
+        }
+      };
+
       window.addEventListener('cogniguide:generation-complete', handleGenerationComplete);
+      window.addEventListener('cogniguide:credits-updated', handleCreditsUpdated as EventListener);
       try {
         const hasUpgradeQuery = Boolean(searchParams.get('upgrade'));
         const hasLocalFlag = typeof window !== 'undefined' && (
@@ -152,7 +218,11 @@ export default function DashboardClient() {
         router.replace('/');
       }
     });
-    return () => { sub.subscription.unsubscribe(); };
+    return () => {
+      sub.subscription.unsubscribe();
+      window.removeEventListener('cogniguide:generation-complete', handleGenerationComplete);
+      window.removeEventListener('cogniguide:credits-updated', handleCreditsUpdated as EventListener);
+    };
   }, [router, searchParams]);
 
   useEffect(() => {
@@ -170,7 +240,15 @@ export default function DashboardClient() {
           (payload) => {
             if (payload.new && typeof (payload.new as any).credits === 'number') {
               const val = Number((payload.new as any).credits ?? 0);
-              setCredits(Number.isFinite(val) ? val : 0);
+              const finalCredits = Number.isFinite(val) ? val : 0;
+              setCredits(finalCredits);
+              // Update cache when credits change
+              try {
+                if (typeof window !== 'undefined') {
+                  localStorage.setItem(`cogniguide_credits_${user.id}`, finalCredits.toString());
+                  localStorage.setItem(`cogniguide_credits_time_${user.id}`, Date.now().toString());
+                }
+              } catch {}
             }
           }
         )
@@ -178,6 +256,7 @@ export default function DashboardClient() {
     return () => {
         supabase.removeChannel(channel);
         window.removeEventListener('cogniguide:generation-complete', () => {});
+        window.removeEventListener('cogniguide:credits-updated', () => {});
       };
     }
   }, [user]);

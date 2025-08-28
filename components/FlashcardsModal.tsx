@@ -231,7 +231,6 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
       <div className="w-full h-full grid grid-rows-[auto,1fr,auto] bg-white p-4 sm:p-6">
         <div className="w-full max-w-5xl mx-auto grid grid-cols-1 sm:grid-cols-3 items-center gap-2 sm:gap-3">
           <div className="text-center sm:text-left text-sm font-medium truncate bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-emerald-600">{title || 'Flashcards'}</div>
-          <div className="text-sm text-gray-600 text-center">{hasCards ? `${index + 1} / ${cards!.length}` : ''}</div>
           <div className="justify-self-center sm:justify-self-end">
             {hasCards && (
               <label className="inline-flex items-center gap-2 text-sm">
@@ -245,6 +244,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
               </label>
             )}
           </div>
+          <div className="text-sm text-gray-600 text-center">{hasCards ? `${index + 1} / ${cards!.length}` : ''}</div>
         </div>
         {hasCards ? (
           <div className="w-full max-w-5xl mx-auto mt-2">

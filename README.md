@@ -11,6 +11,7 @@ CogniGuide comprehensive AI-powered study assistant. It uses an LLM to convert t
 *   **Interactive Mind Maps:** The generated mind maps are visual and interactive, enhancing comprehension and retention. On first load, the entire map is zoomed to fit the screen, giving a 'big picture' overview. Standard interactions like zooming, panning, and node collapsing/expanding are supported.
 *   **Realtime Streaming Rendering:** The backend can stream model output token-by-token and the frontend progressively renders the Markmap markdown as tokens arrive so the mind map begins appearing immediately instead of waiting for the full generation to finish.
 *   **Smart File Caching:** Advanced caching system prevents redundant file processing when users add/remove files. Uses content-based hashing to ensure consistent caching across different environments (localhost/production) and browsers. Only changed file combinations trigger re-processing, significantly improving performance for multi-file uploads.
+*   **Credit Loading Optimization:** Instant credit balance display with intelligent caching system. Credits load immediately on dashboard refresh using localStorage cache (5-minute expiration) with background refresh for accuracy. Eliminates the brief "0.0" flash that occurred during sequential API calls.
 *   **Multiple Export Options:** Users can download the generated mind maps in various formats including HTML, SVG, PNG, and PDF.
 *   **Flashcards Generation (Two ways):**
     - From Mind Map: After a mind map is generated, users can generate study flashcards from the Markmap markdown and switch between the mind map view and a flashcards study mode.
@@ -33,6 +34,7 @@ CogniGuide comprehensive AI-powered study assistant. It uses an LLM to convert t
     *   **Paid plan users**: 30 credits worth (114,000 characters)
     Content exceeding tier limits is truncated at word boundaries with a message indicating the user should sign up or upgrade for unlimited access.
     *   **Performance Optimization**: User tier information is cached in memory for 5 minutes to avoid repeated database queries, ensuring fast response times for logged-in users.
+*   **Credit Loading Optimization**: Instant credit balance display with localStorage caching (5-minute expiration) and parallel loading eliminates sequential API calls and the brief "0.0" flash during dashboard refresh.
     *   **Smart File Processing Cache**: The frontend implements intelligent file set caching to prevent redundant document processing. When users upload multiple files, the system:
         - Generates a unique key using content-based hashing (first 512 bytes of each file) combined with file metadata (name, size, type)
         - Ensures consistent caching across different environments (localhost/production) and browsers
@@ -193,15 +195,17 @@ For consistent branding across the application, use the `CogniGuide_logo.png` fi
 ### Credit Management APIs
 
 #### Ensure Credits API (`app/api/ensure-credits/route.ts`)
-*   **Purpose:** Ensures users have the correct credit allocation based on their subscription status
+*   **Purpose:** Ensures users have the correct credit allocation based on their subscription status and returns current credit balance
 *   **Method:** POST/GET
 *   **Authentication:** Required (Bearer token in Authorization header)
 *   **Functionality:**
     - Checks for active subscription status
     - For free users: Grants initial credits and handles monthly refills
-    - For paid users: Skips credit management (handled via webhooks)
+    - For paid users: Returns current credits without modification (handled via webhooks)
     - Prevents duplicate credit entries using upsert operations
     - Tracks last refill date to manage monthly cycles
+    - **Optimized Performance:** Returns current credit balance in single API call, eliminating need for separate database queries
+    - **Smart Caching:** Frontend uses localStorage cache (5-minute expiration) with background refresh for instant loading
 
 #### Refill Credits API (`app/api/refill-credits/route.ts`)
 *   **Purpose:** Cron job endpoint for monthly credit refills for paid subscribers
@@ -233,10 +237,14 @@ For consistent branding across the application, use the `CogniGuide_logo.png` fi
     - Mind maps use lucide `Map` icon; clicking loads saved `markdown` into the viewer (`MindMapModal`).
     - Flashcards use lucide `CreditCard` icon; clicking opens `FlashcardsModal` with the saved cards.
     - Data source: `combinedHistory` state built from `mindmaps` and `flashcards` tables; refreshed via `loadAllHistory(user.id)` after any save.
+*   **Real-time Credit Updates:** Credit balance updates instantly after generation without requiring page refresh. Uses custom events (`cogniguide:credits-updated`) to synchronize credit display across components.
 *   Provides the same generator UI (dropzone + prompt) as the landing page with a selector to switch between Mind Map and Flashcards generation.
     - Mind maps are saved automatically with extracted title.
     - Flashcards generated directly from files/prompts are saved with an empty `markdown` string and a derived title, then the sidebar refreshes immediately.
 *   Includes a "Sign out" action that clears the session and redirects home.
+*   **Performance Optimizations:**
+    - **Instant Credit Loading:** Credits load immediately using localStorage cache with background refresh, eliminating the brief "0.0" flash
+    - **Real-time Updates:** Credit balance updates instantly after generation via custom events, no page refresh needed
 *   Spaced repetition prefetch & caching:
     - On dashboard load (after history fetch), all schedules are loaded in a single bulk request from `flashcards_schedule`, normalized to deck card counts, and cached (in‑memory + `localStorage`).
     - The due‑now queue and a `window.__cogniguide_due_map` are computed up‑front so opening the modal is instant.
@@ -325,6 +333,16 @@ The application includes a dynamic sitemap (`app/sitemap.ts`) that automatically
 
 The sitemap automatically adapts to different deployment environments and uses appropriate URLs for production, staging, and development.
 
+### Favicon
+To ensure Google reliably picks up your favicon, include explicit links in the document head and store the assets in `public/`:
+
+```html
+<link rel="icon" href="/favicon.ico" sizes="any" type="image/x-icon" />
+<link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
+```
+
+These are already added in `app/layout.tsx`. You can optionally add platform-specific icons as needed (e.g., `apple-touch-icon`, `favicon.svg`).
+
 ## Environment Variables
 Define these in `.env.local` (and on your hosting provider):
 
@@ -386,6 +404,15 @@ NEXT_PUBLIC_BASE_URL=your_production_domain # Optional: defaults to deployment U
   - **Insufficient credits UX**: When the server returns `402` with the message "Insufficient credits. Upload a smaller file or", the client shows this error inline with an adjacent "Upgrade Plan" button (same behavior as the Upgrade button on the landing page).
     - If authenticated: navigates to `/dashboard?upgrade=true` which opens the in‑app pricing modal.
     - If not authenticated: sets `localStorage.cogniguide_upgrade_flow = 'true'` and navigates to `/pricing` to prompt sign‑in then continue checkout.
+
+#### Real-time Credit Updates
+
+The application implements real-time credit balance synchronization across components using custom DOM events:
+
+*   **Event System:** Uses `cogniguide:credits-updated` custom event to notify components of credit changes
+*   **Automatic Synchronization:** Credit balance updates instantly after generation without page refresh
+*   **Cache Management:** Updates localStorage cache when credits change to maintain consistency
+*   **Memory Management:** Proper event listener cleanup prevents memory leaks
 
 #### Important Implementation Note: Credit Updates
 

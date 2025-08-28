@@ -33,6 +33,7 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <head>
         <link rel="icon" href="/favicon.ico" sizes="any" type="image/x-icon" />
+        <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
       </head>
       <body className={`${poppins.className} flex min-h-screen flex-col bg-background text-foreground`}>
         <main className="flex-1">{children}</main>

@@ -22,7 +22,7 @@ const InteractiveMindMap = () => {
 export default function Home() {
   const [showAuth, setShowAuth] = useState(false);
   const [isAuthed, setIsAuthed] = useState(false);
-  const [view, setView] = useState('flashcards');
+  const [view, setView] = useState('mindmap');
   const router = useRouter();
 
   useEffect(() => {
@@ -102,7 +102,7 @@ export default function Home() {
                 >
                   <path d="M7 10L12 15L17 10" />
                 </svg>
-                Start Generating - No signup
+                Try it - No signup
               </button>
             </div>
           </section>
