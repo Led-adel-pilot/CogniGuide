@@ -159,6 +159,9 @@ export default function DashboardClient() {
   };
 
   useEffect(() => {
+    let handleGenerationComplete: (() => void) | null = null;
+    let handleCreditsUpdated: ((event: CustomEvent) => void) | null = null;
+
     const init = async () => {
       const { data } = await supabase.auth.getUser();
       const authed = data.user ? { id: data.user.id, email: data.user.email || undefined } : null;
@@ -168,19 +171,15 @@ export default function DashboardClient() {
         router.replace('/');
         return;
       }
-      // Load credits immediately (no dependency on history loading)
-      loadUserCredits(authed.id);
 
-      // Load history in parallel
-      const all = await loadAllHistory(authed.id);
-      try { await prefetchSpacedData(all.flashcards); } catch {}
-      const handleGenerationComplete = () => {
+      // Define event handlers
+      handleGenerationComplete = () => {
         if (authed.id) {
           loadAllHistory(authed.id);
         }
       };
 
-      const handleCreditsUpdated = (event: CustomEvent) => {
+      handleCreditsUpdated = (event: CustomEvent) => {
         const { credits } = event.detail;
         if (typeof credits === 'number') {
           setCredits(credits);
@@ -194,8 +193,17 @@ export default function DashboardClient() {
         }
       };
 
+      // Load credits immediately (no dependency on history loading)
+      loadUserCredits(authed.id);
+
+      // Load history in parallel
+      const all = await loadAllHistory(authed.id);
+      try { await prefetchSpacedData(all.flashcards); } catch {}
+
+      // Add event listeners
       window.addEventListener('cogniguide:generation-complete', handleGenerationComplete);
       window.addEventListener('cogniguide:credits-updated', handleCreditsUpdated as EventListener);
+
       try {
         const hasUpgradeQuery = Boolean(searchParams.get('upgrade'));
         const hasLocalFlag = typeof window !== 'undefined' && (
@@ -211,6 +219,7 @@ export default function DashboardClient() {
         }
       } catch {}
     };
+
     init();
     const { data: sub } = supabase.auth.onAuthStateChange(async (_event, session) => {
       if (!session?.user) {
@@ -218,10 +227,15 @@ export default function DashboardClient() {
         router.replace('/');
       }
     });
+
     return () => {
       sub.subscription.unsubscribe();
-      window.removeEventListener('cogniguide:generation-complete', handleGenerationComplete);
-      window.removeEventListener('cogniguide:credits-updated', handleCreditsUpdated as EventListener);
+      if (handleGenerationComplete) {
+        window.removeEventListener('cogniguide:generation-complete', handleGenerationComplete);
+      }
+      if (handleCreditsUpdated) {
+        window.removeEventListener('cogniguide:credits-updated', handleCreditsUpdated as EventListener);
+      }
     };
   }, [router, searchParams]);
 
