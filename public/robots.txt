@@ -1,23 +1,15 @@
 User-agent: *
+# Allow site publicly
 Allow: /
-Allow: /pricing
-Allow: /contact
-Allow: /legal/
+
+# Block private/internal endpoints
 Disallow: /dashboard
 Disallow: /api/
 Disallow: /_next/
 Disallow: /*.json$
-Disallow: /*?*
 
-# Sitemap
+# (OPTIONAL) Avoid crawling query-string URLs — use only if intentional
+# Disallow: /*?*
+
+# Ensure sitemap is discoverable
 Sitemap: https://www.cogniguide.app/sitemap.xml
-
-# Major search engines
-User-agent: Googlebot
-Allow: /
-
-User-agent: Bingbot
-Allow: /
-
-User-agent: Slurp
-Allow: /
