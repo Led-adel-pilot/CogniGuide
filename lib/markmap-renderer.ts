@@ -39,6 +39,7 @@ export interface MindMapNode {
 export interface InitializeOptions {
     initialPanXOffset?: number;
     initialPanYOffset?: number;
+    disableInteractions?: boolean;
 }
 
 interface RgbColor { r: number; g: number; b: number; }
@@ -784,15 +785,17 @@ export function initializeMindMap(
         rerenderMindMap();
         autoFitView(markdown);
 
-        // Attach event listeners
-        viewport.addEventListener('wheel', handleWheel);
-        viewport.addEventListener('mousedown', handleMouseDown);
-        window.addEventListener('mouseup', handleMouseUp);
-        window.addEventListener('mousemove', handleMouseMove);
-        // Add touch event listeners for mobile
-        viewport.addEventListener('touchstart', handleTouchStart, { passive: false });
-        viewport.addEventListener('touchmove', handleTouchMove, { passive: false });
-        window.addEventListener('touchend', handleTouchEnd);
+        // Attach event listeners (unless disabled)
+        if (!options?.disableInteractions) {
+            viewport.addEventListener('wheel', handleWheel);
+            viewport.addEventListener('mousedown', handleMouseDown);
+            window.addEventListener('mouseup', handleMouseUp);
+            window.addEventListener('mousemove', handleMouseMove);
+            // Add touch event listeners for mobile
+            viewport.addEventListener('touchstart', handleTouchStart, { passive: false });
+            viewport.addEventListener('touchmove', handleTouchMove, { passive: false });
+            window.addEventListener('touchend', handleTouchEnd);
+        }
 
     } catch (error) {
         console.error("Error rendering mind map:", error);

@@ -13,7 +13,9 @@ export default function EmbeddedMindMap({ markdown }: EmbeddedMindMapProps) {
 
   useEffect(() => {
     if (viewportRef.current && containerRef.current && markdown) {
-      initializeMindMap(markdown, viewportRef.current, containerRef.current);
+      initializeMindMap(markdown, viewportRef.current, containerRef.current, {
+        disableInteractions: true
+      });
     }
 
     return () => {
@@ -22,7 +24,7 @@ export default function EmbeddedMindMap({ markdown }: EmbeddedMindMapProps) {
   }, [markdown]);
 
   return (
-    <div ref={viewportRef} className="map-viewport h-full w-full !bg-transparent cursor-grab active:cursor-grabbing">
+    <div ref={viewportRef} className="map-viewport h-full w-full !bg-transparent cursor-default">
       <div ref={containerRef} id="mindmap-container"></div>
     </div>
   );
