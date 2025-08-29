@@ -13,6 +13,8 @@ import { NON_AUTH_FREE_LIMIT } from '@/lib/plans';
 import { Sparkles } from 'lucide-react';
 
 export default function Generator({ redirectOnAuth = false, showTitle = true }: { redirectOnAuth?: boolean, showTitle?: boolean }) {
+  // Enforce a client-side per-file size cap to avoid server 413s (Vercel ~4.5MB)
+  const MAX_FILE_BYTES = Math.floor(4.2 * 1024 * 1024); // ~4.2MB safety margin
   const [files, setFiles] = useState<File[]>([]);
   const [preParsed, setPreParsed] = useState<{ text: string; images: string[]; rawCharCount?: number } | null>(null);
   const [isPreParsing, setIsPreParsing] = useState(false);
@@ -111,37 +113,44 @@ export default function Generator({ redirectOnAuth = false, showTitle = true }: 
   }, [getFileKey]);
 
   const handleFileChange = useCallback(async (selectedFiles: File[]) => {
-    setFiles(selectedFiles);
-    // Don't clear errors when files change - let specific actions handle error clearing
-    // setError(null);
+    // Clear any previous errors when files change
+    setError(null);
+    
     if (!selectedFiles || selectedFiles.length === 0) {
-      // Clear cache and pre-parsed results when no files selected
+      setFiles([]);
       processedFileSetsCache.current.clear();
       setPreParsed(null);
       lastPreparseKeyRef.current = null;
+      setAllowedNameSizes(undefined);
       return;
     }
 
+    // Validate file sizes before accepting them
+    const tooLargeFile = selectedFiles.find(f => f.size > MAX_FILE_BYTES);
+    if (tooLargeFile) {
+      setError(`"${tooLargeFile.name}" is too large. Max file size is ${(MAX_FILE_BYTES / (1024 * 1024)).toFixed(1)} MB.`);
+      return; // Don't update files state
+    }
+
+    setFiles(selectedFiles);
     // Generate a key for the current file set
     const fileSetKey = await getFileSetKey(selectedFiles);
+    debugLog(`File set key: ${fileSetKey}`);
+    lastPreparseKeyRef.current = fileSetKey;
 
-    // Check if we have a cached result for this exact file set
+    // Check if we have a cached result for this exact file set (valid for 5 minutes)
     const cachedResult = processedFileSetsCache.current.get(fileSetKey);
     const cacheAge = cachedResult ? Date.now() - cachedResult.processedAt : 0;
     const isCacheValid = cachedResult && cacheAge < 5 * 60 * 1000;
-
-    debugLog(`File set key: ${fileSetKey}`);
-    debugLog(`Cache hit: ${!!cachedResult}, Cache age: ${Math.round(cacheAge / 1000)}s, Valid: ${isCacheValid}`);
+    debugLog(`Cache hit: ${!!cachedResult}, Cache age: ${Math.round(cacheAge / 1000)}s, Valid: ${!!isCacheValid}`);
 
     if (isCacheValid) {
       // Use cached result
-      debugLog('Using cached result');
       const j = cachedResult.result;
       const isAuthedFromApi = Boolean(j?.isAuthed);
       const text = typeof j?.text === 'string' ? j.text : '';
       const images = Array.isArray(j?.images) ? j.images as string[] : [];
       const rawCharCount = typeof j?.totalRawChars === 'number' ? j.totalRawChars as number : undefined;
-
       setPreParsed({ text, images, rawCharCount });
 
       // Handle cumulative pruning feedback from cached result
@@ -149,28 +158,18 @@ export default function Generator({ redirectOnAuth = false, showTitle = true }: 
       const includedFiles = Array.isArray(j?.includedFiles) ? j.includedFiles as { name: string; size: number }[] : [];
       const excludedFiles = Array.isArray(j?.excludedFiles) ? j.excludedFiles as { name: string; size: number }[] : [];
       const partialFile = j?.partialFile as { name: string; size: number; includedChars: number } | null;
-
       if (limitExceeded) {
         setAllowedNameSizes(includedFiles);
-        const keptNames = includedFiles.map(f => f.name);
-        const removedNames = excludedFiles.map(f => f.name);
-        const partialNote = partialFile && partialFile.name ? ` and partially included "${partialFile.name}"` : '';
-        const removedNote = removedNames.length > 0 ? ` Removed: ${removedNames.join(', ')}.` : '';
-        // Only show the plan-specific error message for authenticated users (from API or client state)
         if (isAuthedFromApi || isAuthed) {
-          setError(`Content exceeds the length limit for your current plan. the content has been truncated.`);
+          setError('Content exceeds the length limit for your current plan. the content has been truncated.');
         }
       } else {
         setAllowedNameSizes(undefined);
       }
-
-      lastPreparseKeyRef.current = fileSetKey;
       return;
-    } else {
-      debugLog('Cache miss or expired, processing files');
     }
 
-    // No valid cache, need to process all files
+    // No valid cache, pre-parse now (single upload)
     try {
       setIsPreParsing(true);
       const formData = new FormData();
@@ -186,8 +185,10 @@ export default function Generator({ redirectOnAuth = false, showTitle = true }: 
       });
 
       if (!res.ok) {
-        // Non-fatal; generation will fallback to legacy upload path
+        // Non-fatal; generation can fallback to legacy upload path
         try { const j = await res.json(); setError(j?.error || 'Failed to prepare files.'); } catch {}
+        setPreParsed(null);
+        setAllowedNameSizes(undefined);
         return;
       }
 
@@ -216,7 +217,6 @@ export default function Generator({ redirectOnAuth = false, showTitle = true }: 
       const text = typeof j?.text === 'string' ? j.text : '';
       const images = Array.isArray(j?.images) ? j.images as string[] : [];
       const rawCharCount = typeof j?.totalRawChars === 'number' ? j.totalRawChars as number : undefined;
-
       setPreParsed({ text, images, rawCharCount });
 
       // Handle cumulative pruning feedback
@@ -224,29 +224,20 @@ export default function Generator({ redirectOnAuth = false, showTitle = true }: 
       const includedFiles = Array.isArray(j?.includedFiles) ? j.includedFiles as { name: string; size: number }[] : [];
       const excludedFiles = Array.isArray(j?.excludedFiles) ? j.excludedFiles as { name: string; size: number }[] : [];
       const partialFile = j?.partialFile as { name: string; size: number; includedChars: number } | null;
-
       if (limitExceeded) {
         setAllowedNameSizes(includedFiles);
-        const keptNames = includedFiles.map(f => f.name);
-        const removedNames = excludedFiles.map(f => f.name);
-        const partialNote = partialFile && partialFile.name ? ` and partially included "${partialFile.name}"` : '';
-        const removedNote = removedNames.length > 0 ? ` Removed: ${removedNames.join(', ')}.` : '';
-        // Only show the plan-specific error message for authenticated users (from API or client state)
         if (isAuthedFromApi || isAuthed) {
-          setError(`Content exceeds the length limit for your current plan. the content has been truncated.`);
+          setError('Content exceeds the length limit for your current plan. the content has been truncated.');
         }
       } else {
         setAllowedNameSizes(undefined);
       }
-
-      lastPreparseKeyRef.current = fileSetKey;
-
     } catch {
       // Non-fatal
     } finally {
       setIsPreParsing(false);
     }
-  }, [getFileKey, isAuthed]);
+  }, [getFileSetKey, debugLog, MAX_FILE_BYTES, isAuthed]);
 
   const handleSubmit = async () => {
     posthog.capture('generation_submitted', {
@@ -279,8 +270,31 @@ export default function Generator({ redirectOnAuth = false, showTitle = true }: 
         const { data: sessionData } = await supabase.auth.getSession();
         const accessToken = sessionData?.session?.access_token;
         let res: Response;
-        if (preParsed) {
-          const payload = { text: preParsed.text || '', images: preParsed.images || [], prompt: prompt.trim() || '', rawCharCount: preParsed.rawCharCount };
+        // If we haven't pre-parsed yet, do it now (single upload)
+        let effectivePreParsed: { text: string; images: string[]; rawCharCount?: number } | null = preParsed;
+        if (!effectivePreParsed && files.length > 0) {
+          try {
+            setIsPreParsing(true);
+            const formData = new FormData();
+            files.forEach((f) => formData.append('files', f));
+            const preRes = await fetch('/api/preparse', {
+              method: 'POST',
+              body: formData,
+              headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : undefined,
+            });
+            if (preRes.ok) {
+              const j = await preRes.json();
+              const text = typeof j?.text === 'string' ? j.text : '';
+              const images = Array.isArray(j?.images) ? j.images as string[] : [];
+              const rawCharCount = typeof j?.totalRawChars === 'number' ? j.totalRawChars as number : undefined;
+              effectivePreParsed = { text, images, rawCharCount };
+              setPreParsed(effectivePreParsed);
+            }
+          } catch {}
+          finally { setIsPreParsing(false); }
+        }
+        if (effectivePreParsed) {
+          const payload = { text: effectivePreParsed.text || '', images: effectivePreParsed.images || [], prompt: prompt.trim() || '', rawCharCount: effectivePreParsed.rawCharCount };
           res = await fetch('/api/generate-flashcards?stream=1', {
             method: 'POST',
             body: JSON.stringify(payload),
@@ -445,8 +459,31 @@ export default function Generator({ redirectOnAuth = false, showTitle = true }: 
       const { data: sessionData } = await supabase.auth.getSession();
       const accessToken = sessionData?.session?.access_token;
       let response: Response;
-      if (preParsed) {
-        const payload = { text: preParsed.text || '', images: preParsed.images || [], prompt: prompt.trim() || '', rawCharCount: preParsed.rawCharCount };
+      // If we haven't pre-parsed yet, do it now (single upload)
+      let effectivePreParsed: { text: string; images: string[]; rawCharCount?: number } | null = preParsed;
+      if (!effectivePreParsed && files.length > 0) {
+        try {
+          setIsPreParsing(true);
+          const formData = new FormData();
+          if (files.length > 0) { files.forEach(file => { formData.append('files', file); }); }
+          const preRes = await fetch('/api/preparse', {
+            method: 'POST',
+            body: formData,
+            headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : undefined,
+          });
+          if (preRes.ok) {
+            const j = await preRes.json();
+            const text = typeof j?.text === 'string' ? j.text : '';
+            const images = Array.isArray(j?.images) ? j.images as string[] : [];
+            const rawCharCount = typeof j?.totalRawChars === 'number' ? j.totalRawChars as number : undefined;
+            effectivePreParsed = { text, images, rawCharCount };
+            setPreParsed(effectivePreParsed);
+          }
+        } catch {}
+        finally { setIsPreParsing(false); }
+      }
+      if (effectivePreParsed) {
+        const payload = { text: effectivePreParsed.text || '', images: effectivePreParsed.images || [], prompt: prompt.trim() || '', rawCharCount: effectivePreParsed.rawCharCount };
         response = await fetch('/api/generate-mindmap', {
           method: 'POST',
           body: JSON.stringify(payload),
