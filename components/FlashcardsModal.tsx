@@ -50,6 +50,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
   const [predictedDueByGrade, setPredictedDueByGrade] = React.useState<Record<number, string>>({});
   const [predictedDueDatesByGrade, setPredictedDueDatesByGrade] = React.useState<Record<number, Date>>({});
   const [hoveredGrade, setHoveredGrade] = React.useState<number | null>(null);
+  const [finished, setFinished] = React.useState(false);
   const current = scheduledCards && scheduledCards[index] ? scheduledCards[index] : null;
 
   React.useEffect(() => {
@@ -59,6 +60,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
       setHoveredGrade(null);
       setPredictedDueByGrade({});
       setPredictedDueDatesByGrade({});
+      setFinished(false);
     }
   }, [open]);
 
@@ -187,7 +189,13 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
       return filtered;
     });
     if (!studyDueOnly && scheduledCards && scheduledCards.length > 0) {
-      setIndex((i) => (i + 1) % scheduledCards.length);
+      const nextIndex = (index + 1) % scheduledCards.length;
+      if (nextIndex === 0) {
+        // We've completed the full deck
+        setFinished(true);
+      } else {
+        setIndex(nextIndex);
+      }
     }
   };
 
@@ -195,9 +203,22 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
     if (studyDueOnly && dueList.length > 0) {
       const pos = dueList.indexOf(index);
       const nextPos = (pos + 1) % dueList.length;
+      if (nextPos === 0) {
+        // We've completed all due cards
+        setFinished(true);
+        return index; // Stay on current card
+      }
       return dueList[nextPos];
     }
-    if (scheduledCards && scheduledCards.length > 0) return (index + 1) % scheduledCards.length;
+    if (scheduledCards && scheduledCards.length > 0) {
+      const nextIndex = (index + 1) % scheduledCards.length;
+      if (nextIndex === 0) {
+        // We've completed the full deck
+        setFinished(true);
+        return index; // Stay on current card
+      }
+      return nextIndex;
+    }
     return index;
   };
   const getPrevIndex = () => {
@@ -244,14 +265,14 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
               </label>
             )}
           </div>
-          <div className="text-sm text-gray-600 text-center">{hasCards ? `${index + 1} / ${cards!.length}` : ''}</div>
+          <div className="text-sm text-gray-600 text-center">{hasCards ? (finished ? 'Completed' : `${index + 1} / ${cards!.length}`) : ''}</div>
         </div>
         {hasCards ? (
           <div className="w-full max-w-5xl mx-auto mt-2">
             <div className="h-1.5 rounded-full bg-gray-100 overflow-hidden">
               <div
                 className="h-full bg-gradient-to-r from-indigo-500 via-sky-500 to-emerald-500"
-                style={{ width: `${((index + 1) / cards!.length) * 100}%` }}
+                style={{ width: `${finished ? 100 : ((index + 1) / cards!.length) * 100}%` }}
               />
             </div>
           </div>
@@ -264,6 +285,33 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
             <div className="flex items-center gap-2 text-gray-600">
               <Loader2 className="h-5 w-5 animate-spin" />
               {isGenerating ? 'Generating flashcards…' : 'No flashcards yet'}
+            </div>
+          ) : finished ? (
+            <div className="w-full">
+              <div className="relative mx-auto rounded-[1.35rem] p-[1.5px] bg-gradient-to-br from-emerald-200 via-teal-200 to-green-200">
+                <div className="bg-white border border-gray-200 rounded-[1.25rem] shadow p-8 sm:p-10 min-h-[200px] sm:min-h-[250px] flex flex-col items-center justify-center text-center">
+                  <div className="text-4xl mb-4">🎉</div>
+                  <div className="text-gray-900 text-xl sm:text-2xl font-bold leading-7 sm:leading-8 mb-4">
+                    Congratulations!
+                  </div>
+                  <div className="text-gray-700 text-sm sm:text-base leading-6 max-w-md">
+                    You have finished this deck for now. For best results with spaced repetition, be sure to come back for future review sessions.
+                  </div>
+                  <button
+                    onClick={() => {
+                      setFinished(false);
+                      setIndex(0);
+                      setShowAnswer(false);
+                      setHoveredGrade(null);
+                      setPredictedDueByGrade({});
+                      setPredictedDueDatesByGrade({});
+                    }}
+                    className="mt-6 inline-flex items-center h-10 px-6 rounded-full text-white bg-gradient-to-r from-blue-600 via-cyan-500 to-teal-500 shadow-sm hover:opacity-90 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/50 whitespace-nowrap"
+                  >
+                    Start Over
+                  </button>
+                </div>
+              </div>
             </div>
           ) : (
             <div className="w-full">
@@ -288,7 +336,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
                           {cards![index]?.answer || ''}
                         </ReactMarkdown>
                       </div>
-                      
+
                     </div>
                   )}
                 </div>
@@ -297,7 +345,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
           )}
         </div>
 
-        {hasCards ? (
+        {hasCards && !finished ? (
           <div className="w-full max-w-3xl mx-auto mt-4 grid grid-cols-3 items-center gap-2 sm:gap-3">
             {!showAnswer ? (
               <div className="justify-self-start">
