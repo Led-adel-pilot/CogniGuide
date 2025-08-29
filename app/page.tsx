@@ -79,10 +79,10 @@ export default function Home() {
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[40rem] h-[40rem] bg-primary/10 rounded-full blur-3xl -z-10"></div>
             <div className="container relative z-10">
               <h1 className="text-4xl md:text-6xl font-extrabold font-heading tracking-tighter mb-6 leading-tight">
-                Turn Your Notes into Mind Maps & Flashcards with AI.
+                Study Smarter, Not Harder.
               </h1>
               <p className="max-w-3xl mx-auto text-lg md:text-xl text-muted-foreground mb-10">
-                Upload your PDFs, slides, or documents. Our AI creates clear mind maps and smart, spaced-repetition flashcards to help you learn faster.
+                Upload your PDFs, slides, or documents. Our AI creates clear mind maps and smart, spaced-repetition flashcards to help you learn 2x faster and ace your next test.
               </p>
               <button
                 onClick={handleScrollToGenerator}
@@ -139,6 +139,12 @@ export default function Home() {
                     {view === 'mindmap' ? <InteractiveMindMap /> : <EmbeddedFlashcards />}
                   </div>
                 </div>
+              </div>
+              <div className="text-center mt-12">
+                <p className="text-muted-foreground mb-1">Our users have already generated countless study materials.</p>
+                <p className="text-muted-foreground">
+                  <span className="font-semibold text-primary">800+</span> mind maps & flashcards generated this week.
+                </p>
               </div>
             </div>
           </section>

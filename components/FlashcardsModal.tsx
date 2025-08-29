@@ -1,6 +1,8 @@
 'use client';
 
 import React from 'react';
+import { supabase } from '@/lib/supabaseClient';
+import AuthModal from '@/components/AuthModal';
 import { nextSchedule, createInitialSchedule, type FsrsScheduleState, type Grade } from '@/lib/spaced-repetition';
 import { loadDeckSchedule, saveDeckSchedule, loadDeckScheduleAsync, saveDeckScheduleAsync } from '@/lib/sr-store';
 import ReactMarkdown from 'react-markdown';
@@ -51,7 +53,23 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
   const [predictedDueDatesByGrade, setPredictedDueDatesByGrade] = React.useState<Record<number, Date>>({});
   const [hoveredGrade, setHoveredGrade] = React.useState<number | null>(null);
   const [finished, setFinished] = React.useState(false);
+  const [userId, setUserId] = React.useState<string | null>(null);
+  const [showAuthModal, setShowAuthModal] = React.useState(false);
+  const [showLossAversionPopup, setShowLossAversionPopup] = React.useState(false);
   const current = scheduledCards && scheduledCards[index] ? scheduledCards[index] : null;
+
+  const handleClose = (event?: React.MouseEvent) => {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+    // Show popup only if user is not signed in, has generated cards, and is not viewing a saved deck
+    if (!userId && !deckId && cards && cards.length > 0) {
+      setShowLossAversionPopup(true);
+    } else {
+      onClose();
+    }
+  };
 
   React.useEffect(() => {
     if (!open) {
@@ -61,8 +79,33 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
       setPredictedDueByGrade({});
       setPredictedDueDatesByGrade({});
       setFinished(false);
+      setShowLossAversionPopup(false);
     }
   }, [open]);
+
+  React.useEffect(() => {
+    let isMounted = true;
+    const init = async () => {
+      try {
+        const { data } = await supabase.auth.getUser();
+        if (!isMounted) return;
+        setUserId(data.user ? data.user.id : null);
+      } catch (error) {
+        console.error('Failed to get user session:', error);
+        if (!isMounted) return;
+        setUserId(null);
+      }
+    };
+    init();
+    const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (!isMounted) return;
+      setUserId(session?.user?.id ?? null);
+    });
+    return () => {
+      isMounted = false;
+      sub.subscription.unsubscribe();
+    };
+  }, []);
 
   React.useEffect(() => {
     if (!cards || cards.length === 0) { setScheduledCards(null); return; }
@@ -240,7 +283,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
       {!isEmbedded && (
         <div className="absolute top-2 right-2 z-30">
           <button
-            onClick={onClose}
+            onClick={handleClose}
             className="inline-flex items-center justify-center w-8 h-8 bg-white text-gray-700 rounded-full border border-gray-300 shadow-sm hover:bg-gray-100 focus:outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400/50"
             aria-label="Close"
           >
@@ -288,30 +331,100 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
             </div>
           ) : finished ? (
             <div className="w-full">
-              <div className="relative mx-auto rounded-[1.35rem] p-[1.5px] bg-gradient-to-br from-emerald-200 via-teal-200 to-green-200">
-                <div className="bg-white border border-gray-200 rounded-[1.25rem] shadow p-8 sm:p-10 min-h-[200px] sm:min-h-[250px] flex flex-col items-center justify-center text-center">
-                  <div className="text-4xl mb-4">🎉</div>
-                  <div className="text-gray-900 text-xl sm:text-2xl font-bold leading-7 sm:leading-8 mb-4">
-                    Congratulations!
+              {userId || deckId ? (
+                <div className="relative mx-auto rounded-[1.35rem] p-[1.5px] bg-gradient-to-br from-emerald-200 via-teal-200 to-green-200">
+                  <div className="bg-white border border-gray-200 rounded-[1.25rem] shadow p-8 sm:p-10 min-h-[200px] sm:min-h-[250px] flex flex-col items-center justify-center text-center">
+                    <div className="text-4xl mb-4">🎉</div>
+                    <div className="text-gray-900 text-xl sm:text-2xl font-bold leading-7 sm:leading-8 mb-4">
+                      Congratulations!
+                    </div>
+                    <div className="text-gray-700 text-sm sm:text-base leading-6 max-w-md">
+                      You have finished this deck for now. For best results with spaced repetition, be sure to come back for future review sessions.
+                    </div>
+                    <button
+                      onClick={() => {
+                        setFinished(false);
+                        setIndex(0);
+                        setShowAnswer(false);
+                        setHoveredGrade(null);
+                        setPredictedDueByGrade({});
+                        setPredictedDueDatesByGrade({});
+                      }}
+                      className="mt-6 inline-flex items-center h-10 px-6 rounded-full text-white bg-gradient-to-r from-blue-600 via-cyan-500 to-teal-500 shadow-sm hover:opacity-90 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/50 whitespace-nowrap"
+                    >
+                      Start Over
+                    </button>
                   </div>
-                  <div className="text-gray-700 text-sm sm:text-base leading-6 max-w-md">
-                    You have finished this deck for now. For best results with spaced repetition, be sure to come back for future review sessions.
-                  </div>
-                  <button
-                    onClick={() => {
-                      setFinished(false);
-                      setIndex(0);
-                      setShowAnswer(false);
-                      setHoveredGrade(null);
-                      setPredictedDueByGrade({});
-                      setPredictedDueDatesByGrade({});
-                    }}
-                    className="mt-6 inline-flex items-center h-10 px-6 rounded-full text-white bg-gradient-to-r from-blue-600 via-cyan-500 to-teal-500 shadow-sm hover:opacity-90 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/50 whitespace-nowrap"
-                  >
-                    Start Over
-                  </button>
                 </div>
-              </div>
+              ) : isEmbedded ? (
+                <div className="relative mx-auto rounded-[1.35rem] p-[1.5px] bg-gradient-to-br from-indigo-200 via-sky-200 to-emerald-200">
+                  <div className="bg-white border border-gray-200 rounded-[1.25rem] shadow p-8 sm:p-10 min-h-[200px] sm:min-h-[250px] flex flex-col items-center justify-center text-center">
+                    <h2 className="text-2xl font-bold mb-4">Ready to study smarter?</h2>
+                    <p className="text-muted-foreground mb-6 max-w-md">
+                      You've seen how effective flashcards can be. Create your own study set from your course materials in seconds.
+                    </p>
+                    <div className="flex flex-row gap-3 w-full max-w-md justify-center">
+                      <button
+                        onClick={() => {
+                          document.getElementById('generator')?.scrollIntoView({ behavior: 'smooth' });
+                        }}
+                        className="flex-1 h-10 px-6 text-base font-bold text-white bg-gradient-to-r from-blue-600 via-cyan-500 to-teal-500 rounded-full hover:opacity-90 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/50 whitespace-nowrap inline-flex items-center justify-center"
+                      >
+                        Create My Study Set
+                      </button>
+                      <button
+                        onClick={() => {
+                          setFinished(false);
+                          setIndex(0);
+                          setShowAnswer(false);
+                          setHoveredGrade(null);
+                          setPredictedDueByGrade({});
+                          setPredictedDueDatesByGrade({});
+                        }}
+                        className="flex-1 h-10 px-6 text-base font-medium text-gray-600 bg-gray-100 rounded-full hover:bg-gray-200 transition-colors"
+                      >
+                        Review Sample
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="relative mx-auto rounded-[1.35rem] p-[1.5px] bg-gradient-to-br from-indigo-200 via-sky-200 to-emerald-200">
+                  <div className="bg-white border border-gray-200 rounded-[1.25rem] shadow p-8 sm:p-10 min-h-[200px] sm:min-h-[250px] flex flex-col items-center justify-center text-center">
+                    <h2 className="text-2xl font-bold mb-4">🎉 Great job! Don't lose your progress!</h2>
+                    <p className="text-muted-foreground mb-6 max-w-md">
+                      Sign up to save this flashcard deck and track your study progress with spaced repetition.
+                    </p>
+                    <div className="flex flex-row gap-3 w-full max-w-md justify-center">
+                      <button
+                        onClick={() => {
+                          if (title && cards) {
+                            const pendingDeck = { title, cards };
+                            localStorage.setItem('cogniguide:pending_flashcards', JSON.stringify(pendingDeck));
+                          }
+                          setShowAuthModal(true);
+                        }}
+                        className="flex-1 h-10 px-6 text-base font-bold text-white bg-gradient-to-r from-blue-600 via-cyan-500 to-teal-500 rounded-full hover:opacity-90 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/50 whitespace-nowrap"
+                      >
+                        Sign Up & Save Deck
+                      </button>
+                      <button
+                        onClick={() => {
+                          setFinished(false);
+                          setIndex(0);
+                          setShowAnswer(false);
+                          setHoveredGrade(null);
+                          setPredictedDueByGrade({});
+                          setPredictedDueDatesByGrade({});
+                        }}
+                        className="flex-1 h-10 px-6 text-base font-medium text-gray-600 bg-gray-100 rounded-full hover:bg-gray-200 transition-colors"
+                      >
+                        Start Over
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           ) : (
             <div className="w-full">
@@ -444,7 +557,39 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
 
   return (
     <div className="fixed inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center z-[100] p-4 font-sans">
+      <AuthModal open={showAuthModal} onClose={() => setShowAuthModal(false)} />
       <ModalContent />
+      {showLossAversionPopup && (
+        <div className="absolute inset-0 flex items-center justify-center z-[110]">
+          <div className="bg-white p-8 rounded-2xl shadow-xl max-w-md w-full text-center">
+            <h2 className="text-2xl font-bold mb-4">Don't Lose Your Progress!</h2>
+            <p className="text-muted-foreground mb-6">
+              Sign up to save this deck and track your study progress with spaced repetition.
+            </p>
+            <div className="grid grid-cols-2 gap-3 w-full max-w-md">
+              <button
+                onClick={() => {
+                  if (title && cards) {
+                    const pendingDeck = { title, cards };
+                    localStorage.setItem('cogniguide:pending_flashcards', JSON.stringify(pendingDeck));
+                  }
+                  setShowLossAversionPopup(false);
+                  setShowAuthModal(true);
+                }}
+                className="inline-flex items-center justify-center min-w-0 h-10 px-6 text-sm font-bold text-white bg-gradient-to-r from-blue-600 via-cyan-500 to-teal-500 rounded-full hover:opacity-90 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/50 whitespace-nowrap"
+              >
+                Save & Continue
+              </button>
+              <button
+                onClick={onClose}
+                className="inline-flex items-center justify-center min-w-0 h-10 px-6 text-sm font-medium text-gray-600 bg-gray-100 rounded-full hover:bg-gray-200 transition-colors whitespace-nowrap"
+              >
+                Continue without saving
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

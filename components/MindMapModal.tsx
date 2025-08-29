@@ -9,6 +9,7 @@ import domtoimage from 'dom-to-image-more';
 import { supabase } from '@/lib/supabaseClient';
 import { loadDeckSchedule, saveDeckSchedule, loadDeckScheduleAsync, saveDeckScheduleAsync } from '@/lib/sr-store';
 import posthog from 'posthog-js';
+import AuthModal from '@/components/AuthModal';
 
 interface MindMapModalProps {
   markdown: string | null;
@@ -318,6 +319,24 @@ body { margin: 0; background: #ffffff; ${computedFontFamily ? `font-family: ${co
   const [isSavingFlashcards, setIsSavingFlashcards] = useState(false);
   const [flashcardsSavedId, setFlashcardsSavedId] = useState<string | null>(null);
   const [isCheckingFlashcards, setIsCheckingFlashcards] = useState(false);
+  const [showLossAversionPopup, setShowLossAversionPopup] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [hasGeneratedContent, setHasGeneratedContent] = useState(false);
+
+  const handleClose = (event?: React.MouseEvent) => {
+    // Prevent any automatic triggers
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+
+    // Only show popup if user has generated content and is not authenticated
+    if (!userId && hasGeneratedContent) {
+      setShowLossAversionPopup(true);
+    } else {
+      onClose();
+    }
+  };
 
   const handleGenerateFlashcards = async () => {
     if (!markdown) return;
@@ -518,6 +537,7 @@ body { margin: 0; background: #ffffff; ${computedFontFamily ? `font-family: ${co
     if (!initializedRef.current && viewMode === 'map') {
       initializeMindMap(markdown, viewportRef.current, containerRef.current);
       initializedRef.current = true;
+      setHasGeneratedContent(true);
     } else {
       if (viewMode === 'map') updateMindMap(markdown);
     }
@@ -528,6 +548,8 @@ body { margin: 0; background: #ffffff; ${computedFontFamily ? `font-family: ${co
   useEffect(() => {
     if (!markdown) {
       initializedRef.current = false;
+      setHasGeneratedContent(false);
+      setShowLossAversionPopup(false);
       cleanup();
     }
   }, [markdown]);
@@ -649,123 +671,157 @@ body { margin: 0; background: #ffffff; ${computedFontFamily ? `font-family: ${co
   }
 
   return (
-    <div className="fixed inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center z-[100] p-4 font-sans">
-      <div className="relative bg-white w-full h-full rounded-[1.5rem] border border-gray-200 ring-1 ring-black/5 shadow-2xl shadow-[0_10px_25px_rgba(0,0,0,0.12),0_25px_70px_rgba(0,0,0,0.18)] flex flex-col overflow-hidden">
-        <div className="absolute top-2 right-2 z-30">
-          <div className="inline-flex items-center gap-1.5 rounded-full border border-gray-200 bg-white/95 shadow-sm px-2 py-1">
-            {viewMode === 'map' ? (
-              <>
-                <button
-                  onClick={flashcards ? () => setViewMode('flashcards') : handleGenerateFlashcards}
-                  className="inline-flex items-center gap-1 px-4 py-1.5 rounded-full border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 text-sm focus:outline-none min-w-[44px]"
-                  disabled={isGeneratingFlashcards || isCheckingFlashcards}
-                >
-                  {isGeneratingFlashcards ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  ) : isCheckingFlashcards ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  ) : (
-                    <FlashcardIcon className="h-4 w-4" />
-                  )}
-                </button>
-
-                <div className="relative">
-                  <div
-                    ref={triggerGroupRef}
-                    className="inline-flex rounded-full"
+    <>
+      <AuthModal open={showAuthModal} onClose={() => setShowAuthModal(false)} />
+      <div className="fixed inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center z-[100] p-4 font-sans">
+        <div className="relative bg-white w-full h-full rounded-[1.5rem] border border-gray-200 ring-1 ring-black/5 shadow-2xl shadow-[0_10px_25px_rgba(0,0,0,0.12),0_25px_70px_rgba(0,0,0,0.18)] flex flex-col overflow-hidden">
+          <div className="absolute top-2 right-2 z-30">
+            <div className="inline-flex items-center gap-1.5 rounded-full border border-gray-200 bg-white/95 shadow-sm px-2 py-1">
+              {viewMode === 'map' ? (
+                <>
+                  <button
+                    onClick={flashcards ? () => setViewMode('flashcards') : handleGenerateFlashcards}
+                    className="inline-flex items-center gap-1 px-4 py-1.5 rounded-full border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 text-sm focus:outline-none min-w-[44px]"
+                    disabled={isGeneratingFlashcards || isCheckingFlashcards}
                   >
-                    <button
-                      onClick={() => setDropdownOpen(!isDropdownOpen)}
-                      className="inline-flex items-center gap-1 px-4 py-1.5 rounded-full border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 text-sm focus:outline-none min-w-[44px]"
-                      aria-haspopup="menu"
-                      aria-expanded={isDropdownOpen}
-                    >
-                      <Download className="h-4 w-4" />
-                      <svg className="h-4 w-4 ml-1 -mr-0.5" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" /></svg>
-                    </button>
-                  </div>
+                    {isGeneratingFlashcards ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : isCheckingFlashcards ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <FlashcardIcon className="h-4 w-4" />
+                    )}
+                  </button>
 
-                  {isDropdownOpen && (
+                  <div className="relative">
                     <div
-                      className="absolute right-0 mt-2 bg-white rounded-3xl shadow-sm z-20 border border-gray-200 p-2 min-w-[120px]"
-                      role="menu"
-                      style={{ width: Math.max(dropdownWidth || 0, 120) }}
+                      ref={triggerGroupRef}
+                      className="inline-flex rounded-full"
                     >
-                      <div className="flex flex-col gap-1.5">
-                        <button
-                          type="button"
-                          onClick={() => { posthog.capture('mindmap_exported', { format: 'svg' }); handleDownload('svg'); setDropdownOpen(false); }}
-                          className="w-full flex items-center gap-2 px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-100 rounded-xl focus:outline-none"
-                        >
-                          <FileImage className="h-4 w-4" /> SVG
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => { posthog.capture('mindmap_exported', { format: 'png' }); handleDownload('png'); setDropdownOpen(false); }}
-                          className="w-full flex items-center gap-2 px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-100 rounded-xl focus:outline-none"
-                        >
-                          <FileImage className="h-4 w-4" /> PNG
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => { posthog.capture('mindmap_exported', { format: 'pdf' }); handlePrintPdf(); setDropdownOpen(false); }}
-                          className="w-full flex items-center gap-2 px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-100 rounded-xl focus:outline-none"
-                        >
-                          <Printer className="h-4 w-4" /> PDF (Print)
-                        </button>
-                      </div>
+                      <button
+                        onClick={() => setDropdownOpen(!isDropdownOpen)}
+                        className="inline-flex items-center gap-1 px-4 py-1.5 rounded-full border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 text-sm focus:outline-none min-w-[44px]"
+                        aria-haspopup="menu"
+                        aria-expanded={isDropdownOpen}
+                      >
+                        <Download className="h-4 w-4" />
+                        <svg className="h-4 w-4 ml-1 -mr-0.5" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" /></svg>
+                      </button>
                     </div>
-                  )}
-                </div>
-              </>
-            ) : (
-              <>
-                <button
-                  onClick={() => setViewMode('map')}
-                  className="inline-flex items-center justify-center w-8 h-8 rounded-full border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 focus:outline-none"
-                  aria-label="Back to Map"
-                >
-                  <MapIcon className="h-4 w-4" />
-                </button>
-              </>
-            )}
 
-            <button
-              onClick={onClose}
-              className="inline-flex items-center justify-center w-8 h-8 bg-white text-gray-700 rounded-full border border-gray-300 shadow-sm hover:bg-gray-100 focus:outline-none"
-              aria-label="Close"
-            >
-              <X className="h-4 w-4" />
-            </button>
+                    {isDropdownOpen && (
+                      <div
+                        className="absolute right-0 mt-2 bg-white rounded-3xl shadow-sm z-20 border border-gray-200 p-2 min-w-[120px]"
+                        role="menu"
+                        style={{ width: Math.max(dropdownWidth || 0, 120) }}
+                      >
+                        <div className="flex flex-col gap-1.5">
+                          <button
+                            type="button"
+                            onClick={() => { posthog.capture('mindmap_exported', { format: 'svg' }); handleDownload('svg'); setDropdownOpen(false); }}
+                            className="w-full flex items-center gap-2 px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-100 rounded-xl focus:outline-none"
+                          >
+                            <FileImage className="h-4 w-4" /> SVG
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => { posthog.capture('mindmap_exported', { format: 'png' }); handleDownload('png'); setDropdownOpen(false); }}
+                            className="w-full flex items-center gap-2 px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-100 rounded-xl focus:outline-none"
+                          >
+                            <FileImage className="h-4 w-4" /> PNG
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => { posthog.capture('mindmap_exported', { format: 'pdf' }); handlePrintPdf(); setDropdownOpen(false); }}
+                            className="w-full flex items-center gap-2 px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-100 rounded-xl focus:outline-none"
+                          >
+                            <Printer className="h-4 w-4" /> PDF (Print)
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </>
+              ) : (
+                <>
+                  <button
+                    onClick={() => setViewMode('map')}
+                    className="inline-flex items-center justify-center w-8 h-8 rounded-full border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 focus:outline-none"
+                    aria-label="Back to Map"
+                  >
+                    <MapIcon className="h-4 w-4" />
+                  </button>
+                </>
+              )}
+
+              <button
+                onClick={handleClose}
+                className="inline-flex items-center justify-center w-8 h-8 bg-white text-gray-700 rounded-full border border-gray-300 shadow-sm hover:bg-gray-100 focus:outline-none"
+                aria-label="Close"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
           </div>
-        </div>
 
-        {/* White overlay to fully cover mind map when in flashcards mode */}
-        {viewMode === 'flashcards' && (
-          <div className="absolute inset-0 bg-white z-10" />
-        )}
-
-        <div className="w-full h-full relative">
-          <div
-            ref={viewportRef}
-            className={`map-viewport w-full h-full flex-grow bg-white z-0 ${viewMode === 'flashcards' ? 'hidden' : ''}`}
-          >
-            <div ref={containerRef} id="mindmap-container" />
-          </div>
+          {/* White overlay to fully cover mind map when in flashcards mode */}
           {viewMode === 'flashcards' && (
-            <FlashcardsModal
-              open={true}
-              title={getTitle(markdown) || undefined}
-              cards={flashcards}
-              isGenerating={isGeneratingFlashcards}
-              error={generationError || undefined}
-              onClose={() => setViewMode('map')}
-              deckId={flashcardsSavedId || undefined}
-              initialIndex={flashcardIndex}
-            />
+            <div className="absolute inset-0 bg-white z-10" />
           )}
+
+          <div className="w-full h-full relative">
+            <div
+              ref={viewportRef}
+              className={`map-viewport w-full h-full flex-grow bg-white z-0 ${viewMode === 'flashcards' ? 'hidden' : ''}`}
+            >
+              <div ref={containerRef} id="mindmap-container" />
+            </div>
+            {viewMode === 'flashcards' && (
+              <FlashcardsModal
+                open={true}
+                title={getTitle(markdown) || undefined}
+                cards={flashcards}
+                isGenerating={isGeneratingFlashcards}
+                error={generationError || undefined}
+                onClose={() => setViewMode('map')}
+                deckId={flashcardsSavedId || undefined}
+                initialIndex={flashcardIndex}
+              />
+            )}
+          </div>
         </div>
+
+        {showLossAversionPopup && (
+          <div className="absolute inset-0 flex items-center justify-center z-[110]">
+            <div className="bg-white p-8 rounded-2xl shadow-xl max-w-md w-full text-center">
+              <h2 className="text-2xl font-bold mb-4">Don't Lose Your Mind Map!</h2>
+              <p className="text-muted-foreground mb-6">
+                Sign up to save your mind map, generate unlimited flashcards, and track your study progress with spaced repetition.
+              </p>
+              <div className="grid grid-cols-2 gap-3 w-full max-w-md">
+                <button
+                  onClick={() => {
+                    if (markdown) {
+                      localStorage.setItem('cogniguide:pending_mindmap', markdown);
+                    }
+                    setShowLossAversionPopup(false);
+                    setShowAuthModal(true);
+                  }}
+                  className="inline-flex items-center justify-center min-w-0 h-10 px-6 text-sm font-bold text-white bg-gradient-to-r from-blue-600 via-cyan-500 to-teal-500 rounded-full hover:opacity-90 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/50 whitespace-nowrap"
+                >
+                  Save & Continue
+                </button>
+                <button
+                  onClick={onClose}
+                  className="inline-flex items-center justify-center min-w-0 h-10 px-6 text-sm font-medium text-gray-600 bg-gray-100 rounded-full hover:bg-gray-200 transition-colors whitespace-nowrap"
+                >
+                  Continue without saving
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
-    </div>
+    </>
   );
 }

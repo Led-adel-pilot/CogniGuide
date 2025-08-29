@@ -172,6 +172,70 @@ export default function DashboardClient() {
         return;
       }
 
+      // Check for and save a pending mind map from a pre-auth session
+      try {
+        const pendingMarkdown = localStorage.getItem('cogniguide:pending_mindmap');
+        if (pendingMarkdown && authed.id) {
+          // Clear immediately to prevent re-saving on refresh
+          localStorage.removeItem('cogniguide:pending_mindmap');
+          
+          const title = extractTitle(pendingMarkdown);
+          const { data: insertData, error: insertError } = await supabase
+            .from('mindmaps')
+            .insert({
+              user_id: authed.id,
+              title,
+              markdown: pendingMarkdown,
+            })
+            .select()
+            .single();
+
+          if (!insertError && insertData) {
+            // Open the newly saved mind map for a seamless UX
+            setMarkdown(pendingMarkdown);
+            // Reload history to show the new item
+            await loadAllHistory(authed.id);
+          } else if (insertError) {
+            console.error('Failed to save pending mind map:', insertError);
+          }
+        }
+      } catch (e) {
+        console.error('Error processing pending mind map:', e);
+      }
+
+      // Check for and save a pending flashcard deck from a pre-auth session
+      try {
+        const pendingFlashcardsRaw = localStorage.getItem('cogniguide:pending_flashcards');
+        if (pendingFlashcardsRaw && authed.id) {
+          // Clear immediately to prevent re-saving
+          localStorage.removeItem('cogniguide:pending_flashcards');
+
+          const pendingDeck = JSON.parse(pendingFlashcardsRaw);
+          if (pendingDeck && pendingDeck.title && Array.isArray(pendingDeck.cards)) {
+            const { data: insertData, error: insertError } = await supabase
+              .from('flashcards')
+              .insert({
+                user_id: authed.id,
+                title: pendingDeck.title,
+                cards: pendingDeck.cards,
+                markdown: '', // No markdown since it's from a non-mindmap source
+              })
+              .select()
+              .single();
+
+            if (!insertError && insertData) {
+              // Reload history to show the new item
+              await loadAllHistory(authed.id);
+              // Optionally, you could auto-open the new deck here
+            } else if (insertError) {
+              console.error('Failed to save pending flashcards:', insertError);
+            }
+          }
+        }
+      } catch (e) {
+        console.error('Error processing pending flashcards:', e);
+      }
+
       // Define event handlers
       handleGenerationComplete = () => {
         if (authed.id) {

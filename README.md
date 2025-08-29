@@ -17,6 +17,7 @@ CogniGuide comprehensive AI-powered study assistant. It uses an LLM to convert t
     - From Mind Map: After a mind map is generated, users can generate study flashcards from the Markmap markdown and switch between the mind map view and a flashcards study mode.
     - Direct from Files: On the generator, a selector lets users choose “Flashcards” to generate flashcards directly from uploaded documents/images (without first creating a mind map). The backend accepts `FormData` uploads and streams NDJSON lines for incremental flashcards.
 *   **Auth & History:** Users must sign in (Email magic link or Google) to generate mind maps or flashcards. Signed-in users get a dashboard with a unified reverse-chronological history of both mind maps and flashcards. Items show lucide icons (map vs card). Mind maps are stored as Markmap markdown; flashcards are stored as a JSON array (and may omit markdown when generated directly from files/prompts).
+*   **Seamless Save on Sign-Up:** When a non-authenticated user generates a mind map and then signs up to save it, the mind map is automatically saved to their new account and appears in their history, ensuring no work is lost.
 
 ## Technology Stack
 *   **Framework:** Next.js (React) for building the web application.
