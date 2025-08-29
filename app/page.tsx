@@ -57,7 +57,8 @@ export default function Home() {
             <div className="flex items-center gap-2">
               <Image src={CogniGuideLogo} alt="CogniGuide Logo" width={40} height={40} className="h-10 w-10 text-primary" />
               <h1 className="text-2xl font-bold font-heading tracking-tighter">CogniGuide</h1>
-              <Link href="/pricing" className="text-sm text-muted-foreground hover:underline">Pricing</Link>
+              {/* <Link href="/pricing" className="text-sm text-muted-foreground hover:underline">Pricing</Link> */}
+              {/* Maybe reducing user signup conversion, to be researched */}
             </div>
             <div className="flex items-center gap-2">
               {isAuthed ? (
@@ -102,7 +103,7 @@ export default function Home() {
                 >
                   <path d="M7 10L12 15L17 10" />
                 </svg>
-                Try it - No signup
+                Try it - No Signup
               </button>
             </div>
           </section>
@@ -152,7 +153,8 @@ export default function Home() {
           <div className="container py-3 flex flex-col md:flex-row justify-between items-center gap-2">
             <p className="text-xs text-muted-foreground/70">&copy; {new Date().getFullYear()} CogniGuide. All rights reserved.</p>
             <nav className="flex flex-wrap justify-center gap-2 sm:gap-4">
-              <Link href="/pricing" className="text-xs text-muted-foreground/70 hover:underline">Pricing</Link>
+              {/* <Link href="/pricing" className="text-xs text-muted-foreground/70 hover:underline">Pricing</Link> */}
+              {/* Maybe reducing user signup conversion, to be researched */}
               <Link href="/contact" className="text-xs text-muted-foreground/70 hover:underline">Contact</Link>
               <Link href="/legal/refund-policy" className="text-xs text-muted-foreground/70 hover:underline">Refund Policy</Link>
               <Link href="/legal/cancellation-policy" className="text-xs text-muted-foreground/70 hover:underline">Cancellation Policy</Link>
