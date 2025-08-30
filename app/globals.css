@@ -117,6 +117,12 @@
     padding: 8px 14px;
     box-shadow: var(--node-shadow);
     cursor: pointer;
+    /* Prefer app font but ensure robust emoji fallback (Windows + macOS + Linux) */
+    font-family: "Poppins", system-ui, -apple-system, "Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", "Segoe UI Symbol", "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+    /* Stabilize glyph rasterization across animations */
+    /* Avoid forcing a 3D transform to prevent emoji fallback quirks on some systems */
+    backface-visibility: hidden;
+    will-change: transform, opacity, top, left;
     transition: border-color 0.2s, background-color 0.2s,
                 transform 0.35s cubic-bezier(0.4, 0, 0.2, 1),
                 opacity 0.35s cubic-bezier(0.4, 0, 0.2, 1),
@@ -130,8 +136,11 @@
 
 .mindmap-node:hover {
     border-color: var(--hover-border-color);
-    transform: scale(1.05);
     z-index: 5;
+}
+
+.mindmap-node.has-children:hover {
+    transform: scale(1.05);
 }
 
 .mindmap-node.root {
@@ -172,7 +181,12 @@
     stroke: var(--connector-color);
     stroke-width: 2px;
     fill: none;
-    transition: stroke 0.2s, opacity 0.3s ease 150ms, d 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    transition: stroke 0.2s ease,
+                opacity 0.25s ease 50ms,
+                d 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+                stroke-dashoffset 0.35s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .mindmap-node code {

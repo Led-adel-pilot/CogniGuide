@@ -296,8 +296,8 @@ function parseMarkmap(markdown: string): MindMapNode {
         rootText = lines[h1Index].trim().substring(2);
         lines.splice(h1Index, 1);
     }
-    const rootBaseColor = isDarkMode() ? '#2d3748' : '#dfecf6ff';
-    const rootTextColor = isDarkMode() ? 'hsla(208, 82%, 85%, 1.00)' : 'hsla(208, 82%, 39%, 1.00)';
+    const rootBaseColor = isDarkMode() ? 'hsla(214, 56%, 23%, 1.00)' : 'hsla(206, 56%, 92%, 1.00)';
+    const rootTextColor = isDarkMode() ? 'hsla(213, 82%, 85%, 1.00)' : 'hsla(208, 82%, 39%, 1.00)';
     const root: MindMapNode = {
         id: 'node-0', text: rootText, html: renderMarkdownToHTML(rootText),
         children: [], level: 0, isRoot: true, color: rootBaseColor, textColor: rootTextColor, parent: null,
@@ -471,10 +471,6 @@ function getTreeBounds(node: MindMapNode): { minX: number, minY: number, width: 
 function drawConnector(parent: MindMapNode, child: MindMapNode, svgEl: SVGSVGElement, xOffset: number, yOffset: number, isExpanding: boolean): SVGPathElement {
     const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
     path.setAttribute('class', 'connector-path');
-    if (isExpanding) {
-        path.style.opacity = '0';
-        requestAnimationFrame(() => { path.style.opacity = '1'; });
-    }
     // Match connector color to the node's text color for visual consistency
     const connectorStroke = child.textColor ?? (child.color ? darkenColor(child.color, 70) : '#000000');
     path.style.stroke = connectorStroke;
@@ -483,6 +479,29 @@ function drawConnector(parent: MindMapNode, child: MindMapNode, svgEl: SVGSVGEle
     const d = `M ${p1.x} ${p1.y} C ${p1.x + (p2.x - p1.x) / 2} ${p1.y}, ${p1.x + (p2.x - p1.x) / 2} ${p2.y}, ${p2.x} ${p2.y}`;
     path.setAttribute('d', d);
     svgEl.appendChild(path);
+
+    // Prepare stroke-dash animation for aesthetic draw-in effect
+    try {
+        const length = path.getTotalLength();
+        path.style.strokeDasharray = `${length}`;
+        if (isExpanding) {
+            path.style.opacity = '0';
+            path.style.strokeDashoffset = `${length}`;
+            // Use two RAFs to ensure styles are applied before transition starts
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                    path.style.opacity = '1';
+                    path.style.strokeDashoffset = '0';
+                });
+            });
+        } else {
+            // Fully drawn by default
+            path.style.strokeDashoffset = '0';
+        }
+    } catch {
+        // getTotalLength can throw for invalid paths; ignore and leave as-is
+    }
+
     return path;
 }
 
@@ -637,7 +656,8 @@ function toggleNodeCollapse(node: MindMapNode) {
             }
 
             // Animate connectors
-            if (n.connectorPath && n.parent) {
+            const pathEl = n.connectorPath;
+            if (pathEl && n.parent) {
                 const parent = n.parent;
                 // A parent of a descendant can either be another descendant or the node being collapsed.
                 const parentIsDescendant = descendantNodes.includes(parent);
@@ -648,9 +668,31 @@ function toggleNodeCollapse(node: MindMapNode) {
                 const p2 = { x: targetX + PADDING, y: targetY + n.height / 2 + PADDING };
                 const d = `M ${p1.x} ${p1.y} C ${p1.x + (p2.x - p1.x) / 2} ${p1.y}, ${p1.x + (p2.x - p1.x) / 2} ${p2.y}, ${p2.x} ${p2.y}`;
                 
-                n.connectorPath.setAttribute('d', d);
-                if (isDescendant) {
-                    n.connectorPath.style.opacity = '0';
+                // Update path shape immediately
+                pathEl.setAttribute('d', d);
+
+                try {
+                    const length = pathEl.getTotalLength();
+                    if (isDescendant) {
+                        // Only descendants erase; keep remaining connected path morphing smoothly
+                        pathEl.style.strokeDasharray = `${length}`;
+                        pathEl.style.strokeDashoffset = '0';
+                        requestAnimationFrame(() => {
+                            requestAnimationFrame(() => {
+                                pathEl.style.strokeDashoffset = `${length}`;
+                                pathEl.style.opacity = '0';
+                            });
+                        });
+                    } else {
+                        // Do not use dash trick for non-descendants; rely on CSS 'd' transition to morph
+                        pathEl.style.removeProperty('stroke-dasharray');
+                        pathEl.style.removeProperty('stroke-dashoffset');
+                        pathEl.style.opacity = '1';
+                    }
+                } catch {
+                    if (isDescendant) {
+                        pathEl.style.opacity = '0';
+                    }
                 }
             }
         });
