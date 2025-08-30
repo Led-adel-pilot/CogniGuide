@@ -35,18 +35,27 @@ export default function PromptForm({
 
   const getPlaceholder = () => {
     const hasFiles = filesLength > 0;
+    const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
 
     if (mode === 'flashcards') {
       if (hasFiles) {
-        return "e.g., 'Only make flashcards about the first and third chapters'";
+        return isMobile
+          ? "e.g., 'Flashcards for chapters 1 & 3'"
+          : "e.g., 'Only make flashcards about the first and third chapters'";
       }
-      return "e.g., 'Only make flashcards about the first and third chapters'";
+      return isMobile
+        ? "e.g., 'Flashcards for chapters 1 & 3'"
+        : "e.g., 'Only make flashcards about the first and third chapters'";
     }
 
     if (hasFiles) {
-      return "e.g., 'Focus on chapter summaries and key arguments'";
+      return isMobile
+        ? "e.g., 'Focus on summaries & key points'"
+        : "e.g., 'Focus on chapter summaries and key arguments'";
     }
-    return "e.g., 'Make a mind map about the fundamentals of quantum computing'";
+    return isMobile
+      ? "e.g., 'Mindmap for time management'"
+      : "e.g., 'Create a mindmap for time management strategies'";
   };
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {

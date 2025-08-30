@@ -641,16 +641,18 @@ export default function DashboardClient() {
           <div className="w-6" /> {/* Spacer */}
         </header>
         <div className="container mx-auto px-6 pb-6 mt-12">
-          <div className="text-center mt-2 mb-8">
-            <button
-              onClick={() => setIsPricingModalOpen(true)}
-              className="upgrade-plan-btn"
-            >
-              <Sparkles className="h-4 w-4" />
-              <span>Upgrade your Plan</span>
-            </button>
+          <div className="max-w-3xl mx-auto">
+            <div className="text-center mt-2 mb-8">
+              <button
+                onClick={() => setIsPricingModalOpen(true)}
+                className="upgrade-plan-btn"
+              >
+                <Sparkles className="h-4 w-4" />
+                <span>Upgrade your Plan</span>
+              </button>
+            </div>
+            <Generator showTitle={false} />
           </div>
-          <Generator showTitle={false} />
         </div>
       </main>
 
