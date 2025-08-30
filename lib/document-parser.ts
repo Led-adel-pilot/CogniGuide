@@ -10,7 +10,7 @@ import Pptx from 'pptx-text-parser/lib/node-pptx';
 const CHARS_PER_CREDIT = 3800;
 const TIER_LIMITS = {
   'non-auth': 5 * CHARS_PER_CREDIT, // 19,000 characters
-  'free': 5 * CHARS_PER_CREDIT,     // 19,000 characters
+  'free': 20 * CHARS_PER_CREDIT,     // 76,000 characters
   'paid': 30 * CHARS_PER_CREDIT     // 114,000 characters
 } as const;
 

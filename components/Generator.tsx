@@ -14,7 +14,7 @@ import { Sparkles } from 'lucide-react';
 
 export default function Generator({ redirectOnAuth = false, showTitle = true, compact = false }: { redirectOnAuth?: boolean, showTitle?: boolean, compact?: boolean }) {
   // Enforce a client-side per-file size cap to avoid server 413s (Vercel ~4.5MB)
-  const MAX_FILE_BYTES = Math.floor(25 * 1024 * 1024); // 25MB per file when using Supabase Storage
+  const MAX_FILE_BYTES = Math.floor(50 * 1024 * 1024); // 50MB per file when using Supabase Storage
   const [files, setFiles] = useState<File[]>([]);
   const [preParsed, setPreParsed] = useState<{ text: string; images: string[]; rawCharCount?: number } | null>(null);
   const [isPreParsing, setIsPreParsing] = useState(false);
@@ -176,7 +176,7 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
       return;
     }
 
-    // Validate file sizes before accepting them (25MB when using Supabase Storage)
+    // Validate file sizes before accepting them (50MB when using Supabase Storage)
     const tooLargeFile = selectedFiles.find(f => f.size > MAX_FILE_BYTES);
     if (tooLargeFile) {
       setError(`"${tooLargeFile.name}" is too large. Max file size is ${(MAX_FILE_BYTES / (1024 * 1024)).toFixed(1)} MB.`);
