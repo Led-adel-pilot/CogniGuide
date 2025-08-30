@@ -55,12 +55,26 @@ export default function DashboardClient() {
   const [user, setUser] = useState<SessionUser | null>(null);
   const [loading, setLoading] = useState(true);
   const [markdown, setMarkdown] = useState<string | null>(null);
-  const [history, setHistory] = useState<MindmapRecord[]>([]);
+  // Full flashcards list for spaced repetition prefetching
   const [flashcardsHistory, setFlashcardsHistory] = useState<FlashcardsRecord[]>([]);
+  // Sidebar combined history (paginated)
   const [combinedHistory, setCombinedHistory] = useState<Array<
     | { type: 'mindmap'; id: string; title: string | null; created_at: string; markdown: string }
     | { type: 'flashcards'; id: string; title: string | null; created_at: string; cards: FlashcardType[] }
   >>([]);
+  // Pagination state
+  const PAGE_SIZE = 10;
+  const [mmOffset, setMmOffset] = useState(0);
+  const [fcOffset, setFcOffset] = useState(0);
+  const [hasMoreMm, setHasMoreMm] = useState(true);
+  const [hasMoreFc, setHasMoreFc] = useState(true);
+  const [historyBuffer, setHistoryBuffer] = useState<Array<
+    | { type: 'mindmap'; id: string; title: string | null; created_at: string; markdown: string }
+    | { type: 'flashcards'; id: string; title: string | null; created_at: string; cards: FlashcardType[] }
+  >>([]);
+  const [isHistoryInitialLoading, setIsHistoryInitialLoading] = useState(true);
+  const [isHistoryLoadingMore, setIsHistoryLoadingMore] = useState(false);
+  const [hasMoreHistory, setHasMoreHistory] = useState(true);
   const [flashcardsOpen, setFlashcardsOpen] = useState(false);
   const [flashcardsTitle, setFlashcardsTitle] = useState<string | null>(null);
   const [flashcardsCards, setFlashcardsCards] = useState<FlashcardType[] | null>(null);
@@ -80,6 +94,20 @@ export default function DashboardClient() {
   const [legalOpen, setLegalOpen] = useState(false);
   const prefetchingRef = useRef(false);
   const [totalDueCount, setTotalDueCount] = useState<number>(0);
+  const listRef = useRef<HTMLDivElement | null>(null);
+  const loadMoreRef = useRef<HTMLDivElement | null>(null);
+
+  // Refs mirroring pagination state for async safety
+  const historyBufferRef = useRef(historyBuffer);
+  const hasMoreMmRef = useRef(hasMoreMm);
+  const hasMoreFcRef = useRef(hasMoreFc);
+  const mmOffsetRef = useRef(0);
+  const fcOffsetRef = useRef(0);
+  const isFetchingRef = useRef(false);
+  const seenKeysRef = useRef<Set<string>>(new Set());
+  useEffect(() => { historyBufferRef.current = historyBuffer; }, [historyBuffer]);
+  useEffect(() => { hasMoreMmRef.current = hasMoreMm; }, [hasMoreMm]);
+  useEffect(() => { hasMoreFcRef.current = hasMoreFc; }, [hasMoreFc]);
 
   const handleClosePricingModal = () => {
     setIsPricingModalOpen(false);
@@ -195,8 +223,8 @@ export default function DashboardClient() {
           if (!insertError && insertData) {
             // Open the newly saved mind map for a seamless UX
             setMarkdown(pendingMarkdown);
-            // Reload history to show the new item
-            await loadAllHistory(authed.id);
+            // Reload sidebar history to show the new item
+            await initPaginatedHistory(authed.id);
           } else if (insertError) {
             console.error('Failed to save pending mind map:', insertError);
           }
@@ -226,8 +254,8 @@ export default function DashboardClient() {
               .single();
 
             if (!insertError && insertData) {
-              // Reload history to show the new item
-              await loadAllHistory(authed.id);
+              // Reload sidebar history to show the new item
+              await initPaginatedHistory(authed.id);
               // Optionally, you could auto-open the new deck here
             } else if (insertError) {
               console.error('Failed to save pending flashcards:', insertError);
@@ -241,7 +269,10 @@ export default function DashboardClient() {
       // Define event handlers
       handleGenerationComplete = () => {
         if (authed.id) {
-          loadAllHistory(authed.id);
+          initPaginatedHistory(authed.id);
+          loadAllFlashcardsOnly(authed.id).then((allFlash) => {
+            try { prefetchSpacedData(allFlash); } catch {}
+          });
         }
       };
 
@@ -262,9 +293,12 @@ export default function DashboardClient() {
       // Load credits immediately (no dependency on history loading)
       loadUserCredits(authed.id);
 
-      // Load history in parallel
-      const all = await loadAllHistory(authed.id);
-      try { await prefetchSpacedData(all.flashcards); } catch {}
+      // Initialize paginated sidebar history and spaced data prefetch
+      await initPaginatedHistory(authed.id);
+      try {
+        const allFlash = await loadAllFlashcardsOnly(authed.id);
+        await prefetchSpacedData(allFlash);
+      } catch {}
 
       // Add event listeners
       window.addEventListener('cogniguide:generation-complete', handleGenerationComplete);
@@ -341,58 +375,185 @@ export default function DashboardClient() {
     }
   }, [user]);
 
-  const loadHistory = async (userId: string) => {
-    const { data, error } = await supabase
-      .from('mindmaps')
-      .select('*')
-      .eq('user_id', userId)
-      .order('created_at', { ascending: false });
-    if (!error && data) setHistory(data as unknown as MindmapRecord[]);
-  };
+  // Infinite scroll: observe sentinel inside sidebar list
+  useEffect(() => {
+    if (!user) return;
+    const sentinel = loadMoreRef.current;
+    if (!sentinel) return;
+    const rootEl = listRef.current || undefined;
+    const observer = new IntersectionObserver((entries) => {
+      for (const entry of entries) {
+        if (entry.isIntersecting) {
+          loadMoreHistory(user.id);
+        }
+      }
+    }, { root: rootEl, rootMargin: '0px 0px 200px 0px' });
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, [user, hasMoreHistory, isHistoryInitialLoading]);
 
-  const loadFlashcardsHistory = async (userId: string) => {
+  // Load all flashcards for spaced repetition prefetch (separate from sidebar pagination)
+  const loadAllFlashcardsOnly = async (userId: string) => {
     const { data, error } = await supabase
       .from('flashcards')
       .select('*')
       .eq('user_id', userId)
       .order('created_at', { ascending: false });
-    if (!error && data) setFlashcardsHistory(data as unknown as FlashcardsRecord[]);
+    const fcArr = (!error && data ? (data as any as FlashcardsRecord[]) : []);
+    setFlashcardsHistory(fcArr);
+    return fcArr;
   };
 
-  const loadAllHistory = async (userId: string) => {
-    const [mm, fc] = await Promise.all([
-      supabase
-        .from('mindmaps')
-        .select('*')
-        .eq('user_id', userId)
-        .order('created_at', { ascending: false }),
-      supabase
-        .from('flashcards')
-        .select('*')
-        .eq('user_id', userId)
-        .order('created_at', { ascending: false })
-    ]);
-    const mmArr = (!mm.error && mm.data ? (mm.data as any as MindmapRecord[]) : []);
-    const fcArr = (!fc.error && fc.data ? (fc.data as any as FlashcardsRecord[]) : []);
-    setHistory(mmArr);
-    setFlashcardsHistory(fcArr);
-    const mmItems = mmArr.map((m) => ({
+  // Fetch a chunk of mindmaps
+  const fetchMindmapsChunk = async (userId: string, offset: number, size: number) => {
+    const { data, error } = await supabase
+      .from('mindmaps')
+      .select('*')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false })
+      .range(offset, offset + size - 1);
+    const mmArr = (!error && data ? (data as any as MindmapRecord[]) : []);
+    return mmArr.map((m) => ({
       type: 'mindmap' as const,
       id: m.id,
       title: m.title,
       created_at: m.created_at,
       markdown: m.markdown,
     }));
-    const fcItems = fcArr.map((f) => ({
+  };
+
+  // Fetch a chunk of flashcards
+  const fetchFlashcardsChunk = async (userId: string, offset: number, size: number) => {
+    const { data, error } = await supabase
+      .from('flashcards')
+      .select('*')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false })
+      .range(offset, offset + size - 1);
+    const fcArr = (!error && data ? (data as any as FlashcardsRecord[]) : []);
+    return fcArr.map((f) => ({
       type: 'flashcards' as const,
       id: f.id,
       title: f.title,
       created_at: f.created_at,
       cards: (f.cards as any) as FlashcardType[],
     }));
-    const combined = [...mmItems, ...fcItems].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
-    setCombinedHistory(combined);
-    return { mindmaps: mmArr, flashcards: fcArr };
+  };
+
+  const mergeAndSort = (arr: typeof combinedHistory) =>
+    [...arr].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+
+  const fetchNextIntoBuffer = async (userId: string) => {
+    if (isFetchingRef.current) return [] as typeof combinedHistory;
+    isFetchingRef.current = true;
+    try {
+      const mmStart = mmOffsetRef.current;
+      const fcStart = fcOffsetRef.current;
+      const [mmItems, fcItems] = await Promise.all([
+        hasMoreMmRef.current ? fetchMindmapsChunk(userId, mmStart, PAGE_SIZE) : Promise.resolve([]),
+        hasMoreFcRef.current ? fetchFlashcardsChunk(userId, fcStart, PAGE_SIZE) : Promise.resolve([]),
+      ]);
+
+      if (hasMoreMmRef.current) {
+        mmOffsetRef.current = mmStart + mmItems.length;
+        setMmOffset(mmOffsetRef.current);
+        if (mmItems.length < PAGE_SIZE) setHasMoreMm(false);
+      }
+      if (hasMoreFcRef.current) {
+        fcOffsetRef.current = fcStart + fcItems.length;
+        setFcOffset(fcOffsetRef.current);
+        if (fcItems.length < PAGE_SIZE) setHasMoreFc(false);
+      }
+
+      const keyOf = (x: any) => `${x.type}:${x.id}`;
+      // Seed seen with already-rendered and buffered items
+      for (const it of combinedHistory) seenKeysRef.current.add(keyOf(it));
+      for (const it of historyBufferRef.current) seenKeysRef.current.add(keyOf(it));
+
+      const mergedSorted = mergeAndSort([...mmItems, ...fcItems]);
+      const deduped: typeof combinedHistory = [];
+      for (const item of mergedSorted) {
+        const key = keyOf(item);
+        if (!seenKeysRef.current.has(key)) {
+          seenKeysRef.current.add(key);
+          deduped.push(item);
+        }
+      }
+      return deduped;
+    } finally {
+      isFetchingRef.current = false;
+    }
+  };
+
+  const initPaginatedHistory = async (userId: string) => {
+    setIsHistoryInitialLoading(true);
+    setCombinedHistory([]);
+    setHistoryBuffer([]);
+    historyBufferRef.current = [];
+    setMmOffset(0);
+    setFcOffset(0);
+    mmOffsetRef.current = 0;
+    fcOffsetRef.current = 0;
+    seenKeysRef.current = new Set();
+    setHasMoreMm(true);
+    setHasMoreFc(true);
+    setHasMoreHistory(true);
+    const newItems = await fetchNextIntoBuffer(userId);
+    const bufferAfter = mergeAndSort([...historyBufferRef.current, ...newItems]);
+    const take = Math.min(PAGE_SIZE, bufferAfter.length);
+    const first = bufferAfter.slice(0, take);
+    historyBufferRef.current = bufferAfter.slice(take);
+    setHistoryBuffer(historyBufferRef.current);
+    setCombinedHistory(first);
+    if (first.length === 0) {
+      // Fallback: top-10 combined if chunk APIs return empty
+      try {
+        const [mm, fc] = await Promise.all([
+          supabase
+            .from('mindmaps')
+            .select('*')
+            .eq('user_id', userId)
+            .order('created_at', { ascending: false })
+            .limit(PAGE_SIZE),
+          supabase
+            .from('flashcards')
+            .select('*')
+            .eq('user_id', userId)
+            .order('created_at', { ascending: false })
+            .limit(PAGE_SIZE),
+        ]);
+        const mmArr = (!mm.error && mm.data ? (mm.data as any as MindmapRecord[]) : []);
+        const fcArr = (!fc.error && fc.data ? (fc.data as any as FlashcardsRecord[]) : []);
+        const merged = mergeAndSort([
+          ...mmArr.map((m) => ({ type: 'mindmap' as const, id: m.id, title: m.title, created_at: m.created_at, markdown: m.markdown })),
+          ...fcArr.map((f) => ({ type: 'flashcards' as const, id: f.id, title: f.title, created_at: f.created_at, cards: (f.cards as any) as FlashcardType[] })),
+        ]).slice(0, PAGE_SIZE);
+        setCombinedHistory(merged);
+      } catch {}
+    }
+    setHasMoreHistory(historyBufferRef.current.length > 0 || hasMoreMmRef.current || hasMoreFcRef.current);
+    setIsHistoryInitialLoading(false);
+  };
+
+  const loadMoreHistory = async (userId: string) => {
+    if (isHistoryLoadingMore || !hasMoreHistory) return;
+    setIsHistoryLoadingMore(true);
+    try {
+      if (historyBufferRef.current.length < PAGE_SIZE && (hasMoreMmRef.current || hasMoreFcRef.current)) {
+        const newItems = await fetchNextIntoBuffer(userId);
+        const merged = mergeAndSort([...historyBufferRef.current, ...newItems]);
+        historyBufferRef.current = merged;
+        setHistoryBuffer(historyBufferRef.current);
+      }
+      const take = Math.min(PAGE_SIZE, historyBufferRef.current.length);
+      const nextChunk = historyBufferRef.current.slice(0, take);
+      historyBufferRef.current = historyBufferRef.current.slice(take);
+      setHistoryBuffer(historyBufferRef.current);
+      setCombinedHistory((prev) => mergeAndSort([...prev, ...nextChunk]));
+      setHasMoreHistory(historyBufferRef.current.length > 0 || hasMoreMmRef.current || hasMoreFcRef.current);
+    } finally {
+      setIsHistoryLoadingMore(false);
+    }
   };
 
   const extractTitle = (md: string): string => {
@@ -533,8 +694,18 @@ export default function DashboardClient() {
             <X className="h-5 w-5" />
           </button>
         </div>
-        <div className="flex-1 overflow-y-auto space-y-2 pr-1">
-          {combinedHistory.length === 0 && (
+        <div className="flex-1 overflow-y-auto space-y-2 pr-1" ref={listRef}>
+          {isHistoryInitialLoading && (
+            <div className="space-y-2">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <div key={i} className="p-2 rounded-xl border bg-muted/20 animate-pulse">
+                  <div className="h-4 w-24 bg-muted rounded mb-2" />
+                  <div className="h-3 w-40 bg-muted rounded" />
+                </div>
+              ))}
+            </div>
+          )}
+          {!isHistoryInitialLoading && combinedHistory.length === 0 && (
             <div className="text-sm text-muted-foreground">No history yet.</div>
           )}
           {combinedHistory.map((item) => (
@@ -590,6 +761,14 @@ export default function DashboardClient() {
               </div>
             </button>
           ))}
+          {isHistoryLoadingMore && (
+            <div className="flex items-center justify-center py-3 text-muted-foreground">
+              <Loader2 className="h-4 w-4 animate-spin mr-2" /> Loading more…
+            </div>
+          )}
+          {hasMoreHistory && !isHistoryInitialLoading && (
+            <div ref={loadMoreRef} className="h-4" />
+          )}
         </div>
         <div className="mt-auto border-t pt-4">
           <button

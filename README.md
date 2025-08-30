@@ -263,7 +263,8 @@ For consistent branding across the application, use the `CogniGuide_logo.png` fi
 *   Displays a unified sidebar history list (mind maps + flashcards) with icons:
     - Mind maps use lucide `Map` icon; clicking loads saved `markdown` into the viewer (`MindMapModal`).
     - Flashcards use lucide `CreditCard` icon; clicking opens `FlashcardsModal` with the saved cards.
-    - Data source: `combinedHistory` state built from `mindmaps` and `flashcards` tables; refreshed via `loadAllHistory(user.id)` after any save.
+    - Sidebar history is now paginated for performance: it initially loads 10 items and then fetches 10 more as you scroll (infinite scroll). A skeleton loader shows during the initial load and a spinner appears while loading more.
+    - Data source: a paginated `combinedHistory` built by interleaving `mindmaps` and `flashcards` ordered by `created_at` descending. Fetching uses per‑table pagination and merges the results client‑side.
 *   **Real-time Credit Updates:** Credit balance updates instantly after generation without requiring page refresh. Uses custom events (`cogniguide:credits-updated`) to synchronize credit display across components.
 *   Provides the same generator UI (dropzone + prompt) as the landing page with a selector to switch between Mind Map and Flashcards generation.
     - Mind maps are saved automatically with extracted title.
@@ -277,6 +278,29 @@ For consistent branding across the application, use the `CogniGuide_logo.png` fi
     - The due‑now queue and a `window.__cogniguide_due_map` are computed up‑front so opening the modal is instant.
     - If the network is unavailable, due lists are recomputed from the cache to maintain responsiveness.
     - When new flashcards are created, history reloads and the prefetch runs again to refresh dues.
+
+#### Pagination Implementation Notes (Critical for Future Development)
+The sidebar history uses a sophisticated pagination system with infinite scroll. Key technical details and pitfalls to avoid:
+
+*   **Architecture Overview:**
+    - Fetches 10 items per page from both `mindmaps` and `flashcards` tables simultaneously
+    - Merges results client-side by `created_at` descending order
+    - Uses a buffer system: pre-fetches chunks into a buffer, then moves items to display list
+    - Infinite scroll triggered via `IntersectionObserver` on a sentinel element
+    - Loading states: skeleton cards for initial load, spinner for incremental loads
+
+*   **Critical Race Condition Fixes (Essential):**
+    - **Concurrency Guard:** `isFetchingRef` prevents overlapping fetches that could reuse stale offsets
+    - **Stable Offset Refs:** `mmOffsetRef`/`fcOffsetRef` ensure each fetch uses correct range even as state updates
+    - **Global Deduplication:** `seenKeysRef` tracks all rendered/buffered items to prevent duplicates across loads
+    - **Key Generation:** Uses `${type}:${id}` format for React keys to ensure uniqueness across item types
+
+*   **Common Pitfalls to Avoid:**
+    - ❌ **Don't rely on state variables directly in async fetches** - they can become stale during rapid scrolling
+    - ❌ **Don't assume React keys will be unique by default** - explicitly track and filter duplicates
+    - ❌ **Don't trigger fetches without proper loading guards** - can cause overlapping requests and inconsistent state
+    - ❌ **Don't mix rendered items with buffer items for deduplication** - maintain separate tracking
+    - ❌ **Don't forget to reset pagination state on history refresh** - clears refs and seen-keys set
 
 ### Authentication Requirements
 *   **Non-authenticated users**: Can generate mind maps and flashcards with a limited quota (configured via `NON_AUTH_FREE_LIMIT` in `lib/plans.ts`, default: 3 generations). Generations are tracked via localStorage and do not persist across devices.
