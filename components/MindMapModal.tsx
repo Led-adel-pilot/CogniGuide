@@ -673,15 +673,16 @@ body { margin: 0; background: #ffffff; ${computedFontFamily ? `font-family: ${co
   return (
     <>
       <AuthModal open={showAuthModal} onClose={() => setShowAuthModal(false)} />
-      <div className="fixed inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center z-[100] p-4 font-sans">
-        <div className="relative bg-background w-full h-full rounded-[1.5rem] border border-gray-200 ring-1 ring-black/5 shadow-2xl shadow-[0_10px_25px_rgba(0,0,0,0.12),0_25px_70px_rgba(0,0,0,0.18)] flex flex-col overflow-hidden">
+      <div className="fixed inset-0 backdrop-blur-sm flex items-center justify-center z-[100] p-4 font-sans" style={{ backgroundColor: 'var(--color-background)' }}>
+        <div className="relative w-full h-full rounded-[1.5rem] border border-border ring-1 ring-black/5 shadow-2xl shadow-[0_10px_25px_rgba(0,0,0,0.12),0_25px_70px_rgba(0,0,0,0.18)] flex flex-col overflow-hidden" style={{ backgroundColor: 'var(--color-background)' }}>
           <div className="absolute top-2 right-2 z-30">
-            <div className="inline-flex items-center gap-1.5 rounded-full border border-gray-200 bg-background/95 shadow-sm px-2 py-1">
+            <div className="inline-flex items-center gap-1.5 rounded-full border border-border shadow-sm px-2 py-1" style={{ backgroundColor: 'var(--color-background)' }}>
               {viewMode === 'map' ? (
                 <>
                   <button
                     onClick={flashcards ? () => setViewMode('flashcards') : handleGenerateFlashcards}
-                    className="inline-flex items-center gap-1 px-4 py-1.5 rounded-full border border-gray-300 dark:border-gray-600 bg-background text-foreground hover:bg-muted/50 dark:hover:bg-muted/80 text-sm focus:outline-none min-w-[44px]"
+                    className="inline-flex items-center gap-1 px-4 py-1.5 rounded-full border border-border text-foreground hover:bg-muted/50 text-sm focus:outline-none min-w-[44px]"
+                    style={{ backgroundColor: 'var(--color-background)' }}
                     disabled={isGeneratingFlashcards || isCheckingFlashcards}
                   >
                     {isGeneratingFlashcards ? (
@@ -700,7 +701,8 @@ body { margin: 0; background: #ffffff; ${computedFontFamily ? `font-family: ${co
                     >
                       <button
                         onClick={() => setDropdownOpen(!isDropdownOpen)}
-                        className="inline-flex items-center gap-1 px-4 py-1.5 rounded-full border border-gray-300 dark:border-gray-600 bg-background text-foreground hover:bg-muted/50 dark:hover:bg-muted/80 text-sm focus:outline-none min-w-[44px]"
+                        className="inline-flex items-center gap-1 px-4 py-1.5 rounded-full border border-border text-foreground hover:bg-muted/50 text-sm focus:outline-none min-w-[44px]"
+                        style={{ backgroundColor: 'var(--color-background)' }}
                         aria-haspopup="menu"
                         aria-expanded={isDropdownOpen}
                       >
@@ -711,9 +713,12 @@ body { margin: 0; background: #ffffff; ${computedFontFamily ? `font-family: ${co
 
                     {isDropdownOpen && (
                       <div
-                        className="absolute right-0 mt-2 bg-background rounded-3xl shadow-sm z-20 border border-gray-200 p-2 min-w-[120px]"
+                        className="absolute right-0 mt-2 rounded-3xl shadow-sm z-20 border border-border p-2 min-w-[120px]"
+                        style={{
+                          backgroundColor: 'var(--color-background)',
+                          width: Math.max(dropdownWidth || 0, 120)
+                        }}
                         role="menu"
-                        style={{ width: Math.max(dropdownWidth || 0, 120) }}
                       >
                         <div className="flex flex-col gap-1.5">
                           <button
@@ -746,7 +751,8 @@ body { margin: 0; background: #ffffff; ${computedFontFamily ? `font-family: ${co
                 <>
                   <button
                     onClick={() => setViewMode('map')}
-                    className="inline-flex items-center justify-center w-8 h-8 rounded-full border border-gray-300 dark:border-gray-600 bg-background text-foreground hover:bg-muted/50 dark:hover:bg-muted/80 focus:outline-none"
+                    className="inline-flex items-center justify-center w-8 h-8 rounded-full border border-border text-foreground hover:bg-muted/50 focus:outline-none"
+                    style={{ backgroundColor: 'var(--color-background)' }}
                     aria-label="Back to Map"
                   >
                     <MapIcon className="h-4 w-4" />
@@ -756,7 +762,8 @@ body { margin: 0; background: #ffffff; ${computedFontFamily ? `font-family: ${co
 
               <button
                 onClick={handleClose}
-                className="inline-flex items-center justify-center w-8 h-8 bg-background text-foreground rounded-full border border-gray-300 dark:border-gray-600 shadow-sm hover:bg-muted/50 dark:hover:bg-muted/80 focus:outline-none"
+                className="inline-flex items-center justify-center w-8 h-8 text-foreground rounded-full border border-border shadow-sm hover:bg-muted/50 focus:outline-none"
+                style={{ backgroundColor: 'var(--color-background)' }}
                 aria-label="Close"
               >
                 <X className="h-4 w-4" />
@@ -766,13 +773,14 @@ body { margin: 0; background: #ffffff; ${computedFontFamily ? `font-family: ${co
 
           {/* White overlay to fully cover mind map when in flashcards mode */}
           {viewMode === 'flashcards' && (
-            <div className="absolute inset-0 bg-background z-10" />
+            <div className="absolute inset-0 z-10" style={{ backgroundColor: 'var(--color-background)' }} />
           )}
 
           <div className="w-full h-full relative">
             <div
               ref={viewportRef}
-              className={`map-viewport w-full h-full flex-grow bg-background z-0 ${viewMode === 'flashcards' ? 'hidden' : ''}`}
+              className={`map-viewport w-full h-full flex-grow z-0 ${viewMode === 'flashcards' ? 'hidden' : ''}`}
+              style={{ backgroundColor: 'var(--color-background)' }}
             >
               <div ref={containerRef} id="mindmap-container" />
             </div>
@@ -795,7 +803,7 @@ body { margin: 0; background: #ffffff; ${computedFontFamily ? `font-family: ${co
           <div className="absolute inset-0 flex items-center justify-center z-[110]">
             {/* Black transparent background */}
             <div className="absolute inset-0 bg-black/40 dark:bg-black/60 z-0"></div>
-            <div className="bg-background border p-8 rounded-2xl shadow-xl max-w-md w-full text-center relative z-10">
+            <div className="border p-8 rounded-2xl shadow-xl max-w-md w-full text-center relative z-10" style={{ backgroundColor: 'var(--color-background)' }}>
               <h2 className="text-2xl font-bold mb-4">Don't Lose Your Mind Map!</h2>
               <p className="text-muted-foreground mb-6">
                 Sign up to save your mind map, generate unlimited flashcards, and track your study progress with spaced repetition.

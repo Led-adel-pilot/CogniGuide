@@ -51,28 +51,68 @@ const HORIZONTAL_SPACING = 150;
 const VERTICAL_SPACING = 10;
 const PADDING = 50;
 const ANIMATION_DURATION = 350;
-const NODE_COLOR_PALETTE = [
-    '#f6e7dfff',
-    '#edf6dfff',
-    '#f6e9dfff',
-    '#dfecf6ff', 
-    '#dff6ecff',
-    '#f6dfe6ff',
-    '#f0dff6ff',
-    '#f9f6dcff',
-    '#f9edebff'
+
+// Light Mode Color Palette
+const L_NODE_COLOR_PALETTE = [
+    'hsla(21, 56%, 92%, 1.00)',
+    'hsla(83, 56%, 92%, 1.00)',
+    'hsla(26, 56%, 92%, 1.00)',
+    'hsla(206, 56%, 92%, 1.00)',
+    'hsla(154, 56%, 92%, 1.00)',
+    'hsla(342, 56%, 92%, 1.00)',
+    'hsla(284, 56%, 92%, 1.00)',
+    'hsla(54, 71%, 92%, 1.00)',
+    'hsla(9, 54%, 95%, 1.00)'
 ];
-// Text/border colors are derived from the node colors for good contrast
-const TEXT_COLOR_PALETTE = [
-    '#bd4828ff', 
-    '#6aa210ff', 
-    '#bd780aff', 
-    '#1269b5ff', 
-    '#10a277ff', 
-    '#a91e4aff', 
-    '#861ea9ff', 
-    '#c1b010ff', 
-    '#b51222ff'];
+const L_TEXT_COLOR_PALETTE = [
+    'hsla(13, 65%, 45%, 1.00)',
+    'hsla(83, 82%, 35%, 1.00)',
+    'hsla(37, 90%, 39%, 1.00)',
+    'hsla(208, 82%, 39%, 1.00)',
+    'hsla(162, 82%, 35%, 1.00)',
+    'hsla(341, 70%, 39%, 1.00)',
+    'hsla(285, 70%, 39%, 1.00)',
+    'hsla(54, 85%, 41%, 1.00)',
+    'hsla(354, 82%, 39%, 1.00)'
+];
+
+// Dark Mode Color Palette
+const D_NODE_COLOR_PALETTE = [
+    'hsla(21, 20%, 22%, 1.00)',
+    'hsla(83, 20%, 22%, 1.00)',
+    'hsla(26, 20%, 22%, 1.00)',
+    'hsla(206, 20%, 22%, 1.00)',
+    'hsla(154, 20%, 22%, 1.00)',
+    'hsla(342, 20%, 22%, 1.00)',
+    'hsla(284, 20%, 22%, 1.00)',
+    'hsla(54, 20%, 22%, 1.00)',
+    'hsla(9, 20%, 25%, 1.00)'
+];
+const D_TEXT_COLOR_PALETTE = [
+    'hsla(13, 75%, 85%, 1.00)',
+    'hsla(83, 75%, 85%, 1.00)',
+    'hsla(37, 75%, 85%, 1.00)',
+    'hsla(208, 75%, 85%, 1.00)',
+    'hsla(162, 75%, 85%, 1.00)',
+    'hsla(341, 75%, 85%, 1.00)',
+    'hsla(285, 75%, 85%, 1.00)',
+    'hsla(54, 75%, 85%, 1.00)',
+    'hsla(354, 75%, 85%, 1.00)'
+];
+
+// Dynamically select palette based on dark mode media query
+const isDarkMode = () => {
+    // 1. Check for theme override from the app's theme toggle
+    const appTheme = document.documentElement.dataset.theme;
+    if (appTheme === 'dark') return true;
+    if (appTheme === 'light') return false;
+    // 2. Fallback to system preference
+    return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+};
+const getNodeColorPalette = () => isDarkMode() ? D_NODE_COLOR_PALETTE : L_NODE_COLOR_PALETTE;
+const getTextColorPalette = () => isDarkMode() ? D_TEXT_COLOR_PALETTE : L_TEXT_COLOR_PALETTE;
+
+
 // Optional initial pan offsets applied on first render/initialization
 const INITIAL_PAN_X_OFFSET = -400;
 const INITIAL_PAN_Y_OFFSET = 0;
@@ -89,6 +129,7 @@ let svg: SVGSVGElement;
 // Pan and Zoom State
 let scale = 1, panX = 0, panY = 0;
 let userHasInteracted = false; // Track if user has manually panned or zoomed
+let themeObserver: MutationObserver | null = null;
 // Mouse panning state
 let isPanning = false, startX = 0, startY = 0;
 // Touch gesture state
@@ -110,6 +151,20 @@ function hexToRgb(hex: string): RgbColor {
         b = parseInt(hex.slice(5, 7), 16);
     }
     return { r, g, b };
+}
+
+function colorToRgb(color: string): RgbColor {
+    if (!color) return { r: 0, g: 0, b: 0 };
+    if (color.startsWith('#')) return hexToRgb(color);
+    if (color.startsWith('hsl')) {
+        const match = color.match(/hsla?\((\d+),\s*([\d.]+)%,\s*([\d.]+)%/);
+        if (!match) return { r: 0, g: 0, b: 0 };
+        const h = parseInt(match[1], 10) / 360;
+        const s = parseFloat(match[2]) / 100;
+        const l = parseFloat(match[3]) / 100;
+        return hslToRgb(h, s, l);
+    }
+    return { r: 0, g: 0, b: 0 };
 }
 
 function rgbToHex(r: number, g: number, b: number): string {
@@ -157,7 +212,7 @@ function hslToRgb(h: number, s: number, l: number): RgbColor {
 }
 
 function varyHue(color: string, amount: number): string {
-    const { r, g, b } = hexToRgb(color);
+    const { r, g, b } = colorToRgb(color);
     let { h, s, l } = rgbToHsl(r, g, b);
     h = (h + amount + 1) % 1;
     const { r: newR, g: newG, b: newB } = hslToRgb(h, s, l);
@@ -166,7 +221,7 @@ function varyHue(color: string, amount: number): string {
 
 function darkenColor(color: string, percent: number): string {
     if (!color) return '#000000';
-    let { r, g, b } = hexToRgb(color);
+    let { r, g, b } = colorToRgb(color);
     const amount = 1 - percent / 100;
     r = Math.floor(r * amount);
     g = Math.floor(g * amount);
@@ -176,7 +231,7 @@ function darkenColor(color: string, percent: number): string {
 
 function saturateColor(color: string, percent: number): string {
     if (!color) return '#000000';
-    let { r, g, b } = hexToRgb(color);
+    let { r, g, b } = colorToRgb(color);
     let { h, s, l } = rgbToHsl(r, g, b);
     s = Math.min(1, s * (1 + percent / 100));
     const { r: newR, g: newG, b: newB } = hslToRgb(h, s, l);
@@ -241,10 +296,11 @@ function parseMarkmap(markdown: string): MindMapNode {
         rootText = lines[h1Index].trim().substring(2);
         lines.splice(h1Index, 1);
     }
-    const rootBaseColor = '#dfecf6ff';
+    const rootBaseColor = isDarkMode() ? '#2d3748' : '#dfecf6ff';
+    const rootTextColor = isDarkMode() ? 'hsla(208, 82%, 85%, 1.00)' : 'hsla(208, 82%, 39%, 1.00)';
     const root: MindMapNode = {
         id: 'node-0', text: rootText, html: renderMarkdownToHTML(rootText),
-        children: [], level: 0, isRoot: true, color: rootBaseColor, textColor: TEXT_COLOR_PALETTE[3], parent: null,
+        children: [], level: 0, isRoot: true, color: rootBaseColor, textColor: rootTextColor, parent: null,
         width: 0, height: 0, x: 0, y: 0
     };
     const parentStack = [root];
@@ -287,6 +343,8 @@ function parseMarkmap(markdown: string): MindMapNode {
         let nodeColor: string | null;
         let nodeTextColor: string | null;
         if (parent.isRoot) {
+            const NODE_COLOR_PALETTE = getNodeColorPalette();
+            const TEXT_COLOR_PALETTE = getTextColorPalette();
             const idx = colorIndex++ % NODE_COLOR_PALETTE.length;
             nodeColor = NODE_COLOR_PALETTE[idx];
             nodeTextColor = TEXT_COLOR_PALETTE[idx] ?? darkenColor(nodeColor, 70);
@@ -660,6 +718,14 @@ function handleWheel(e: WheelEvent) {
     applyTransform();
 }
 
+function handleDarkModeChange() {
+    // Rerender only if theme is 'system'
+    const appTheme = document.documentElement.dataset.theme;
+    if (appTheme === 'system' || !appTheme) {
+        rerenderMindMap();
+    }
+}
+
 function handleMouseDown(e: MouseEvent) {
     if ((e.target as HTMLElement).closest('.mindmap-node')) return;
     e.preventDefault();
@@ -795,6 +861,17 @@ export function initializeMindMap(
             viewport.addEventListener('touchstart', handleTouchStart, { passive: false });
             viewport.addEventListener('touchmove', handleTouchMove, { passive: false });
             window.addEventListener('touchend', handleTouchEnd);
+            // Listen for dark mode changes
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', handleDarkModeChange);
+
+            // Observe data-theme attribute changes on <html> to react to theme toggle
+            themeObserver = new MutationObserver(() => {
+                rerenderMindMap();
+            });
+            themeObserver.observe(document.documentElement, {
+                attributes: true,
+                attributeFilter: ['data-theme', 'class'] 
+            });
         }
 
     } catch (error) {
@@ -836,6 +913,11 @@ export function cleanup() {
     window.removeEventListener('mouseup', handleMouseUp);
     window.removeEventListener('mousemove', handleMouseMove);
     window.removeEventListener('touchend', handleTouchEnd);
+    window.matchMedia('(prefers-color-scheme: dark)').removeEventListener('change', handleDarkModeChange);
+    if (themeObserver) {
+        themeObserver.disconnect();
+        themeObserver = null;
+    }
 }
 
 /**
