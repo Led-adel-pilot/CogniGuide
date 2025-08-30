@@ -44,7 +44,7 @@ CogniGuide comprehensive AI-powered study assistant. It uses an LLM to convert t
         - Only re-processes when the file set actually changes (files added/removed/modified)
         - Automatically cleans up old cache entries (keeps last 10) to prevent memory issues
         - Includes development-mode debug logging for production troubleshooting
-        - Includes client-side file size validation (4.2 MB per file limit) to prevent server 413 errors
+        - Includes client-side file size validation (25 MB per file limit when using Supabase Storage) to prevent server 413 errors
         - Instantly serves cached results for identical file combinations, enabling immediate generation after clicking Generate
  *   **Mind Map Rendering:** The application uses a custom Markmap-like renderer implemented in `lib/markmap-renderer.ts` (and embedded within `components/MindMapModal.tsx` for HTML export). This renderer handles parsing markdown, measuring node sizes, laying out the tree, and drawing SVG connectors and HTML nodes. It includes logic for color variations, node collapsing/expanding, and pan/zoom functionality. It now features an intelligent **auto-fit-to-view** that centers and scales the mind map to be fully visible on initial load and during streaming. This behavior stops once the user interacts with the map.
     *   **Touch Support:** The renderer now includes comprehensive touch event handling for mobile devices, enabling single-finger panning and two-finger pinch-to-zoom gestures for intuitive navigation.
@@ -231,7 +231,7 @@ For consistent branding across the application, use the `CogniGuide_logo.png` fi
     - Provides character count for credit calculation
     - **Smart Caching Integration:** Frontend implements robust file set caching with content-based hashing to avoid redundant API calls. Files are pre-processed immediately upon upload and cached for 5 minutes. Ensures consistent caching across different environments (localhost/production) and browsers. Only processes when file combinations actually change, significantly improving performance for iterative workflows. Includes development-mode debug logging for production troubleshooting.
     - **Large File Support:** JSON mode also accepts Supabase Storage object paths (see below) to handle large uploads beyond Vercel limits
-    - **File Size Validation:** Client-side validation allows up to 50 MB per file when using Supabase Storage
+    - **File Size Validation:** Client-side validation allows up to 25 MB per file when using Supabase Storage
 
 #### Storage Upload API (`app/api/storage/get-signed-uploads/route.ts`)
 *   Purpose: Generate signed upload URLs for each file so the browser uploads directly to Supabase Storage (private `uploads` bucket), avoiding Vercel's ~4.5 MB request limit
