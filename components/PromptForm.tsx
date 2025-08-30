@@ -15,6 +15,7 @@ interface PromptFormProps {
   ctaLabel?: string;
   mode?: 'mindmap' | 'flashcards';
   onInteract?: () => void;
+  previewLoading?: boolean;
 }
 
 export default function PromptForm({
@@ -27,6 +28,7 @@ export default function PromptForm({
   ctaLabel,
   mode = 'mindmap',
   onInteract,
+  previewLoading = false,
 }: PromptFormProps) {
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const formRef = useRef<HTMLFormElement | null>(null);
@@ -130,12 +132,14 @@ export default function PromptForm({
       <button
         type="submit"
         disabled={disabled || (filesLength === 0 && prompt.trim().length === 0)}
-        className="flex-shrink-0 inline-flex items-center justify-center w-10 h-10 text-white bg-primary rounded-full shadow hover:bg-primary/90 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+        className={`flex-shrink-0 inline-flex items-center justify-center w-10 h-10 text-white bg-primary rounded-full shadow hover:bg-primary/90 transition-all duration-300 disabled:opacity-60 disabled:cursor-not-allowed relative overflow-hidden ${
+          previewLoading && !isLoading ? 'button-attention' : ''
+        }`}
         aria-label={ctaLabel ?? 'Send prompt'}
       >
         {isLoading ? (
           <svg
-            className="animate-spin h-4 w-4"
+            className="animate-spin h-4 w-4 relative z-10"
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
             viewBox="0 0 24 24"
@@ -157,7 +161,7 @@ export default function PromptForm({
             ></path>
           </svg>
         ) : (
-          <Send className="h-4 w-4" />
+          <Send className="h-4 w-4 relative z-10" />
         )}
       </button>
     </form>

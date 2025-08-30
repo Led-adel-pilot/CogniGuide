@@ -45,6 +45,7 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
   const [authChecked, setAuthChecked] = useState(false);
   const [freeGenerationsLeft, setFreeGenerationsLeft] = useState<number>(NON_AUTH_FREE_LIMIT);
   const [allowedNameSizes, setAllowedNameSizes] = useState<{ name: string; size: number }[] | undefined>(undefined);
+  const [previewLoading, setPreviewLoading] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -78,6 +79,16 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
     });
     return () => { sub.subscription.unsubscribe(); };
   }, [router, redirectOnAuth]);
+
+  // Effect to handle preview animation for non-auth users
+  useEffect(() => {
+    if (!isAuthed && authChecked) {
+      const hasInput = files.length > 0 || prompt.trim().length > 0;
+      setPreviewLoading(hasInput && !isLoading && !isPreParsing);
+    } else {
+      setPreviewLoading(false);
+    }
+  }, [isAuthed, authChecked, files.length, prompt, isLoading, isPreParsing]);
 
   // Helper function to generate a unique key for a file
   const getFileKey = useCallback(async (file: File): Promise<string> => {
@@ -708,6 +719,7 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
                 filesLength={files.length}
                 ctaLabel={mode==='flashcards' ? 'Generate Flashcards' : 'Generate Mind Map'}
                 mode={mode}
+                previewLoading={previewLoading}
                 onInteract={() => {
                   if (!authChecked) return;
                   if (!isAuthed && freeGenerationsLeft <= 0) setShowAuth(true);
