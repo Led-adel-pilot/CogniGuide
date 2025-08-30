@@ -33,7 +33,7 @@ CogniGuide comprehensive AI-powered study assistant. It uses an LLM to convert t
     *   **Non-authenticated users**: 1 credit worth (3,800 characters)
     *   **Free plan users**: 5 credits worth (19,000 characters)
     *   **Paid plan users**: 30 credits worth (114,000 characters)
-    Content exceeding tier limits is truncated at word boundaries with a message indicating the user should sign up or upgrade for unlimited access.
+    Content exceeding tier limits is truncated at word boundaries with a message indicating the user should sign up or upgrade for more access.
     *   **Performance Optimization**: User tier information is cached in memory for 5 minutes to avoid repeated database queries, ensuring fast response times for logged-in users.
 *   **Credit Loading Optimization**: Instant credit balance display with localStorage caching (5-minute expiration) and parallel loading eliminates sequential API calls and the brief "0.0" flash during dashboard refresh.
     *   **Smart File Processing Cache**: The frontend implements intelligent file set caching and immediate pre-processing to prevent redundant document processing and eliminate generation wait times. When users upload multiple files, the system:

@@ -317,11 +317,11 @@ export default function PricingClient({ onPurchaseComplete }: PricingClientProps
       <div className="container">
         {/* Billing cycle toggle */}
         <div className="flex items-center justify-center mb-6">
-          <div className="inline-flex items-center bg-gray-100 rounded-full p-1">
+          <div className="inline-flex items-center billing-toggle-bg rounded-full p-1">
             <button
               type="button"
-              className={`px-4 py-2 text-sm rounded-full ${
-                billingCycle === 'month' ? 'bg-background shadow' : ''
+              className={`px-4 py-2 text-sm rounded-full billing-toggle-button ${
+                billingCycle === 'month' ? 'billing-toggle-active' : ''
               }`}
               onClick={() => setBillingCycle('month')}
             >
@@ -329,8 +329,8 @@ export default function PricingClient({ onPurchaseComplete }: PricingClientProps
             </button>
             <button
               type="button"
-              className={`px-4 py-2 text-sm rounded-full ${
-                billingCycle === 'year' ? 'bg-background shadow' : ''
+              className={`px-4 py-2 text-sm rounded-full billing-toggle-button ${
+                billingCycle === 'year' ? 'billing-toggle-active' : ''
               }`}
               onClick={() => setBillingCycle('year')}
             >

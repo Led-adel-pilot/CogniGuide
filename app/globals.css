@@ -53,6 +53,16 @@
   .upgrade-plan-btn:hover {
     background-color: rgba(37, 99, 235, 0.5); /* slightly lighter dark blue on hover */
   }
+
+  /* Dark mode billing toggle overrides */
+  .billing-toggle-bg {
+    background-color: var(--color-muted); /* Dark mode: use muted background */
+  }
+
+  .billing-toggle-active {
+    background-color: var(--color-background);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3); /* Slightly stronger shadow for dark mode */
+  }
 }
 
 @layer base {
@@ -271,6 +281,22 @@
       opacity: 0.6;
       transform: translateX(100%);
     }
+  }
+
+  /* Billing Toggle Styles */
+  .billing-toggle-bg {
+    background-color: #f3f4f6; /* Light mode: gray-100 equivalent */
+  }
+
+  .billing-toggle-button {
+    color: var(--color-foreground);
+    transition: all 0.2s ease;
+  }
+
+  .billing-toggle-active {
+    background-color: var(--color-background);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    color: var(--color-foreground);
   }
 }
 
