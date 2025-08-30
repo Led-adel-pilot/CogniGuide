@@ -673,14 +673,14 @@ export default function Generator({ redirectOnAuth = false, showTitle = true }: 
                       posthog.capture('generation_mode_changed', { new_mode: 'mindmap' });
                       setMode('mindmap');
                     }}
-                    className={`px-4 py-1.5 text-sm font-semibold rounded-full transition-colors ${mode==='mindmap' ? 'bg-white text-primary shadow' : 'text-muted-foreground hover:text-primary'}`}
+                    className={`px-4 py-1.5 text-sm font-semibold rounded-full transition-colors ${mode==='mindmap' ? 'bg-background text-primary shadow' : 'text-muted-foreground hover:text-primary'}`}
                   >Mind Map</button>
                   <button
                     onClick={() => {
                       posthog.capture('generation_mode_changed', { new_mode: 'flashcards' });
                       setMode('flashcards');
                     }}
-                    className={`px-4 py-1.5 text-sm font-semibold rounded-full transition-colors ${mode==='flashcards' ? 'bg-white text-primary shadow' : 'text-muted-foreground hover:text-primary'}`}
+                    className={`px-4 py-1.5 text-sm font-semibold rounded-full transition-colors ${mode==='flashcards' ? 'bg-background text-primary shadow' : 'text-muted-foreground hover:text-primary'}`}
                   >Flashcards</button>
                 </div>
               </div>
@@ -713,7 +713,7 @@ export default function Generator({ redirectOnAuth = false, showTitle = true }: 
                 }}
               />                  
               {error && (
-                <div className="mt-4 text-center p-4 bg-blue-50 border border-blue-200 text-blue-700 rounded-[1.25rem]">
+                <div className="mt-4 text-center p-4 bg-muted border border-border text-foreground rounded-[1.25rem]">
                   <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
                     {typeof error === 'string' && error.toLowerCase().includes('insufficient credits') && (
                       <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
@@ -721,7 +721,7 @@ export default function Generator({ redirectOnAuth = false, showTitle = true }: 
                         <button
                           type="button"
                           onClick={handleUpgradeClick}
-                          className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-full bg-blue-100/50 text-blue-700 hover:bg-blue-200/50 border border-blue-200 transition-colors"
+                          className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-full bg-primary/10 text-primary hover:bg-primary/20 border border-primary/20 transition-colors"
                         >
                           <Sparkles className="h-4 w-4" />
                           <span>Upload your Plan</span>
@@ -735,7 +735,7 @@ export default function Generator({ redirectOnAuth = false, showTitle = true }: 
                           <button
                             type="button"
                             onClick={() => setShowAuth(true)}
-                            className="underline hover:no-underline font-semibold"
+                            className="underline hover:no-underline font-semibold text-primary"
                           >
                             sign up
                           </button>{' '}
@@ -745,7 +745,7 @@ export default function Generator({ redirectOnAuth = false, showTitle = true }: 
                           <button
                             type="button"
                             onClick={() => setShowAuth(true)}
-                            className="underline hover:no-underline font-semibold"
+                            className="underline hover:no-underline font-semibold text-primary"
                           >
                             sign up
                           </button>{' '}
@@ -767,13 +767,13 @@ export default function Generator({ redirectOnAuth = false, showTitle = true }: 
               )}
 
               {!isAuthed && freeGenerationsLeft > 0 && freeGenerationsLeft < NON_AUTH_FREE_LIMIT && (
-                <div className="mt-4 text-center p-3 bg-green-50 border border-green-200 text-green-700 rounded-[1.25rem]">
+                <div className="mt-4 text-center p-3 bg-muted border border-border text-foreground rounded-[1.25rem]">
                   <p className="text-sm font-medium">
                     {freeGenerationsLeft} no-signup {freeGenerationsLeft === 1 ? 'generation' : 'generations'} remaining.{' '}
                     <button
                       type="button"
                       onClick={() => setShowAuth(true)}
-                      className="underline hover:no-underline font-semibold"
+                      className="underline hover:no-underline font-semibold text-primary"
                     >
                       Sign up
                     </button>{' '}
@@ -783,13 +783,13 @@ export default function Generator({ redirectOnAuth = false, showTitle = true }: 
               )}
 
               {!isAuthed && freeGenerationsLeft === NON_AUTH_FREE_LIMIT && (files.length > 0 || prompt.trim()) && (
-                <div className="mt-4 text-center p-3 bg-blue-50 border border-blue-200 text-blue-700 rounded-[1.25rem]">
+                <div className="mt-4 text-center p-3 bg-muted border border-border text-foreground rounded-[1.25rem]">
                   <p className="text-sm font-medium">
                     You have {NON_AUTH_FREE_LIMIT} no-signup generations!{' '}
                     <button
                       type="button"
                       onClick={() => setShowAuth(true)}
-                      className="underline hover:no-underline font-semibold"
+                      className="underline hover:no-underline font-semibold text-primary"
                     >
                       Sign up
                     </button>{' '}

@@ -279,12 +279,16 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
   const hasCards = Boolean(cards && cards.length > 0);
 
   const ModalContent = () => (
-    <div className="relative bg-white w-full h-full rounded-[1.5rem] border border-gray-200 ring-1 ring-black/5 shadow-2xl flex flex-col overflow-hidden">
+    <div className={`relative w-full h-full rounded-[1.5rem] flex flex-col overflow-hidden ${
+      isEmbedded
+        ? '!bg-transparent !border-0 !ring-0 !shadow-none'
+        : 'bg-background border border-gray-200 dark:border-gray-600 ring-1 ring-black/5 dark:ring-white/10 shadow-2xl'
+    }`}>
       {!isEmbedded && (
         <div className="absolute top-2 right-2 z-30">
           <button
             onClick={handleClose}
-            className="inline-flex items-center justify-center w-8 h-8 bg-white text-gray-700 rounded-full border border-gray-300 shadow-sm hover:bg-gray-100 focus:outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400/50"
+            className="inline-flex items-center justify-center w-8 h-8 bg-background text-foreground rounded-full border border-gray-300 dark:border-gray-600 shadow-sm hover:bg-muted/50 dark:hover:bg-muted/80 focus:outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400/50"
             aria-label="Close"
           >
             <X className="h-4 w-4" />
@@ -292,27 +296,27 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
         </div>
       )}
 
-      <div className="w-full h-full grid grid-rows-[auto,1fr,auto] bg-white p-4 sm:p-6">
+      <div className="w-full h-full grid grid-rows-[auto,1fr,auto] bg-background p-4 sm:p-6">
         <div className="w-full max-w-5xl mx-auto grid grid-cols-1 sm:grid-cols-3 items-center gap-2 sm:gap-3">
-          <div className="text-center sm:text-left text-sm font-medium truncate bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-emerald-600">{title || 'Flashcards'}</div>
+          <div className="text-center sm:text-left text-sm font-medium truncate text-foreground">{title || 'Flashcards'}</div>
           <div className="justify-self-center sm:justify-self-end">
             {hasCards && (
               <label className="inline-flex items-center gap-2 text-sm">
-                <span className="text-gray-700 font-medium">Exam date</span>
+                <span className="text-foreground font-medium">Exam date</span>
                 <input
                   type="date"
-                  className="h-7 px-2 py-1 text-xs font-semibold rounded-md border border-gray-200 bg-white text-gray-800 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-indigo-400/50 focus-visible:border-indigo-300 hover:border-gray-300 transition-colors"
+                  className="h-7 px-2 py-1 text-xs font-semibold rounded-md border border-gray-200 bg-background text-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-indigo-400/50 focus-visible:border-indigo-300 hover:border-gray-300 transition-colors"
                   value={deckExamDate}
                   onChange={(e) => handleSetDeckExamDate(e.target.value)}
                 />
               </label>
             )}
           </div>
-          <div className="text-sm text-gray-600 text-center">{hasCards ? (finished ? 'Completed' : `${index + 1} / ${cards!.length}`) : ''}</div>
+          <div className="text-sm text-muted-foreground text-center">{hasCards ? (finished ? 'Completed' : `${index + 1} / ${cards!.length}`) : ''}</div>
         </div>
         {hasCards ? (
           <div className="w-full max-w-5xl mx-auto mt-2">
-            <div className="h-1.5 rounded-full bg-gray-100 overflow-hidden">
+            <div className="h-1.5 rounded-full bg-muted overflow-hidden">
               <div
                 className="h-full bg-gradient-to-r from-indigo-500 via-sky-500 to-emerald-500"
                 style={{ width: `${finished ? 100 : ((index + 1) / cards!.length) * 100}%` }}
@@ -325,7 +329,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
           {error ? (
             <div className="w-full text-sm text-red-600">{error}</div>
           ) : !hasCards ? (
-            <div className="flex items-center gap-2 text-gray-600">
+            <div className="flex items-center gap-2 text-muted-foreground">
               <Loader2 className="h-5 w-5 animate-spin" />
               {isGenerating ? 'Generating flashcards…' : 'No flashcards yet'}
             </div>
@@ -333,12 +337,12 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
             <div className="w-full">
               {userId || deckId ? (
                 <div className="relative mx-auto rounded-[1.35rem] p-[1.5px] bg-gradient-to-br from-emerald-200 via-teal-200 to-green-200">
-                  <div className="bg-white border border-gray-200 rounded-[1.25rem] shadow p-8 sm:p-10 min-h-[200px] sm:min-h-[250px] flex flex-col items-center justify-center text-center">
+                  <div className="bg-background border border-gray-200 rounded-[1.25rem] shadow p-8 sm:p-10 min-h-[200px] sm:min-h-[250px] flex flex-col items-center justify-center text-center">
                     <div className="text-4xl mb-4">🎉</div>
-                    <div className="text-gray-900 text-xl sm:text-2xl font-bold leading-7 sm:leading-8 mb-4">
+                    <div className="text-foreground text-xl sm:text-2xl font-bold leading-7 sm:leading-8 mb-4">
                       Congratulations!
                     </div>
-                    <div className="text-gray-700 text-sm sm:text-base leading-6 max-w-md">
+                    <div className="text-foreground text-sm sm:text-base leading-6 max-w-md">
                       You have finished this deck for now. For best results with spaced repetition, be sure to come back for future review sessions.
                     </div>
                     <button
@@ -358,8 +362,8 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
                 </div>
               ) : isEmbedded ? (
                 <div className="relative mx-auto rounded-[1.35rem] p-[1.5px] bg-gradient-to-br from-indigo-200 via-sky-200 to-emerald-200">
-                  <div className="bg-white border border-gray-200 rounded-[1.25rem] shadow p-8 sm:p-10 min-h-[200px] sm:min-h-[250px] flex flex-col items-center justify-center text-center">
-                    <h2 className="text-2xl font-bold mb-4">Ready to study smarter?</h2>
+                  <div className="bg-background border border-gray-200 rounded-[1.25rem] shadow p-8 sm:p-10 min-h-[200px] sm:min-h-[250px] flex flex-col items-center justify-center text-center">
+                    <h2 className="text-foreground text-2xl font-bold mb-4">Ready to study smarter?</h2>
                     <p className="text-muted-foreground mb-6 max-w-md">
                       You've seen how effective flashcards can be. Create your own study set from your course materials in seconds.
                     </p>
@@ -381,7 +385,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
                           setPredictedDueByGrade({});
                           setPredictedDueDatesByGrade({});
                         }}
-                        className="flex-1 h-10 px-6 text-base font-medium text-gray-600 bg-gray-100 rounded-full hover:bg-gray-200 transition-colors"
+                        className="flex-1 h-10 px-6 text-base font-medium text-muted-foreground bg-muted rounded-full hover:bg-muted/70 transition-colors"
                       >
                         Review Sample
                       </button>
@@ -390,8 +394,8 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
                 </div>
               ) : (
                 <div className="relative mx-auto rounded-[1.35rem] p-[1.5px] bg-gradient-to-br from-indigo-200 via-sky-200 to-emerald-200">
-                  <div className="bg-white border border-gray-200 rounded-[1.25rem] shadow p-8 sm:p-10 min-h-[200px] sm:min-h-[250px] flex flex-col items-center justify-center text-center">
-                    <h2 className="text-2xl font-bold mb-4">🎉 Great job! Don't lose your progress!</h2>
+                  <div className="bg-background border border-gray-200 rounded-[1.25rem] shadow p-8 sm:p-10 min-h-[200px] sm:min-h-[250px] flex flex-col items-center justify-center text-center">
+                    <h2 className="text-foreground text-2xl font-bold mb-4">🎉 Great job! Don't lose your progress!</h2>
                     <p className="text-muted-foreground mb-6 max-w-md">
                       Sign up to save this flashcard deck and track your study progress with spaced repetition.
                     </p>
@@ -417,7 +421,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
                           setPredictedDueByGrade({});
                           setPredictedDueDatesByGrade({});
                         }}
-                        className="flex-1 h-10 px-6 text-base font-medium text-gray-600 bg-gray-100 rounded-full hover:bg-gray-200 transition-colors"
+                        className="flex-1 h-10 px-6 text-base font-medium text-muted-foreground bg-muted rounded-full hover:bg-muted/70 transition-colors"
                       >
                         Start Over
                       </button>
@@ -429,11 +433,11 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
           ) : (
             <div className="w-full">
               <div className="relative mx-auto rounded-[1.35rem] p-[1.5px] bg-gradient-to-br from-indigo-200 via-sky-200 to-emerald-200">
-                <div className="bg-white border border-gray-200 rounded-[1.25rem] shadow p-5 sm:p-6 min-h-[180px] sm:min-h-[200px]">
-                  <div className="text-gray-900 text-xl sm:text-2xl font-semibold leading-7 sm:leading-8 break-words">{cards![index]?.question}</div>
-                  <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-gray-600">
+                <div className="bg-background border border-gray-200 rounded-[1.25rem] shadow p-5 sm:p-6 min-h-[180px] sm:min-h-[200px]">
+                  <div className="text-foreground text-xl sm:text-2xl font-semibold leading-7 sm:leading-8 break-words">{cards![index]?.question}</div>
+                  <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
                     {showAnswer && current?.schedule?.due ? (
-                      <span className="inline-flex items-center h-6 px-2.5 rounded-full bg-sky-50 text-sky-700 border border-sky-200">
+                      <span className="inline-flex items-center h-6 px-2.5 rounded-full bg-sky-50 dark:bg-sky-900/30 text-sky-700 dark:text-sky-300 border border-sky-200 dark:border-sky-800">
                         {hoveredGrade && predictedDueDatesByGrade[hoveredGrade]
                           ? `Next due: ${predictedDueDatesByGrade[hoveredGrade].toLocaleDateString()} ${predictedDueDatesByGrade[hoveredGrade].toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`
                           : `Was due: ${new Date(current.schedule.due).toLocaleDateString()} ${new Date(current.schedule.due).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`
@@ -442,9 +446,9 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
                     ) : null}
                   </div>
                   {showAnswer && (
-                    <div className="mt-4 text-gray-700">
-                      <div className="h-px bg-gray-200 mb-4" />
-                      <div className="max-h-[45vh] overflow-y-auto text-sm text-gray-700">
+                    <div className="mt-4 text-foreground">
+                      <div className="h-px bg-border mb-4" />
+                      <div className="max-h-[45vh] overflow-y-auto text-sm text-foreground">
                         <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
                           {cards![index]?.answer || ''}
                         </ReactMarkdown>
@@ -464,7 +468,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
               <div className="justify-self-start">
                 <button
                   onClick={() => { if (!cards) return; setIndex(getPrevIndex()); setShowAnswer(false); setHoveredGrade(null); setPredictedDueByGrade({}); setPredictedDueDatesByGrade({}); }}
-                  className="inline-flex items-center justify-center h-10 w-10 sm:w-auto sm:px-4 rounded-full border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400/50"
+                  className="inline-flex items-center justify-center h-10 w-10 sm:w-auto sm:px-4 rounded-full border border-gray-300 dark:border-gray-600 bg-background text-foreground hover:bg-muted/50 dark:hover:bg-muted/80 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400/50"
                 >
                   <ChevronLeft className="h-5 w-5 sm:mr-2" />
                   <span className="hidden sm:inline">Prev</span>
@@ -475,45 +479,45 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
               {showAnswer ? (
                 <div className="flex items-end justify-center gap-3 flex-nowrap">
                   <div className="flex flex-col items-center">
-                    <span className="text-[11px] text-gray-500 h-4">{predictedDueByGrade[1] || ''}</span>
+                    <span className="text-[11px] text-gray-500 dark:text-gray-400 h-4">{predictedDueByGrade[1] || ''}</span>
                     <button
                       onClick={() => handleGrade(1)}
                       onMouseEnter={() => setHoveredGrade(1)}
                       onMouseLeave={() => setHoveredGrade(null)}
-                      className="h-9 px-3 text-xs rounded-full border border-red-200 bg-red-50 text-red-700 hover:bg-red-100 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-300/50"
+                      className="h-9 px-3 text-xs rounded-full border border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-300 hover:bg-red-100 dark:hover:bg-red-900/50 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-300/50"
                     >
                       Again
                     </button>
                   </div>
                   <div className="flex flex-col items-center">
-                    <span className="text-[11px] text-gray-500 h-4">{predictedDueByGrade[2] || ''}</span>
+                    <span className="text-[11px] text-gray-500 dark:text-gray-400 h-4">{predictedDueByGrade[2] || ''}</span>
                     <button
                       onClick={() => handleGrade(2)}
                       onMouseEnter={() => setHoveredGrade(2)}
                       onMouseLeave={() => setHoveredGrade(null)}
-                      className="h-9 px-3 text-xs rounded-full border border-amber-200 bg-amber-50 text-amber-700 hover:bg-amber-100 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-300/50"
+                      className="h-9 px-3 text-xs rounded-full border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 hover:bg-amber-100 dark:hover:bg-amber-900/50 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-300/50"
                     >
                       Hard
                     </button>
                   </div>
                   <div className="flex flex-col items-center">
-                    <span className="text-[11px] text-gray-500 h-4">{predictedDueByGrade[3] || ''}</span>
+                    <span className="text-[11px] text-gray-500 dark:text-gray-400 h-4">{predictedDueByGrade[3] || ''}</span>
                     <button
                       onClick={() => handleGrade(3)}
                       onMouseEnter={() => setHoveredGrade(3)}
                       onMouseLeave={() => setHoveredGrade(null)}
-                      className="h-9 px-3 text-xs rounded-full border border-sky-200 bg-sky-50 text-sky-700 hover:bg-sky-100 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-300/50"
+                      className="h-9 px-3 text-xs rounded-full border border-sky-200 dark:border-sky-800 bg-sky-50 dark:bg-sky-900/30 text-sky-700 dark:text-sky-300 hover:bg-sky-100 dark:hover:bg-sky-900/50 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-300/50"
                     >
                       Good
                     </button>
                   </div>
                   <div className="flex flex-col items-center">
-                    <span className="text-[11px] text-gray-500 h-4">{predictedDueByGrade[4] || ''}</span>
+                    <span className="text-[11px] text-gray-500 dark:text-gray-400 h-4">{predictedDueByGrade[4] || ''}</span>
                     <button
                       onClick={() => handleGrade(4)}
                       onMouseEnter={() => setHoveredGrade(4)}
                       onMouseLeave={() => setHoveredGrade(null)}
-                      className="h-9 px-3 text-xs rounded-full border border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/50"
+                      className="h-9 px-3 text-xs rounded-full border border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/50"
                     >
                       Easy
                     </button>
@@ -536,7 +540,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
               <div className="justify-self-end">
                 <button
                   onClick={() => { if (!cards) return; setIndex(getNextIndex()); setShowAnswer(false); setHoveredGrade(null); setPredictedDueByGrade({}); setPredictedDueDatesByGrade({}); }}
-                  className="inline-flex items-center justify-center h-10 w-10 sm:w-auto sm:px-4 rounded-full border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400/50"
+                  className="inline-flex items-center justify-center h-10 w-10 sm:w-auto sm:px-4 rounded-full border border-gray-300 dark:border-gray-600 bg-background text-foreground hover:bg-muted/50 dark:hover:bg-muted/80 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400/50"
                 >
                   <span className="hidden sm:inline">Next</span>
                   <ChevronRight className="h-5 w-5 sm:ml-2" />
@@ -561,12 +565,14 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
       <ModalContent />
       {showLossAversionPopup && (
         <div className="absolute inset-0 flex items-center justify-center z-[110]">
-          <div className="bg-white p-8 rounded-2xl shadow-xl max-w-md w-full text-center">
-            <h2 className="text-2xl font-bold mb-4">Don't Lose Your Progress!</h2>
+          {/* Black transparent background */}
+          <div className="absolute inset-0 bg-black/40 dark:bg-black/60 z-0"></div>
+          <div className="bg-background border p-8 rounded-2xl shadow-xl max-w-md w-full text-center relative z-10">
+            <h2 className="text-foreground text-2xl font-bold mb-4">Don't Lose Your Progress!</h2>
             <p className="text-muted-foreground mb-6">
               Sign up to save this deck and track your study progress with spaced repetition.
             </p>
-            <div className="grid grid-cols-2 gap-3 w-full max-w-md">
+            <div className="flex flex-col gap-3 w-full max-w-md">
               <button
                 onClick={() => {
                   if (title && cards) {
@@ -576,13 +582,13 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
                   setShowLossAversionPopup(false);
                   setShowAuthModal(true);
                 }}
-                className="inline-flex items-center justify-center min-w-0 h-10 px-6 text-sm font-bold text-white bg-gradient-primary rounded-full hover:bg-gradient-primary-hover transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/50 whitespace-nowrap"
+                className="w-full h-10 px-6 text-sm font-bold text-white bg-gradient-primary rounded-full hover:bg-gradient-primary-hover transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/50 whitespace-nowrap"
               >
                 Save & Continue
               </button>
               <button
                 onClick={onClose}
-                className="inline-flex items-center justify-center min-w-0 h-10 px-6 text-sm font-medium text-gray-600 bg-gray-100 rounded-full hover:bg-gray-200 transition-colors whitespace-nowrap"
+                className="w-full h-10 px-6 text-sm font-medium text-muted-foreground bg-muted rounded-full hover:bg-muted/70 transition-colors whitespace-nowrap"
               >
                 Continue without saving
               </button>

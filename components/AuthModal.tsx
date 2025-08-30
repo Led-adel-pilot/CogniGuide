@@ -66,16 +66,16 @@ export default function AuthModal({ open, onClose }: AuthModalProps) {
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/50">
-      <div className="bg-white w-full max-w-md rounded-[1.5rem] shadow-2xl p-6 relative">
-        <button onClick={onClose} className="absolute top-3 right-3 w-10 h-10 inline-flex items-center justify-center rounded-full border hover:bg-gray-50">
+    <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/40 dark:bg-black/60">
+      <div className="bg-background border w-full max-w-md rounded-[1.5rem] shadow-2xl p-6 relative">
+        <button onClick={onClose} className="absolute top-3 right-3 w-10 h-10 inline-flex items-center justify-center rounded-full border hover:bg-muted/50">
           <X className="h-5 w-5" />
         </button>
         <h2 className="text-xl font-bold mb-2">Create a free account</h2>
-        <p className="text-sm text-gray-600 mb-4">Sign up to continue generating and save your history.</p>
+        <p className="text-sm text-muted-foreground mb-4">Sign up to continue generating and save your history.</p>
 
-        {message && <div className="mb-3 text-sm text-green-700 bg-green-50 border border-green-200 rounded p-2">{message}</div>}
-        {error && <div className="mb-3 text-sm text-red-700 bg-red-50 border border-red-200 rounded p-2">{error}</div>}
+        {message && <div className="mb-3 text-sm text-green-700 dark:text-green-400 bg-green-50 dark:bg-green-950/50 border border-green-200 dark:border-green-800 rounded p-2">{message}</div>}
+        {error && <div className="mb-3 text-sm text-red-700 dark:text-red-400 bg-red-50 dark:bg-red-950/50 border border-red-200 dark:border-red-800 rounded p-2">{error}</div>}
 
         <div className="space-y-3">
           <div className="flex gap-2">
@@ -97,20 +97,20 @@ export default function AuthModal({ open, onClose }: AuthModalProps) {
           </div>
 
           <div className="flex items-center gap-3">
-            <div className="flex-1 h-px bg-gray-200" />
-            <span className="text-xs text-gray-500">or</span>
-            <div className="flex-1 h-px bg-gray-200" />
+            <div className="flex-1 h-px bg-muted" />
+            <span className="text-xs text-muted-foreground">or</span>
+            <div className="flex-1 h-px bg-muted" />
           </div>
 
           <button
             onClick={handleGoogleSignIn}
-            className="w-full inline-flex items-center justify-center gap-2 px-5 py-2 border rounded-full hover:bg-gray-50"
+            className="w-full inline-flex items-center justify-center gap-2 px-5 py-2 border rounded-full hover:bg-muted/50"
           >
             <img alt="Google" src="https://www.google.com/favicon.ico" className="h-4 w-4" />
             <span>Continue with Google</span>
           </button>
 
-          <p className="text-xs text-gray-500 flex items-center gap-1 mt-2">
+          <p className="text-xs text-muted-foreground flex items-center gap-1 mt-2">
             <LogIn className="h-3 w-3" />
             Already have an account? Use the same options to sign in.
           </p>

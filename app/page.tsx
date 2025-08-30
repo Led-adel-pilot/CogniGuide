@@ -63,7 +63,7 @@ export default function Home() {
             <div className="flex items-center gap-2">
               {isAuthed ? (
                 <>
-                  <button onClick={() => router.push('/dashboard')} className="px-4 py-2 text-sm rounded-full border hover:bg-gray-50">Dashboard</button>
+                  <button onClick={() => router.push('/dashboard')} className="px-4 py-2 text-sm rounded-full border hover:bg-muted/50">Dashboard</button>
                 </>
               ) : (
                 <button onClick={() => setShowAuth(true)} className="px-4 py-2 text-sm rounded-full bg-primary text-white hover:bg-primary/90 transition-colors">Sign up</button>
@@ -79,7 +79,7 @@ export default function Home() {
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[40rem] h-[40rem] bg-primary/10 rounded-full blur-3xl -z-10"></div>
             <div className="container relative z-10">
               <h1 className="text-4xl md:text-6xl font-extrabold font-heading tracking-tighter mb-6 leading-tight">
-                Study Smarter, Not Harder.
+                Learn Faster. Remember More.<br />Ace Your Exams.
               </h1>
               <p className="max-w-3xl mx-auto text-lg md:text-xl text-muted-foreground mb-10">
                 Upload your PDFs, slides, or documents. Our AI creates clear mind maps and smart, spaced-repetition flashcards to help you learn 2x faster and ace your next test.
@@ -122,19 +122,19 @@ export default function Home() {
                   <div className="inline-flex p-1 rounded-full border bg-muted/50">
                     <button
                       onClick={() => setView('mindmap')}
-                      className={`px-4 py-1.5 text-sm font-semibold rounded-full transition-colors ${view === 'mindmap' ? 'bg-white text-primary shadow' : 'text-muted-foreground hover:text-primary'}`}
+                      className={`px-4 py-1.5 text-sm font-semibold rounded-full transition-colors ${view === 'mindmap' ? 'bg-background text-primary shadow' : 'text-muted-foreground hover:text-primary'}`}
                     >
                       Mind Map
                     </button>
                     <button
                       onClick={() => setView('flashcards')}
-                      className={`px-4 py-1.5 text-sm font-semibold rounded-full transition-colors ${view === 'flashcards' ? 'bg-white text-primary shadow' : 'text-muted-foreground hover:text-primary'}`}
+                      className={`px-4 py-1.5 text-sm font-semibold rounded-full transition-colors ${view === 'flashcards' ? 'bg-background text-primary shadow' : 'text-muted-foreground hover:text-primary'}`}
                     >
                       Flashcards
                     </button>
                   </div>
                 </div>
-                <div className="bg-white rounded-[2rem] border shadow-xl shadow-slate-200/50 overflow-hidden">
+                <div className="bg-background rounded-[2rem] border shadow-xl shadow-slate-200/50 dark:shadow-slate-700/50 overflow-hidden">
                   <div className={`w-full ${view === 'mindmap' ? 'h-[300px] md:h-[600px]' : 'h-[68vh] md:h-[600px]'}`}>
                     {view === 'mindmap' ? <InteractiveMindMap /> : <EmbeddedFlashcards />}
                   </div>

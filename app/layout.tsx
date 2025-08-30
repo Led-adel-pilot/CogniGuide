@@ -34,6 +34,24 @@ export default function RootLayout({
       <head>
         <link rel="icon" href="/favicon.ico" sizes="any" type="image/x-icon" />
         <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              try {
+                const savedTheme = localStorage.getItem('cogniguide_theme');
+                let theme = 'light';
+                if (savedTheme === 'dark') {
+                  theme = 'dark';
+                } else if (savedTheme === 'system' || !savedTheme) {
+                  if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                    theme = 'dark';
+                  }
+                }
+                document.documentElement.dataset.theme = theme;
+              } catch (e) {}
+            `,
+          }}
+        />
       </head>
       <body className={`${poppins.className} flex min-h-screen flex-col bg-background text-foreground`}>
         <main className="flex-1">{children}</main>

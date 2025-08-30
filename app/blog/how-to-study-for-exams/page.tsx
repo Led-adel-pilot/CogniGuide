@@ -8,7 +8,7 @@ export const metadata: Metadata = {
 
 export default function HowToStudyForExamsPage() {
   return (
-    <div className="bg-white text-gray-800 font-sans leading-relaxed min-h-screen">
+    <div className="bg-background text-foreground font-sans leading-relaxed min-h-screen">
       <div className="max-w-4xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
         <article className="prose lg:prose-lg xl:prose-xl max-w-none">
           <header className="text-center mb-12">

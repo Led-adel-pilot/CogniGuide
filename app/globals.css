@@ -16,6 +16,35 @@
   --font-heading: "Poppins", "sans-serif";
 }
 
+/* Dark mode overrides */
+[data-theme="dark"] {
+  /* Lighter dark theme (midnight slate) */
+  --color-background: oklch(20% 0.02 250);
+  --color-foreground: oklch(96% 0.01 240);
+  --color-primary: oklch(72% 0.19 260);
+  --color-primary-foreground: oklch(18% 0.01 250);
+  --color-secondary: oklch(28% 0.02 250);
+  --color-muted: oklch(30% 0.015 250);
+  --color-muted-foreground: oklch(80% 0.01 250);
+  --color-accent: oklch(35% 0.12 260);
+  --color-border: oklch(34% 0.02 250);
+  --color-ring: oklch(72% 0.19 260);
+
+  /* Mind map dark mode overrides */
+  --background-color: oklch(22% 0.02 250);
+  --node-bg-color: oklch(26% 0.02 250);
+  --node-border-color: oklch(36% 0.02 250);
+  --node-shadow: 0 4px 10px rgba(0, 0, 0, 0.22);
+  --root-bg-color: oklch(72% 0.19 260);
+  --root-text-color: oklch(18% 0.01 250);
+  --connector-color: oklch(42% 0.02 250);
+  --text-color: oklch(94% 0.01 240);
+  --hover-border-color: oklch(72% 0.19 260);
+  --code-bg-color: oklch(30% 0.015 250);
+  --indicator-border-color: oklch(42% 0.02 250);
+  --collapsed-indicator-color: oklch(72% 0.19 260);
+}
+
 @layer base {
   * {
     border-color: var(--color-border);
@@ -108,7 +137,7 @@
 }
 
 .mindmap-node.root.has-children::after {
-     background-color: #fff;
+     background-color: var(--root-text-color);
 }
 
 .mindmap-node.collapsed.has-children::after {
@@ -135,7 +164,7 @@
 }
 
 .mindmap-node a {
-    color: #007bff;
+    color: var(--root-bg-color);
     text-decoration: none;
 }
 
@@ -148,7 +177,7 @@
 }
 
 .mindmap-node mark {
-    background-color: #f7e776;
+    background-color: oklch(75% 0.15 60);
     padding: 0.1em 0.2em;
 }
 

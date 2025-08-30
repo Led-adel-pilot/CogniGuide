@@ -321,7 +321,7 @@ export default function PricingClient({ onPurchaseComplete }: PricingClientProps
             <button
               type="button"
               className={`px-4 py-2 text-sm rounded-full ${
-                billingCycle === 'month' ? 'bg-white shadow' : ''
+                billingCycle === 'month' ? 'bg-background shadow' : ''
               }`}
               onClick={() => setBillingCycle('month')}
             >
@@ -330,7 +330,7 @@ export default function PricingClient({ onPurchaseComplete }: PricingClientProps
             <button
               type="button"
               className={`px-4 py-2 text-sm rounded-full ${
-                billingCycle === 'year' ? 'bg-white shadow' : ''
+                billingCycle === 'year' ? 'bg-background shadow' : ''
               }`}
               onClick={() => setBillingCycle('year')}
             >
@@ -341,7 +341,7 @@ export default function PricingClient({ onPurchaseComplete }: PricingClientProps
 
         <div className="grid gap-6 md:grid-cols-3">
           {/* Free */}
-          <div className="relative rounded-[1.25rem] border bg-white p-6 shadow-sm">
+          <div className="relative rounded-[1.25rem] border bg-background p-6 shadow-sm">
             <h3 className="text-xl font-bold font-heading mb-1">{user ? 'Free' : 'Free forever'}</h3>
             <p className="text-muted-foreground mb-6">Get started and try the core experience.</p>
             <div className="mb-6">
@@ -369,7 +369,7 @@ export default function PricingClient({ onPurchaseComplete }: PricingClientProps
           </div>
 
           {/* Student (Most Popular) */}
-          <div className="relative rounded-[1.25rem] border bg-white p-6 shadow-sm ring-1 ring-primary/10">
+          <div className="relative rounded-[1.25rem] border bg-background p-6 shadow-sm ring-1 ring-primary/10">
             <div className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full border bg-primary text-white px-3 py-1 text-xs font-semibold shadow">Recommended</div>
             <h3 className="text-xl font-bold font-heading mb-1">Student</h3>
             <p className="text-muted-foreground mb-6">Plenty of credits for regular study and exam prep.</p>
@@ -399,7 +399,7 @@ export default function PricingClient({ onPurchaseComplete }: PricingClientProps
           </div>
 
           {/* Pro */}
-          <div className="relative rounded-[1.25rem] border bg-white p-6 shadow-sm">
+          <div className="relative rounded-[1.25rem] border bg-background p-6 shadow-sm">
             <h3 className="text-xl font-bold font-heading mb-1">Pro</h3>
             <p className="text-muted-foreground mb-6">For power users with high-volume needs.</p>
             <div className="mb-6">

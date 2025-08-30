@@ -7,7 +7,7 @@ import { supabase, MindmapRecord, FlashcardsRecord } from '@/lib/supabaseClient'
 import Generator from '@/components/Generator';
 import MindMapModal from '@/components/MindMapModal';
 import FlashcardsModal, { Flashcard as FlashcardType } from '@/components/FlashcardsModal';
-import { BrainCircuit, LogOut, Loader2, Map as MapIcon, Coins, Zap, Sparkles, CalendarClock, Menu, X } from 'lucide-react';
+import { BrainCircuit, LogOut, Loader2, Map as MapIcon, Coins, Zap, Sparkles, CalendarClock, Menu, X, ChevronRight } from 'lucide-react';
 import FlashcardIcon from '@/components/FlashcardIcon';
 import { loadDeckSchedule, saveDeckSchedule, loadDeckScheduleAsync, saveDeckScheduleAsync, loadAllDeckSchedulesAsync, upsertDeckSchedulesBulkAsync, type StoredDeckSchedule } from '@/lib/sr-store';
 import { createInitialSchedule } from '@/lib/spaced-repetition';
@@ -15,6 +15,7 @@ import PricingModal from '@/components/PricingModal';
 import CogniGuideLogo from '../../CogniGuide_logo.png';
 import Image from 'next/image';
 import posthog from 'posthog-js';
+import ThemeToggle from '@/components/ThemeToggle';
 
 type SessionUser = {
   id: string;
@@ -76,6 +77,7 @@ export default function DashboardClient() {
   const [spacedLoading, setSpacedLoading] = useState(false);
   const [spacedError, setSpacedError] = useState<string | null>(null);
   const [spacedPrefetched, setSpacedPrefetched] = useState(false);
+  const [legalOpen, setLegalOpen] = useState(false);
   const prefetchingRef = useRef(false);
   const [totalDueCount, setTotalDueCount] = useState<number>(0);
 
@@ -642,7 +644,7 @@ export default function DashboardClient() {
           <div className="text-center mt-2 mb-8">
             <button
               onClick={() => setIsPricingModalOpen(true)}
-              className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-full bg-blue-100/50 text-blue-600 hover:bg-blue-200/50 transition-colors"
+              className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-full bg-blue-100/50 text-blue-600 hover:bg-blue-200/50 dark:bg-blue-900/50 dark:text-blue-400 dark:hover:bg-blue-800/50 transition-colors"
             >
               <Sparkles className="h-4 w-4" />
               <span>Upgrade your Plan</span>
@@ -676,8 +678,8 @@ export default function DashboardClient() {
       />
 
       {spacedOpen && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center" onClick={() => setSpacedOpen(false)}>
-          <div className="bg-white rounded-[2rem] p-6 w-full max-w-2xl" onClick={(e) => e.stopPropagation()}>
+        <div className="fixed inset-0 bg-black/40 dark:bg-black/60 z-50 flex items-center justify-center" onClick={() => setSpacedOpen(false)}>
+          <div className="bg-background rounded-[2rem] p-6 w-full max-w-2xl border" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-bold">Spaced repetition</h2>
               <button onClick={() => setSpacedOpen(false)} className="px-3 py-1.5 rounded-full border">Close</button>
@@ -704,7 +706,7 @@ export default function DashboardClient() {
                       <div className="text-xs text-muted-foreground">{count} due now</div>
                     </div>
                     <button
-                      className="px-3 py-1.5 text-xs rounded-full border bg-white hover:bg-gray-50"
+                      className="px-3 py-1.5 text-xs rounded-full border bg-background hover:bg-muted/50"
                       onClick={() => {
                         const list = (dueMap[f.id] as number[]) || [];
                         posthog.capture('spaced_repetition_deck_studied', {
@@ -736,50 +738,63 @@ export default function DashboardClient() {
       )}
 
       {isSettingsOpen && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center" onClick={() => setIsSettingsOpen(false)}>
-          <div className="bg-white rounded-[2rem] p-6 w-full max-w-sm" onClick={(e) => e.stopPropagation()}>
-            <h2 className="text-lg font-bold mb-4">Settings</h2>
-            <div className="p-4 rounded-[1.25rem] border bg-muted/30 mb-4">
-              <div className="text-sm text-muted-foreground">Credit Balance</div>
-              <div className="text-2xl font-bold flex items-center gap-2">
-                <Coins className="h-6 w-6 text-primary" />
-                <span>{(Math.floor(credits * 10) / 10).toFixed(1)}</span>
+        <div className="fixed inset-0 bg-black/40 dark:bg-black/60 z-50 flex items-center justify-center p-4" onClick={() => setIsSettingsOpen(false)}>
+          <div className="bg-background rounded-[2rem] p-6 w-full max-w-sm border flex flex-col" onClick={(e) => e.stopPropagation()}>
+            <h2 className="text-lg font-bold mb-4 flex-shrink-0">Settings</h2>
+            <div className="flex-1">
+              <div className="p-4 rounded-[1.25rem] border bg-muted/30 mb-4">
+                <div className="text-sm text-muted-foreground">Credit Balance</div>
+                <div className="text-2xl font-bold flex items-center gap-2">
+                  <Coins className="h-6 w-6 text-primary" />
+                  <span>{(Math.floor(credits * 10) / 10).toFixed(1)}</span>
+                </div>
               </div>
+              <div className="mb-4">
+                <ThemeToggle />
+              </div>
+              <nav className="mb-4">
+                <ul className="space-y-2 text-sm">
+                  <li>
+                    <button
+                      type="button"
+                      onClick={() => setIsPricingModalOpen(true)}
+                      className="w-full text-left p-3 rounded-[1.25rem] border bg-background hover:bg-muted/50"
+                    >
+                      Pricing
+                    </button>
+                  </li>
+                  <li>
+                    <Link href="/contact" className="block w-full p-3 rounded-[1.25rem] border bg-background hover:bg-muted/50">Contact</Link>
+                  </li>
+                  <li className="relative">
+                    <button
+                      onClick={() => setLegalOpen(!legalOpen)}
+                      className="w-full text-left p-3 rounded-[1.25rem] border bg-background hover:bg-muted/50 flex items-center justify-between"
+                    >
+                      <span>Legal</span>
+                      <ChevronRight className={`h-4 w-4 transition-transform ${legalOpen ? 'rotate-90' : ''}`} />
+                    </button>
+                    {legalOpen && (
+                      <div className="absolute left-full top-0 ml-2 z-10 bg-background border rounded-[1.25rem] p-2 shadow-lg min-w-[140px]">
+                        <div className="flex flex-col space-y-1">
+                          <Link href="/legal/refund-policy" className="block w-full p-2 text-xs rounded-lg border bg-background hover:bg-muted/50">Refunds</Link>
+                          <Link href="/legal/cancellation-policy" className="block w-full p-2 text-xs rounded-lg border bg-background hover:bg-muted/50">Cancellation</Link>
+                          <Link href="/legal/terms" className="block w-full p-2 text-xs rounded-lg border bg-background hover:bg-muted/50">Terms</Link>
+                          <Link href="/legal/privacy-policy" className="block w-full p-2 text-xs rounded-lg border bg-background hover:bg-muted/50">Privacy</Link>
+                        </div>
+                      </div>
+                    )}
+                  </li>
+                </ul>
+              </nav>
             </div>
-            <nav className="mb-4">
-              <ul className="space-y-2 text-sm">
-                <li>
-                  <button
-                    type="button"
-                    onClick={() => setIsPricingModalOpen(true)}
-                    className="w-full text-left p-3 rounded-[1.25rem] border bg-background hover:bg-muted/50"
-                  >
-                    Pricing
-                  </button>
-                </li>
-                <li>
-                  <Link href="/contact" className="block w-full p-3 rounded-[1.25rem] border bg-background hover:bg-muted/50">Contact</Link>
-                </li>
-                <li>
-                  <Link href="/legal/refund-policy" className="block w-full p-3 rounded-[1.25rem] border bg-background hover:bg-muted/50">Refunds</Link>
-                </li>
-                <li>
-                  <Link href="/legal/cancellation-policy" className="block w-full p-3 rounded-[1.25rem] border bg-background hover:bg-muted/50">Cancellation</Link>
-                </li>
-                <li>
-                  <Link href="/legal/terms" className="block w-full p-3 rounded-[1.25rem] border bg-background hover:bg-muted/50">Terms</Link>
-                </li>
-                <li>
-                  <Link href="/legal/privacy-policy" className="block w-full p-3 rounded-[1.25rem] border bg-background hover:bg-muted/50">Privacy</Link>
-                </li>
-              </ul>
-              <div className="text-xs text-muted-foreground text-center mt-4">© {new Date().getFullYear()} CogniGuide</div>
-            </nav>
 
-            <button onClick={handleSignOut} className="w-full text-left p-3 rounded-[1.25rem] border bg-background hover:bg-red-50 hover:border-red-200 flex items-center gap-3 text-red-600">
+            <button onClick={handleSignOut} className="w-full text-left p-3 rounded-[1.25rem] border bg-background hover:bg-red-50 hover:border-red-200 dark:hover:bg-red-900/20 dark:hover:border-red-800 flex items-center gap-3 text-red-600 flex-shrink-0 mt-4">
               <LogOut className="h-5 w-5" />
               <span className="font-medium">Sign out</span>
             </button>
+
+            <div className="text-xs text-muted-foreground text-center mt-4">© {new Date().getFullYear()} CogniGuide</div>
           </div>
         </div>
       )}
