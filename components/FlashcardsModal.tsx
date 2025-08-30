@@ -367,12 +367,12 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
                     <p className="text-muted-foreground mb-6 max-w-md">
                       You've seen how effective flashcards can be. Create your own study set from your course materials in seconds.
                     </p>
-                    <div className="flex flex-row gap-3 w-full max-w-md justify-center">
+                    <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full max-w-md justify-center">
                       <button
                         onClick={() => {
                           document.getElementById('generator')?.scrollIntoView({ behavior: 'smooth' });
                         }}
-                        className="flex-1 h-10 px-6 text-base font-bold text-white bg-gradient-primary rounded-full hover:bg-gradient-primary-hover transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/50 whitespace-nowrap inline-flex items-center justify-center"
+                        className="flex-1 h-auto sm:h-10 py-2 sm:py-0 px-6 text-base font-bold text-white bg-gradient-primary rounded-full hover:bg-gradient-primary-hover transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/50 whitespace-nowrap inline-flex items-center justify-center"
                       >
                         Create My Study Set
                       </button>
@@ -385,7 +385,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
                           setPredictedDueByGrade({});
                           setPredictedDueDatesByGrade({});
                         }}
-                        className="flex-1 h-10 px-6 text-base font-medium text-muted-foreground bg-muted rounded-full hover:bg-muted/70 transition-colors"
+                        className="flex-1 h-auto sm:h-10 py-2 sm:py-0 px-6 text-base font-medium text-muted-foreground bg-muted rounded-full hover:bg-muted/70 transition-colors"
                       >
                         Review Sample
                       </button>
@@ -399,7 +399,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
                     <p className="text-muted-foreground mb-6 max-w-md">
                       Sign up to save this flashcard deck and track your study progress with spaced repetition.
                     </p>
-                    <div className="flex flex-row gap-3 w-full max-w-md justify-center">
+                    <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full max-w-md justify-center">
                       <button
                         onClick={() => {
                           if (title && cards) {
@@ -408,7 +408,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
                           }
                           setShowAuthModal(true);
                         }}
-                        className="flex-1 h-10 px-6 text-base font-bold text-white bg-gradient-primary rounded-full hover:bg-gradient-primary-hover transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/50 whitespace-nowrap"
+                        className="flex-1 h-auto sm:h-10 py-2 sm:py-0 px-6 text-base font-bold text-white bg-gradient-primary rounded-full hover:bg-gradient-primary-hover transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/50 whitespace-nowrap"
                       >
                         Sign Up & Save Deck
                       </button>
@@ -421,7 +421,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
                           setPredictedDueByGrade({});
                           setPredictedDueDatesByGrade({});
                         }}
-                        className="flex-1 h-10 px-6 text-base font-medium text-muted-foreground bg-muted rounded-full hover:bg-muted/70 transition-colors"
+                        className="flex-1 h-auto sm:h-10 py-2 sm:py-0 px-6 text-base font-medium text-muted-foreground bg-muted rounded-full hover:bg-muted/70 transition-colors"
                       >
                         Start Over
                       </button>
