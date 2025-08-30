@@ -297,9 +297,10 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
       )}
 
       <div className="w-full h-full grid grid-rows-[auto,1fr,auto] bg-background p-4 sm:p-6">
-        <div className="w-full max-w-5xl mx-auto grid grid-cols-1 sm:grid-cols-3 items-center gap-2 sm:gap-3">
-          <div className="text-center sm:text-left text-sm font-medium truncate text-foreground">{title || 'Flashcards'}</div>
-          <div className="justify-self-center sm:justify-self-end">
+        <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 items-center gap-2 sm:gap-3">
+          <div className="text-center md:text-left text-sm font-medium truncate text-foreground">{title || 'Flashcards'}</div>
+          <div className="text-sm text-muted-foreground text-center hidden md:block">{hasCards ? (finished ? 'Completed' : `${index + 1} / ${cards!.length}`) : ''}</div>
+          <div className="justify-self-center md:justify-self-end">
             {hasCards && (
               <label className="inline-flex items-center gap-2 text-sm">
                 <span className="text-foreground font-medium">Exam date</span>
@@ -312,7 +313,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
               </label>
             )}
           </div>
-          <div className="text-sm text-muted-foreground text-center">{hasCards ? (finished ? 'Completed' : `${index + 1} / ${cards!.length}`) : ''}</div>
+          <div className="text-sm text-muted-foreground text-center md:hidden">{hasCards ? (finished ? 'Completed' : `${index + 1} / ${cards!.length}`) : ''}</div>
         </div>
         {hasCards ? (
           <div className="w-full max-w-5xl mx-auto mt-2">
@@ -370,7 +371,15 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
                     <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full max-w-md justify-center">
                       <button
                         onClick={() => {
-                          document.getElementById('generator')?.scrollIntoView({ behavior: 'smooth' });
+                          const element = document.getElementById('generator');
+                          if (element) {
+                            const elementTop = element.getBoundingClientRect().top + window.pageYOffset;
+                            // Account for sticky header (64px) plus additional padding
+                            window.scrollTo({
+                              top: elementTop - 100,
+                              behavior: 'smooth'
+                            });
+                          }
                         }}
                         className="flex-1 h-auto sm:h-10 py-2 sm:py-0 px-6 text-base font-bold text-white bg-gradient-primary rounded-full hover:bg-gradient-primary-hover transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/50 whitespace-nowrap inline-flex items-center justify-center"
                       >

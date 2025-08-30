@@ -22,7 +22,6 @@ const InteractiveMindMap = () => {
 export default function Home() {
   const [showAuth, setShowAuth] = useState(false);
   const [isAuthed, setIsAuthed] = useState(false);
-  const [view, setView] = useState('mindmap');
   const router = useRouter();
 
   useEffect(() => {
@@ -95,36 +94,35 @@ export default function Home() {
             </div>
           </section>
 
-          {/* Why Mind Maps Section */}
-          <section className="pt-10 md:pt-12 pb-10 bg-muted/30 border-y">
+          {/* Mind Maps Section */}
+          <section className="pt-10 md:pt-12 pb-16 bg-muted/30 border-y">
             <div className="container">
               <div className="text-center mb-8">
-                <h2 className="text-3xl md:text-4xl font-bold font-heading tracking-tight">The Science of Smarter Learning</h2>
+                <h2 className="text-3xl md:text-4xl font-bold font-heading tracking-tight">Visual Learning with Mind Maps</h2>
                 <p className="text-muted-foreground mt-3 max-w-3xl mx-auto">
-                  CogniGuide combines research-backed methods: visual <span className="font-semibold">  mind maps</span> to reduce cognitive load, <span className="font-semibold">active recall</span> with flashcards and <span className="font-semibold">spaced repetition</span> to secure long-term memory.
+                  Mind maps reduce cognitive load by organizing information visually, making complex topics easier to understand and remember.
                 </p>
               </div>
-              <div className="relative">
-                <div className="flex justify-center mb-4">
-                  <div className="inline-flex p-1 rounded-full border bg-muted/50">
-                    <button
-                      onClick={() => setView('mindmap')}
-                      className={`px-4 py-1.5 text-sm font-semibold rounded-full transition-colors ${view === 'mindmap' ? 'bg-background text-primary shadow' : 'text-muted-foreground hover:text-primary'}`}
-                    >
-                      Mind Map
-                    </button>
-                    <button
-                      onClick={() => setView('flashcards')}
-                      className={`px-4 py-1.5 text-sm font-semibold rounded-full transition-colors ${view === 'flashcards' ? 'bg-background text-primary shadow' : 'text-muted-foreground hover:text-primary'}`}
-                    >
-                      Flashcards
-                    </button>
-                  </div>
+              <div className="bg-background rounded-[2rem] border shadow-xl shadow-slate-200/50 dark:shadow-slate-700/50 overflow-hidden">
+                <div className="w-full h-[300px] md:h-[600px]">
+                  <InteractiveMindMap />
                 </div>
-                <div className="bg-background rounded-[2rem] border shadow-xl shadow-slate-200/50 dark:shadow-slate-700/50 overflow-hidden">
-                  <div className={`w-full ${view === 'mindmap' ? 'h-[300px] md:h-[600px]' : 'h-[68vh] md:h-[600px]'}`}>
-                    {view === 'mindmap' ? <InteractiveMindMap /> : <EmbeddedFlashcards />}
-                  </div>
+              </div>
+            </div>
+          </section>
+
+          {/* Flashcards Section */}
+          <section className="pt-16 md:pt-20 pb-16">
+            <div className="container">
+              <div className="text-center mb-8">
+                <h2 className="text-3xl md:text-4xl font-bold font-heading tracking-tight">Active Recall with Spaced Repetition</h2>
+                <p className="text-muted-foreground mt-3 max-w-3xl mx-auto">
+                  Flashcards powered by spaced repetition help you retain information longer through active recall and scientifically-optimized review schedules.
+                </p>
+              </div>
+              <div className="bg-background rounded-[2rem] border shadow-xl shadow-slate-200/50 dark:shadow-slate-700/50 overflow-hidden">
+                <div className="w-full h-[68vh] md:h-[600px]">
+                  <EmbeddedFlashcards />
                 </div>
               </div>
               <div className="text-center mt-12">
