@@ -43,6 +43,16 @@
   --code-bg-color: oklch(30% 0.015 250);
   --indicator-border-color: oklch(42% 0.02 250);
   --collapsed-indicator-color: oklch(72% 0.19 260);
+
+  /* Dark mode button overrides */
+  .upgrade-plan-btn {
+    background-color: rgba(30, 64, 175, 0.5); /* dark blue background */
+    color: #60a5fa; /* lighter blue text for dark mode */
+  }
+
+  .upgrade-plan-btn:hover {
+    background-color: rgba(37, 99, 235, 0.5); /* slightly lighter dark blue on hover */
+  }
 }
 
 @layer base {
@@ -203,6 +213,26 @@
 
   .bg-gradient-primary-hover {
     background: linear-gradient(to right, #1d4ed8, #0891b2, #0f766e);
+  }
+
+  /* Upgrade Plan Button Styles */
+  .upgrade-plan-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    border-radius: 9999px;
+    background-color: rgba(219, 234, 254, 0.5); /* bg-blue-100/50 */
+    color: #2563eb; /* text-blue-600 */
+    border: none;
+    transition: all 0.2s ease;
+    cursor: pointer;
+  }
+
+  .upgrade-plan-btn:hover {
+    background-color: rgba(191, 219, 254, 0.5); /* bg-blue-200/50 */
   }
 }
 

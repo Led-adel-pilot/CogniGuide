@@ -644,7 +644,7 @@ export default function DashboardClient() {
           <div className="text-center mt-2 mb-8">
             <button
               onClick={() => setIsPricingModalOpen(true)}
-              className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-full bg-blue-100/50 text-blue-600 hover:bg-blue-200/50 transition-colors"
+              className="upgrade-plan-btn"
             >
               <Sparkles className="h-4 w-4" />
               <span>Upgrade your Plan</span>

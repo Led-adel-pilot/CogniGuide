@@ -115,7 +115,7 @@ export default function PromptForm({
         }}
         onKeyDown={handleKeyDown}
         placeholder={getPlaceholder()}
-        className="flex-1 px-3 py-2 bg-transparent border-none resize-none focus:outline-none text-sm leading-relaxed overflow-y-auto"
+        className="flex-1 px-3 py-2 bg-transparent border-none resize-none focus:outline-none text-sm leading-relaxed overflow-y-auto placeholder:text-muted-foreground"
         style={{
           maxHeight: '200px',
         }}
