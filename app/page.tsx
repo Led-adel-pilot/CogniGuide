@@ -43,10 +43,6 @@ export default function Home() {
     return () => { sub.subscription.unsubscribe(); };
   }, [router]);
 
-  const handleScrollToGenerator = () => {
-    document.getElementById('generator')?.scrollIntoView({ behavior: 'smooth' });
-  };
-
   return (
     <>
       <AuthModal open={showAuth} onClose={() => setShowAuth(false)} />
@@ -73,38 +69,29 @@ export default function Home() {
         </header>
 
         <main className="flex-1">
-          {/* Hero Section */}
-          <section className="relative text-center py-20 md:py-32 overflow-hidden">
+          {/* Hero Section with Generator */}
+          <section className="relative pt-12 pb-16 md:pt-16 md:pb-20 overflow-hidden">
             <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[40rem] h-[40rem] bg-primary/10 rounded-full blur-3xl -z-10"></div>
-            <div className="container relative z-10">
-              <h1 className="text-4xl md:text-6xl font-extrabold font-heading tracking-tighter mb-6 leading-tight">
-                Learn Faster. Remember More.<br />Ace Your Exams.
-              </h1>
-              <p className="max-w-3xl mx-auto text-lg md:text-xl text-muted-foreground mb-10">
-                Upload your PDFs, slides, or documents. Our AI creates clear mind maps and smart, spaced-repetition flashcards to help you learn 2x faster and ace your next test.
-              </p>
-              <button
-                onClick={handleScrollToGenerator}
-                className="group flex items-center justify-center gap-2 mx-auto px-8 py-3 text-base font-bold text-white bg-primary rounded-full shadow-lg shadow-primary/20 hover:bg-primary/90 transition-all duration-300 ease-in-out transform hover:scale-105"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="h-5 w-5 transition-transform group-hover:translate-y-1 animate-bounce"
-                  aria-hidden="true"
-                >
-                  <path d="M7 10L12 15L17 10" />
-                </svg>
-                Try it - No Signup
-              </button>
+            <div className="container">
+              <div className="flex flex-col lg:flex-row gap-12 lg:gap-16 items-start">
+                {/* Left side - Headline */}
+                <div className="w-full lg:w-[28rem] xl:w-[32rem]">
+                  <div className="text-center lg:text-left">
+                    <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold font-heading tracking-tighter md:leading-tight mb-6">
+                      Learn Faster. Remember More. Ace Your Exams.
+                    </h1>
+                    <p className="text-xl text-muted-foreground leading-relaxed">
+                      Upload your PDFs, slides, or documents. Our AI creates clear mind maps and smart, spaced-repetition flashcards to help you learn 2x faster and ace your next test.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Right side - Generator */}
+                <div className="flex-1 w-full">
+                  <Generator redirectOnAuth showTitle={false} />
+                </div>
+              </div>
             </div>
           </section>
 
@@ -148,11 +135,6 @@ export default function Home() {
               </div>
             </div>
           </section>
-
-          <Generator redirectOnAuth />
-
-
-
         </main>
 
         <footer className="border-t bg-muted/40">

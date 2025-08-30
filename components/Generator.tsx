@@ -12,7 +12,7 @@ import { supabase } from '@/lib/supabaseClient';
 import { NON_AUTH_FREE_LIMIT } from '@/lib/plans';
 import { Sparkles } from 'lucide-react';
 
-export default function Generator({ redirectOnAuth = false, showTitle = true }: { redirectOnAuth?: boolean, showTitle?: boolean }) {
+export default function Generator({ redirectOnAuth = false, showTitle = true, compact = false }: { redirectOnAuth?: boolean, showTitle?: boolean, compact?: boolean }) {
   // Enforce a client-side per-file size cap to avoid server 413s (Vercel ~4.5MB)
   const MAX_FILE_BYTES = Math.floor(25 * 1024 * 1024); // 25MB per file when using Supabase Storage
   const [files, setFiles] = useState<File[]>([]);
@@ -654,18 +654,18 @@ export default function Generator({ redirectOnAuth = false, showTitle = true }: 
       <MindMapModal markdown={markdown} onClose={handleCloseModal} />
       <FlashcardsModal open={flashcardsOpen} title={flashcardsTitle} cards={flashcardsCards} isGenerating={isLoading && mode==='flashcards'} error={flashcardsError} onClose={handleCloseFlashcards} deckId={flashcardsDeckId} />
       <AuthModal open={showAuth} onClose={() => setShowAuth(false)} />
-      <section id="generator" className={showTitle ? 'py-20' : 'pb-20'}>
+      <section id="generator" className={showTitle ? (compact ? 'pt-3 pb-5' : 'pt-4 pb-8') : (compact ? 'pb-12' : 'pb-20')}>
         <div className="container">
           {showTitle && (
-            <div className="text-center mb-12">
-              <h2 className="text-3xl md:text-4xl font-bold font-heading tracking-tight">Generate Mind Map or Flashcards</h2>
-              <p className="text-muted-foreground mt-2">Upload a document or simply describe your topic. Choose your output.</p>
+            <div className={compact ? 'text-center mb-4' : 'text-center mb-6'}>
+              <h2 className={compact ? 'text-2xl md:text-3xl font-bold font-heading tracking-tight' : 'text-3xl md:text-4xl font-bold font-heading tracking-tight'}>Turn Your Notes into Mind Maps &amp; Flashcards with AI.</h2>
+              <p className="text-muted-foreground mt-2">Upload your PDFs, slides, or documents. Our AI creates clear mind maps and smart, spaced-repetition flashcards to help you learn faster.</p>
             </div>
           )}
-          <div className="relative w-full max-w-3xl mx-auto bg-background rounded-[2rem] border shadow-[0_0_20px_2px_rgba(0,0,0,0.1)]">
-            <div className="absolute -top-4 -left-4 w-24 h-24 bg-primary/10 rounded-full blur-2xl -z-10"></div>
-            <div className="absolute -bottom-4 -right-4 w-32 h-32 bg-accent/10 rounded-full blur-3xl -z-10"></div>
-            <div className="p-6 sm:p-8 space-y-6">
+          <div className={compact ? 'relative w-full max-w-none mx-auto bg-background rounded-[2rem] border shadow-[0_0_16px_2px_rgba(0,0,0,0.08)]' : 'relative w-full max-w-none mx-auto bg-background rounded-[2rem] border shadow-[0_0_20px_2px_rgba(0,0,0,0.1)]'}>
+            <div className={compact ? 'absolute -top-3 -left-3 w-20 h-20 bg-primary/10 rounded-full blur-2xl -z-10' : 'absolute -top-4 -left-4 w-24 h-24 bg-primary/10 rounded-full blur-2xl -z-10'}></div>
+            <div className={compact ? 'absolute -bottom-3 -right-3 w-28 h-28 bg-accent/10 rounded-full blur-3xl -z-10' : 'absolute -bottom-4 -right-4 w-32 h-32 bg-accent/10 rounded-full blur-3xl -z-10'}></div>
+            <div className={compact ? 'p-4 sm:p-6 space-y-4' : 'p-4 sm:p-6 space-y-4'}>
               <div className="flex items-center justify-center">
                 <div className="inline-flex p-1 rounded-full border bg-muted/50">
                   <button
@@ -689,6 +689,7 @@ export default function Generator({ redirectOnAuth = false, showTitle = true }: 
                 disabled={isLoading || markdown !== null || flashcardsOpen}
                 isPreParsing={isPreParsing}
                 allowedNameSizes={allowedNameSizes}
+                size={compact ? 'compact' : 'default'}
                 onOpen={() => {
                   if (!authChecked) return false;
                   if (!isAuthed && freeGenerationsLeft <= 0) {

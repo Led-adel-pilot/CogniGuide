@@ -13,9 +13,11 @@ interface DropzoneProps {
   isPreParsing?: boolean;
   // Optional whitelist of files to keep by name+size (used to prune overflow files)
   allowedNameSizes?: { name: string; size: number }[];
+  // Visual size variant
+  size?: 'default' | 'compact';
 }
 
-export default function Dropzone({ onFileChange, disabled = false, onOpen, isPreParsing = false, allowedNameSizes }: DropzoneProps) {
+export default function Dropzone({ onFileChange, disabled = false, onOpen, isPreParsing = false, allowedNameSizes, size = 'default' }: DropzoneProps) {
   const [dragIsOver, setDragIsOver] = useState(false);
   const [files, setFiles] = useState<File[]>([]);
   const inputRef = useRef<HTMLInputElement | null>(null);
@@ -122,11 +124,12 @@ export default function Dropzone({ onFileChange, disabled = false, onOpen, isPre
   }
 
   const dropzoneClassName = useMemo(() => {
-    const base = 'flex flex-col items-center justify-center w-full h-48 border-2 border-dashed rounded-[1.25rem] cursor-pointer transition-colors duration-300';
+    const heightClass = size === 'compact' ? 'h-36 sm:h-40' : 'h-48';
+    const base = `flex flex-col items-center justify-center w-full ${heightClass} border-2 border-dashed rounded-[1.25rem] cursor-pointer transition-colors duration-300`;
     if (disabled) return `${base} bg-muted/50 border-border/30 cursor-not-allowed`;
     if (dragIsOver) return `${base} bg-primary/10 border-primary`;
     return `${base} bg-background hover:bg-muted/50 border-border/50 hover:border-primary/50`;
-  }, [dragIsOver, disabled]);
+  }, [dragIsOver, disabled, size]);
 
   return (
     <div className="w-full">

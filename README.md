@@ -138,6 +138,12 @@ Each flashcard tracks:
     * **Clean Interface**: Hides internal FSRS metrics while maintaining powerful spaced repetition capabilities.
 *   `components/Generator.tsx`: The core file upload and generation component that powers both mind map and flashcard creation. Features intelligent file processing with smart caching to prevent redundant re-processing when users add/remove files. Handles file validation, pre-processing via the `/api/preparse` endpoint, credit checking, and orchestrates the generation workflow for both mind maps and flashcards.
     * **Smart File Caching**: Implements robust file set caching with content-based hashing to ensure consistent caching across different environments (localhost/production) and browsers. Caches complete processing results for each unique combination of files, dramatically improving performance for iterative multi-file workflows. Includes development-mode debug logging for production troubleshooting.
+    * **Layout Constraints & Width Adjustments**: The Generator component's width is constrained by both internal `max-w-*` classes and external wrapper constraints. When adjusting the width:
+        - **Internal Constraints**: The component itself has `max-w-*` classes (currently `max-w-none` for full expansion) that control the maximum width within its container
+        - **External Constraints**: In `app/page.tsx`, the Generator is wrapped with width classes (currently `flex-1 w-full`) that determine how much space it occupies in the flex layout
+        - **Layout Structure**: The component uses a flex layout where the left side (headline) has fixed width (`lg:w-[28rem] xl:w-[32rem]`) and the right side (Generator) takes remaining space (`flex-1`)
+        - **Width Adjustment Process**: To increase width, adjust both the Generator's internal `max-w-*` constraint AND the wrapper's width allocation. Simply changing one without the other won't produce visible results due to the flex layout structure
+        - **Compact Mode**: The `compact` prop affects styling but doesn't change width constraints - those must be adjusted separately
 *   `components/AuthModal.tsx`: A modal for authentication that supports email magic-link sign-in and Google OAuth. Triggered when users attempt to generate content without signing in on the landing page or via header "Sign in". On success, redirects to the dashboard.
 
 ### Design System & UI Preferences
