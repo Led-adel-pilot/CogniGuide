@@ -10,7 +10,7 @@ CogniGuide comprehensive AI-powered study assistant. It uses an LLM to convert t
 *   **Instant Generation:** Processes content and generates mind maps rapidly, saving users hours of manual work.
 *   **Interactive Mind Maps:** The generated mind maps are visual and interactive, enhancing comprehension and retention. On first load, the entire map is zoomed to fit the screen, giving a 'big picture' overview. Standard interactions like zooming, panning, and node collapsing/expanding are supported.
 *   **Realtime Streaming Rendering:** The backend can stream model output token-by-token and the frontend progressively renders the Markmap markdown as tokens arrive so the mind map begins appearing immediately instead of waiting for the full generation to finish.
-*   **Smart File Caching:** Advanced caching system prevents redundant file processing when users add/remove files. Uses content-based hashing to ensure consistent caching across different environments (localhost/production) and browsers. Only changed file combinations trigger re-processing, significantly improving performance for multi-file uploads.
+*   **Smart File Caching & Pre-processing:** Advanced caching system prevents redundant file processing when users add/remove files. Files are automatically pre-processed immediately upon upload to extract text and images, eliminating the wait time when clicking Generate. Uses content-based hashing to ensure consistent caching across different environments (localhost/production) and browsers. Only changed file combinations trigger re-processing, significantly improving performance for multi-file uploads. Uploads are offloaded to Supabase Storage to bypass Vercel's ~4.5 MB body limit; client-side validation now allows up to 50 MB per file.
 *   **Credit Loading Optimization:** Instant credit balance display with intelligent caching system. Credits load immediately on dashboard refresh using localStorage cache (5-minute expiration) with background refresh for accuracy. Eliminates the brief "0.0" flash that occurred during sequential API calls.
 *   **Multiple Export Options:** Users can download the generated mind maps in various formats including HTML, SVG, PNG, and PDF.
 *   **Flashcards Generation (Two ways):**
@@ -36,15 +36,16 @@ CogniGuide comprehensive AI-powered study assistant. It uses an LLM to convert t
     Content exceeding tier limits is truncated at word boundaries with a message indicating the user should sign up or upgrade for unlimited access.
     *   **Performance Optimization**: User tier information is cached in memory for 5 minutes to avoid repeated database queries, ensuring fast response times for logged-in users.
 *   **Credit Loading Optimization**: Instant credit balance display with localStorage caching (5-minute expiration) and parallel loading eliminates sequential API calls and the brief "0.0" flash during dashboard refresh.
-    *   **Smart File Processing Cache**: The frontend implements intelligent file set caching to prevent redundant document processing. When users upload multiple files, the system:
+    *   **Smart File Processing Cache**: The frontend implements intelligent file set caching and immediate pre-processing to prevent redundant document processing and eliminate generation wait times. When users upload multiple files, the system:
         - Generates a unique key using content-based hashing (first 512 bytes of each file) combined with file metadata (name, size, type)
         - Ensures consistent caching across different environments (localhost/production) and browsers
-        - Caches complete processing results for each unique file combination
+        - Automatically pre-processes files immediately upon upload, extracting text and images in the background
+        - Caches complete processing results for each unique file combination (5-minute validity)
         - Only re-processes when the file set actually changes (files added/removed/modified)
-        - Maintains cache validity for 5 minutes to handle edge cases
         - Automatically cleans up old cache entries (keeps last 10) to prevent memory issues
         - Includes development-mode debug logging for production troubleshooting
-        - Instantly serves cached results for identical file combinations, dramatically improving performance for iterative workflows
+        - Includes client-side file size validation (4.2 MB per file limit) to prevent server 413 errors
+        - Instantly serves cached results for identical file combinations, enabling immediate generation after clicking Generate
  *   **Mind Map Rendering:** The application uses a custom Markmap-like renderer implemented in `lib/markmap-renderer.ts` (and embedded within `components/MindMapModal.tsx` for HTML export). This renderer handles parsing markdown, measuring node sizes, laying out the tree, and drawing SVG connectors and HTML nodes. It includes logic for color variations, node collapsing/expanding, and pan/zoom functionality. It now features an intelligent **auto-fit-to-view** that centers and scales the mind map to be fully visible on initial load and during streaming. This behavior stops once the user interacts with the map.
     *   **Touch Support:** The renderer now includes comprehensive touch event handling for mobile devices, enabling single-finger panning and two-finger pinch-to-zoom gestures for intuitive navigation.
     *   **Incremental Updates:** The renderer exposes an `updateMindMap(markdown: string)` function to support incremental re-rendering while the model is streaming output, enabling smooth progressive visualization.
@@ -219,7 +220,7 @@ For consistent branding across the application, use the `CogniGuide_logo.png` fi
     - Updates user_credits table with new balances
 
 #### Preparse API (`app/api/preparse/route.ts`)
-*   **Purpose:** Pre-processes uploaded files to extract text and prepare content for generation
+*   **Purpose:** Pre-processes uploaded files immediately upon selection to extract text and prepare content for generation, eliminating wait times when clicking Generate
 *   **Method:** POST
 *   **Content-Type:** multipart/form-data
 *   **Functionality:**
@@ -228,7 +229,26 @@ For consistent branding across the application, use the `CogniGuide_logo.png` fi
     - Converts images to base64 data URLs for multimodal processing
     - Returns combined text and image data for efficient processing
     - Provides character count for credit calculation
-    - **Smart Caching Integration:** Frontend implements robust file set caching with content-based hashing to avoid redundant API calls. Ensures consistent caching across different environments (localhost/production) and browsers. Only processes when file combinations actually change, significantly improving performance for iterative workflows. Includes development-mode debug logging for production troubleshooting.
+    - **Smart Caching Integration:** Frontend implements robust file set caching with content-based hashing to avoid redundant API calls. Files are pre-processed immediately upon upload and cached for 5 minutes. Ensures consistent caching across different environments (localhost/production) and browsers. Only processes when file combinations actually change, significantly improving performance for iterative workflows. Includes development-mode debug logging for production troubleshooting.
+    - **Large File Support:** JSON mode also accepts Supabase Storage object paths (see below) to handle large uploads beyond Vercel limits
+    - **File Size Validation:** Client-side validation allows up to 50 MB per file when using Supabase Storage
+
+#### Storage Upload API (`app/api/storage/get-signed-uploads/route.ts`)
+*   Purpose: Generate signed upload URLs for each file so the browser uploads directly to Supabase Storage (private `uploads` bucket), avoiding Vercel's ~4.5 MB request limit
+*   Method: POST
+*   Content-Type: `application/json`
+*   Input: `{ files: [{ name, size, type }], anonId?: string }`
+*   Output: `{ bucket: 'uploads', items: [{ path, token }] }`
+*   Flow: The client receives `{path, token}` per file and uses `supabase.storage.from(bucket).uploadToSignedUrl(path, token, file)` to upload
+*   Notes:
+    - Bucket: Create a private bucket named `uploads` in Supabase Storage
+    - Security: Files remain private; the server (with Service Role) downloads them for preprocessing; the client never gets permanent public URLs
+    - Expiration: Preparse generates short-lived signed URLs for images if needed by the LLM
+
+#### Preparse JSON (Storage) Mode
+*   The preparse API now accepts a JSON payload: `{ bucket: 'uploads', objects: [{ path, name?, type?, size? }] }`
+*   For non-image files, the server downloads from Storage and extracts text; for images, it generates a 30‑minute signed URL and includes it in `images`
+*   Response shape is identical to multipart mode: `{ text, images, totalRawChars, maxChars, limitExceeded, includedFiles, excludedFiles, partialFile }`
 
 *   `lib/supabaseClient.ts`: Initializes the Supabase browser client using `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY`. Also exports the `MindmapRecord` type used for dashboard history.
 

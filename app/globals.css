@@ -162,6 +162,19 @@
                       linear-gradient(to bottom, var(--color-border) 1px, transparent 1px);
     background-size: 3rem 3rem;
   }
+
+  /* Global gradient utilities */
+  .bg-gradient-primary {
+    background: linear-gradient(to right, #2563eb, #06b6d4, #14b8a6);
+  }
+
+  .bg-gradient-secondary {
+    background: linear-gradient(to right, #c7d2fe, #7dd3fc, #a7f3d0);
+  }
+
+  .bg-gradient-primary-hover {
+    background: linear-gradient(to right, #1d4ed8, #0891b2, #0f766e);
+  }
 }
 
 /* Scrollbar: transparent track, thicker, shorter track, hover fades */

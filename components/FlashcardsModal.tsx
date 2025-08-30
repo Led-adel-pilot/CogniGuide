@@ -350,7 +350,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
                         setPredictedDueByGrade({});
                         setPredictedDueDatesByGrade({});
                       }}
-                      className="mt-6 inline-flex items-center h-10 px-6 rounded-full text-white bg-gradient-to-r from-blue-600 via-cyan-500 to-teal-500 shadow-sm hover:opacity-90 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/50 whitespace-nowrap"
+                      className="mt-6 inline-flex items-center h-10 px-6 rounded-full text-white bg-gradient-primary shadow-sm hover:bg-gradient-primary-hover transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/50 whitespace-nowrap"
                     >
                       Start Over
                     </button>
@@ -368,7 +368,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
                         onClick={() => {
                           document.getElementById('generator')?.scrollIntoView({ behavior: 'smooth' });
                         }}
-                        className="flex-1 h-10 px-6 text-base font-bold text-white bg-gradient-to-r from-blue-600 via-cyan-500 to-teal-500 rounded-full hover:opacity-90 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/50 whitespace-nowrap inline-flex items-center justify-center"
+                        className="flex-1 h-10 px-6 text-base font-bold text-white bg-gradient-primary rounded-full hover:bg-gradient-primary-hover transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/50 whitespace-nowrap inline-flex items-center justify-center"
                       >
                         Create My Study Set
                       </button>
@@ -404,7 +404,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
                           }
                           setShowAuthModal(true);
                         }}
-                        className="flex-1 h-10 px-6 text-base font-bold text-white bg-gradient-to-r from-blue-600 via-cyan-500 to-teal-500 rounded-full hover:opacity-90 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/50 whitespace-nowrap"
+                        className="flex-1 h-10 px-6 text-base font-bold text-white bg-gradient-primary rounded-full hover:bg-gradient-primary-hover transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/50 whitespace-nowrap"
                       >
                         Sign Up & Save Deck
                       </button>
@@ -527,7 +527,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
                     study_due_only: studyDueOnly,
                   });
                   setShowAnswer(true);
-                }} className="inline-flex items-center h-10 px-5 rounded-full text-white bg-gradient-to-r from-blue-600 via-cyan-500 to-teal-500 shadow-sm hover:opacity-90 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/50 whitespace-nowrap">
+                }} className="inline-flex items-center h-10 px-5 rounded-full text-white bg-gradient-primary shadow-sm hover:bg-gradient-primary-hover transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/50 whitespace-nowrap">
                   <Eye className="h-5 w-5 mr-2" /> Show Answer
                 </button>
               )}
@@ -576,7 +576,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
                   setShowLossAversionPopup(false);
                   setShowAuthModal(true);
                 }}
-                className="inline-flex items-center justify-center min-w-0 h-10 px-6 text-sm font-bold text-white bg-gradient-to-r from-blue-600 via-cyan-500 to-teal-500 rounded-full hover:opacity-90 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/50 whitespace-nowrap"
+                className="inline-flex items-center justify-center min-w-0 h-10 px-6 text-sm font-bold text-white bg-gradient-primary rounded-full hover:bg-gradient-primary-hover transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/50 whitespace-nowrap"
               >
                 Save & Continue
               </button>

@@ -14,7 +14,7 @@ import { Sparkles } from 'lucide-react';
 
 export default function Generator({ redirectOnAuth = false, showTitle = true }: { redirectOnAuth?: boolean, showTitle?: boolean }) {
   // Enforce a client-side per-file size cap to avoid server 413s (Vercel ~4.5MB)
-  const MAX_FILE_BYTES = Math.floor(4.2 * 1024 * 1024); // ~4.2MB safety margin
+  const MAX_FILE_BYTES = Math.floor(50 * 1024 * 1024); // 50MB per file when using Supabase Storage
   const [files, setFiles] = useState<File[]>([]);
   const [preParsed, setPreParsed] = useState<{ text: string; images: string[]; rawCharCount?: number } | null>(null);
   const [isPreParsing, setIsPreParsing] = useState(false);
@@ -112,6 +112,46 @@ export default function Generator({ redirectOnAuth = false, showTitle = true }: 
     return fileKeys.sort().join('||');
   }, [getFileKey]);
 
+  // Upload files to Supabase Storage using signed URLs, then call JSON preparse
+  const uploadAndPreparse = useCallback(async (selectedFiles: File[]) => {
+    const { data: sessionData } = await supabase.auth.getSession();
+    const accessToken = sessionData?.session?.access_token;
+    // Generate stable keys per file for deterministic storage paths
+    const keys = await Promise.all(selectedFiles.map(f => getFileKey(f)));
+    const filesMeta = selectedFiles.map((f, i) => ({ name: f.name, size: f.size, type: f.type || 'application/octet-stream', key: keys[i] }));
+    const anonId = (typeof window !== 'undefined') ? (localStorage.getItem('cogniguide_anon_id') || (() => { const v = crypto.randomUUID(); localStorage.setItem('cogniguide_anon_id', v); return v; })()) : undefined;
+    // Request signed upload URLs
+    const signedRes = await fetch('/api/storage/get-signed-uploads', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}) },
+      body: JSON.stringify({ files: filesMeta, anonId }),
+    });
+    if (!signedRes.ok) {
+      const j = await signedRes.json().catch(() => null);
+      throw new Error(j?.error || 'Failed to prepare uploads');
+    }
+    const { bucket, items } = await signedRes.json();
+    // Upload each file via signed URL
+    for (let i = 0; i < selectedFiles.length; i++) {
+      const file = selectedFiles[i];
+      const { path, token } = items[i];
+      const { error: upErr } = await supabase.storage.from(bucket).uploadToSignedUrl(path, token, file, { upsert: true, contentType: file.type || 'application/octet-stream' });
+      if (upErr) throw upErr;
+    }
+    // Build objects descriptor and call JSON preparse
+    const objects = items.map((it: any, i: number) => ({ path: it.path, name: selectedFiles[i].name, type: selectedFiles[i].type || 'application/octet-stream', size: selectedFiles[i].size }));
+    const preRes = await fetch('/api/preparse', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}) },
+      body: JSON.stringify({ bucket, objects }),
+    });
+    if (!preRes.ok) {
+      const j = await preRes.json().catch(() => null);
+      throw new Error(j?.error || 'Failed to prepare files.');
+    }
+    return await preRes.json();
+  }, [getFileKey]);
+
   const handleFileChange = useCallback(async (selectedFiles: File[]) => {
     // Clear any previous errors when files change
     setError(null);
@@ -125,7 +165,7 @@ export default function Generator({ redirectOnAuth = false, showTitle = true }: 
       return;
     }
 
-    // Validate file sizes before accepting them
+    // Validate file sizes before accepting them (generous 50MB when using Supabase Storage)
     const tooLargeFile = selectedFiles.find(f => f.size > MAX_FILE_BYTES);
     if (tooLargeFile) {
       setError(`"${tooLargeFile.name}" is too large. Max file size is ${(MAX_FILE_BYTES / (1024 * 1024)).toFixed(1)} MB.`);
@@ -169,30 +209,31 @@ export default function Generator({ redirectOnAuth = false, showTitle = true }: 
       return;
     }
 
-    // No valid cache, pre-parse now (single upload)
+    // No valid cache, pre-parse now using Supabase Storage JSON flow (fallback to legacy on failure)
     try {
       setIsPreParsing(true);
-      const formData = new FormData();
-      selectedFiles.forEach((f) => formData.append('files', f));
-
-      const { data: sessionData } = await supabase.auth.getSession();
-      const accessToken = sessionData?.session?.access_token;
-
-      const res = await fetch('/api/preparse', {
-        method: 'POST',
-        body: formData,
-        headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : undefined,
-      });
-
-      if (!res.ok) {
-        // Non-fatal; generation can fallback to legacy upload path
-        try { const j = await res.json(); setError(j?.error || 'Failed to prepare files.'); } catch {}
-        setPreParsed(null);
-        setAllowedNameSizes(undefined);
-        return;
+      let j: any;
+      try {
+        j = await uploadAndPreparse(selectedFiles);
+      } catch (e) {
+        // Fallback: legacy small-upload path if JSON/storage fails
+        const formData = new FormData();
+        selectedFiles.forEach((f) => formData.append('files', f));
+        const { data: sessionData } = await supabase.auth.getSession();
+        const accessToken = sessionData?.session?.access_token;
+        const res = await fetch('/api/preparse', {
+          method: 'POST',
+          body: formData,
+          headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : undefined,
+        });
+        if (!res.ok) {
+          try { const jj = await res.json(); setError(jj?.error || 'Failed to prepare files.'); } catch {}
+          setPreParsed(null);
+          setAllowedNameSizes(undefined);
+          return;
+        }
+        j = await res.json();
       }
-
-      const j = await res.json();
 
       // Cache the complete result for this file set
       processedFileSetsCache.current.set(fileSetKey, {
@@ -237,7 +278,7 @@ export default function Generator({ redirectOnAuth = false, showTitle = true }: 
     } finally {
       setIsPreParsing(false);
     }
-  }, [getFileSetKey, debugLog, MAX_FILE_BYTES, isAuthed]);
+  }, [getFileSetKey, debugLog, MAX_FILE_BYTES, isAuthed, uploadAndPreparse]);
 
   const handleSubmit = async () => {
     posthog.capture('generation_submitted', {
@@ -275,21 +316,12 @@ export default function Generator({ redirectOnAuth = false, showTitle = true }: 
         if (!effectivePreParsed && files.length > 0) {
           try {
             setIsPreParsing(true);
-            const formData = new FormData();
-            files.forEach((f) => formData.append('files', f));
-            const preRes = await fetch('/api/preparse', {
-              method: 'POST',
-              body: formData,
-              headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : undefined,
-            });
-            if (preRes.ok) {
-              const j = await preRes.json();
-              const text = typeof j?.text === 'string' ? j.text : '';
-              const images = Array.isArray(j?.images) ? j.images as string[] : [];
-              const rawCharCount = typeof j?.totalRawChars === 'number' ? j.totalRawChars as number : undefined;
-              effectivePreParsed = { text, images, rawCharCount };
-              setPreParsed(effectivePreParsed);
-            }
+            const j = await uploadAndPreparse(files);
+            const text = typeof j?.text === 'string' ? j.text : '';
+            const images = Array.isArray(j?.images) ? j.images as string[] : [];
+            const rawCharCount = typeof j?.totalRawChars === 'number' ? j.totalRawChars as number : undefined;
+            effectivePreParsed = { text, images, rawCharCount };
+            setPreParsed(effectivePreParsed);
           } catch {}
           finally { setIsPreParsing(false); }
         }
@@ -301,6 +333,7 @@ export default function Generator({ redirectOnAuth = false, showTitle = true }: 
             headers: { 'Content-Type': 'application/json', ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}) },
           });
         } else {
+          // As a last resort, fall back to legacy multipart for very small sets
           const formData = new FormData();
           files.forEach((file) => formData.append('files', file));
           if (prompt.trim()) formData.append('prompt', prompt.trim());
@@ -464,21 +497,12 @@ export default function Generator({ redirectOnAuth = false, showTitle = true }: 
       if (!effectivePreParsed && files.length > 0) {
         try {
           setIsPreParsing(true);
-          const formData = new FormData();
-          if (files.length > 0) { files.forEach(file => { formData.append('files', file); }); }
-          const preRes = await fetch('/api/preparse', {
-            method: 'POST',
-            body: formData,
-            headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : undefined,
-          });
-          if (preRes.ok) {
-            const j = await preRes.json();
-            const text = typeof j?.text === 'string' ? j.text : '';
-            const images = Array.isArray(j?.images) ? j.images as string[] : [];
-            const rawCharCount = typeof j?.totalRawChars === 'number' ? j.totalRawChars as number : undefined;
-            effectivePreParsed = { text, images, rawCharCount };
-            setPreParsed(effectivePreParsed);
-          }
+          const j = await uploadAndPreparse(files);
+          const text = typeof j?.text === 'string' ? j.text : '';
+          const images = Array.isArray(j?.images) ? j.images as string[] : [];
+          const rawCharCount = typeof j?.totalRawChars === 'number' ? j.totalRawChars as number : undefined;
+          effectivePreParsed = { text, images, rawCharCount };
+          setPreParsed(effectivePreParsed);
         } catch {}
         finally { setIsPreParsing(false); }
       }
@@ -490,6 +514,7 @@ export default function Generator({ redirectOnAuth = false, showTitle = true }: 
           headers: { 'Content-Type': 'application/json', ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}) },
         });
       } else {
+        // As a last resort, fallback to legacy multipart
         const formData = new FormData();
         if (files.length > 0) { files.forEach(file => { formData.append('files', file); }); }
         if (prompt.trim()) formData.append('prompt', prompt.trim());
