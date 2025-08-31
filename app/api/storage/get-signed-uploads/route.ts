@@ -55,7 +55,10 @@ export async function POST(req: NextRequest) {
     for (let i = 0; i < files.length; i++) {
       const f = files[i];
       const safeName = sanitizeFileName(String(f.name || `file-${i}`));
-      const key = (typeof f.key === 'string' && f.key) ? f.key.replace(/[^A-Za-z0-9._|-]/g, '_') : Math.random().toString(36).slice(2);
+      // Sanitize key strictly to avoid problematic URL characters (remove pipe "|")
+      const key = (typeof f.key === 'string' && f.key)
+        ? f.key.replace(/[^A-Za-z0-9._-]/g, '_')
+        : Math.random().toString(36).slice(2);
       const path = `${ownerPrefix}/${dateDir}/${key}/${safeName}`;
       const { data, error } = await supabaseAdmin.storage.from(bucket).createSignedUploadUrl(path);
       if (error || !data) {

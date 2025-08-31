@@ -229,8 +229,9 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
       } catch (e) {
         // Fallback: legacy small-upload path if JSON/storage fails
         const totalBytes = selectedFiles.reduce((sum, f) => sum + (f.size || 0), 0);
+        const reason = (e && (e as any).message) || (e && (e as any).error) || (typeof e === 'string' ? e : '') || 'Unknown error';
         if (totalBytes > 4 * 1024 * 1024) {
-          setError('Upload failed and storage pre-parse is not available right now. Please try again later or check storage configuration.');
+          setError(`Storage pre-parse failed: ${reason}. Large files cannot be sent directly; please retry later or check storage configuration.`);
           setPreParsed(null);
           setAllowedNameSizes(undefined);
           return;
