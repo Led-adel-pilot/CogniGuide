@@ -886,7 +886,7 @@ body { margin: 0; background: #ffffff; ${computedFontFamily ? `font-family: ${co
             <div className="border p-8 rounded-2xl shadow-xl max-w-md w-full text-center relative z-10" style={{ backgroundColor: 'var(--color-background)' }}>
               <h2 className="text-2xl font-bold mb-4">Sign Up to Save Your Mind Map!</h2>
               <p className="text-muted-foreground mb-6">
-                Sign up to save your mind map, and track your study progress with spaced repetition flashcards.
+                Sign up to continue reading and track your study progress with spaced repetition flashcards.
               </p>
               <div className="flex flex-col gap-3 w-full max-w-md">
                 <button

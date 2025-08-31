@@ -56,6 +56,8 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
   const [userId, setUserId] = React.useState<string | null>(null);
   const [showAuthModal, setShowAuthModal] = React.useState(false);
   const [showLossAversionPopup, setShowLossAversionPopup] = React.useState(false);
+  const [showSignupPopup, setShowSignupPopup] = React.useState(false);
+  const [cardsViewedCount, setCardsViewedCount] = React.useState(0);
   const current = scheduledCards && scheduledCards[index] ? scheduledCards[index] : null;
 
   const handleClose = (event?: React.MouseEvent) => {
@@ -80,6 +82,8 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
       setPredictedDueDatesByGrade({});
       setFinished(false);
       setShowLossAversionPopup(false);
+      setShowSignupPopup(false);
+      setCardsViewedCount(0);
     }
   }, [open]);
 
@@ -346,19 +350,21 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
                     <div className="text-foreground text-sm sm:text-base leading-6 max-w-md">
                       You have finished this deck for now. For best results with spaced repetition, be sure to come back for future review sessions.
                     </div>
-                    <button
-                      onClick={() => {
-                        setFinished(false);
-                        setIndex(0);
-                        setShowAnswer(false);
-                        setHoveredGrade(null);
-                        setPredictedDueByGrade({});
-                        setPredictedDueDatesByGrade({});
-                      }}
-                      className="mt-6 inline-flex items-center h-10 px-6 rounded-full text-white bg-gradient-primary shadow-sm hover:bg-gradient-primary-hover transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/50 whitespace-nowrap"
-                    >
-                      Start Over
-                    </button>
+                                          <button
+                        onClick={() => {
+                          setFinished(false);
+                          setIndex(0);
+                          setShowAnswer(false);
+                          setHoveredGrade(null);
+                          setPredictedDueByGrade({});
+                          setPredictedDueDatesByGrade({});
+                          setCardsViewedCount(0);
+                          setShowSignupPopup(false);
+                        }}
+                        className="mt-6 inline-flex items-center h-10 px-6 rounded-full text-white bg-gradient-primary shadow-sm hover:bg-gradient-primary-hover transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/50 whitespace-nowrap"
+                      >
+                        Start Over
+                      </button>
                   </div>
                 </div>
               ) : isEmbedded ? (
@@ -393,6 +399,8 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
                           setHoveredGrade(null);
                           setPredictedDueByGrade({});
                           setPredictedDueDatesByGrade({});
+                          setCardsViewedCount(0);
+                          setShowSignupPopup(false);
                         }}
                         className="flex-1 h-auto sm:h-10 py-2 sm:py-0 px-6 text-base font-medium text-muted-foreground bg-muted rounded-full hover:bg-muted/70 transition-colors"
                       >
@@ -429,6 +437,8 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
                           setHoveredGrade(null);
                           setPredictedDueByGrade({});
                           setPredictedDueDatesByGrade({});
+                          setCardsViewedCount(0);
+                          setShowSignupPopup(false);
                         }}
                         className="flex-1 h-auto sm:h-10 py-2 sm:py-0 px-6 text-base font-medium text-muted-foreground bg-muted rounded-full hover:bg-muted/70 transition-colors"
                       >
@@ -540,6 +550,17 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
                     study_due_only: studyDueOnly,
                   });
                   setShowAnswer(true);
+                  // Track cards viewed for non-auth users
+                  if (!userId) {
+                    setCardsViewedCount(prev => {
+                      const newCount = prev + 1;
+                      // Show signup popup after viewing 3 cards
+                      if (newCount >= 3 && !showSignupPopup) {
+                        setShowSignupPopup(true);
+                      }
+                      return newCount;
+                    });
+                  }
                 }} className="inline-flex items-center h-10 px-5 rounded-full text-white bg-gradient-primary shadow-sm hover:bg-gradient-primary-hover transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/50 whitespace-nowrap">
                   <Eye className="h-5 w-5 mr-2" /> Show Answer
                 </button>
@@ -600,6 +621,40 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
                 className="w-full h-10 px-6 text-sm font-medium text-muted-foreground bg-muted rounded-full hover:bg-muted/70 transition-colors whitespace-nowrap"
               >
                 Continue without saving
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showSignupPopup && (
+        <div className="absolute inset-0 flex items-center justify-center z-[110]">
+          {/* Black transparent background */}
+          <div className="absolute inset-0 bg-black/40 dark:bg-black/60 z-0"></div>
+          <div className="bg-background border p-8 rounded-2xl shadow-xl max-w-md w-full text-center relative z-10">
+            <h2 className="text-foreground text-2xl font-bold mb-4">Sign Up to Save Your Flashcards!</h2>
+            <p className="text-muted-foreground mb-6">
+              Sign up to save your flashcard deck and get scheduled reviews based on the spaced repetition algorithm.
+            </p>
+            <div className="flex flex-col gap-3 w-full max-w-md">
+              <button
+                onClick={() => {
+                  if (title && cards) {
+                    const pendingDeck = { title, cards };
+                    localStorage.setItem('cogniguide:pending_flashcards', JSON.stringify(pendingDeck));
+                  }
+                  setShowSignupPopup(false);
+                  setShowAuthModal(true);
+                }}
+                className="w-full h-10 px-6 text-sm font-bold text-white bg-gradient-primary rounded-full hover:bg-gradient-primary-hover transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/50 whitespace-nowrap"
+              >
+                Sign Up & Save Progress
+              </button>
+              <button
+                onClick={onClose}
+                className="w-full h-10 px-6 text-sm font-medium text-muted-foreground bg-muted rounded-full hover:bg-muted/70 transition-colors whitespace-nowrap"
+              >
+                Close without saving
               </button>
             </div>
           </div>
