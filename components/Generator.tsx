@@ -579,6 +579,8 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
             if (typeof window !== 'undefined') window.dispatchEvent(new CustomEvent('cogniguide:generation-complete'));
           } catch {}
         }
+        // Mindmap stream completion event (non-stream path mimics completion)
+        try { if (typeof window !== 'undefined') setTimeout(() => window.dispatchEvent(new CustomEvent('cogniguide:mindmap-stream-complete')), 0); } catch {}
         // No longer require sign-in after successful generation
         return;
       }
@@ -629,6 +631,8 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
           if (typeof window !== 'undefined') window.dispatchEvent(new CustomEvent('cogniguide:generation-complete'));
         } catch {}
       }
+      // Mindmap stream completion event (stream path)
+      try { if (typeof window !== 'undefined') setTimeout(() => window.dispatchEvent(new CustomEvent('cogniguide:mindmap-stream-complete')), 0); } catch {}
       // No longer require sign-in after successful generation
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to generate mind map.';

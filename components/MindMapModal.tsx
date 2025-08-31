@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { initializeMindMap, cleanup, getFullMindMapBounds, updateMindMap, recommendPrintScaleMultiplier, getPrintZoomBias } from '@/lib/markmap-renderer';
+import { initializeMindMap, cleanup, getFullMindMapBounds, updateMindMap, recommendPrintScaleMultiplier, getPrintZoomBias, collapseToMainBranches } from '@/lib/markmap-renderer';
 import { Download, X, FileImage, Loader2, Printer, Map as MapIcon } from 'lucide-react';
 import FlashcardIcon from '@/components/FlashcardIcon';
 import FlashcardsModal from '@/components/FlashcardsModal';
@@ -21,6 +21,7 @@ export default function MindMapModal({ markdown, onClose }: MindMapModalProps) {
   const viewportRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [isDropdownOpen, setDropdownOpen] = useState(false);
+  const collapseRequestedRef = useRef(false);
 
   // NEW: ref and state to size the dropdown to the trigger width
   const triggerGroupRef = useRef<HTMLDivElement>(null);
@@ -550,6 +551,8 @@ body { margin: 0; background: #ffffff; ${computedFontFamily ? `font-family: ${co
       initializedRef.current = false;
       setHasGeneratedContent(false);
       setShowLossAversionPopup(false);
+      // Reset collapse request state so future generations don't inherit it
+      collapseRequestedRef.current = false;
       cleanup();
     }
   }, [markdown]);
@@ -560,6 +563,35 @@ body { margin: 0; background: #ffffff; ${computedFontFamily ? `font-family: ${co
       cleanup();
     };
   }, []);
+
+  // Collapse to main branches when mindmap stream completes
+  useEffect(() => {
+    const onComplete = () => {
+      collapseRequestedRef.current = true;
+      try { collapseToMainBranches(); } catch {}
+      // Retry a few times to handle race with renderer initialization
+      try { setTimeout(() => { try { collapseToMainBranches(); } catch {} }, 60); } catch {}
+      try { setTimeout(() => { try { collapseToMainBranches(); } catch {} }, 180); } catch {}
+      try { setTimeout(() => { try { collapseToMainBranches(); } catch {} }, 360); } catch {}
+    };
+    if (typeof window !== 'undefined') {
+      window.addEventListener('cogniguide:mindmap-stream-complete', onComplete);
+    }
+    return () => {
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('cogniguide:mindmap-stream-complete', onComplete);
+      }
+    };
+  }, []);
+
+  // If initialization happens after completion event, apply collapse immediately
+  useEffect(() => {
+    if (!viewportRef.current || !containerRef.current) return;
+    if (!markdown) return;
+    if (initializedRef.current && collapseRequestedRef.current) {
+      try { collapseToMainBranches(); } catch {}
+    }
+  }, [markdown, initializedRef.current]);
 
   // Detect authenticated user for saving flashcards
   useEffect(() => {
@@ -606,6 +638,8 @@ body { margin: 0; background: #ffffff; ${computedFontFamily ? `font-family: ${co
     setViewMode('map');
     setGenerationError(null);
     setFlashcardIndex(0);
+    // New generation: clear previous completion flag to avoid stale collapses
+    collapseRequestedRef.current = false;
     const cached = flashcardsCacheRef.current.get(markdown);
     setFlashcards(cached ?? null);
     setFlashcardsSavedId(null);

@@ -50,7 +50,7 @@ interface HslColor { h: number; s: number; l: number; }
 const HORIZONTAL_SPACING = 150;
 const VERTICAL_SPACING = 10;
 const PADDING = 50;
-const ANIMATION_DURATION = 350;
+const ANIMATION_DURATION = 300;
 
 // Light Mode Color Palette
 const L_NODE_COLOR_PALETTE = [
@@ -125,6 +125,7 @@ let stableRootY: number | null = null;
 let mapContainer: HTMLElement;
 let viewport: HTMLElement;
 let svg: SVGSVGElement;
+let lastMarkdown: string = '';
 
 // Pan and Zoom State
 let scale = 1, panX = 0, panY = 0;
@@ -135,6 +136,8 @@ let isPanning = false, startX = 0, startY = 0;
 // Touch gesture state
 let isPinching = false, initialDistance = 0;
 let lastTouchX = 0, lastTouchY = 0; // For single-finger panning
+// Transform animation state
+let transformAnimationToken = 0;
 
 // Initial pan offset state (can be overridden via initialize options)
 let initialPanXOffset = INITIAL_PAN_X_OFFSET;
@@ -377,6 +380,41 @@ function applyTransform() {
     }
 }
 
+// Smoothly animate pan and zoom to the target transform
+function animateTransformTo(targetScale: number, targetPanX: number, targetPanY: number, duration = ANIMATION_DURATION) {
+    const startScale = scale;
+    const startPanX = panX;
+    const startPanY = panY;
+    const startTime = performance.now();
+    const token = ++transformAnimationToken;
+
+    const easeInOutCubic = (t: number) => (t < 0.5)
+        ? 4 * t * t * t
+        : 1 - Math.pow(-2 * t + 2, 3) / 2;
+
+    function step(now: number) {
+        if (token !== transformAnimationToken) return; // cancelled by interaction or new anim
+        const elapsed = now - startTime;
+        const t = Math.min(1, elapsed / duration);
+        const e = easeInOutCubic(t);
+
+        scale = startScale + (targetScale - startScale) * e;
+        panX = startPanX + (targetPanX - startPanX) * e;
+        panY = startPanY + (targetPanY - startPanY) * e;
+        applyTransform();
+
+        if (t < 1) {
+            requestAnimationFrame(step);
+        } else {
+            if (mindMapTree) {
+                stableRootY = mindMapTree.y;
+            }
+        }
+    }
+
+    requestAnimationFrame(step);
+}
+
 function autoFitView(markdown: string) {
     if (!viewport) return;
 
@@ -410,6 +448,37 @@ function autoFitView(markdown: string) {
     if (mindMapTree) {
         stableRootY = mindMapTree.y;
     }
+}
+
+// Auto-fit the view to the CURRENT rendered tree state (respects collapsed nodes)
+function autoFitToCurrentTree() {
+    if (!viewport || !mindMapTree) return;
+
+    const bounds = getTreeBounds(mindMapTree);
+    if (!bounds || bounds.width === 0 || bounds.height === 0) return;
+
+    const viewportWidth = viewport.clientWidth;
+    const viewportHeight = viewport.clientHeight;
+
+    // Use 99.5% of viewport to leave a smaller margin
+    const effectiveWidth = viewportWidth * 0.7;
+    const effectiveHeight = viewportHeight * 0.7;
+
+    const contentWidth = bounds.width + PADDING * 2;
+    const contentHeight = bounds.height + PADDING * 2;
+
+    const scaleX = effectiveWidth / contentWidth;
+    const scaleY = effectiveHeight / contentHeight;
+
+    const targetScale = Math.min(scaleX, scaleY, 2); // Cap max zoom
+
+    const contentCenterX = bounds.minX + PADDING + bounds.width / 2;
+    const contentCenterY = bounds.minY + PADDING + bounds.height / 2;
+
+    const targetPanX = (viewportWidth / 2) - (contentCenterX * targetScale);
+    const targetPanY = (viewportHeight / 2) - (contentCenterY * targetScale);
+
+    animateTransformTo(targetScale, targetPanX, targetPanY, ANIMATION_DURATION + 100);
 }
 
 
@@ -745,6 +814,8 @@ function rerenderMindMap() {
 function handleWheel(e: WheelEvent) {
     e.preventDefault();
     userHasInteracted = true;
+    // Cancel ongoing transform animation on user interaction
+    transformAnimationToken++;
     const zoomSpeed = 0.1;
     const oldScale = scale;
     const rect = viewport.getBoundingClientRect();
@@ -772,6 +843,8 @@ function handleMouseDown(e: MouseEvent) {
     if ((e.target as HTMLElement).closest('.mindmap-node')) return;
     e.preventDefault();
     userHasInteracted = true;
+    // Cancel ongoing transform animation on user interaction
+    transformAnimationToken++;
     isPanning = true;
     startX = e.clientX - panX;
     startY = e.clientY - panY;
@@ -807,6 +880,8 @@ function handleTouchStart(e: TouchEvent) {
     if ((e.target as HTMLElement).closest('.mindmap-node')) return;
     e.preventDefault();
     userHasInteracted = true;
+    // Cancel ongoing transform animation on user interaction
+    transformAnimationToken++;
 
     if (e.touches.length === 2) {
         isPinching = true;
@@ -878,6 +953,7 @@ export function initializeMindMap(
     
     viewport = targetViewport;
     mapContainer = targetContainer;
+    lastMarkdown = markdown;
 
     // Set initial offsets from options or fall back to defaults
     initialPanXOffset = options?.initialPanXOffset ?? INITIAL_PAN_X_OFFSET;
@@ -929,6 +1005,7 @@ export function initializeMindMap(
 export function updateMindMap(markdown: string) {
     if (!mapContainer || !viewport) return;
     try {
+        lastMarkdown = markdown;
         mindMapTree = parseMarkmap(markdown);
         mindMapTree.children.forEach(child => applyColorVariations(child));
         // Do not reset pan/zoom or stableRootY; rerender preserves position and animates connectors
@@ -941,6 +1018,41 @@ export function updateMindMap(markdown: string) {
         // eslint-disable-next-line no-console
         console.warn('Incremental render failed for current partial markdown:', error);
     }
+}
+
+/**
+ * Collapses the rendered mind map so that only the root and its immediate
+ * children remain visible, with all other sub-branches hidden. Intended to be
+ * called once streaming of markdown has completed.
+ */
+export function collapseToMainBranches() {
+    if (!mindMapTree) return;
+    // Cancel any ongoing transform animation to avoid conflicting with collapse animations
+    transformAnimationToken++;
+    // Ensure root stays visible
+    mindMapTree.isCollapsed = false;
+    // Collapse each immediate child's subtree (child stays visible)
+    const children = mindMapTree.children.slice();
+    children.forEach((child) => {
+        if (child.children.length > 0 && !child.isAnimating && !child.isCollapsed) {
+            toggleNodeCollapse(child);
+        }
+    });
+    // After collapse animation completes, ensure collapsed state and auto-fit
+    setTimeout(() => {
+        try {
+            // Fallback: enforce collapse for any immediate child that still isn't collapsed
+            if (mindMapTree) {
+                mindMapTree.children.forEach((child) => {
+                    if (child.children.length > 0 && !child.isCollapsed) {
+                        child.isCollapsed = true;
+                    }
+                });
+            }
+            rerenderMindMap();
+        } catch {}
+        autoFitToCurrentTree();
+    }, 0);
 }
 /**
  * Cleans up event listeners to prevent memory leaks.

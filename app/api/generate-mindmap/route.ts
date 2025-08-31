@@ -153,11 +153,9 @@ Your task is to analyze the provided text and generate a mind map in Markmap Mar
 ### Core Structure
 
 *   **Central Topic:** Start with a Level 1 Heading (#).
-*   **Main Branches:** Use first-level bullet points (-) for the primary ideas radiating from the center. These should never not have sub-branches. These should be multiple.
+*   **Main Branches:** NEVER make only one main branch. Use first-level bullet points (-) for the primary ideas radiating from the center. These should never not have sub-branches. EVERY main branch MUST HAVE sub-branches.
 *   **Sub-Branches:** Use nested/indented bullet points to represent sub-topics and details, creating a clear hierarchy.
 *   **Avoid long Sentences:** Mainly use concise phrases for each bullet point. Avoid lengthy sentences to maximize clarity and associative power.
-
-### Psychological Enhancements
 
 *   **Use Emojis as Visual Cues:** Add emojis to branches to visually categorize themes, add emphasis, and improve recall, mimicking the use of color and images.
 
