@@ -446,7 +446,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
                   <div className="text-foreground text-xl sm:text-2xl font-semibold leading-7 sm:leading-8 break-words">{cards![index]?.question}</div>
                   <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
                     {showAnswer && current?.schedule?.due ? (
-                      <span className="inline-flex items-center h-6 px-2.5 rounded-full bg-sky-50 dark:bg-sky-900/30 text-sky-700 dark:text-sky-300 border border-sky-200 dark:border-sky-800">
+                      <span className="inline-flex items-center h-6 px-2.5 rounded-full bg-sky-50 dark:bg-sky-900/30 text-sky-700 dark:text-sky-300 border border-sky-200 dark:border-sky-800 flashcard-due-pill">
                         {hoveredGrade && predictedDueDatesByGrade[hoveredGrade]
                           ? `Next due: ${predictedDueDatesByGrade[hoveredGrade].toLocaleDateString()} ${predictedDueDatesByGrade[hoveredGrade].toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`
                           : `Was due: ${new Date(current.schedule.due).toLocaleDateString()} ${new Date(current.schedule.due).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`
@@ -493,7 +493,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
                       onClick={() => handleGrade(1)}
                       onMouseEnter={() => setHoveredGrade(1)}
                       onMouseLeave={() => setHoveredGrade(null)}
-                      className="h-9 px-3 text-xs rounded-full border border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-300 hover:bg-red-100 dark:hover:bg-red-900/50 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-300/50"
+                      className="h-9 px-3 text-xs rounded-full border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-300/50 flashcard-grade-again"
                     >
                       Again
                     </button>
@@ -504,7 +504,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
                       onClick={() => handleGrade(2)}
                       onMouseEnter={() => setHoveredGrade(2)}
                       onMouseLeave={() => setHoveredGrade(null)}
-                      className="h-9 px-3 text-xs rounded-full border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 hover:bg-amber-100 dark:hover:bg-amber-900/50 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-300/50"
+                      className="h-9 px-3 text-xs rounded-full border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-300/50 flashcard-grade-hard"
                     >
                       Hard
                     </button>
@@ -515,7 +515,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
                       onClick={() => handleGrade(3)}
                       onMouseEnter={() => setHoveredGrade(3)}
                       onMouseLeave={() => setHoveredGrade(null)}
-                      className="h-9 px-3 text-xs rounded-full border border-sky-200 dark:border-sky-800 bg-sky-50 dark:bg-sky-900/30 text-sky-700 dark:text-sky-300 hover:bg-sky-100 dark:hover:bg-sky-900/50 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-300/50"
+                      className="h-9 px-3 text-xs rounded-full border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-300/50 flashcard-grade-good"
                     >
                       Good
                     </button>
@@ -526,7 +526,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
                       onClick={() => handleGrade(4)}
                       onMouseEnter={() => setHoveredGrade(4)}
                       onMouseLeave={() => setHoveredGrade(null)}
-                      className="h-9 px-3 text-xs rounded-full border border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/50"
+                      className="h-9 px-3 text-xs rounded-full border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/50 flashcard-grade-easy"
                     >
                       Easy
                     </button>

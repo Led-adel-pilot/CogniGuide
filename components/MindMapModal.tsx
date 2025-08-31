@@ -321,6 +321,7 @@ body { margin: 0; background: #ffffff; ${computedFontFamily ? `font-family: ${co
   const [flashcardsSavedId, setFlashcardsSavedId] = useState<string | null>(null);
   const [isCheckingFlashcards, setIsCheckingFlashcards] = useState(false);
   const [showLossAversionPopup, setShowLossAversionPopup] = useState(false);
+  const [showTimeBasedPopup, setShowTimeBasedPopup] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [hasGeneratedContent, setHasGeneratedContent] = useState(false);
 
@@ -551,11 +552,23 @@ body { margin: 0; background: #ffffff; ${computedFontFamily ? `font-family: ${co
       initializedRef.current = false;
       setHasGeneratedContent(false);
       setShowLossAversionPopup(false);
+      setShowTimeBasedPopup(false);
       // Reset collapse request state so future generations don't inherit it
       collapseRequestedRef.current = false;
       cleanup();
     }
   }, [markdown]);
+
+  // Timer for time-based signup popup for non-auth users
+  useEffect(() => {
+    if (!markdown || userId || showTimeBasedPopup) return;
+
+    const timer = setTimeout(() => {
+      setShowTimeBasedPopup(true);
+    }, 50000); // 50 seconds
+
+    return () => clearTimeout(timer);
+  }, [markdown, userId, showTimeBasedPopup]);
 
   useEffect(() => {
     return () => {
@@ -860,6 +873,39 @@ body { margin: 0; background: #ffffff; ${computedFontFamily ? `font-family: ${co
                   className="w-full h-10 px-6 text-sm font-medium text-muted-foreground bg-muted rounded-full hover:bg-muted/80 transition-colors whitespace-nowrap"
                 >
                   Continue without saving
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {showTimeBasedPopup && (
+          <div className="absolute inset-0 flex items-center justify-center z-[110]">
+            {/* Black transparent background */}
+            <div className="absolute inset-0 bg-black/40 dark:bg-black/60 z-0"></div>
+            <div className="border p-8 rounded-2xl shadow-xl max-w-md w-full text-center relative z-10" style={{ backgroundColor: 'var(--color-background)' }}>
+              <h2 className="text-2xl font-bold mb-4">Sign Up to Save Your Mind Map!</h2>
+              <p className="text-muted-foreground mb-6">
+                Sign up to save your mind map, and track your study progress with spaced repetition flashcards.
+              </p>
+              <div className="flex flex-col gap-3 w-full max-w-md">
+                <button
+                  onClick={() => {
+                    if (markdown) {
+                      localStorage.setItem('cogniguide:pending_mindmap', markdown);
+                    }
+                    setShowTimeBasedPopup(false);
+                    setShowAuthModal(true);
+                  }}
+                  className="w-full h-10 px-6 text-sm font-bold text-white bg-gradient-to-r from-blue-600 via-cyan-500 to-teal-500 rounded-full hover:opacity-90 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/50 whitespace-nowrap"
+                >
+                  Save & Continue
+                </button>
+                <button
+                  onClick={onClose}
+                  className="w-full h-10 px-6 text-sm font-medium text-muted-foreground bg-muted rounded-full hover:bg-muted/80 transition-colors whitespace-nowrap"
+                >
+                  Close without saving
                 </button>
               </div>
             </div>

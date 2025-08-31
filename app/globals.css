@@ -63,6 +63,13 @@
     background-color: var(--color-background);
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3); /* Slightly stronger shadow for dark mode */
   }
+
+  /* Flashcard modal dark-mode overrides */
+  .flashcard-due-pill { @apply dark:bg-sky-900/30 dark:text-sky-300; }
+  .flashcard-grade-again { @apply dark:border-red-800 dark:bg-red-900/30 dark:text-red-300 dark:hover:bg-red-900/50; }
+  .flashcard-grade-hard { @apply dark:border-amber-800 dark:bg-amber-900/30 dark:text-amber-300 dark:hover:bg-amber-900/50; }
+  .flashcard-grade-good { @apply dark:border-sky-800 dark:bg-sky-900/30 dark:text-sky-300 dark:hover:bg-sky-900/50; }
+  .flashcard-grade-easy { @apply dark:border-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300 dark:hover:bg-emerald-900/50; }
 }
 
 @layer base {
@@ -313,6 +320,13 @@
     color: var(--color-foreground);
   }
 }
+
+/* Flashcard modal light-mode fix */
+.flashcard-due-pill { @apply bg-sky-50 text-sky-700; }
+.flashcard-grade-again { @apply border-red-200 bg-red-50 text-red-700 hover:bg-red-100; }
+.flashcard-grade-hard { @apply border-amber-200 bg-amber-50 text-amber-700 hover:bg-amber-100; }
+.flashcard-grade-good { @apply border-sky-200 bg-sky-50 text-sky-700 hover:bg-sky-100; }
+.flashcard-grade-easy { @apply border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100; }
 
 /* Scrollbar: transparent track, thicker, shorter track, hover fades */
 @layer base {

@@ -167,6 +167,29 @@ These preferences reflect the current, polished UI and should be used consistent
 - **Optional library**: You may use shadcn/ui components to speed up consistent, reusable UI primitives (e.g., Dialog, Button). Match the shape rules above (pills/circles/rounded panels) and white background.
 - **Accessibility/Feel**: Keep hover states subtle, focus-visible rings on interactive elements, and avoid dark backgrounds/panels.
 
+### FlashcardsModal Styling Guidelines
+To ensure consistent light and dark mode appearance in `components/FlashcardsModal.tsx`, follow these conventions:
+1. Use the `flashcard-due-pill` class for the due date pill:
+   - Light mode: `bg-sky-50 text-sky-700`
+   - Dark mode: `dark:bg-sky-900/30 dark:text-sky-300`
+2. Use the `flashcard-grade-{again,hard,good,easy}` utility classes for the grading buttons:
+   - Light mode definitions (in `app/globals.css`):
+     ```css
+     .flashcard-grade-again { @apply border-red-200 bg-red-50 text-red-700 hover:bg-red-100; }
+     .flashcard-grade-hard  { @apply border-amber-200 bg-amber-50 text-amber-700 hover:bg-amber-100; }
+     .flashcard-grade-good  { @apply border-sky-200 bg-sky-50 text-sky-700 hover:bg-sky-100; }
+     .flashcard-grade-easy  { @apply border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100; }
+     ```
+   - Dark mode overrides:
+     ```css
+     .flashcard-grade-again { @apply dark:border-red-800 dark:bg-red-900/30 dark:text-red-300 dark:hover:bg-red-900/50; }
+     .flashcard-grade-hard  { @apply dark:border-amber-800 dark:bg-amber-900/30 dark:text-amber-300 dark:hover:bg-amber-900/50; }
+     .flashcard-grade-good  { @apply dark:border-sky-800 dark:bg-sky-900/30 dark:text-sky-300 dark:hover:bg-sky-900/50; }
+     .flashcard-grade-easy  { @apply dark:border-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300 dark:hover:bg-emerald-900/50; }
+     ```
+3. Apply these classes directly in the JSX of `FlashcardsModal.tsx` instead of inline color utilities.
+4. Verify definitions in `app/globals.css` to avoid mismatches.
+
 ### Logo Usage Guidelines
 
 For consistent branding across the application, use the `CogniGuide_logo.png` file for all logo displays:
