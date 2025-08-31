@@ -228,6 +228,13 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
         j = await uploadAndPreparse(selectedFiles);
       } catch (e) {
         // Fallback: legacy small-upload path if JSON/storage fails
+        const totalBytes = selectedFiles.reduce((sum, f) => sum + (f.size || 0), 0);
+        if (totalBytes > 4 * 1024 * 1024) {
+          setError('Upload failed and storage pre-parse is not available right now. Please try again later or check storage configuration.');
+          setPreParsed(null);
+          setAllowedNameSizes(undefined);
+          return;
+        }
         const formData = new FormData();
         selectedFiles.forEach((f) => formData.append('files', f));
         const { data: sessionData } = await supabase.auth.getSession();
@@ -345,6 +352,10 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
           });
         } else {
           // As a last resort, fall back to legacy multipart for very small sets
+          const totalBytes = files.reduce((sum, f) => sum + (f.size || 0), 0);
+          if (totalBytes > 4 * 1024 * 1024) {
+            throw new Error('Upload is too large for direct submit and storage pre-parse failed. Please retry or check storage configuration.');
+          }
           const formData = new FormData();
           files.forEach((file) => formData.append('files', file));
           if (prompt.trim()) formData.append('prompt', prompt.trim());
@@ -526,6 +537,10 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
         });
       } else {
         // As a last resort, fallback to legacy multipart
+        const totalBytes = files.reduce((sum, f) => sum + (f.size || 0), 0);
+        if (totalBytes > 4 * 1024 * 1024) {
+          throw new Error('Upload is too large for direct submit and storage pre-parse failed. Please retry or check storage configuration.');
+        }
         const formData = new FormData();
         if (files.length > 0) { files.forEach(file => { formData.append('files', file); }); }
         if (prompt.trim()) formData.append('prompt', prompt.trim());
