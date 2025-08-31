@@ -226,6 +226,33 @@ function extractJsonObject(text: string): any {
   throw new Error('Model response was not valid JSON');
 }
 
+// Simple, consistent logging of model input
+function logLlmInput(kind: string, prompt: string) {
+  console.log(`=== ${kind} ===`);
+  console.log('Character count:', prompt.length);
+  console.log('Text content preview:', prompt.substring(0, 200) + (prompt.length > 200 ? '...' : ''));
+  console.log('==============================');
+}
+
+// Shared non-streaming completion + JSON parsing
+async function generateJsonFromModel(userContent: any): Promise<{ title: string | null; cards: Flashcard[] }> {
+  const completion = await openai.chat.completions.create({
+    model: 'gemini-2.5-flash-lite',
+    // @ts-ignore
+    reasoning_effort: 'none',
+    messages: [{ role: 'user', content: userContent }],
+    stream: false,
+    // @ts-ignore
+    response_format: { type: 'json_object' },
+  });
+  const content = completion.choices?.[0]?.message?.content ?? '';
+  if (!content) throw new Error('No content returned from model');
+  const parsed = extractJsonObject(content);
+  const cards: Flashcard[] = Array.isArray(parsed?.cards) ? parsed.cards : [];
+  if (cards.length === 0) throw new Error('Failed to generate flashcards');
+  return { title: parsed.title || null, cards };
+}
+
 export async function POST(req: NextRequest) {
   try {
     const url = req.nextUrl;
@@ -340,36 +367,20 @@ export async function POST(req: NextRequest) {
         if (shouldStream) {
           const streamingPrompt = buildFlashcardPrompt({ mode: 'stream', sourceType: 'markmap', sourceContent: body.markdown!, numCards: body.numCards });
 
-          // Log the total text after truncation sent to LLM and its character count
-          console.log('=== FLASHCARDS MARKDOWN STREAMING LLM INPUT ===');
-          console.log('Character count:', streamingPrompt.length);
-          console.log('Text content preview:', streamingPrompt.substring(0, 200) + (streamingPrompt.length > 200 ? '...' : ''));
-          console.log('===============================================');
+          logLlmInput('FLASHCARDS MARKDOWN STREAMING LLM INPUT', streamingPrompt);
 
           return streamNdjson(streamingPrompt, (userIdForCredits && creditsNeeded > 0) ? { userId: userIdForCredits, credits: creditsNeeded } : undefined);
         }
         const prompt = buildFlashcardPrompt({ mode: 'json', sourceType: 'markmap', sourceContent: body.markdown!, numCards: body.numCards });
 
-        // Log the total text after truncation sent to LLM and its character count
-        console.log('=== FLASHCARDS MARKDOWN NON-STREAMING LLM INPUT ===');
-        console.log('Character count:', prompt.length);
-        console.log('Text content preview:', prompt.substring(0, 200) + (prompt.length > 200 ? '...' : ''));
-        console.log('==================================================');
-        const completion = await openai.chat.completions.create({
-          model: 'gemini-2.5-flash-lite',
-          // @ts-ignore
-          reasoning_effort: 'none',
-          messages: [{ role: 'user', content: prompt }],
-          stream: false,
-          // @ts-ignore
-          response_format: { type: 'json_object' },
-        });
-        const content = completion.choices?.[0]?.message?.content ?? '';
-        if (!content) return NextResponse.json({ error: 'No content returned from model' }, { status: 502 });
-        const parsed = extractJsonObject(content);
-        const cards: Flashcard[] = Array.isArray(parsed?.cards) ? parsed.cards : [];
-        if (cards.length === 0) return NextResponse.json({ error: 'Failed to generate flashcards' }, { status: 502 });
-        return NextResponse.json({ title: parsed.title || null, cards });
+        logLlmInput('FLASHCARDS MARKDOWN NON-STREAMING LLM INPUT', prompt);
+        try {
+          const result = await generateJsonFromModel(prompt);
+          return NextResponse.json(result);
+        } catch (e) {
+          const msg = e instanceof Error ? e.message : 'Failed to generate flashcards';
+          return NextResponse.json({ error: msg }, { status: 502 });
+        }
       }
 
       // Text/images/prompt path (pre-parsed input)
@@ -388,32 +399,20 @@ export async function POST(req: NextRequest) {
       }
       const streamingPrompt = buildFlashcardPrompt({ mode: shouldStream ? 'stream' : 'json', sourceType: 'text', sourceContent: text || 'No text provided. Analyze the attached image(s) only and build flashcards from their content.', userInstruction: promptText, imagesCount: images.length, numCards: body.numCards });
 
-      // Log the total text after truncation sent to LLM and its character count
-      console.log('=== FLASHCARDS PRE-PARSED LLM INPUT ===');
-      console.log('Character count:', streamingPrompt.length);
-      console.log('Text content preview:', streamingPrompt.substring(0, 200) + (streamingPrompt.length > 200 ? '...' : ''));
-      console.log('=====================================');
-
+      logLlmInput('FLASHCARDS PRE-PARSED LLM INPUT', streamingPrompt);
+      const userContent: any = images.length > 0
+        ? [{ type: 'text', text: streamingPrompt }, ...images.map((url) => ({ type: 'image_url', image_url: { url } }))]
+        : streamingPrompt;
       if (shouldStream) {
-        const userContent: any = images.length > 0 ? [{ type: 'text', text: streamingPrompt }, ...images.map((url) => ({ type: 'image_url', image_url: { url } }))] : streamingPrompt;
         return streamNdjson(userContent, (userIdForCredits && creditsNeeded > 0) ? { userId: userIdForCredits, credits: creditsNeeded } : undefined);
       }
-      const userContent: any = images.length > 0 ? [{ type: 'text', text: streamingPrompt }, ...images.map((url) => ({ type: 'image_url', image_url: { url } }))] : streamingPrompt;
-      const completion = await openai.chat.completions.create({
-        model: 'gemini-2.5-flash-lite',
-        // @ts-ignore
-        reasoning_effort: 'none',
-        messages: [{ role: 'user', content: userContent }],
-        stream: false,
-        // @ts-ignore
-        response_format: { type: 'json_object' },
-      });
-      const content = completion.choices?.[0]?.message?.content ?? '';
-      if (!content) return NextResponse.json({ error: 'No content returned from model' }, { status: 502 });
-      const parsed = extractJsonObject(content);
-      const cards: Flashcard[] = Array.isArray(parsed?.cards) ? parsed.cards : [];
-      if (cards.length === 0) return NextResponse.json({ error: 'Failed to generate flashcards' }, { status: 502 });
-      return NextResponse.json({ title: parsed.title || null, cards });
+      try {
+        const result = await generateJsonFromModel(userContent);
+        return NextResponse.json(result);
+      } catch (e) {
+        const msg = e instanceof Error ? e.message : 'Failed to generate flashcards';
+        return NextResponse.json({ error: msg }, { status: 502 });
+      }
     }
 
     // Multipart form-data path: files + optional prompt
@@ -460,77 +459,9 @@ export async function POST(req: NextRequest) {
         userInstruction: promptText,
         imagesCount: imageParts.length,
       });
-      const userContent: any = imageParts.length > 0
-        ? [{ type: 'text', text: prompt }, ...imageParts]
-        : prompt;
-
-      // Log the total text after truncation sent to LLM and its character count
-      console.log('=== FLASHCARDS STREAMING LLM INPUT ===');
-      console.log('Character count:', prompt.length);
-      console.log('Text content preview:', prompt.substring(0, 200) + (prompt.length > 200 ? '...' : ''));
-      console.log('=====================================');
-
-      // Wrap stream to refund credits on complete failure before first line
-      const encoder = new TextEncoder();
-      const stream = await openai.chat.completions.create({
-        model: 'gemini-2.5-flash-lite',
-        // @ts-ignore
-        reasoning_effort: 'none',
-        messages: [{ role: 'user', content: userContent }],
-        stream: true,
-      });
-      let anyChunkSent = false;
-      let anyCardSent = false;
-      let buffer = '';
-      let pendingLine: string | null = null;
-      const reservedForUserId = userId || null;
-      const reservedCredits = creditsNeeded;
-      const readable = new ReadableStream<Uint8Array>({
-        async start(controller) {
-          try {
-            // Emit an immediate meta line so the client can render instantly
-            try {
-              const earlyMeta = JSON.stringify({ type: 'meta', title: 'flashcards' }) + '\n';
-              controller.enqueue(encoder.encode(earlyMeta));
-              anyChunkSent = true; // do not count as card
-            } catch {}
-            for await (const chunk of stream as any) {
-              const token: string = (chunk?.choices?.[0]?.delta?.content || '');
-              if (!token) continue;
-              buffer += token;
-              let newlineIndex = buffer.indexOf('\n');
-              while (newlineIndex !== -1) {
-                let line = buffer.slice(0, newlineIndex).trim();
-                buffer = buffer.slice(newlineIndex + 1);
-                newlineIndex = buffer.indexOf('\n');
-                if (!line) continue;
-                if (pendingLine) { line = pendingLine + line; pendingLine = null; }
-                try {
-                  const obj = JSON.parse(line);
-                  controller.enqueue(encoder.encode(line + '\n'));
-                  anyChunkSent = true;
-                  if (obj && obj.type === 'card') anyCardSent = true;
-                } catch { pendingLine = line; }
-              }
-            }
-            if (pendingLine) {
-              try {
-                const obj = JSON.parse(pendingLine);
-                controller.enqueue(encoder.encode(pendingLine + '\n'));
-                anyChunkSent = true;
-                if (obj && obj.type === 'card') anyCardSent = true;
-              } catch {}
-            }
-            controller.close();
-          } catch (err) {
-            if (!anyCardSent && reservedForUserId && reservedCredits > 0) {
-              try { await refundCredits(reservedForUserId, reservedCredits); } catch {}
-            }
-            if (!anyCardSent) controller.error(err); else { try { controller.close(); } catch {} }
-          }
-        }
-      });
-      return new Response(readable, { headers: { 'Content-Type': 'text/plain; charset=utf-8', 'Cache-Control': 'no-cache' } });
+      const userContent: any = imageParts.length > 0 ? [{ type: 'text', text: prompt }, ...imageParts] : prompt;
+      logLlmInput('FLASHCARDS STREAMING LLM INPUT', prompt);
+      return streamNdjson(userContent, (userId && creditsNeeded > 0) ? { userId, credits: creditsNeeded } : undefined);
     }
 
     // Non-streaming JSON
@@ -543,27 +474,14 @@ export async function POST(req: NextRequest) {
     });
     const userContent: any = imageParts.length > 0 ? [{ type: 'text', text: prompt }, ...imageParts] : prompt;
 
-    // Log the total text after truncation sent to LLM and its character count
-    console.log('=== FLASHCARDS NON-STREAMING LLM INPUT ===');
-    console.log('Character count:', prompt.length);
-    console.log('Text content preview:', prompt.substring(0, 200) + (prompt.length > 200 ? '...' : ''));
-    console.log('==========================================');
-
-    const completion = await openai.chat.completions.create({
-      model: 'gemini-2.5-flash-lite',
-      // @ts-ignore
-      reasoning_effort: 'none',
-      messages: [{ role: 'user', content: userContent }],
-      stream: false,
-      // @ts-ignore
-      response_format: { type: 'json_object' },
-    });
-    const content = completion.choices?.[0]?.message?.content ?? '';
-    if (!content) return NextResponse.json({ error: 'No content returned from model' }, { status: 502 });
-    const parsed = extractJsonObject(content);
-    const cards: Flashcard[] = Array.isArray(parsed?.cards) ? parsed.cards : [];
-    if (cards.length === 0) return NextResponse.json({ error: 'Failed to generate flashcards' }, { status: 502 });
-    return NextResponse.json({ title: parsed.title || null, cards });
+    logLlmInput('FLASHCARDS NON-STREAMING LLM INPUT', prompt);
+    try {
+      const result = await generateJsonFromModel(userContent);
+      return NextResponse.json(result);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : 'Failed to generate flashcards';
+      return NextResponse.json({ error: msg }, { status: 502 });
+    }
   } catch (error) {
     console.error('Error in generate-flashcards API:', error);
     const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred.';

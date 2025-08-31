@@ -722,19 +722,20 @@ body { margin: 0; background: #ffffff; ${computedFontFamily ? `font-family: ${co
       <AuthModal open={showAuthModal} onClose={() => setShowAuthModal(false)} />
       <div className="fixed inset-0 backdrop-blur-sm flex items-center justify-center z-[100] p-4 font-sans" style={{ backgroundColor: 'var(--color-background)' }}>
         <div className="relative w-full h-full rounded-[1.5rem] border border-border ring-1 ring-black/5 shadow-2xl shadow-[0_10px_25px_rgba(0,0,0,0.12),0_25px_70px_rgba(0,0,0,0.18)] flex flex-col overflow-hidden" style={{ backgroundColor: 'var(--color-background)' }}>
-          <div className="absolute top-2 right-2 z-30">
-            <div className="inline-flex items-center gap-1.5 rounded-full border border-border shadow-sm px-2 py-1" style={{ backgroundColor: 'var(--color-background)' }}>
+          <div className="absolute top-2 right-2 z-30 group inline-flex items-center gap-1.5">
               {viewMode === 'map' ? (
                 <>
                   <button
                     onClick={flashcards ? () => setViewMode('flashcards') : handleGenerateFlashcards}
-                    className="inline-flex items-center gap-1 px-4 py-1.5 rounded-full border border-border text-foreground hover:bg-muted/50 text-sm focus:outline-none min-w-[44px]"
+                    className={`inline-flex items-center gap-1 px-4 py-1.5 rounded-full border border-border text-foreground hover:bg-muted/50 text-sm focus:outline-none min-w-[44px] transition-all duration-300 ease-in-out ${
+                      isGeneratingFlashcards
+                        ? 'opacity-100 translate-x-0 pointer-events-auto'
+                        : 'opacity-0 translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 pointer-events-none group-hover:pointer-events-auto'
+                    }`}
                     style={{ backgroundColor: 'var(--color-background)' }}
-                    disabled={isGeneratingFlashcards || isCheckingFlashcards}
+                    disabled={isGeneratingFlashcards}
                   >
                     {isGeneratingFlashcards ? (
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                    ) : isCheckingFlashcards ? (
                       <Loader2 className="h-4 w-4 animate-spin" />
                     ) : (
                       <FlashcardIcon className="h-4 w-4" />
@@ -744,7 +745,7 @@ body { margin: 0; background: #ffffff; ${computedFontFamily ? `font-family: ${co
                   <div className="relative">
                     <div
                       ref={triggerGroupRef}
-                      className="inline-flex rounded-full"
+                      className="inline-flex rounded-full opacity-0 translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 ease-in-out pointer-events-none group-hover:pointer-events-auto"
                     >
                       <button
                         onClick={() => setDropdownOpen(!isDropdownOpen)}
@@ -798,7 +799,7 @@ body { margin: 0; background: #ffffff; ${computedFontFamily ? `font-family: ${co
                 <>
                   <button
                     onClick={() => setViewMode('map')}
-                    className="inline-flex items-center justify-center w-8 h-8 rounded-full border border-border text-foreground hover:bg-muted/50 focus:outline-none"
+                    className="inline-flex items-center justify-center w-8 h-8 rounded-full border border-border text-foreground hover:bg-muted/50 focus:outline-none opacity-100 translate-x-0 transition-all duration-300 ease-in-out"
                     style={{ backgroundColor: 'var(--color-background)' }}
                     aria-label="Back to Map"
                   >
@@ -809,13 +810,12 @@ body { margin: 0; background: #ffffff; ${computedFontFamily ? `font-family: ${co
 
               <button
                 onClick={handleClose}
-                className="inline-flex items-center justify-center w-8 h-8 text-foreground rounded-full border border-border shadow-sm hover:bg-muted/50 focus:outline-none"
+                className="inline-flex items-center justify-center w-8 h-8 text-foreground rounded-full border border-border shadow-sm hover:bg-muted/50 focus:outline-none opacity-100 translate-x-0 transition-all duration-200 ease-in-out"
                 style={{ backgroundColor: 'var(--color-background)' }}
                 aria-label="Close"
               >
                 <X className="h-4 w-4" />
               </button>
-            </div>
           </div>
 
           {/* White overlay to fully cover mind map when in flashcards mode */}

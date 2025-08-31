@@ -286,13 +286,13 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
     <div className={`relative w-full h-full rounded-[1.5rem] flex flex-col overflow-hidden ${
       isEmbedded
         ? '!bg-transparent !border-0 !ring-0 !shadow-none'
-        : 'bg-background border border-gray-200 dark:border-gray-600 ring-1 ring-black/5 dark:ring-white/10 shadow-2xl'
+        : 'bg-background border border-border ring-1 ring-black/5 shadow-2xl'
     }`}>
       {!isEmbedded && (
         <div className="absolute top-2 right-2 z-30">
           <button
             onClick={handleClose}
-            className="inline-flex items-center justify-center w-8 h-8 bg-background text-foreground rounded-full border border-gray-300 dark:border-gray-600 shadow-sm hover:bg-muted/50 dark:hover:bg-muted/80 focus:outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400/50"
+            className="inline-flex items-center justify-center w-8 h-8 bg-background text-foreground rounded-full border border-border shadow-sm hover:bg-muted/50 dark:hover:bg-muted/80 focus:outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400/50"
             aria-label="Close"
           >
             <X className="h-4 w-4" />
@@ -310,7 +310,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
                 <span className="text-foreground font-medium">Exam date</span>
                 <input
                   type="date"
-                  className="h-7 px-2 py-1 text-xs font-semibold rounded-md border border-gray-200 bg-background text-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-indigo-400/50 focus-visible:border-indigo-300 hover:border-gray-300 transition-colors"
+                  className="h-7 px-2 py-1 text-xs font-semibold rounded-md border border-border bg-background text-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-indigo-400/50 focus-visible:border-indigo-300 hover:border-gray-300 transition-colors"
                   value={deckExamDate}
                   onChange={(e) => handleSetDeckExamDate(e.target.value)}
                 />
@@ -342,7 +342,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
             <div className="w-full">
               {userId || deckId ? (
                 <div className="relative mx-auto rounded-[1.35rem] p-[1.5px] bg-gradient-to-br from-emerald-200 via-teal-200 to-green-200">
-                  <div className="bg-background border border-gray-200 rounded-[1.25rem] shadow p-8 sm:p-10 min-h-[200px] sm:min-h-[250px] flex flex-col items-center justify-center text-center">
+                  <div className="bg-background border border-border rounded-[1.25rem] shadow p-8 sm:p-10 min-h-[200px] sm:min-h-[250px] flex flex-col items-center justify-center text-center">
                     <div className="text-4xl mb-4">🎉</div>
                     <div className="text-foreground text-xl sm:text-2xl font-bold leading-7 sm:leading-8 mb-4">
                       Congratulations!
@@ -369,7 +369,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
                 </div>
               ) : isEmbedded ? (
                 <div className="relative mx-auto rounded-[1.35rem] p-[1.5px] bg-gradient-to-br from-indigo-200 via-sky-200 to-emerald-200">
-                  <div className="bg-background border border-gray-200 rounded-[1.25rem] shadow p-8 sm:p-10 min-h-[200px] sm:min-h-[250px] flex flex-col items-center justify-center text-center">
+                  <div className="bg-background border border-border rounded-[1.25rem] shadow p-8 sm:p-10 min-h-[200px] sm:min-h-[250px] flex flex-col items-center justify-center text-center">
                     <h2 className="text-foreground text-2xl font-bold mb-4">Ready to study smarter?</h2>
                     <p className="text-muted-foreground mb-6 max-w-md">
                       You've seen how effective flashcards can be. Create your own study set from your course materials in seconds.
@@ -411,7 +411,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
                 </div>
               ) : (
                 <div className="relative mx-auto rounded-[1.35rem] p-[1.5px] bg-gradient-to-br from-indigo-200 via-sky-200 to-emerald-200">
-                  <div className="bg-background border border-gray-200 rounded-[1.25rem] shadow p-8 sm:p-10 min-h-[200px] sm:min-h-[250px] flex flex-col items-center justify-center text-center">
+                  <div className="bg-background border border-border rounded-[1.25rem] shadow p-8 sm:p-10 min-h-[200px] sm:min-h-[250px] flex flex-col items-center justify-center text-center">
                     <h2 className="text-foreground text-2xl font-bold mb-4">🎉 Great job! Don't lose your progress!</h2>
                     <p className="text-muted-foreground mb-6 max-w-md">
                       Sign up to save this flashcard deck and track your study progress with spaced repetition.
@@ -452,7 +452,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
           ) : (
             <div className="w-full">
               <div className="relative mx-auto rounded-[1.35rem] p-[1.5px] bg-gradient-to-br from-indigo-200 via-sky-200 to-emerald-200">
-                <div className="bg-background border border-gray-200 rounded-[1.25rem] shadow p-5 sm:p-6 min-h-[180px] sm:min-h-[200px]">
+                <div className="bg-background border border-border rounded-[1.25rem] shadow p-5 sm:p-6 min-h-[180px] sm:min-h-[200px]">
                   <div className="text-foreground text-xl sm:text-2xl font-semibold leading-7 sm:leading-8 break-words">{cards![index]?.question}</div>
                   <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
                     {showAnswer && current?.schedule?.due ? (
@@ -487,7 +487,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
               <div className="justify-self-start">
                 <button
                   onClick={() => { if (!cards) return; setIndex(getPrevIndex()); setShowAnswer(false); setHoveredGrade(null); setPredictedDueByGrade({}); setPredictedDueDatesByGrade({}); }}
-                  className="inline-flex items-center justify-center h-10 w-10 sm:w-auto sm:px-4 rounded-full border border-gray-300 dark:border-gray-600 bg-background text-foreground hover:bg-muted/50 dark:hover:bg-muted/80 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400/50"
+                  className="inline-flex items-center justify-center h-10 w-10 sm:w-auto sm:px-4 rounded-full border border-border bg-background text-foreground hover:bg-muted/50 dark:hover:bg-muted/80 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400/50"
                 >
                   <ChevronLeft className="h-5 w-5 sm:mr-2" />
                   <span className="hidden sm:inline">Prev</span>
@@ -570,7 +570,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
               <div className="justify-self-end">
                 <button
                   onClick={() => { if (!cards) return; setIndex(getNextIndex()); setShowAnswer(false); setHoveredGrade(null); setPredictedDueByGrade({}); setPredictedDueDatesByGrade({}); }}
-                  className="inline-flex items-center justify-center h-10 w-10 sm:w-auto sm:px-4 rounded-full border border-gray-300 dark:border-gray-600 bg-background text-foreground hover:bg-muted/50 dark:hover:bg-muted/80 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400/50"
+                  className="inline-flex items-center justify-center h-10 w-10 sm:w-auto sm:px-4 rounded-full border border-border bg-background text-foreground hover:bg-muted/50 dark:hover:bg-muted/80 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400/50"
                 >
                   <span className="hidden sm:inline">Next</span>
                   <ChevronRight className="h-5 w-5 sm:ml-2" />
