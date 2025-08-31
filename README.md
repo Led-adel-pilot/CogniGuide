@@ -44,9 +44,11 @@ CogniGuide comprehensive AI-powered study assistant. It uses an LLM to convert t
         - Only re-processes when the file set actually changes (files added/removed/modified)
         - Automatically cleans up old cache entries (keeps last 10) to prevent memory issues
         - Includes development-mode debug logging for production troubleshooting
-        - Includes client-side file size validation (25 MB per file limit when using Supabase Storage) to prevent server 413 errors
+        - Includes client-side file size validation (25 MB per file limit when using Supabase Storage)
+    - **Critical Fix**: File keys are sanitized to `[A-Za-z0-9._-]` to prevent pipe characters ("|") from breaking Supabase signed uploads. Raw keys like `name|size|type|hash` were causing `createSignedUploadUrl`/`uploadToSignedUrl` failures, forcing fallback to legacy multipart uploads which hit Vercel's 4.5MB limit → 413 errors.
+    - **Fallback Guards**: Legacy multipart uploads (>4MB total) are blocked with clear error messages to prevent 413 responses. When storage pre-parse fails, users see actionable errors instead of cryptic server errors.
         - Instantly serves cached results for identical file combinations, enabling immediate generation after clicking Generate
- *   **Mind Map Rendering:** The application uses a custom Markmap-like renderer implemented in `lib/markmap-renderer.ts` (and embedded within `components/MindMapModal.tsx` for HTML export). This renderer handles parsing markdown, measuring node sizes, laying out the tree, and drawing SVG connectors and HTML nodes. It includes logic for color variations, node collapsing/expanding, and pan/zoom functionality. It now features an intelligent **auto-fit-to-view** that centers and scales the mind map to be fully visible on initial load and during streaming. This behavior stops once the user interacts with the map.
+ *   **Mind Map Rendering:** The application uses a custom Markmap-like renderer implemented in `lib/markmap-renderer.ts` (and embedded within `components/MindMapModal.tsx` for HTML export). This renderer handles parsing markdown, measuring node sizes, laying out the tree, and drawing SVG connectors and HTML nodes. It includes logic for color variations, node collapsing/expanding, and pan/zoom functionality. It now features an intelligent **auto-fit-to-view** that centers and scales the mind map to be fully visible on initial load and during streaming. This behavior stops once the user interacts with the map. Additionally, automatic collapse to main branches after generation is gated: it applies to non-authenticated users and to authenticated users who have never generated a mind map before; returning authenticated users keep the full expansion by default.
     *   **Touch Support:** The renderer now includes comprehensive touch event handling for mobile devices, enabling single-finger panning and two-finger pinch-to-zoom gestures for intuitive navigation.
     *   **Incremental Updates:** The renderer exposes an `updateMindMap(markdown: string)` function to support incremental re-rendering while the model is streaming output, enabling smooth progressive visualization.
 *   **Spaced Repetition:** TS-FSRS (Free Spaced Repetition Scheduler) algorithm implementation for optimal flashcard scheduling. The `ts-fsrs` library provides FSRS-6 algorithm with configurable parameters for difficulty, stability, and optimal review timing.
@@ -269,10 +271,15 @@ For consistent branding across the application, use the `CogniGuide_logo.png` fi
 *   Input: `{ files: [{ name, size, type }], anonId?: string }`
 *   Output: `{ bucket: 'uploads', items: [{ path, token }] }`
 *   Flow: The client receives `{path, token}` per file and uses `supabase.storage.from(bucket).uploadToSignedUrl(path, token, file)` to upload
+*   **Critical Implementation Details**:
+    - **File Key Sanitization**: Keys are strictly sanitized to `[A-Za-z0-9._-]` to prevent pipe characters ("|") from breaking signed uploads
+    - **Path Format**: `users/{userId}/YYYY-MM-DD/{sanitizedKey}/{filename}` or `anon/{anonId}/YYYY-MM-DD/{sanitizedKey}/{filename}`
+    - **Fallback Prevention**: Guards in client code prevent legacy multipart fallbacks when storage fails, avoiding 413 errors
 *   Notes:
     - Bucket: Create a private bucket named `uploads` in Supabase Storage
     - Security: Files remain private; the server (with Service Role) downloads them for preprocessing; the client never gets permanent public URLs
     - Expiration: Preparse generates short-lived signed URLs for images if needed by the LLM
+    - **Troubleshooting**: If uploads fail, check that keys don't contain special characters that break URL generation
 
 #### Preparse JSON (Storage) Mode
 *   The preparse API now accepts a JSON payload: `{ bucket: 'uploads', objects: [{ path, name?, type?, size? }] }`
@@ -349,6 +356,50 @@ The sidebar history uses a sophisticated pagination system with infinite scroll.
 *   RLS & indexing notes:
     - RLS policies restrict SELECT/INSERT to `auth.uid() = user_id`.
     - No btree index on the large `markdown` text column (to avoid size limits). The UI avoids querying by full `markdown`. If you need server‑side de‑duplication or exact matching, consider adding a computed hash column (e.g., SHA‑256/MD5 of `markdown`) with an index and querying by that.
+
+## Troubleshooting Guide
+
+### Common Issues & Solutions
+
+#### 413 "Request Entity Too Large" Errors
+**Symptoms**: Users see "Failed to generate flashcards. Server returned 413" or "Upload failed and storage pre-parse is not available right now."
+
+**Root Causes & Fixes**:
+1. **Pipe Characters in File Keys**: File keys containing "|" (pipe) characters break Supabase signed uploads
+   - **Fix**: Keys are sanitized to `[A-Za-z0-9._-]` in `app/api/storage/get-signed-uploads/route.ts`
+   - **Before**: `name|size|type|hash` → **After**: `name_size_type_hash`
+
+2. **Missing/Invalid Supabase Environment Variables**:
+   - **Required**: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`
+   - **Test**: Check browser Network tab for failed `/api/storage/get-signed-uploads` or `/api/preparse` requests
+   - **Fix**: Ensure all three variables are set correctly in Vercel environment
+
+3. **Large Files Falling Back to Legacy Multipart**:
+   - **Issue**: When storage pre-parse fails, client attempts direct file upload to serverless function
+   - **Vercel Limit**: 4.5MB per request → 413 error
+   - **Fix**: Guards prevent fallback for files >4MB, showing clear error messages instead
+
+**Debug Steps**:
+1. Open browser DevTools → Network tab
+2. Select a large file and watch these requests:
+   - `POST /api/storage/get-signed-uploads` (should return 200)
+   - `POST /api/preparse` (should return 200)
+3. If either fails, check server logs and environment variables
+4. Test with smaller files first to isolate storage vs size issues
+
+#### Storage Pre-parse Failures
+**Symptoms**: "Storage pre-parse failed: [error]. Large files cannot be sent directly"
+
+**Common Causes**:
+- Invalid Supabase configuration
+- Missing `uploads` bucket in Supabase Storage
+- Bucket permissions not allowing service role access
+- Network connectivity issues
+
+**Verification**:
+- Ensure private `uploads` bucket exists in Supabase Storage
+- Verify service role has read/write access to the bucket
+- Check that signed URLs are being generated correctly
 
 ## Getting Started (Development)
 To run the development server:

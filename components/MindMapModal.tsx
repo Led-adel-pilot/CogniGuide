@@ -324,6 +324,9 @@ body { margin: 0; background: #ffffff; ${computedFontFamily ? `font-family: ${co
   const [showTimeBasedPopup, setShowTimeBasedPopup] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [hasGeneratedContent, setHasGeneratedContent] = useState(false);
+  // Gate auto-collapse: allow for non-auth users, and for auth users only if they have never generated a mind map before
+  const [shouldAutoCollapse, setShouldAutoCollapse] = useState<boolean>(false);
+  const shouldAutoCollapseRef = useRef<boolean>(false);
 
   const handleClose = (event?: React.MouseEvent) => {
     // Prevent any automatic triggers
@@ -580,12 +583,13 @@ body { margin: 0; background: #ffffff; ${computedFontFamily ? `font-family: ${co
   // Collapse to main branches when mindmap stream completes
   useEffect(() => {
     const onComplete = () => {
+      if (!shouldAutoCollapseRef.current) return;
       collapseRequestedRef.current = true;
-      try { collapseToMainBranches(); } catch {}
+      try { collapseToMainBranches({ animate: false }); } catch {}
       // Retry a few times to handle race with renderer initialization
-      try { setTimeout(() => { try { collapseToMainBranches(); } catch {} }, 60); } catch {}
-      try { setTimeout(() => { try { collapseToMainBranches(); } catch {} }, 180); } catch {}
-      try { setTimeout(() => { try { collapseToMainBranches(); } catch {} }, 360); } catch {}
+      try { setTimeout(() => { try { collapseToMainBranches({ animate: false }); } catch {} }, 60); } catch {}
+      try { setTimeout(() => { try { collapseToMainBranches({ animate: false }); } catch {} }, 180); } catch {}
+      try { setTimeout(() => { try { collapseToMainBranches({ animate: false }); } catch {} }, 360); } catch {}
     };
     if (typeof window !== 'undefined') {
       window.addEventListener('cogniguide:mindmap-stream-complete', onComplete);
@@ -601,10 +605,61 @@ body { margin: 0; background: #ffffff; ${computedFontFamily ? `font-family: ${co
   useEffect(() => {
     if (!viewportRef.current || !containerRef.current) return;
     if (!markdown) return;
-    if (initializedRef.current && collapseRequestedRef.current) {
-      try { collapseToMainBranches(); } catch {}
+    if (initializedRef.current && collapseRequestedRef.current && shouldAutoCollapseRef.current) {
+      try { collapseToMainBranches({ animate: false }); } catch {}
     }
   }, [markdown, initializedRef.current]);
+
+  // Determine whether auto-collapse should be enabled for this user
+  useEffect(() => {
+    let cancelled = false;
+    const computeAutoCollapse = async () => {
+      // Non-auth users: enable auto-collapse
+      if (!userId) {
+        if (!cancelled) {
+          setShouldAutoCollapse(true);
+          shouldAutoCollapseRef.current = true;
+        }
+        return;
+      }
+      const cacheKey = `cogniguide:user:${userId}:hasPriorMindmap`;
+      // Try local cache first
+      try {
+        const raw = typeof window !== 'undefined' ? window.localStorage.getItem(cacheKey) : null;
+        if (raw === 'true' || raw === 'false') {
+          const hasPrior = raw === 'true';
+          if (!cancelled) {
+            setShouldAutoCollapse(!hasPrior);
+            shouldAutoCollapseRef.current = !hasPrior;
+          }
+          return;
+        }
+      } catch {}
+      // Query Supabase to see if the user has any prior mindmaps
+      try {
+        const { data, error } = await supabase
+          .from('mindmaps')
+          .select('id')
+          .eq('user_id', userId)
+          .limit(1);
+        const hasPrior = !error && Array.isArray(data) && data.length > 0;
+        if (!cancelled) {
+          setShouldAutoCollapse(!hasPrior);
+          shouldAutoCollapseRef.current = !hasPrior;
+          try {
+            if (typeof window !== 'undefined') window.localStorage.setItem(cacheKey, hasPrior ? 'true' : 'false');
+          } catch {}
+        }
+      } catch {
+        if (!cancelled) {
+          setShouldAutoCollapse(false);
+          shouldAutoCollapseRef.current = false;
+        }
+      }
+    };
+    computeAutoCollapse();
+    return () => { cancelled = true; };
+  }, [userId]);
 
   // Detect authenticated user for saving flashcards
   useEffect(() => {

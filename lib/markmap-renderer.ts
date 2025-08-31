@@ -481,6 +481,41 @@ function autoFitToCurrentTree() {
     animateTransformTo(targetScale, targetPanX, targetPanY, ANIMATION_DURATION + 100);
 }
 
+// Immediate (non-animated) fit to the CURRENT rendered tree state
+function autoFitToCurrentTreeImmediate() {
+    if (!viewport || !mindMapTree) return;
+
+    const bounds = getTreeBounds(mindMapTree);
+    if (!bounds || bounds.width === 0 || bounds.height === 0) return;
+
+    const viewportWidth = viewport.clientWidth;
+    const viewportHeight = viewport.clientHeight;
+
+    // Use same effective size as animated fit for consistency
+    const effectiveWidth = viewportWidth * 0.7;
+    const effectiveHeight = viewportHeight * 0.7;
+
+    const contentWidth = bounds.width + PADDING * 2;
+    const contentHeight = bounds.height + PADDING * 2;
+
+    const scaleX = effectiveWidth / contentWidth;
+    const scaleY = effectiveHeight / contentHeight;
+
+    const targetScale = Math.min(scaleX, scaleY, 2);
+
+    const contentCenterX = bounds.minX + PADDING + bounds.width / 2;
+    const contentCenterY = bounds.minY + PADDING + bounds.height / 2;
+
+    const targetPanX = (viewportWidth / 2) - (contentCenterX * targetScale);
+    const targetPanY = (viewportHeight / 2) - (contentCenterY * targetScale);
+
+    scale = targetScale;
+    panX = targetPanX;
+    panY = targetPanY;
+    applyTransform();
+    stableRootY = mindMapTree.y;
+}
+
 
 function measureNodeSizes(node: MindMapNode) {
     const tempNode = document.createElement('div');
@@ -1025,34 +1060,53 @@ export function updateMindMap(markdown: string) {
  * children remain visible, with all other sub-branches hidden. Intended to be
  * called once streaming of markdown has completed.
  */
-export function collapseToMainBranches() {
+export function collapseToMainBranches(options?: { animate?: boolean }) {
     if (!mindMapTree) return;
-    // Cancel any ongoing transform animation to avoid conflicting with collapse animations
+    const animate = options?.animate !== false; // default true
+    // Cancel any ongoing transform animation to avoid conflicting with collapse
     transformAnimationToken++;
     // Ensure root stays visible
     mindMapTree.isCollapsed = false;
-    // Collapse each immediate child's subtree (child stays visible)
+
+    if (animate) {
+        // Collapse each immediate child's subtree (child stays visible) with animations
+        const children = mindMapTree.children.slice();
+        children.forEach((child) => {
+            if (child.children.length > 0 && !child.isAnimating && !child.isCollapsed) {
+                toggleNodeCollapse(child);
+            }
+        });
+        // After collapse animation completes, ensure collapsed state and auto-fit
+        setTimeout(() => {
+            try {
+                // Fallback: enforce collapse for any immediate child that still isn't collapsed
+                if (mindMapTree) {
+                    mindMapTree.children.forEach((child) => {
+                        if (child.children.length > 0 && !child.isCollapsed) {
+                            child.isCollapsed = true;
+                        }
+                    });
+                }
+                rerenderMindMap();
+            } catch {}
+            autoFitToCurrentTree();
+        }, 0);
+        return;
+    }
+
+    // No-animation path: mark children collapsed and rerender immediately
     const children = mindMapTree.children.slice();
     children.forEach((child) => {
-        if (child.children.length > 0 && !child.isAnimating && !child.isCollapsed) {
-            toggleNodeCollapse(child);
+        if (child.children.length > 0) {
+            child.isCollapsed = true;
+            child.isAnimating = false;
+            delete child.isExpanding;
         }
     });
-    // After collapse animation completes, ensure collapsed state and auto-fit
-    setTimeout(() => {
-        try {
-            // Fallback: enforce collapse for any immediate child that still isn't collapsed
-            if (mindMapTree) {
-                mindMapTree.children.forEach((child) => {
-                    if (child.children.length > 0 && !child.isCollapsed) {
-                        child.isCollapsed = true;
-                    }
-                });
-            }
-            rerenderMindMap();
-        } catch {}
-        autoFitToCurrentTree();
-    }, 0);
+    try {
+        rerenderMindMap();
+    } catch {}
+    autoFitToCurrentTree();
 }
 /**
  * Cleans up event listeners to prevent memory leaks.
