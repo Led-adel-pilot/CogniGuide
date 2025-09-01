@@ -139,6 +139,15 @@ let lastTouchX = 0, lastTouchY = 0; // For single-finger panning
 // Transform animation state
 let transformAnimationToken = 0;
 
+// ============== PERFORMANCE STATE (RAF + CACHING) ==============
+// Schedule transform writes to next animation frame to avoid flooding style updates
+let transformRafId: number | null = null;
+// Cache viewport rect during interactions to avoid layout thrash
+let viewportRect: DOMRect | null = null;
+let viewportRectDirty = true;
+// Transient will-change timer for the container to improve smoothness without long-lived layers
+let willChangeTimeoutId: number | null = null;
+
 // Initial pan offset state (can be overridden via initialize options)
 let initialPanXOffset = INITIAL_PAN_X_OFFSET;
 let initialPanYOffset = INITIAL_PAN_Y_OFFSET;
@@ -378,6 +387,40 @@ function applyTransform() {
     if (mapContainer) {
         mapContainer.style.transform = `translate(${panX}px, ${panY}px) scale(${scale})`;
     }
+}
+
+// Request a transform update on the next animation frame
+function requestTransformUpdate() {
+    if (transformRafId !== null) return;
+    transformRafId = requestAnimationFrame(() => {
+        transformRafId = null;
+        applyTransform();
+    });
+}
+
+function getViewportRect(): DOMRect {
+    if (viewportRectDirty || !viewportRect) {
+        viewportRect = viewport.getBoundingClientRect();
+        viewportRectDirty = false;
+    }
+    return viewportRect;
+}
+
+function invalidateViewportRect() {
+    viewportRectDirty = true;
+}
+
+function bumpContainerWillChange() {
+    if (!mapContainer) return;
+    mapContainer.style.willChange = 'transform';
+    if (willChangeTimeoutId !== null) {
+        window.clearTimeout(willChangeTimeoutId);
+    }
+    // Remove the hint shortly after interaction stops to prevent blurriness
+    willChangeTimeoutId = window.setTimeout(() => {
+        if (mapContainer) mapContainer.style.removeProperty('will-change');
+        willChangeTimeoutId = null;
+    }, 200);
 }
 
 // Smoothly animate pan and zoom to the target transform
@@ -853,7 +896,7 @@ function handleWheel(e: WheelEvent) {
     transformAnimationToken++;
     const zoomSpeed = 0.1;
     const oldScale = scale;
-    const rect = viewport.getBoundingClientRect();
+    const rect = getViewportRect();
     const mouseX = e.clientX - rect.left;
     const mouseY = e.clientY - rect.top;
     if (e.deltaY < 0) {
@@ -863,7 +906,8 @@ function handleWheel(e: WheelEvent) {
     }
     panX = mouseX - (mouseX - panX) * (scale / oldScale);
     panY = mouseY - (mouseY - panY) * (scale / oldScale);
-    applyTransform();
+    bumpContainerWillChange();
+    requestTransformUpdate();
 }
 
 function handleDarkModeChange() {
@@ -893,7 +937,8 @@ function handleMouseMove(e: MouseEvent) {
     if (!isPanning) return;
     panX = e.clientX - startX;
     panY = e.clientY - startY;
-    applyTransform();
+    bumpContainerWillChange();
+    requestTransformUpdate();
 }
 
 // ============== TOUCH EVENT HANDLERS (for Mobile) ==============
@@ -941,7 +986,7 @@ function handleTouchMove(e: TouchEvent) {
         scale = Math.max(0.1, Math.min(oldScale * scaleFactor, 5));
         initialDistance = newDistance; // Update for next move event
 
-        const rect = viewport.getBoundingClientRect();
+        const rect = getViewportRect();
         const midpoint = getMidpoint(e.touches);
         const midpointX = midpoint.x - rect.left;
         const midpointY = midpoint.y - rect.top;
@@ -956,8 +1001,8 @@ function handleTouchMove(e: TouchEvent) {
         lastTouchX = touch.clientX;
         lastTouchY = touch.clientY;
     }
-
-    applyTransform();
+    bumpContainerWillChange();
+    requestTransformUpdate();
 }
 
 function handleTouchEnd(e: TouchEvent) {
@@ -985,6 +1030,13 @@ export function initializeMindMap(
     panY = 0;
     stableRootY = null;
     userHasInteracted = false;
+    // Reset perf caches
+    viewportRect = null;
+    viewportRectDirty = true;
+    if (transformRafId !== null) {
+        cancelAnimationFrame(transformRafId);
+        transformRafId = null;
+    }
     
     viewport = targetViewport;
     mapContainer = targetContainer;
@@ -1006,7 +1058,7 @@ export function initializeMindMap(
 
         // Attach event listeners (unless disabled)
         if (!options?.disableInteractions) {
-            viewport.addEventListener('wheel', handleWheel);
+            viewport.addEventListener('wheel', handleWheel, { passive: false });
             viewport.addEventListener('mousedown', handleMouseDown);
             window.addEventListener('mouseup', handleMouseUp);
             window.addEventListener('mousemove', handleMouseMove);
@@ -1016,6 +1068,8 @@ export function initializeMindMap(
             window.addEventListener('touchend', handleTouchEnd);
             // Listen for dark mode changes
             window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', handleDarkModeChange);
+            // Keep cached viewport rect valid on resize
+            window.addEventListener('resize', invalidateViewportRect, { passive: true });
 
             // Observe data-theme attribute changes on <html> to react to theme toggle
             themeObserver = new MutationObserver(() => {
@@ -1121,10 +1175,18 @@ export function cleanup() {
     window.removeEventListener('mouseup', handleMouseUp);
     window.removeEventListener('mousemove', handleMouseMove);
     window.removeEventListener('touchend', handleTouchEnd);
+    window.removeEventListener('resize', invalidateViewportRect);
     window.matchMedia('(prefers-color-scheme: dark)').removeEventListener('change', handleDarkModeChange);
     if (themeObserver) {
         themeObserver.disconnect();
         themeObserver = null;
+    }
+    if (willChangeTimeoutId !== null) {
+        window.clearTimeout(willChangeTimeoutId);
+        willChangeTimeoutId = null;
+    }
+    if (mapContainer) {
+        mapContainer.style.removeProperty('will-change');
     }
 }
 
