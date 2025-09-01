@@ -34,7 +34,7 @@
   --background-color: oklch(22% 0.02 250);
   --node-bg-color: oklch(26% 0.02 250);
   --node-border-color: oklch(36% 0.02 250);
-  --node-shadow: 0 4px 10px rgba(0, 0, 0, 0.22);
+  --node-shadow: none;
   --root-bg-color: oklch(72% 0.19 260);
   --root-text-color: oklch(18% 0.01 250);
   --connector-color: oklch(42% 0.02 250);
@@ -93,7 +93,7 @@
     --background-color: #f8f9fa;
     --node-bg-color: #ffffff;
     --node-border-color: #dee2e6;
-    --node-shadow: 0 4px 8px rgba(0, 0, 0, 0.07);
+    --node-shadow: none;
     --root-bg-color: #007bff;
     --root-text-color: #ffffff;
     --connector-color: #cbd5e0;
