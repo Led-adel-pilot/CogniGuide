@@ -10,6 +10,7 @@ import { supabase } from '@/lib/supabaseClient';
 import { loadDeckSchedule, saveDeckSchedule, loadDeckScheduleAsync, saveDeckScheduleAsync } from '@/lib/sr-store';
 import posthog from 'posthog-js';
 import AuthModal from '@/components/AuthModal';
+import jsPDF from 'jspdf';
 
 interface MindMapModalProps {
   markdown: string | null;
@@ -103,7 +104,7 @@ export default function MindMapModal({ markdown, onClose }: MindMapModalProps) {
     return undefined;
   };
 
-  const handleDownload = async (format: 'svg' | 'png') => {
+  const handleDownload = async (format: 'svg' | 'png' | 'pdf') => {
     if (!containerRef.current) return;
     const title = getTitle(markdown || '');
     const sanitizedTitle = title.replace(/[^a-z0-9]/gi, '_').toLowerCase();
@@ -160,7 +161,7 @@ export default function MindMapModal({ markdown, onClose }: MindMapModalProps) {
             } finally {
               document.body.removeChild(wrapper);
             }
-        } else if (format === 'png') {
+        } else if (format === 'png' || format === 'pdf') {
             // Use a detached wrapper and crop to the exact content bounds to prevent tinted edges
             // 1) Measure content bounds from live DOM (nodes are absolutely positioned inside the container)
             const nodes = Array.from(container.querySelectorAll('.mindmap-node')) as HTMLElement[];
@@ -251,10 +252,29 @@ export default function MindMapModal({ markdown, onClose }: MindMapModalProps) {
                 style: { background: themeBackground, backgroundColor: themeBackground, ...(options.style || {}) },
                 cacheBust: true
               });
-              const link = document.createElement('a');
-              link.download = `${sanitizedTitle}.png`;
-              link.href = dataUrl;
-              link.click();
+              if (format === 'png') {
+                const link = document.createElement('a');
+                link.download = `${sanitizedTitle}.png`;
+                link.href = dataUrl;
+                link.click();
+              } else {
+                const pxToMm = 0.264583;
+                const imgWidthMm = cropWidth * pxToMm;
+                const imgHeightMm = cropHeight * pxToMm;
+                const orientation = imgWidthMm > imgHeightMm ? 'landscape' : 'portrait';
+                const pdf = new jsPDF({ orientation, unit: 'mm', format: 'a4' });
+                const pageWidth = pdf.internal.pageSize.getWidth();
+                const pageHeight = pdf.internal.pageSize.getHeight();
+                // No margins - fill entire page (may distort aspect ratio)
+                const scaleX = pageWidth / imgWidthMm;
+                const scaleY = pageHeight / imgHeightMm;
+                const renderW = imgWidthMm * scaleX;
+                const renderH = imgHeightMm * scaleY;
+                const x = 0;
+                const y = 0;
+                pdf.addImage(dataUrl, 'PNG', x, y, renderW, renderH);
+                pdf.save(`${sanitizedTitle}.pdf`);
+              }
             } finally {
               document.body.removeChild(wrapper);
             }
@@ -799,6 +819,13 @@ export default function MindMapModal({ markdown, onClose }: MindMapModalProps) {
                             className="w-full flex items-center gap-2 px-3 py-1.5 text-sm text-foreground hover:bg-muted rounded-xl focus:outline-none"
                           >
                             <FileImage className="h-4 w-4" /> PNG
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => { posthog.capture('mindmap_exported', { format: 'pdf' }); handleDownload('pdf'); setDropdownOpen(false); }}
+                            className="w-full flex items-center gap-2 px-3 py-1.5 text-sm text-foreground hover:bg-muted rounded-xl focus:outline-none"
+                          >
+                            <FileImage className="h-4 w-4" /> PDF
                           </button>
 
                         </div>
