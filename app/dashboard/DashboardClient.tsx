@@ -660,6 +660,14 @@ export default function DashboardClient() {
   const handleSignOut = async () => {
     posthog.capture('user_signed_out');
     await supabase.auth.signOut();
+
+    // Clear the auth cookie to prevent middleware from redirecting back to dashboard
+    try {
+      if (typeof document !== 'undefined') {
+        document.cookie = 'cg_authed=; Path=/; Max-Age=0; SameSite=Lax; Secure';
+      }
+    } catch {}
+
     router.replace('/');
   };
 

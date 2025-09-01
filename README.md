@@ -218,6 +218,29 @@ For consistent branding across the application, use the `CogniGuide_logo.png` fi
     - If modifying auth flow, ensure cookie updates happen immediately after session changes
 *   **Performance Impact:** Eliminates perceived latency for returning users by avoiding client-side auth roundtrips
 
+#### ⚠️ Critical Sign Out Bug Fix
+*   **Issue**: After implementing middleware auto-redirect, users could get stuck in dashboard after signing out
+*   **Root Cause**: The `cg_authed` cookie wasn't being cleared during sign out, causing middleware to redirect back to dashboard
+*   **Symptom**: Users click "Sign out" → page appears stuck → history doesn't load → can't access landing page → must manually delete cookies
+*   **Solution**: Always clear `cg_authed` cookie in `handleSignOut` before redirecting:
+    ```typescript
+    const handleSignOut = async () => {
+      posthog.capture('user_signed_out');
+      await supabase.auth.signOut();
+
+      // CRITICAL: Clear auth cookie to prevent middleware redirect loop
+      try {
+        if (typeof document !== 'undefined') {
+          document.cookie = 'cg_authed=; Path=/; Max-Age=0; SameSite=Lax; Secure';
+        }
+      } catch {}
+
+      router.replace('/');
+    };
+    ```
+*   **Prevention**: When modifying auth flows, always ensure cookies are properly cleared on sign out to prevent redirect loops
+*   **Testing**: Verify sign out works by checking cookie is cleared and user can access landing page without redirects
+
 ### Backend API (`app/api/generate-mindmap/route.ts`)
 *   This is a Next.js API route (`POST` handler) responsible for processing mind map generation requests.
 *   It receives `FormData` which can contain either a `File` object (for document uploads) or a `promptText` string.
