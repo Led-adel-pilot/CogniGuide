@@ -459,6 +459,15 @@ The sidebar history uses a sophisticated pagination system with infinite scroll.
 - Verify service role has read/write access to the bucket
 - Check that signed URLs are being generated correctly
 
+#### Mind Map Node Blurriness Issue
+**Symptoms**: Mind map nodes appear blurry until hovered over or parent collapsed/expanded.
+
+**Root Cause**: Over-aggressive CSS `will-change` property forced long-lived raster layers, preventing crisp initial rendering.
+
+**Solution**: Limited `will-change` to `opacity, top, left` and added font-smoothing properties in `app/globals.css`.
+
+**Prevention**: Use minimal `will-change` properties and avoid forcing transform compositing on text elements.
+
 #### PNG Export Frame Issue
 **Symptoms**: Downloaded PNG images of mind maps have an unwanted colored frame (light blue or dark blue) that varies with the theme.
 

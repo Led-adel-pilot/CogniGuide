@@ -127,9 +127,13 @@
     /* Prefer app font but ensure robust emoji fallback (Windows + macOS + Linux) */
     font-family: "Poppins", system-ui, -apple-system, "Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", "Segoe UI Symbol", "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
     /* Stabilize glyph rasterization across animations */
-    /* Avoid forcing a 3D transform to prevent emoji fallback quirks on some systems */
+    /* Avoid over-aggressive compositing to prevent long-lived raster layers */
     backface-visibility: hidden;
-    will-change: transform, opacity, top, left;
+    /* Limit will-change to opacity/position so text gets re-rasterized at final scale */
+    will-change: opacity, top, left;
+    /* Improve text rendering clarity */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
     transition: border-color 0.2s, background-color 0.2s,
                 transform 0.35s cubic-bezier(0.4, 0, 0.2, 1),
                 opacity 0.35s cubic-bezier(0.4, 0, 0.2, 1),
