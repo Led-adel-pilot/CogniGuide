@@ -205,6 +205,19 @@ For consistent branding across the application, use the `CogniGuide_logo.png` fi
   - Landing page hero section
 - **Avoid**: Using generic icons like `BrainCircuit` from Lucide React for logo representation
 
+### Authentication & Redirect Optimization
+*   **Fast Auth Detection:** To eliminate 2-3 second delays when authenticated users visit the landing page, the app uses a lightweight first-party cookie (`cg_authed`) that syncs with Supabase authentication state.
+*   **Cookie Synchronization:** The `cg_authed` cookie is set/updated in `components/HomeLanding.tsx` whenever auth state changes (sign-in/sign-out). This provides instant server-side detection without waiting for Supabase session verification.
+*   **Server-Side Redirect Logic:**
+    - **Middleware** (`middleware.ts`): Checks `cg_authed=1` first, then falls back to Supabase cookie pattern (`sb-*-auth-token`) for immediate redirects
+    - **Page Component** (`app/page.tsx`): Server-side check prioritizes `cg_authed` cookie before Supabase verification
+*   **Maintenance Notes:**
+    - Keep cookie sync logic in `HomeLanding.tsx` consistent with auth state changes
+    - Cookie expires after 30 days and uses secure, same-site settings
+    - Always check lightweight cookie first before expensive Supabase operations
+    - If modifying auth flow, ensure cookie updates happen immediately after session changes
+*   **Performance Impact:** Eliminates perceived latency for returning users by avoiding client-side auth roundtrips
+
 ### Backend API (`app/api/generate-mindmap/route.ts`)
 *   This is a Next.js API route (`POST` handler) responsible for processing mind map generation requests.
 *   It receives `FormData` which can contain either a `File` object (for document uploads) or a `promptText` string.
@@ -303,11 +316,20 @@ For consistent branding across the application, use the `CogniGuide_logo.png` fi
 *   **Performance Optimizations:**
     - **Instant Credit Loading:** Credits load immediately using localStorage cache with background refresh, eliminating the brief "0.0" flash
     - **Real-time Updates:** Credit balance updates instantly after generation via custom events, no page refresh needed
+    - **Fast Auth Redirects:** Lightweight first-party cookies (`cg_authed`) eliminate 2-3 second delays for authenticated users visiting the landing page
 *   Spaced repetition prefetch & caching:
     - On dashboard load (after history fetch), all schedules are loaded in a single bulk request from `flashcards_schedule`, normalized to deck card counts, and cached (in‑memory + `localStorage`).
     - The due‑now queue and a `window.__cogniguide_due_map` are computed up‑front so opening the modal is instant.
     - If the network is unavailable, due lists are recomputed from the cache to maintain responsiveness.
     - When new flashcards are created, history reloads and the prefetch runs again to refresh dues.
+
+#### Performance Best Practices (Critical for Future Development)
+*   **Avoid Auth Delays:** Always implement server-side cookie checks before expensive auth operations. Use lightweight first-party cookies synced with auth providers to enable instant redirects.
+*   **Cookie Strategy:** Store auth indicators locally (cookies/localStorage) to avoid network roundtrips. Sync cookies immediately when auth state changes.
+*   **Progressive Enhancement:** Server-side auth checks should work independently of client-side JavaScript. Always check lightweight indicators first.
+*   **Cache Auth State:** For frequently accessed auth state, use simple, secure cookies with appropriate expiry (30 days max for auth indicators).
+*   **Security First:** Use secure, same-site, short-expiry cookies. Never store sensitive data in client-side cookies.
+*   **Maintenance:** Keep cookie sync logic consistent across all auth state change handlers. Update cookies immediately after session changes, not just on page load.
 
 #### Pagination Implementation Notes (Critical for Future Development)
 The sidebar history uses a sophisticated pagination system with infinite scroll. Key technical details and pitfalls to avoid:
@@ -361,6 +383,19 @@ The sidebar history uses a sophisticated pagination system with infinite scroll.
 
 ### Common Issues & Solutions
 
+#### Authentication Redirect Delays
+**Symptoms**: Signed-in users experience 2-3 second delays when visiting the landing page before being redirected to dashboard.
+
+**Root Cause**: Relying solely on client-side Supabase auth verification without server-side cookie checks.
+
+**Solution**: Use lightweight first-party cookies (`cg_authed`) synced with auth state for instant server-side detection.
+
+**Prevention**:
+- Always check `cg_authed` cookie first in middleware and server components
+- Sync cookie immediately when auth state changes in `HomeLanding.tsx`
+- Keep cookie logic consistent across all auth handlers
+- Use secure, same-site cookies with 30-day expiry
+
 #### 413 "Request Entity Too Large" Errors
 **Symptoms**: Users see "Failed to generate flashcards. Server returned 413" or "Upload failed and storage pre-parse is not available right now."
 
@@ -400,6 +435,30 @@ The sidebar history uses a sophisticated pagination system with infinite scroll.
 - Ensure private `uploads` bucket exists in Supabase Storage
 - Verify service role has read/write access to the bucket
 - Check that signed URLs are being generated correctly
+
+#### PNG Export Frame Issue
+**Symptoms**: Downloaded PNG images of mind maps have an unwanted colored frame (light blue or dark blue) that varies with the theme.
+
+**Root Cause**: The frame was caused by:
+1. A margin (`12px`) applied during the export process, which captured the theme's background color.
+2. The cloned container not enforcing a transparent background during rendering.
+
+**Solution**:
+1. Set the margin to `0` in the PNG export crop to eliminate extra space.
+2. Explicitly set a transparent background on the cloned container and the SVG element during export.
+3. Remove any residual borders, shadows, or outlines that could be captured in the export.
+
+**Files Affected**:
+- `components/MindMapModal.tsx`
+- `lib/markmap-renderer.ts`
+
+**Prevention**:
+- Always ensure the export container has a transparent background (`background: 'transparent'`).
+- Avoid applying margins or padding during export unless absolutely necessary.
+- Test exports in both light and dark themes to catch any visual artifacts.
+
+**Verification**:
+- After changes, verify that exported PNGs have no visible frame and match the mind map's content exactly.
 
 ## Getting Started (Development)
 To run the development server:
