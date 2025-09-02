@@ -152,6 +152,66 @@ let willChangeTimeoutId: number | null = null;
 let initialPanXOffset = INITIAL_PAN_X_OFFSET;
 let initialPanYOffset = INITIAL_PAN_Y_OFFSET;
 
+// ============== MEASUREMENT CACHE ==============
+// Reuse a single hidden measurement host and cache results to avoid repeated layout & KaTeX work
+let measureHost: HTMLElement | null = null;
+const measurementCache: Map<string, { width: number; height: number }> = new Map();
+let measurementCacheVersion = 0;
+
+function getMeasureHost(): HTMLElement {
+    if (measureHost && document.body.contains(measureHost)) return measureHost;
+    measureHost = document.createElement('div');
+    measureHost.id = 'mindmap-measure-host';
+    measureHost.style.position = 'absolute';
+    measureHost.style.left = '-10000px';
+    measureHost.style.top = '0';
+    measureHost.style.visibility = 'hidden';
+    measureHost.style.pointerEvents = 'none';
+    document.body.appendChild(measureHost);
+    return measureHost;
+}
+
+function getMeasurementCacheKey(html: string, isRoot: boolean): string {
+    const theme = document.documentElement.dataset.theme || '';
+    const dark = isDarkMode() ? '1' : '0';
+    return `${measurementCacheVersion}|${dark}|${theme}|${isRoot ? 'root' : 'node'}|${html}`;
+}
+
+function measureHtmlSize(html: string, isRoot: boolean): { width: number; height: number } {
+    const key = getMeasurementCacheKey(html, isRoot);
+    const cached = measurementCache.get(key);
+    if (cached) return cached;
+
+    const host = getMeasureHost();
+    const tempNode = document.createElement('div');
+    tempNode.className = 'mindmap-node';
+    if (isRoot) tempNode.classList.add('root');
+    tempNode.innerHTML = html;
+    host.appendChild(tempNode);
+    if ((window as any).renderMathInElement) {
+        (window as any).renderMathInElement(tempNode, {
+            delimiters: [
+                {left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false},
+                {left: '\\(', right: '\\)', display: false}, {left: '\\[', right: '\\]', display: true}
+            ],
+            throwOnError: false
+        });
+    }
+    const size = { width: tempNode.offsetWidth, height: tempNode.offsetHeight };
+    host.removeChild(tempNode);
+    measurementCache.set(key, size);
+    return size;
+}
+
+function invalidateMeasurementCache() {
+    measurementCache.clear();
+    measurementCacheVersion++;
+    if (measureHost && measureHost.parentNode) {
+        measureHost.parentNode.removeChild(measureHost);
+    }
+    measureHost = null;
+}
+
 // ============== COLOR HELPER FUNCTIONS ==============
 
 function hexToRgb(hex: string): RgbColor {
@@ -524,63 +584,11 @@ function autoFitToCurrentTree() {
     animateTransformTo(targetScale, targetPanX, targetPanY, ANIMATION_DURATION + 100);
 }
 
-// Immediate (non-animated) fit to the CURRENT rendered tree state
-function autoFitToCurrentTreeImmediate() {
-    if (!viewport || !mindMapTree) return;
-
-    const bounds = getTreeBounds(mindMapTree);
-    if (!bounds || bounds.width === 0 || bounds.height === 0) return;
-
-    const viewportWidth = viewport.clientWidth;
-    const viewportHeight = viewport.clientHeight;
-
-    // Use same effective size as animated fit for consistency
-    const effectiveWidth = viewportWidth * 0.7;
-    const effectiveHeight = viewportHeight * 0.7;
-
-    const contentWidth = bounds.width + PADDING * 2;
-    const contentHeight = bounds.height + PADDING * 2;
-
-    const scaleX = effectiveWidth / contentWidth;
-    const scaleY = effectiveHeight / contentHeight;
-
-    const targetScale = Math.min(scaleX, scaleY, 2);
-
-    const contentCenterX = bounds.minX + PADDING + bounds.width / 2;
-    const contentCenterY = bounds.minY + PADDING + bounds.height / 2;
-
-    const targetPanX = (viewportWidth / 2) - (contentCenterX * targetScale);
-    const targetPanY = (viewportHeight / 2) - (contentCenterY * targetScale);
-
-    scale = targetScale;
-    panX = targetPanX;
-    panY = targetPanY;
-    applyTransform();
-    stableRootY = mindMapTree.y;
-}
-
 
 function measureNodeSizes(node: MindMapNode) {
-    const tempNode = document.createElement('div');
-    tempNode.className = 'mindmap-node';
-    if (node.isRoot) tempNode.classList.add('root');
-    tempNode.style.visibility = 'hidden';
-    tempNode.style.position = 'absolute';
-    tempNode.innerHTML = node.html;
-    document.body.appendChild(tempNode);
-    // Assuming KaTeX is available globally if needed
-    if ((window as any).renderMathInElement) {
-        (window as any).renderMathInElement(tempNode, {
-            delimiters: [
-                {left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false},
-                {left: '\\(', right: '\\)', display: false}, {left: '\\[', right: '\\]', display: true}
-            ],
-            throwOnError: false
-        });
-    }
-    node.width = tempNode.offsetWidth;
-    node.height = tempNode.offsetHeight;
-    document.body.removeChild(tempNode);
+    const { width, height } = measureHtmlSize(node.html, !!node.isRoot);
+    node.width = width;
+    node.height = height;
     if (!node.isCollapsed) node.children.forEach(measureNodeSizes);
 }
 
@@ -627,32 +635,21 @@ function drawConnector(parent: MindMapNode, child: MindMapNode, svgEl: SVGSVGEle
     path.setAttribute('d', d);
     svgEl.appendChild(path);
 
-    // Prepare stroke-dash animation for aesthetic draw-in effect
-    try {
-        const length = path.getTotalLength();
-        path.style.strokeDasharray = `${length}`;
-        if (isExpanding) {
-            path.style.opacity = '0';
-            path.style.strokeDashoffset = `${length}`;
-            // Use two RAFs to ensure styles are applied before transition starts
+    // On expand, fade the connector in smoothly.
+    if (isExpanding) {
+        path.style.opacity = '0';
+        // Use two RAFs to ensure styles are applied before the transition starts.
+        requestAnimationFrame(() => {
             requestAnimationFrame(() => {
-                requestAnimationFrame(() => {
-                    path.style.opacity = '1';
-                    path.style.strokeDashoffset = '0';
-                });
+                path.style.opacity = '1';
             });
-        } else {
-            // Fully drawn by default
-            path.style.strokeDashoffset = '0';
-        }
-    } catch {
-        // getTotalLength can throw for invalid paths; ignore and leave as-is
+        });
     }
 
     return path;
 }
 
-function renderNodeAndChildren(node: MindMapNode, container: HTMLElement, svgEl: SVGSVGElement, xOffset: number, yOffset: number, isPartOfExpandingSubtree = false) {
+function renderNodeAndChildren(node: MindMapNode, container: HTMLElement, svgEl: SVGSVGElement, xOffset: number, yOffset: number, expandingSubtreeRoot: MindMapNode | null = null) {
     const nodeEl = document.createElement('div');
     nodeEl.className = 'mindmap-node';
     nodeEl.id = node.id;
@@ -667,11 +664,11 @@ function renderNodeAndChildren(node: MindMapNode, container: HTMLElement, svgEl:
         });
     }
     
-    const shouldAnimateIn = isPartOfExpandingSubtree;
+    const shouldAnimateIn = !!expandingSubtreeRoot;
 
     if (shouldAnimateIn) {
-        nodeEl.style.left = `${node.parent!.x + xOffset}px`;
-        nodeEl.style.top = `${node.parent!.y + yOffset}px`;
+        nodeEl.style.left = `${expandingSubtreeRoot!.x + xOffset}px`;
+        nodeEl.style.top = `${expandingSubtreeRoot!.y + yOffset}px`;
         nodeEl.style.opacity = '0';
         nodeEl.style.transform = 'scale(0.5)';
     } else {
@@ -714,13 +711,15 @@ function renderNodeAndChildren(node: MindMapNode, container: HTMLElement, svgEl:
 
     if (shouldAnimateIn) {
         requestAnimationFrame(() => {
-            nodeEl.style.left = `${node.x + xOffset}px`;
-            nodeEl.style.top = `${node.y + yOffset}px`;
-            nodeEl.style.opacity = '1';
-            nodeEl.style.transform = 'scale(1)';
-            setTimeout(() => {
-                nodeEl.style.transform = '';
-            }, ANIMATION_DURATION);
+            requestAnimationFrame(() => {
+                nodeEl.style.left = `${node.x + xOffset}px`;
+                nodeEl.style.top = `${node.y + yOffset}px`;
+                nodeEl.style.opacity = '1';
+                nodeEl.style.transform = 'scale(1)';
+                setTimeout(() => {
+                    nodeEl.style.transform = '';
+                }, ANIMATION_DURATION);
+            });
         });
     }
 
@@ -729,8 +728,11 @@ function renderNodeAndChildren(node: MindMapNode, container: HTMLElement, svgEl:
     }
 
     if (!node.isCollapsed) {
-        const childrenAreExpanding = node.isExpanding || isPartOfExpandingSubtree;
-        node.children.forEach(child => renderNodeAndChildren(child, container, svgEl, xOffset, yOffset, childrenAreExpanding));
+        let childrenExpandingRoot = expandingSubtreeRoot;
+        if (node.isExpanding) {
+            childrenExpandingRoot = node;
+        }
+        node.children.forEach(child => renderNodeAndChildren(child, container, svgEl, xOffset, yOffset, childrenExpandingRoot));
     }
 }
 
@@ -760,16 +762,18 @@ function toggleNodeCollapse(node: MindMapNode) {
         const descendantNodes: MindMapNode[] = [];
         function traverse(n: MindMapNode, isDescendant = false) {
             allNodes.push(n);
+            n.startX = n.x; 
+            n.startY = n.y;
             if (isDescendant) descendantNodes.push(n);
             if (!n.isCollapsed || n === node) {
                 n.children.forEach(child => traverse(child, isDescendant || n === node));
             }
         }
-        traverse(mindMapTree!);
+        if (mindMapTree) traverse(mindMapTree);
 
         // Set node to collapsed and recalculate layout for final positions.
         node.isCollapsed = true;
-        layoutTree(mindMapTree!, 0, 0);
+        if (mindMapTree) layoutTree(mindMapTree, 0, 0);
 
         // Adjust pan to keep root stable
         const newRootY = mindMapTree!.y;
@@ -782,73 +786,109 @@ function toggleNodeCollapse(node: MindMapNode) {
         }
         stableRootY = newRootY;
 
-        // Animate all nodes to their new positions using CSS transitions
+        // Store final positions
+        allNodes.forEach(n => { n.endX = n.x; n.endY = n.y; });
+
+        // Pre-position elements at their final absolute positions and animate via transforms only
+        const prepositions = new Map<MindMapNode, { finalX: number; finalY: number }>();
+        const targetFinalX = node.endX!;
+        const targetFinalY = node.endY!;
         allNodes.forEach(n => {
-            const el = document.getElementById(n.id);
-            if (!el) return;
-
             const isDescendant = descendantNodes.includes(n);
-            
-            // For descendants, target is the collapsed node's final position.
-            // For other nodes, target is their own new position calculated by layoutTree.
-            const targetX = isDescendant ? node.x : n.x;
-            const targetY = isDescendant ? node.y : n.y;
-
-            el.style.left = `${targetX + PADDING}px`;
-            el.style.top = `${targetY + PADDING}px`;
-
-            if (isDescendant) {
-                el.style.opacity = '0';
-                el.style.transform = 'scale(0.5)';
-            }
-
-            // Animate connectors
-            const pathEl = n.connectorPath;
-            if (pathEl && n.parent) {
-                const parent = n.parent;
-                // A parent of a descendant can either be another descendant or the node being collapsed.
-                const parentIsDescendant = descendantNodes.includes(parent);
-                const parentTargetX = parentIsDescendant ? node.x : parent.x;
-                const parentTargetY = parentIsDescendant ? node.y : parent.y;
-
-                const p1 = { x: parentTargetX + parent.width + PADDING, y: parentTargetY + parent.height / 2 + PADDING };
-                const p2 = { x: targetX + PADDING, y: targetY + n.height / 2 + PADDING };
-                const d = `M ${p1.x} ${p1.y} C ${p1.x + (p2.x - p1.x) / 2} ${p1.y}, ${p1.x + (p2.x - p1.x) / 2} ${p2.y}, ${p2.x} ${p2.y}`;
-                
-                // Update path shape immediately
-                pathEl.setAttribute('d', d);
-
-                try {
-                    const length = pathEl.getTotalLength();
-                    if (isDescendant) {
-                        // Only descendants erase; keep remaining connected path morphing smoothly
-                        pathEl.style.strokeDasharray = `${length}`;
-                        pathEl.style.strokeDashoffset = '0';
-                        requestAnimationFrame(() => {
-                            requestAnimationFrame(() => {
-                                pathEl.style.strokeDashoffset = `${length}`;
-                                pathEl.style.opacity = '0';
-                            });
-                        });
-                    } else {
-                        // Do not use dash trick for non-descendants; rely on CSS 'd' transition to morph
-                        pathEl.style.removeProperty('stroke-dasharray');
-                        pathEl.style.removeProperty('stroke-dashoffset');
-                        pathEl.style.opacity = '1';
-                    }
-                } catch {
-                    if (isDescendant) {
-                        pathEl.style.opacity = '0';
-                    }
+            const finalX = isDescendant ? targetFinalX : n.endX!;
+            const finalY = isDescendant ? targetFinalY : n.endY!;
+            prepositions.set(n, { finalX, finalY });
+            const el = document.getElementById(n.id);
+            if (el) {
+                el.style.transition = 'none';
+                el.style.left = `${finalX + PADDING}px`;
+                el.style.top = `${finalY + PADDING}px`;
+                // For the root node, we want it to be static. Its apparent motion is handled by panning the container.
+                if (n.isRoot) {
+                    el.style.transform = `translate(0px, 0px) scale(1)`;
+                } else {
+                    const dx0 = (n.startX! - finalX);
+                    const dy0 = (n.startY! - finalY);
+                    el.style.transform = `translate(${dx0}px, ${dy0}px) scale(1)`;
                 }
+                // Force reflow to apply styles immediately before animation starts
+                void (el as HTMLElement).offsetWidth;
             }
         });
+        const startTime = performance.now();
 
-        // After animation, rerender to clean up the DOM
-        setTimeout(() => {
-            node.isAnimating = false;
-            rerenderMindMap();
-        }, ANIMATION_DURATION);
+        function animate(currentTime: number) {
+            const elapsedTime = currentTime - startTime;
+            const progress = Math.min(elapsedTime / ANIMATION_DURATION, 1);
+            const easedProgress = 1 - Math.pow(1 - progress, 3); // easeOutCubic
+
+            allNodes.forEach(n => {
+                if (n.isRoot) { 
+                    n.animX = n.endX; 
+                    n.animY = n.endY; 
+                    // No need to update the DOM element's transform, it's static.
+                    return; 
+                }
+
+                let currentX, currentY, opacity = 1, scaleVal = 1;
+
+                if (descendantNodes.includes(n)) {
+                    const targetNode = node;
+                    currentX = n.startX! + (targetNode.endX! - n.startX!) * easedProgress;
+                    currentY = n.startY! + (targetNode.endY! - n.startY!) * easedProgress;
+                    opacity = 1 - easedProgress;
+                    scaleVal = 1 - 0.5 * easedProgress;
+                } else {
+                    currentX = n.startX! + (n.endX! - n.startX!) * easedProgress;
+                    currentY = n.startY! + (n.endY! - n.startY!) * easedProgress;
+                }
+
+                const el = document.getElementById(n.id);
+                if (el) {
+                    el.style.transition = 'none';
+                    const { finalX, finalY } = prepositions.get(n)!;
+                    const dx = currentX - finalX;
+                    const dy = currentY - finalY;
+                    el.style.opacity = String(opacity);
+                    el.style.transform = `translate(${dx}px, ${dy}px) scale(${scaleVal})`;
+                }
+                n.animX = currentX; 
+                n.animY = currentY;
+            });
+
+            allNodes.forEach(n => {
+                if (n.connectorPath && n.parent) {
+                    const parent = n.parent;
+                    const p1 = { x: parent.animX! + parent.width + PADDING, y: parent.animY! + parent.height / 2 + PADDING };
+                    const p2 = { x: n.animX! + PADDING, y: n.animY! + n.height / 2 + PADDING };
+                    const d = `M ${p1.x} ${p1.y} C ${p1.x + (p2.x - p1.x) / 2} ${p1.y}, ${p1.x + (p2.x - p1.x) / 2} ${p2.y}, ${p2.x} ${p2.y}`;
+                    n.connectorPath.style.transition = 'none';
+                    n.connectorPath.setAttribute('d', d);
+                    if (descendantNodes.includes(n)) {
+                        n.connectorPath.style.opacity = String(1 - easedProgress);
+                    }
+                }
+            });
+
+            if (progress < 1) {
+                requestAnimationFrame(animate);
+            } else {
+                // After animation, remove inline styles from surviving nodes to re-enable hover effects
+                allNodes.forEach(n => {
+                    if (!descendantNodes.includes(n)) {
+                        const el = document.getElementById(n.id);
+                        if (el) {
+                            el.style.transition = '';
+                            el.style.transform = '';
+                        }
+                    }
+                });
+                
+                node.isAnimating = false;
+                rerenderMindMap();
+            }
+        }
+        requestAnimationFrame(animate);
     }
 }
 
@@ -878,7 +918,7 @@ function rerenderMindMap() {
     stableRootY = newRootY;
     
     applyTransform();
-    renderNodeAndChildren(mindMapTree, mapContainer, svg, PADDING, PADDING, false);
+    renderNodeAndChildren(mindMapTree, mapContainer, svg, PADDING, PADDING, null);
     
     const bounds = getTreeBounds(mindMapTree);
     mapContainer.style.width = `${bounds.width + 2 * PADDING}px`;
@@ -914,6 +954,7 @@ function handleDarkModeChange() {
     // Rerender only if theme is 'system'
     const appTheme = document.documentElement.dataset.theme;
     if (appTheme === 'system' || !appTheme) {
+        invalidateMeasurementCache();
         rerenderMindMap();
     }
 }
@@ -1073,6 +1114,7 @@ export function initializeMindMap(
 
             // Observe data-theme attribute changes on <html> to react to theme toggle
             themeObserver = new MutationObserver(() => {
+                invalidateMeasurementCache();
                 rerenderMindMap();
             });
             themeObserver.observe(document.documentElement, {
@@ -1132,17 +1174,15 @@ export function collapseToMainBranches(options?: { animate?: boolean }) {
         });
         // After collapse animation completes, ensure collapsed state and auto-fit
         setTimeout(() => {
-            try {
-                // Fallback: enforce collapse for any immediate child that still isn't collapsed
-                if (mindMapTree) {
-                    mindMapTree.children.forEach((child) => {
-                        if (child.children.length > 0 && !child.isCollapsed) {
-                            child.isCollapsed = true;
-                        }
-                    });
-                }
-                rerenderMindMap();
-            } catch {}
+            // Fallback: enforce collapse for any immediate child that still isn't collapsed
+            if (mindMapTree) {
+                mindMapTree.children.forEach((child) => {
+                    if (child.children.length > 0 && !child.isCollapsed) {
+                        child.isCollapsed = true;
+                    }
+                });
+            }
+            rerenderMindMap();
             autoFitToCurrentTree();
         }, 0);
         return;
@@ -1157,9 +1197,7 @@ export function collapseToMainBranches(options?: { animate?: boolean }) {
             delete child.isExpanding;
         }
     });
-    try {
-        rerenderMindMap();
-    } catch {}
+    rerenderMindMap();
     autoFitToCurrentTree();
 }
 /**
@@ -1188,6 +1226,7 @@ export function cleanup() {
     if (mapContainer) {
         mapContainer.style.removeProperty('will-change');
     }
+    invalidateMeasurementCache();
 }
 
 /**
@@ -1296,3 +1335,4 @@ export function recommendPrintScaleMultiplier(
     const bias = clamp(options?.zoomBias ?? 1.0, 0.5, 3) * globalPrintZoomBias;
     return clamp(base * bias, minMul, maxMul);
 }
+
