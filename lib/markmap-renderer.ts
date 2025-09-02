@@ -54,9 +54,9 @@ const ANIMATION_DURATION = 300;
 
 // Light Mode Color Palette
 const L_NODE_COLOR_PALETTE = [
-    'hsla(12, 56%, 92%, 1.00)',
+    'hsla(0, 56%, 92%, 1.00)',
     'hsla(83, 56%, 92%, 1.00)',
-    'hsla(26, 56%, 92%, 1.00)',
+    'hsla(305, 56%, 92%, 1.00)',
     'hsla(206, 56%, 92%, 1.00)',
     'hsla(154, 56%, 92%, 1.00)',
     'hsla(342, 56%, 92%, 1.00)',
@@ -65,9 +65,9 @@ const L_NODE_COLOR_PALETTE = [
     'hsla(9, 54%, 95%, 1.00)'
 ];
 const L_TEXT_COLOR_PALETTE = [
-    'hsla(04, 65%, 45%, 1.00)',
+    'hsla(0, 65%, 45%, 1.00)',
     'hsla(83, 82%, 35%, 1.00)',
-    'hsla(37, 90%, 39%, 1.00)',
+    'hsla(305, 85%, 39%, 1.00)',
     'hsla(208, 82%, 39%, 1.00)',
     'hsla(162, 82%, 35%, 1.00)',
     'hsla(341, 70%, 39%, 1.00)',
@@ -80,7 +80,7 @@ const L_TEXT_COLOR_PALETTE = [
 const D_NODE_COLOR_PALETTE = [
     'hsla(12, 56%, 22%, 1.00)',
     'hsla(83, 56%, 22%, 1.00)',
-    'hsla(26, 56%, 22%, 1.00)',
+    'hsla(305, 56%, 22%, 1.00)',
     'hsla(206, 56%, 22%, 1.00)',
     'hsla(154, 56%, 22%, 1.00)',
     'hsla(342, 56%, 22%, 1.00)',
@@ -91,7 +91,7 @@ const D_NODE_COLOR_PALETTE = [
 const D_TEXT_COLOR_PALETTE = [
     'hsla(04, 65%, 85%, 1.00)',
     'hsla(83, 82%, 85%, 1.00)',
-    'hsla(37, 90%, 85%, 1.00)',
+    'hsla(305, 85%, 85%, 1.00)',
     'hsla(208, 82%, 85%, 1.00)',
     'hsla(162, 82%, 85%, 1.00)',
     'hsla(341, 70%, 85%, 1.00)',
