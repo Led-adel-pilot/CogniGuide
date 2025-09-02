@@ -943,7 +943,7 @@ export default function MindMapModal({ markdown, onClose }: MindMapModalProps) {
                   onClick={onClose}
                   className="w-full h-10 px-6 text-sm font-medium text-muted-foreground bg-muted rounded-full hover:bg-muted/80 transition-colors whitespace-nowrap"
                 >
-                  Close without saving
+                  Close Mind Map
                 </button>
               </div>
             </div>

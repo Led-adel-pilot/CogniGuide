@@ -11,6 +11,18 @@ import type { Components } from 'react-markdown';
 import { ChevronLeft, ChevronRight, Eye, EyeOff, Loader2, X } from 'lucide-react';
 import posthog from 'posthog-js';
 
+const getDeckIdentifier = (deckId?: string, title?: string | null, cards?: Flashcard[] | null): string | null => {
+  if (deckId) return deckId;
+  if (cards && cards.length > 0) {
+    const deckTitle = title || 'Untitled Deck';
+    const cardCount = cards.length;
+    const firstQ = cards[0].question.substring(0, 20);
+    const lastQ = cards[cards.length - 1].question.substring(0, 20);
+    return `unsaved:${deckTitle}:${cardCount}:${firstQ}:${lastQ}`;
+  }
+  return null;
+};
+
 export type Flashcard = { question: string; answer: string };
 type CardWithSchedule = Flashcard & { schedule?: FsrsScheduleState };
 
@@ -59,6 +71,30 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
   const [showSignupPopup, setShowSignupPopup] = React.useState(false);
   const [cardsViewedCount, setCardsViewedCount] = React.useState(0);
   const current = scheduledCards && scheduledCards[index] ? scheduledCards[index] : null;
+
+  const hasCards = Boolean(cards && cards.length > 0);
+
+  const deckIdentifier = React.useMemo(() => getDeckIdentifier(deckId, title, cards), [deckId, title, cards]);
+
+  React.useEffect(() => {
+    if (open && deckIdentifier) {
+      const savedIndexStr = localStorage.getItem(`cogniguide:flashcard-progress:${deckIdentifier}`);
+      if (savedIndexStr) {
+        const savedIndex = parseInt(savedIndexStr, 10);
+        if (!isNaN(savedIndex) && cards && savedIndex >= 0 && savedIndex < cards.length) {
+          if (typeof initialIndex !== 'number') {
+            setIndex(savedIndex);
+          }
+        }
+      }
+    }
+  }, [open, deckIdentifier, cards, initialIndex]);
+
+  React.useEffect(() => {
+    if (deckIdentifier && hasCards) {
+      localStorage.setItem(`cogniguide:flashcard-progress:${deckIdentifier}`, String(index));
+    }
+  }, [deckIdentifier, index, hasCards]);
 
   const handleClose = (event?: React.MouseEvent) => {
     if (event) {
@@ -143,7 +179,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
       setShowAnswer(false);
     }
     setDueList(Array.isArray(dueIndices) ? dueIndices.slice() : []);
-  }, [cards, deckId]);
+  }, [cards, deckId, initialIndex, dueIndices, title]);
 
   React.useEffect(() => {
     if (!deckId || !scheduledCards) return;
@@ -279,8 +315,6 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
   };
 
   if (!open && !isEmbedded) return null;
-
-  const hasCards = Boolean(cards && cards.length > 0);
 
   const ModalContent = () => (
     <div className={`relative w-full h-full rounded-[1.5rem] flex flex-col overflow-hidden ${
