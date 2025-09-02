@@ -6,6 +6,7 @@ Allow: /
 Disallow: /dashboard
 Disallow: /api/
 Disallow: /_next/
+Allow: /manifest.json
 Disallow: /*.json$
 
 # (OPTIONAL) Avoid crawling query-string URLs — use only if intentional
