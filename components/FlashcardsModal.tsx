@@ -588,8 +588,8 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
                   if (!userId) {
                     setCardsViewedCount(prev => {
                       const newCount = prev + 1;
-                      // Show signup popup after viewing 3 cards
-                      if (newCount >= 3 && !showSignupPopup) {
+                      // Show signup popup after viewing 10 cards
+                      if (newCount >= 10 && !showSignupPopup) {
                         setShowSignupPopup(true);
                       }
                       return newCount;

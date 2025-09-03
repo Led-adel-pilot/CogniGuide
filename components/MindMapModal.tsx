@@ -550,7 +550,7 @@ export default function MindMapModal({ markdown, onClose }: MindMapModalProps) {
 
     const timer = setTimeout(() => {
       setShowTimeBasedPopup(true);
-    }, 50000); // 50 seconds
+    }, 120000); // 120 seconds
 
     return () => clearTimeout(timer);
   }, [markdown, userId, showTimeBasedPopup]);
