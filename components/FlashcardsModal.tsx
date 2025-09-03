@@ -4,12 +4,13 @@ import React from 'react';
 import { supabase } from '@/lib/supabaseClient';
 import AuthModal from '@/components/AuthModal';
 import { nextSchedule, createInitialSchedule, type FsrsScheduleState, type Grade } from '@/lib/spaced-repetition';
-import { loadDeckSchedule, saveDeckSchedule, loadDeckScheduleAsync, saveDeckScheduleAsync, formatExamDateForUI, formatExamTimeForUI } from '@/lib/sr-store';
+import { loadDeckSchedule, saveDeckSchedule, loadDeckScheduleAsync, saveDeckScheduleAsync } from '@/lib/sr-store';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import type { Components } from 'react-markdown';
-import { ChevronLeft, ChevronRight, Eye, EyeOff, Loader2, X } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Eye, Loader2, X } from 'lucide-react';
 import posthog from 'posthog-js';
+import { DatePicker } from '@/components/DatePicker';
 
 const getDeckIdentifier = (deckId?: string, title?: string | null, cards?: Flashcard[] | null): string | null => {
   if (deckId) return deckId;
@@ -60,8 +61,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
   const [showAnswer, setShowAnswer] = React.useState(false);
   const [scheduledCards, setScheduledCards] = React.useState<CardWithSchedule[] | null>(null);
   const [deckExamDate, setDeckExamDate] = React.useState<string>('');
-  const [examDateInput, setExamDateInput] = React.useState<string>('');
-  const [examTimeInput, setExamTimeInput] = React.useState<string>('08:00');
+  const [examDateInput, setExamDateInput] = React.useState<Date | undefined>(undefined);
   const [dueList, setDueList] = React.useState<number[]>([]);
   const [predictedDueByGrade, setPredictedDueByGrade] = React.useState<Record<number, string>>({});
   const [predictedDueDatesByGrade, setPredictedDueDatesByGrade] = React.useState<Record<number, Date>>({});
@@ -159,8 +159,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
         const stored = (await loadDeckScheduleAsync(deckId)) || loadDeckSchedule(deckId);
         if (stored && Array.isArray(stored.schedules) && stored.schedules.length === cards.length) {
           setDeckExamDate(stored.examDate || '');
-          setExamDateInput(formatExamDateForUI(stored.examDate));
-          setExamTimeInput(formatExamTimeForUI(stored.examDate));
+          setExamDateInput(stored.examDate ? new Date(stored.examDate) : undefined);
           setScheduledCards(cards.map((c, i) => ({ ...c, schedule: stored.schedules[i] || createInitialSchedule() })));
           if (typeof initialIndex === 'number' && Number.isFinite(initialIndex)) {
             setIndex(Math.max(0, Math.min(cards.length - 1, initialIndex)));
@@ -236,22 +235,13 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
     return `${years}y`;
   }
 
-  const handleSetDeckExamDate = (dateValue?: string, timeValue?: string) => {
-    const date = dateValue || examDateInput;
-    const time = timeValue || examTimeInput;
+  const handleSetDeckExamDate = (dateTimeValue?: Date) => {
+    const dateTime = dateTimeValue || examDateInput;
 
-    if (date && time) {
-      // Combine date and time into a full datetime string
-      const combinedDateTime = new Date(`${date}T${time}`);
-      const isoString = combinedDateTime.toISOString();
+    if (dateTime) {
+      const isoString = dateTime.toISOString();
       setDeckExamDate(isoString);
       // Also copy this onto existing schedules so clamping works immediately
-      setScheduledCards((prev) => prev ? prev.map((c) => ({ ...c, schedule: { ...(c.schedule ?? createInitialSchedule()), examDate: isoString } })) : prev);
-    } else if (date) {
-      // Only date provided, use default time
-      const combinedDateTime = new Date(`${date}T08:00`);
-      const isoString = combinedDateTime.toISOString();
-      setDeckExamDate(isoString);
       setScheduledCards((prev) => prev ? prev.map((c) => ({ ...c, schedule: { ...(c.schedule ?? createInitialSchedule()), examDate: isoString } })) : prev);
     }
   };
@@ -380,15 +370,21 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
           <div className="text-sm text-muted-foreground text-center hidden md:block">{hasCards ? (finished ? 'Completed' : `${index + 1} / ${cards!.length}`) : ''}</div>
           <div className="justify-self-center md:justify-self-end">
             {hasCards && (
-              <label className="inline-flex items-center gap-2 text-sm">
+              <div className="inline-flex items-center gap-2 text-sm">
                 <span className="text-foreground font-medium">Exam date</span>
-                <input
-                  type="date"
-                  className="h-7 px-2 py-1 text-xs font-semibold rounded-md border border-border bg-background text-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-indigo-400/50 focus-visible:border-indigo-300 hover:border-gray-300 transition-colors"
-                  value={deckExamDate}
-                  onChange={(e) => handleSetDeckExamDate(e.target.value)}
-                />
-              </label>
+                <div className="w-32">
+                  <DatePicker
+                    date={examDateInput}
+                    onDateChange={(date) => {
+                      setExamDateInput(date);
+                      handleSetDeckExamDate(date);
+                    }}
+                    placeholder="Select date"
+                    className="h-7 text-xs"
+                    showTimeOnButton={false}
+                  />
+                </div>
+              </div>
             )}
           </div>
           <div className="text-sm text-muted-foreground text-center md:hidden">{hasCards ? (finished ? 'Completed' : `${index + 1} / ${cards!.length}`) : ''}</div>
@@ -744,63 +740,41 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
       )}
 
       {showExamDatePopup && (
-        <div className="absolute inset-0 flex items-center justify-center z-[110]">
+        <div className="absolute inset-0 flex items-center justify-center z-[110] sm:items-start sm:pt-16">
           {/* Black transparent background */}
           <div className="absolute inset-0 bg-black/40 dark:bg-black/60 z-0"></div>
           <div className="bg-background border p-8 rounded-2xl shadow-xl max-w-md w-full text-center relative z-10">
             <h2 className="text-foreground text-2xl font-bold mb-4">📅 Set Your Exam Date</h2>
-            <p className="text-muted-foreground mb-6">
+            <p className="text-muted-foreground text-sm mb-4">
               The spaced repetition algorithm will adjust review intervals to ensure you're well-prepared by your exam date.
             </p>
             <div className="mb-6">
-              <label className="block text-sm font-medium text-foreground mb-2">
-                When is your exam? (optional)
-              </label>
-              <div className="flex gap-2">
-                <div className="flex-1">
-                  <input
-                    type="date"
-                    value={examDateInput}
-                    className="w-full h-10 px-3 py-2 text-sm rounded-lg border border-border bg-background text-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-indigo-400/50 focus-visible:border-indigo-300 hover:border-gray-300 transition-colors"
-                    min={new Date().toISOString().split('T')[0]}
-                    onChange={(e) => {
-                      const selectedDate = e.target.value;
-                      setExamDateInput(selectedDate);
-                    }}
-                  />
-                </div>
-                <div className="flex-1">
-                  <input
-                    type="time"
-                    value={examTimeInput}
-                    className="w-full h-10 px-3 py-2 text-sm rounded-lg border border-border bg-background text-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-indigo-400/50 focus-visible:border-indigo-300 hover:border-gray-300 transition-colors"
-                    onChange={(e) => {
-                      const selectedTime = e.target.value;
-                      setExamTimeInput(selectedTime);
-                    }}
-                  />
-                </div>
+              <div className="relative">
+                <DatePicker
+                  date={examDateInput}
+                  onDateChange={(date) => {
+                    setExamDateInput(date);
+                  }}
+                  placeholder="Select date (optional)"
+                />
               </div>
-              <p className="text-xs text-muted-foreground mt-1">
-                Default time: 8:00 AM if not specified
-              </p>
+
             </div>
             <div className="flex flex-col gap-3 w-full max-w-md">
               <button
                 onClick={() => {
                   if (examDateInput) {
-                    handleSetDeckExamDate(examDateInput, examTimeInput);
+                    handleSetDeckExamDate(examDateInput);
                     markExamDatePopupAsShown(deckIdentifier);
                     setShowExamDatePopup(false);
                     setShowAnswer(true);
                     posthog.capture('exam_date_set', {
                       deckId: deckId,
-                      exam_date: examDateInput,
-                      exam_time: examTimeInput,
+                      exam_datetime: examDateInput.toISOString(),
                     });
                   }
                 }}
-                disabled={!examDateInput}
+                disabled={!examDateInput || examDateInput < new Date()}
                 className="w-full h-10 px-6 text-sm font-medium bg-primary text-primary-foreground rounded-full hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors whitespace-nowrap"
               >
                 Set Exam Date
