@@ -234,6 +234,21 @@ export async function POST(req: NextRequest) {
       let anyTokenSent = false;
       const reservedForUserId = userIdResolved || null;
       const reservedCredits = creditsNeeded;
+
+      // Extract file paths from images for cleanup
+      const filesToCleanup: string[] = [];
+      if (images.length > 0) {
+        images.forEach(url => {
+          if (typeof url === 'string' && url.includes('supabase') && url.includes('/uploads/')) {
+            try {
+              const urlObj = new URL(url);
+              const path = urlObj.pathname.split('/storage/v1/object/public/uploads/')[1];
+              if (path) filesToCleanup.push(path);
+            } catch {}
+          }
+        });
+      }
+
       const readable = new ReadableStream<Uint8Array>({
         async start(controller) {
           try {
@@ -244,6 +259,19 @@ export async function POST(req: NextRequest) {
               controller.enqueue(encoder.encode(token));
             }
             controller.close();
+
+            // Cleanup files after successful streaming
+            if (filesToCleanup.length > 0 && anyTokenSent) {
+              try {
+                await fetch(new URL('/api/storage/cleanup', req.url), {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ paths: filesToCleanup }),
+                });
+              } catch (cleanupError) {
+                console.error('Cleanup failed:', cleanupError);
+              }
+            }
           } catch (err) {
             if (!anyTokenSent) {
               if (reservedForUserId && reservedCredits > 0) {

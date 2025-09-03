@@ -3,6 +3,10 @@
     {
       "path": "/api/refill-credits",
       "schedule": "0 0 * * *"
+    },
+    {
+      "path": "/api/storage/scheduled-cleanup",
+      "schedule": "0 2 * * *"
     }
   ],
   "headers": [

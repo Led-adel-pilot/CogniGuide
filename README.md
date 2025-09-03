@@ -46,6 +46,7 @@ CogniGuide comprehensive AI-powered study assistant. It uses an LLM to convert t
         - Automatically cleans up old cache entries (keeps last 10) to prevent memory issues
         - Includes development-mode debug logging for production troubleshooting
         - Includes client-side file size validation (25 MB per file limit when using Supabase Storage)
+        - **Automatic Storage Cleanup:** Files uploaded to Supabase Storage are automatically deleted immediately after successful processing to prevent hitting the 500MB free tier limit. Includes both immediate cleanup after generation and scheduled cleanup (24-hour safety net) via Vercel Cron Jobs.
     - **Critical Fix**: File keys are sanitized to `[A-Za-z0-9._-]` to prevent pipe characters ("|") from breaking Supabase signed uploads. Raw keys like `name|size|type|hash` were causing `createSignedUploadUrl`/`uploadToSignedUrl` failures, forcing fallback to legacy multipart uploads which hit Vercel's 4.5MB limit → 413 errors.
     - **Fallback Guards**: Legacy multipart uploads (>4MB total) are blocked with clear error messages to prevent 413 responses. When storage pre-parse fails, users see actionable errors instead of cryptic server errors.
         - Instantly serves cached results for identical file combinations, enabling immediate generation after clicking Generate
@@ -371,6 +372,23 @@ For consistent branding across the application, use the `CogniGuide_logo.png` fi
 *   For non-image files, the server downloads from Storage and extracts text; for images, it generates a 30‑minute signed URL and includes it in `images`
 *   Response shape is identical to multipart mode: `{ text, images, totalRawChars, maxChars, limitExceeded, includedFiles, excludedFiles, partialFile }`
 
+#### Storage Cleanup API (`app/api/storage/cleanup/route.ts`)
+*   **Purpose:** Immediately deletes uploaded files from Supabase Storage after successful processing to prevent hitting the 500MB free tier limit
+*   **Method:** POST
+*   **Content-Type:** `application/json`
+*   **Input:** `{ paths: string[] }` - Array of file paths to delete
+*   **Output:** `{ deleted: number }` - Number of files successfully deleted
+*   **Integration:** Automatically called after successful mind map or flashcard generation
+*   **Error Handling:** Failures are logged but don't break the generation process
+
+#### Scheduled Storage Cleanup API (`app/api/storage/scheduled-cleanup/route.ts`)
+*   **Purpose:** Scheduled cleanup job that deletes files older than 24 hours as a safety net
+*   **Method:** GET (triggered by Vercel Cron)
+*   **Schedule:** Daily at 2 AM (`"0 2 * * *"` in `vercel.json`)
+*   **Functionality:** Lists all files in the `uploads` bucket and deletes those older than 24 hours
+*   **Output:** `{ deleted: number, attempted: number }` - Cleanup statistics
+*   **Configuration:** Add to `vercel.json` crons array for automated execution
+
 *   `lib/supabaseClient.ts`: Initializes the Supabase browser client using `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY`. Also exports the `MindmapRecord` type used for dashboard history.
 
 ### Dashboard (`app/dashboard/page.tsx`)
@@ -493,6 +511,30 @@ The sidebar history uses a sophisticated pagination system with infinite scroll.
    - `POST /api/preparse` (should return 200)
 3. If either fails, check server logs and environment variables
 4. Test with smaller files first to isolate storage vs size issues
+
+#### Storage Cleanup Failures
+**Symptoms**: Files remain in Supabase Storage after successful generation, potentially hitting the 500MB limit.
+
+**Root Causes & Fixes**:
+1. **Cleanup API Errors**: The `/api/storage/cleanup` endpoint fails silently
+   - **Check**: Vercel function logs for "Cleanup failed" messages
+   - **Fix**: Verify `SUPABASE_SERVICE_ROLE_KEY` has storage permissions
+   - **Test**: Call cleanup endpoint directly with file paths
+
+2. **Scheduled Cleanup Not Running**: Daily cleanup job doesn't execute
+   - **Check**: Vercel dashboard for cron job execution logs
+   - **Fix**: Ensure `vercel.json` has correct cron configuration
+   - **Manual Trigger**: Call `/api/storage/scheduled-cleanup` directly
+
+3. **File Path Extraction Issues**: URLs not properly parsed for cleanup
+   - **Check**: Server logs for "Cleanup failed" with URL parsing errors
+   - **Fix**: Verify Supabase URLs contain `/storage/v1/object/public/uploads/` pattern
+   - **Debug**: Check that signed URLs are from the correct bucket
+
+**Prevention**:
+- Monitor Supabase Storage usage in dashboard
+- Set up alerts for storage usage > 400MB
+- Keep cleanup logic in sync with upload path generation
 
 #### Storage Pre-parse Failures
 **Symptoms**: "Storage pre-parse failed: [error]. Large files cannot be sent directly"

@@ -262,7 +262,7 @@ export async function POST(req: NextRequest) {
     const contentType = req.headers.get('content-type') || '';
 
     // Helper to stream NDJSON lines from a prompt, with optional credit refund on total failure
-    const streamNdjson = async (promptContent: any, refundInfo?: { userId: string; credits: number }) => {
+    const streamNdjson = async (promptContent: any, refundInfo?: { userId: string; credits: number }, images?: string[]) => {
       const encoder = new TextEncoder();
       const stream = await openai.chat.completions.create({
         model: 'gemini-2.5-flash-lite',
@@ -276,6 +276,20 @@ export async function POST(req: NextRequest) {
       let anyCardSent = false;
       let buffer = '';
       let pendingLine: string | null = null;
+
+      // Extract file paths from images for cleanup
+      const filesToCleanup: string[] = [];
+      if (images && images.length > 0) {
+        images.forEach((url: string) => {
+          if (typeof url === 'string' && url.includes('supabase') && url.includes('/uploads/')) {
+            try {
+              const urlObj = new URL(url);
+              const path = urlObj.pathname.split('/storage/v1/object/public/uploads/')[1];
+              if (path) filesToCleanup.push(path);
+            } catch {}
+          }
+        });
+      }
 
       const readable = new ReadableStream<Uint8Array>({
         async start(controller) {
@@ -320,6 +334,19 @@ export async function POST(req: NextRequest) {
               } catch {}
             }
             controller.close();
+
+            // Cleanup files after successful streaming
+            if (filesToCleanup.length > 0 && anyCardSent) {
+              try {
+                await fetch(new URL('/api/storage/cleanup', req.url), {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ paths: filesToCleanup }),
+                });
+              } catch (cleanupError) {
+                console.error('Cleanup failed:', cleanupError);
+              }
+            }
           } catch (err) {
             if (!anyCardSent) {
               if (refundInfo && refundInfo.credits > 0) {
@@ -369,7 +396,7 @@ export async function POST(req: NextRequest) {
 
           logLlmInput('FLASHCARDS MARKDOWN STREAMING LLM INPUT', streamingPrompt);
 
-          return streamNdjson(streamingPrompt, (userIdForCredits && creditsNeeded > 0) ? { userId: userIdForCredits, credits: creditsNeeded } : undefined);
+          return streamNdjson(streamingPrompt, (userIdForCredits && creditsNeeded > 0) ? { userId: userIdForCredits, credits: creditsNeeded } : undefined, undefined);
         }
         const prompt = buildFlashcardPrompt({ mode: 'json', sourceType: 'markmap', sourceContent: body.markdown!, numCards: body.numCards });
 
@@ -404,7 +431,7 @@ export async function POST(req: NextRequest) {
         ? [{ type: 'text', text: streamingPrompt }, ...images.map((url) => ({ type: 'image_url', image_url: { url } }))]
         : streamingPrompt;
       if (shouldStream) {
-        return streamNdjson(userContent, (userIdForCredits && creditsNeeded > 0) ? { userId: userIdForCredits, credits: creditsNeeded } : undefined);
+        return streamNdjson(userContent, (userIdForCredits && creditsNeeded > 0) ? { userId: userIdForCredits, credits: creditsNeeded } : undefined, images);
       }
       try {
         const result = await generateJsonFromModel(userContent);
@@ -461,7 +488,7 @@ export async function POST(req: NextRequest) {
       });
       const userContent: any = imageParts.length > 0 ? [{ type: 'text', text: prompt }, ...imageParts] : prompt;
       logLlmInput('FLASHCARDS STREAMING LLM INPUT', prompt);
-      return streamNdjson(userContent, (userId && creditsNeeded > 0) ? { userId, credits: creditsNeeded } : undefined);
+      return streamNdjson(userContent, (userId && creditsNeeded > 0) ? { userId, credits: creditsNeeded } : undefined, imageParts.map(img => img.image_url.url));
     }
 
     // Non-streaming JSON

@@ -92,28 +92,36 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
 
   // Helper function to generate a unique key for a file
   const getFileKey = useCallback(async (file: File): Promise<string> => {
-    // Create a more robust key that works consistently across environments
-    // Use file name, size, and type for basic identification
-    const baseKey = `${file.name}|${file.size}|${file.type || 'unknown'}`;
+    // Create a truly unique key that avoids special characters and conflicts
+    // Include timestamp for uniqueness and content hash for deduplication
+    const timestamp = Date.now().toString(36);
+    const random = Math.random().toString(36).slice(2, 8);
 
-    // Add a simple hash of the file content for uniqueness (first 1KB)
     try {
-      const slice = file.slice(0, 1024);
+      // Create content hash from first 512 bytes for deduplication
+      const slice = file.slice(0, 512);
       const arrayBuffer = await slice.arrayBuffer();
       const bytes = new Uint8Array(arrayBuffer);
       let hash = 0;
-      for (let i = 0; i < Math.min(bytes.length, 512); i++) { // Limit to 512 bytes for performance
+      for (let i = 0; i < bytes.length; i++) {
         hash = ((hash << 5) - hash) + bytes[i];
         hash = hash & hash; // Convert to 32-bit integer
       }
-      const contentHash = Math.abs(hash).toString(36);
-      const finalKey = `${baseKey}|${contentHash}`;
+      const contentHash = Math.abs(hash).toString(36).slice(0, 8);
+
+      // Safe filename: sanitize name and limit length
+      const safeName = file.name.replace(/[^A-Za-z0-9._-]/g, '_').slice(0, 50);
+
+      // Final key: timestamp_random_contentHash_safeName
+      const finalKey = `${timestamp}_${random}_${contentHash}_${safeName}`;
       debugLog(`Generated file key: ${finalKey}`);
       return finalKey;
     } catch (error) {
-      // Fallback to base key if hashing fails
-      debugLog(`Hashing failed for ${baseKey}, using fallback:`, error);
-      return baseKey;
+      // Fallback: use timestamp + random + size + safe name
+      const safeName = file.name.replace(/[^A-Za-z0-9._-]/g, '_').slice(0, 50);
+      const fallbackKey = `${timestamp}_${random}_${file.size}_${safeName}`;
+      debugLog(`Hashing failed, using fallback key: ${fallbackKey}`);
+      return fallbackKey;
     }
   }, [debugLog]);
 
