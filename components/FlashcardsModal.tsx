@@ -69,6 +69,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
   const [showAuthModal, setShowAuthModal] = React.useState(false);
   const [showLossAversionPopup, setShowLossAversionPopup] = React.useState(false);
   const [showSignupPopup, setShowSignupPopup] = React.useState(false);
+  const [showExamDatePopup, setShowExamDatePopup] = React.useState(false);
   const [cardsViewedCount, setCardsViewedCount] = React.useState(0);
   const current = scheduledCards && scheduledCards[index] ? scheduledCards[index] : null;
 
@@ -119,6 +120,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
       setFinished(false);
       setShowLossAversionPopup(false);
       setShowSignupPopup(false);
+      setShowExamDatePopup(false);
       setCardsViewedCount(0);
     }
   }, [open]);
@@ -234,6 +236,21 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
     setDeckExamDate(value);
     // Also copy this onto existing schedules so clamping works immediately
     setScheduledCards((prev) => prev ? prev.map((c) => ({ ...c, schedule: { ...(c.schedule ?? createInitialSchedule()), examDate: value || undefined } })) : prev);
+  };
+
+  const hasExamDatePopupBeenShown = (deckIdentifier: string | null): boolean => {
+    if (!deckIdentifier) return false;
+    const shownPopups = JSON.parse(localStorage.getItem('cogniguide:exam_date_popups_shown') || '[]');
+    return shownPopups.includes(deckIdentifier);
+  };
+
+  const markExamDatePopupAsShown = (deckIdentifier: string | null) => {
+    if (!deckIdentifier) return;
+    const shownPopups = JSON.parse(localStorage.getItem('cogniguide:exam_date_popups_shown') || '[]');
+    if (!shownPopups.includes(deckIdentifier)) {
+      shownPopups.push(deckIdentifier);
+      localStorage.setItem('cogniguide:exam_date_popups_shown', JSON.stringify(shownPopups));
+    }
   };
 
   const handleGrade = (g: Grade) => {
@@ -588,7 +605,15 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
                     card_index: index,
                     study_due_only: studyDueOnly,
                   });
-                  setShowAnswer(true);
+
+                  // Check if we should show exam date popup
+                  const shouldShowExamDatePopup = !deckExamDate && !hasExamDatePopupBeenShown(deckIdentifier);
+                  if (shouldShowExamDatePopup) {
+                    setShowExamDatePopup(true);
+                  } else {
+                    setShowAnswer(true);
+                  }
+
                   // Track cards viewed for non-auth users
                   if (!userId) {
                     setCardsViewedCount(prev => {
@@ -694,6 +719,57 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
                 className="w-full h-10 px-6 text-sm font-medium text-muted-foreground bg-muted rounded-full hover:bg-muted/70 transition-colors whitespace-nowrap"
               >
                 Close without saving
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showExamDatePopup && (
+        <div className="absolute inset-0 flex items-center justify-center z-[110]">
+          {/* Black transparent background */}
+          <div className="absolute inset-0 bg-black/40 dark:bg-black/60 z-0"></div>
+          <div className="bg-background border p-8 rounded-2xl shadow-xl max-w-md w-full text-center relative z-10">
+            <h2 className="text-foreground text-2xl font-bold mb-4">📅 Set Your Exam Date</h2>
+            <p className="text-muted-foreground mb-6">
+              The spaced repetition algorithm will adjust review intervals to ensure you're well-prepared by your exam date.
+            </p>
+            <div className="mb-6">
+              <label className="block text-sm font-medium text-foreground mb-2">
+                When is your exam? (optional)
+              </label>
+              <input
+                type="date"
+                className="w-full h-10 px-3 py-2 text-sm rounded-lg border border-border bg-background text-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-indigo-400/50 focus-visible:border-indigo-300 hover:border-gray-300 transition-colors"
+                min={new Date().toISOString().split('T')[0]}
+                onChange={(e) => {
+                  const selectedDate = e.target.value;
+                  if (selectedDate) {
+                    handleSetDeckExamDate(selectedDate);
+                    markExamDatePopupAsShown(deckIdentifier);
+                    setShowExamDatePopup(false);
+                    setShowAnswer(true);
+                    posthog.capture('exam_date_set', {
+                      deckId: deckId,
+                      exam_date: selectedDate,
+                    });
+                  }
+                }}
+              />
+            </div>
+            <div className="flex flex-col gap-3 w-full max-w-md">
+              <button
+                onClick={() => {
+                  markExamDatePopupAsShown(deckIdentifier);
+                  setShowExamDatePopup(false);
+                  setShowAnswer(true);
+                  posthog.capture('exam_date_skipped', {
+                    deckId: deckId,
+                  });
+                }}
+                className="w-full h-10 px-6 text-sm font-medium text-muted-foreground bg-muted rounded-full hover:bg-muted/70 transition-colors whitespace-nowrap"
+              >
+                Skip
               </button>
             </div>
           </div>
