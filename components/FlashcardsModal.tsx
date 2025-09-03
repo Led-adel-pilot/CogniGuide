@@ -265,9 +265,14 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
     // If studying due-only, remove current index from due list and move to next due
     setDueList((list) => {
       if (!studyDueOnly) return list;
+      const currentPos = list.indexOf(index);
       const filtered = list.filter((i) => i !== index);
       if (filtered.length > 0) {
-        setIndex(filtered[0]);
+        // Maintain forward progression: move to the next card in sequence
+        // If we were at position P in the original list, move to position P in the filtered list
+        // If P is beyond the filtered list length, wrap to the beginning
+        const nextPos = currentPos < filtered.length ? currentPos : 0;
+        setIndex(filtered[nextPos]);
       }
       return filtered;
     });
