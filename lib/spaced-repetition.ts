@@ -12,7 +12,7 @@ export type FsrsScheduleState = {
   due: string; // ISO string
   last_review?: string; // ISO string
   state: number; // enum State, store as number for JSON portability
-  examDate?: string; // YYYY-MM-DD
+  examDate?: string; // ISO datetime string (YYYY-MM-DDTHH:mm:ss.sssZ) or date-only string (YYYY-MM-DD)
 };
 
 /**
@@ -79,7 +79,15 @@ export function nextSchedule(
   // If exam date has passed, ignore the constraint and let FSRS work normally
   const examDate = current?.examDate;
   if (examDate) {
-    const exam = new Date(examDate + 'T23:59:59');
+    let exam: Date;
+    if (examDate.includes('T')) {
+      // Full datetime string
+      exam = new Date(examDate);
+    } else {
+      // Legacy date-only string, assume end of day
+      exam = new Date(examDate + 'T23:59:59');
+    }
+
     if (exam >= now && due > exam) {
       // Exam date is in future or today, and FSRS would overshoot it - clamp
       due = exam;

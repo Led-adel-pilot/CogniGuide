@@ -4,7 +4,7 @@ import React from 'react';
 import { supabase } from '@/lib/supabaseClient';
 import AuthModal from '@/components/AuthModal';
 import { nextSchedule, createInitialSchedule, type FsrsScheduleState, type Grade } from '@/lib/spaced-repetition';
-import { loadDeckSchedule, saveDeckSchedule, loadDeckScheduleAsync, saveDeckScheduleAsync } from '@/lib/sr-store';
+import { loadDeckSchedule, saveDeckSchedule, loadDeckScheduleAsync, saveDeckScheduleAsync, formatExamDateForUI, formatExamTimeForUI } from '@/lib/sr-store';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import type { Components } from 'react-markdown';
@@ -60,6 +60,8 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
   const [showAnswer, setShowAnswer] = React.useState(false);
   const [scheduledCards, setScheduledCards] = React.useState<CardWithSchedule[] | null>(null);
   const [deckExamDate, setDeckExamDate] = React.useState<string>('');
+  const [examDateInput, setExamDateInput] = React.useState<string>('');
+  const [examTimeInput, setExamTimeInput] = React.useState<string>('08:00');
   const [dueList, setDueList] = React.useState<number[]>([]);
   const [predictedDueByGrade, setPredictedDueByGrade] = React.useState<Record<number, string>>({});
   const [predictedDueDatesByGrade, setPredictedDueDatesByGrade] = React.useState<Record<number, Date>>({});
@@ -157,6 +159,8 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
         const stored = (await loadDeckScheduleAsync(deckId)) || loadDeckSchedule(deckId);
         if (stored && Array.isArray(stored.schedules) && stored.schedules.length === cards.length) {
           setDeckExamDate(stored.examDate || '');
+          setExamDateInput(formatExamDateForUI(stored.examDate));
+          setExamTimeInput(formatExamTimeForUI(stored.examDate));
           setScheduledCards(cards.map((c, i) => ({ ...c, schedule: stored.schedules[i] || createInitialSchedule() })));
           if (typeof initialIndex === 'number' && Number.isFinite(initialIndex)) {
             setIndex(Math.max(0, Math.min(cards.length - 1, initialIndex)));
@@ -232,10 +236,24 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
     return `${years}y`;
   }
 
-  const handleSetDeckExamDate = (value: string) => {
-    setDeckExamDate(value);
-    // Also copy this onto existing schedules so clamping works immediately
-    setScheduledCards((prev) => prev ? prev.map((c) => ({ ...c, schedule: { ...(c.schedule ?? createInitialSchedule()), examDate: value || undefined } })) : prev);
+  const handleSetDeckExamDate = (dateValue?: string, timeValue?: string) => {
+    const date = dateValue || examDateInput;
+    const time = timeValue || examTimeInput;
+
+    if (date && time) {
+      // Combine date and time into a full datetime string
+      const combinedDateTime = new Date(`${date}T${time}`);
+      const isoString = combinedDateTime.toISOString();
+      setDeckExamDate(isoString);
+      // Also copy this onto existing schedules so clamping works immediately
+      setScheduledCards((prev) => prev ? prev.map((c) => ({ ...c, schedule: { ...(c.schedule ?? createInitialSchedule()), examDate: isoString } })) : prev);
+    } else if (date) {
+      // Only date provided, use default time
+      const combinedDateTime = new Date(`${date}T08:00`);
+      const isoString = combinedDateTime.toISOString();
+      setDeckExamDate(isoString);
+      setScheduledCards((prev) => prev ? prev.map((c) => ({ ...c, schedule: { ...(c.schedule ?? createInitialSchedule()), examDate: isoString } })) : prev);
+    }
   };
 
   const hasExamDatePopupBeenShown = (deckIdentifier: string | null): boolean => {
@@ -738,26 +756,55 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
               <label className="block text-sm font-medium text-foreground mb-2">
                 When is your exam? (optional)
               </label>
-              <input
-                type="date"
-                className="w-full h-10 px-3 py-2 text-sm rounded-lg border border-border bg-background text-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-indigo-400/50 focus-visible:border-indigo-300 hover:border-gray-300 transition-colors"
-                min={new Date().toISOString().split('T')[0]}
-                onChange={(e) => {
-                  const selectedDate = e.target.value;
-                  if (selectedDate) {
-                    handleSetDeckExamDate(selectedDate);
+              <div className="flex gap-2">
+                <div className="flex-1">
+                  <input
+                    type="date"
+                    value={examDateInput}
+                    className="w-full h-10 px-3 py-2 text-sm rounded-lg border border-border bg-background text-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-indigo-400/50 focus-visible:border-indigo-300 hover:border-gray-300 transition-colors"
+                    min={new Date().toISOString().split('T')[0]}
+                    onChange={(e) => {
+                      const selectedDate = e.target.value;
+                      setExamDateInput(selectedDate);
+                    }}
+                  />
+                </div>
+                <div className="flex-1">
+                  <input
+                    type="time"
+                    value={examTimeInput}
+                    className="w-full h-10 px-3 py-2 text-sm rounded-lg border border-border bg-background text-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-indigo-400/50 focus-visible:border-indigo-300 hover:border-gray-300 transition-colors"
+                    onChange={(e) => {
+                      const selectedTime = e.target.value;
+                      setExamTimeInput(selectedTime);
+                    }}
+                  />
+                </div>
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">
+                Default time: 8:00 AM if not specified
+              </p>
+            </div>
+            <div className="flex flex-col gap-3 w-full max-w-md">
+              <button
+                onClick={() => {
+                  if (examDateInput) {
+                    handleSetDeckExamDate(examDateInput, examTimeInput);
                     markExamDatePopupAsShown(deckIdentifier);
                     setShowExamDatePopup(false);
                     setShowAnswer(true);
                     posthog.capture('exam_date_set', {
                       deckId: deckId,
-                      exam_date: selectedDate,
+                      exam_date: examDateInput,
+                      exam_time: examTimeInput,
                     });
                   }
                 }}
-              />
-            </div>
-            <div className="flex flex-col gap-3 w-full max-w-md">
+                disabled={!examDateInput}
+                className="w-full h-10 px-6 text-sm font-medium bg-primary text-primary-foreground rounded-full hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors whitespace-nowrap"
+              >
+                Set Exam Date
+              </button>
               <button
                 onClick={() => {
                   markExamDatePopupAsShown(deckIdentifier);

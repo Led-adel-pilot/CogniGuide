@@ -1,14 +1,77 @@
 import { supabase } from '@/lib/supabaseClient';
 
 export type StoredDeckSchedule = {
-  examDate?: string; // YYYY-MM-DD
+  examDate?: string; // ISO datetime string (YYYY-MM-DDTHH:mm:ss.sssZ) or date-only string (YYYY-MM-DD)
   schedules: Array<any>; // FsrsScheduleState[], but stored as plain JSON
 };
 
 const PREFIX = 'cogniguide_sr_schedule_';
 
+/**
+ * Convert exam date to full datetime string with default 8:00 AM time
+ * Handles both date-only strings (YYYY-MM-DD) and full datetime strings
+ */
+function normalizeExamDate(examDate?: string): string | undefined {
+  if (!examDate) return undefined;
+
+  // If it's already a full datetime string (contains T), return as-is
+  if (examDate.includes('T')) {
+    return examDate;
+  }
+
+  // If it's a date-only string, add default 8:00 AM time
+  try {
+    const date = new Date(examDate);
+    if (isNaN(date.getTime())) return undefined;
+
+    // Set to 8:00 AM local time, then convert to UTC
+    date.setHours(8, 0, 0, 0);
+    return date.toISOString();
+  } catch {
+    return undefined;
+  }
+}
+
+/**
+ * Convert datetime string to date-only string for UI display
+ */
+function formatExamDateForUI(examDate?: string): string {
+  if (!examDate) return '';
+
+  try {
+    const date = new Date(examDate);
+    if (isNaN(date.getTime())) return '';
+
+    // Return date in YYYY-MM-DD format
+    return date.toISOString().split('T')[0];
+  } catch {
+    return '';
+  }
+}
+
+/**
+ * Convert datetime string to time-only string for UI display
+ */
+function formatExamTimeForUI(examDate?: string): string {
+  if (!examDate) return '08:00'; // Default to 8:00 AM
+
+  try {
+    const date = new Date(examDate);
+    if (isNaN(date.getTime())) return '08:00';
+
+    // Return time in HH:mm format
+    const hours = date.getHours().toString().padStart(2, '0');
+    const minutes = date.getMinutes().toString().padStart(2, '0');
+    return `${hours}:${minutes}`;
+  } catch {
+    return '08:00';
+  }
+}
+
 // In-memory cache to avoid redundant Supabase round-trips when the dashboard prefetches
 const memorySchedules: Record<string, StoredDeckSchedule> = {};
+
+export { normalizeExamDate, formatExamDateForUI, formatExamTimeForUI };
 
 export function getMemoryDeckSchedule(deckId: string): StoredDeckSchedule | null {
   return memorySchedules[deckId] || null;
@@ -41,11 +104,12 @@ export function loadDeckSchedule(deckId: string): StoredDeckSchedule | null {
 export function saveDeckSchedule(deckId: string, data: StoredDeckSchedule): void {
   try {
     if (typeof window === 'undefined') return;
+    const normalizedExamDate = normalizeExamDate(data.examDate);
     localStorage.setItem(PREFIX + deckId, JSON.stringify({
-      examDate: data.examDate,
+      examDate: normalizedExamDate,
       schedules: data.schedules,
     }));
-    setMemoryDeckSchedule(deckId, data);
+    setMemoryDeckSchedule(deckId, { ...data, examDate: normalizedExamDate });
   } catch {}
 }
 
@@ -86,18 +150,20 @@ export async function saveDeckScheduleAsync(deckId: string, data: StoredDeckSche
       saveDeckSchedule(deckId, data);
       return;
     }
+    const normalizedExamDate = normalizeExamDate(data.examDate);
     const payload = {
       user_id: userId,
       deck_id: deckId,
-      exam_date: data.examDate || null,
+      exam_date: normalizedExamDate || null,
       schedules: data.schedules || [],
       updated_at: new Date().toISOString(),
     };
     // upsert on (user_id, deck_id)
     await supabase.from('flashcards_schedule').upsert(payload, { onConflict: 'user_id,deck_id' });
     // Keep caches in sync
-    setMemoryDeckSchedule(deckId, data);
-    saveDeckSchedule(deckId, data);
+    const normalizedData = { ...data, examDate: normalizedExamDate };
+    setMemoryDeckSchedule(deckId, normalizedData);
+    saveDeckSchedule(deckId, normalizedData);
   } catch {
     saveDeckSchedule(deckId, data);
   }
@@ -139,17 +205,22 @@ export async function upsertDeckSchedulesBulkAsync(items: Array<{ deckId: string
       items.forEach(({ deckId, data }) => saveDeckSchedule(deckId, data));
       return;
     }
-    const rows = items.map(({ deckId, data }) => ({
-      user_id: userId,
-      deck_id: deckId,
-      exam_date: data.examDate || null,
-      schedules: data.schedules || [],
-      updated_at: new Date().toISOString(),
-    }));
+    const rows = items.map(({ deckId, data }) => {
+      const normalizedExamDate = normalizeExamDate(data.examDate);
+      return {
+        user_id: userId,
+        deck_id: deckId,
+        exam_date: normalizedExamDate || null,
+        schedules: data.schedules || [],
+        updated_at: new Date().toISOString(),
+      };
+    });
     if (rows.length > 0) {
       await supabase.from('flashcards_schedule').upsert(rows, { onConflict: 'user_id,deck_id' });
-      rows.forEach((r) => {
-        const val = { examDate: r.exam_date || undefined, schedules: r.schedules } as StoredDeckSchedule;
+      rows.forEach((r, index) => {
+        const originalData = items[index].data;
+        const normalizedExamDate = normalizeExamDate(originalData.examDate);
+        const val = { examDate: normalizedExamDate || undefined, schedules: r.schedules } as StoredDeckSchedule;
         setMemoryDeckSchedule(r.deck_id as string, val);
         saveDeckSchedule(r.deck_id as string, val);
       });

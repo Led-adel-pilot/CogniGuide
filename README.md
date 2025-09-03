@@ -172,6 +172,49 @@ These preferences reflect the current, polished UI and should be used consistent
   - `components/MindMapModal.tsx` uses rounded container and circular icon controls for downloads/close.
   - `components/Dropzone.tsx` uses rounded containers and circular remove-file buttons.
 - **Optional library**: You may use shadcn/ui components to speed up consistent, reusable UI primitives (e.g., Dialog, Button). Match the shape rules above (pills/circles/rounded panels) and white background.
+
+## shadcn/ui Integration
+
+CogniGuide now includes comprehensive shadcn/ui integration while preserving the exact existing color scheme and design system. This ensures seamless component usage without breaking the established visual identity.
+
+### Key Features
+
+*   **Seamless Color Preservation**: shadcn/ui components automatically use the existing custom color variables (`--color-primary`, `--color-background`, etc.) defined in `app/globals.css`
+*   **CSS Variables Integration**: Components use semantic color classes that map to your existing theme, ensuring perfect visual consistency
+*   **Zero Breaking Changes**: All existing components and styling remain unchanged
+*   **Component Library**: Access to the full shadcn/ui ecosystem for rapid UI development
+
+### Configuration
+
+The integration is configured in `components.json`:
+- `cssVariables: false` - Prevents shadcn from generating conflicting CSS variables
+- `baseColor: "slate"` - Uses slate as base but components inherit your custom colors
+- Standard shadcn setup with Poppins font and Lucide icons
+
+### Available Components
+
+Currently installed shadcn/ui components:
+*   **Button** - Multiple variants (default, outline, secondary, ghost, link) with semantic color classes
+*   **Card** - Card container with Header, Title, Description, Content, Footer
+*   **Input** - Form input field with focus states and validation styles
+*   **Label** - Form label component
+
+The component will automatically:
+- Use your existing color scheme via semantic classes (`bg-primary`, `text-primary-foreground`, etc.)
+- Inherit your design system (rounded corners, shadows, typography)
+- Work seamlessly with light/dark mode
+- Maintain accessibility standards
+
+### Component Customization
+
+When customizing shadcn components, use the semantic color classes defined in `app/globals.css`:
+- `bg-primary` / `text-primary-foreground` - Primary actions and branding
+- `bg-secondary` / `text-secondary-foreground` - Secondary elements
+- `bg-accent` / `text-accent-foreground` - Hover states and highlights
+- `bg-muted` / `text-muted-foreground` - Subtle text and backgrounds
+- `border-border` - Consistent border colors
+- `ring-ring` - Focus ring colors
+
 - **Accessibility/Feel**: Keep hover states subtle, focus-visible rings on interactive elements, and avoid dark backgrounds/panels.
 
 ### FlashcardsModal Styling Guidelines
@@ -724,7 +767,7 @@ create index IF not exists mindmaps_user_id_created_at_idx on public.mindmaps us
 create table public.flashcards_schedule (
   user_id uuid not null,
   deck_id uuid not null,
-  exam_date date null,
+  exam_date timestamp with time zone null,
   schedules jsonb not null default '[]'::jsonb,
   updated_at timestamp with time zone not null default now(),
   constraint flashcards_schedule_pkey primary key (user_id, deck_id),

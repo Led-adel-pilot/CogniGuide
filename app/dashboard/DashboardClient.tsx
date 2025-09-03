@@ -594,7 +594,14 @@ export default function DashboardClient() {
         // Check if exam date has passed - if so, don't include cards in due queue
         let dIdx: number[] = [];
         if (examDate) {
-          const examDateTime = new Date(examDate + 'T23:59:59');
+          let examDateTime: Date;
+          if (examDate.includes('T')) {
+            // Full datetime string
+            examDateTime = new Date(examDate);
+          } else {
+            // Legacy date-only string, assume end of day
+            examDateTime = new Date(examDate + 'T23:59:59');
+          }
           if (examDateTime >= now) {
             // Exam date is in future or today - include due cards
             dIdx = schedules
@@ -653,7 +660,14 @@ export default function DashboardClient() {
       let dIdx: number[] = [];
       const examDate = stored?.examDate;
       if (examDate) {
-        const examDateTime = new Date(examDate + 'T23:59:59');
+        let examDateTime: Date;
+        if (examDate.includes('T')) {
+          // Full datetime string
+          examDateTime = new Date(examDate);
+        } else {
+          // Legacy date-only string, assume end of day
+          examDateTime = new Date(examDate + 'T23:59:59');
+        }
         if (examDateTime >= now) {
           // Exam date is in future or today - include due cards
           dIdx = schedules
