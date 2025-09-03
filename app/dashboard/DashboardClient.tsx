@@ -591,10 +591,25 @@ export default function DashboardClient() {
           // update local cache immediately
           saveDeckSchedule(deckId, normalized);
         }
-        const dIdx = schedules
-          .map((s: any, i: number) => ({ i, due: s?.due ? new Date(s.due) : now }))
-          .filter((x: any) => x.due <= now)
-          .map((x: any) => x.i);
+        // Check if exam date has passed - if so, don't include cards in due queue
+        let dIdx: number[] = [];
+        if (examDate) {
+          const examDateTime = new Date(examDate + 'T23:59:59');
+          if (examDateTime >= now) {
+            // Exam date is in future or today - include due cards
+            dIdx = schedules
+              .map((s: any, i: number) => ({ i, due: s?.due ? new Date(s.due) : now }))
+              .filter((x: any) => x.due <= now)
+              .map((x: any) => x.i);
+          }
+          // If exam date has passed, dIdx remains empty - cards won't show as due
+        } else {
+          // No exam date set - include due cards normally
+          dIdx = schedules
+            .map((s: any, i: number) => ({ i, due: s?.due ? new Date(s.due) : now }))
+            .filter((x: any) => x.due <= now)
+            .map((x: any) => x.i);
+        }
         dueMap[deckId] = dIdx;
         totalDue += dIdx.length;
         if (dIdx.length > 0) {
@@ -634,10 +649,26 @@ export default function DashboardClient() {
         const normalized: StoredDeckSchedule = { examDate: stored?.examDate, schedules };
         saveDeckSchedule(deckId, normalized);
       }
-      const dIdx = schedules
-        .map((s: any, i: number) => ({ i, due: s?.due ? new Date(s.due) : now }))
-        .filter((x: any) => x.due <= now)
-        .map((x: any) => x.i);
+      // Check if exam date has passed - if so, don't include cards in due queue
+      let dIdx: number[] = [];
+      const examDate = stored?.examDate;
+      if (examDate) {
+        const examDateTime = new Date(examDate + 'T23:59:59');
+        if (examDateTime >= now) {
+          // Exam date is in future or today - include due cards
+          dIdx = schedules
+            .map((s: any, i: number) => ({ i, due: s?.due ? new Date(s.due) : now }))
+            .filter((x: any) => x.due <= now)
+            .map((x: any) => x.i);
+        }
+        // If exam date has passed, dIdx remains empty - cards won't show as due
+      } else {
+        // No exam date set - include due cards normally
+        dIdx = schedules
+          .map((s: any, i: number) => ({ i, due: s?.due ? new Date(s.due) : now }))
+          .filter((x: any) => x.due <= now)
+          .map((x: any) => x.i);
+      }
       dueMap[deckId] = dIdx;
       totalDue += dIdx.length;
       if (dIdx.length > 0) queue.push({ id: deckId, title: f.title, cards: cardsArr });

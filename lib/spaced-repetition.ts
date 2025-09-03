@@ -47,8 +47,9 @@ export function createInitialSchedule(now = new Date()): FsrsScheduleState {
 }
 
 /**
- * Compute next FSRS state given a grade. If examDate is provided on the state, we will
- * adjust the next interval to ensure the next due does not overshoot the exam date.
+ * Compute next FSRS state given a grade. If examDate is provided and hasn't passed yet,
+ * we will adjust the next interval to ensure the next due does not overshoot the exam date.
+ * If the exam date has passed, the constraint is ignored and normal FSRS scheduling applies.
  */
 export function nextSchedule(
   current: FsrsScheduleState | null | undefined,
@@ -74,11 +75,16 @@ export function nextSchedule(
   const updated = result.card;
   let due = updated.due instanceof Date ? updated.due : new Date(updated.due);
 
-  // If an exam date exists and would be overshot, clamp due date to the exam date
+  // If an exam date exists and is in the future, clamp due date to the exam date
+  // If exam date has passed, ignore the constraint and let FSRS work normally
   const examDate = current?.examDate;
   if (examDate) {
     const exam = new Date(examDate + 'T23:59:59');
-    if (due > exam) due = exam;
+    if (exam >= now && due > exam) {
+      // Exam date is in future or today, and FSRS would overshoot it - clamp
+      due = exam;
+    }
+    // If exam date has passed (exam < now), ignore constraint and let FSRS work normally
   }
 
   return {
