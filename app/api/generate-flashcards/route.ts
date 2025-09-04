@@ -177,9 +177,9 @@ function buildFlashcardPrompt(opts: {
     : `You will be given source content. Generate high-quality active-recall flashcards that help a learner master the content.`;
 
   const languageAndCount = sourceType === 'markmap'
-    ? `- Produce about 15 to 35 cards depending on content size, NEVER MORE THAN 45.
+    ? `- Produce about 15 to 100 cards depending on content size.
 - The flashcards MUST be in the same language as the mind map.`
-    : `- Produce about 15 to 35 cards depending on content size, NEVER MORE THAN 45.
+    : `- Produce about 15 to 100 cards depending on content size.
 - The flashcards MUST be in the same language as the source content.`;
 
   const body = `You are an expert instructional designer.
@@ -236,15 +236,51 @@ function logLlmInput(kind: string, prompt: string) {
 
 // Shared non-streaming completion + JSON parsing
 async function generateJsonFromModel(userContent: any): Promise<{ title: string | null; cards: Flashcard[] }> {
-  const completion = await openai.chat.completions.create({
-    model: 'gemini-2.5-flash-lite',
-    // @ts-ignore
-    reasoning_effort: 'none',
-    messages: [{ role: 'user', content: userContent }],
-    stream: false,
-    // @ts-ignore
-    response_format: { type: 'json_object' },
-  });
+  let completion;
+  try {
+    completion = await openai.chat.completions.create({
+      model: 'gemini-2.5-flah-lite',
+      // @ts-ignore
+      //reasoning_effort: 'none',
+      messages: [{ role: 'user', content: userContent }],
+      stream: false,
+      // @ts-ignore
+      response_format: { type: 'json_object' },
+    });
+  } catch (apiError) {
+    console.error('OpenAI API error in generateJsonFromModel:', apiError);
+
+    if (apiError instanceof Error) {
+      // Handle specific OpenAI errors
+      if (apiError.message.includes('429') || apiError.message.includes('rate limit')) {
+        throw new Error('Service temporarily busy - rate limit exceeded');
+      }
+
+      if (apiError.message.includes('401') || apiError.message.includes('unauthorized')) {
+        throw new Error('AI service authentication failed');
+      }
+
+      if (apiError.message.includes('400') || apiError.message.includes('bad request')) {
+        throw new Error('Invalid request format for AI service');
+      }
+
+      if (apiError.message.includes('413') || apiError.message.includes('payload too large')) {
+        throw new Error('Content too large for AI service processing');
+      }
+
+      if (apiError.message.includes('500') || apiError.message.includes('502') || apiError.message.includes('503')) {
+        throw new Error('AI service temporarily unavailable');
+      }
+
+      if (apiError.message.includes('content') && apiError.message.includes('policy')) {
+        throw new Error('Content violates AI service usage policy');
+      }
+    }
+
+    // Generic API error
+    throw new Error('Failed to communicate with AI service');
+  }
+
   const content = completion.choices?.[0]?.message?.content ?? '';
   if (!content) throw new Error('No content returned from model');
   const parsed = extractJsonObject(content);
@@ -264,13 +300,57 @@ export async function POST(req: NextRequest) {
     // Helper to stream NDJSON lines from a prompt, with optional credit refund on total failure
     const streamNdjson = async (promptContent: any, refundInfo?: { userId: string; credits: number }, images?: string[]) => {
       const encoder = new TextEncoder();
-      const stream = await openai.chat.completions.create({
-        model: 'gemini-2.5-flash-lite',
-        // @ts-ignore
-        reasoning_effort: 'none',
-        messages: [{ role: 'user', content: promptContent }],
-        stream: true,
-      });
+      let stream;
+      try {
+        stream = await openai.chat.completions.create({
+          model: 'gemini-2.5-flah-lite',
+          // @ts-ignore
+          //reasoning_effort: 'none',
+          messages: [{ role: 'user', content: promptContent }],
+          stream: true,
+        });
+      } catch (apiError) {
+        console.error('OpenAI API error in streamNdjson:', apiError);
+
+        // Refund credits if API call fails
+        if (refundInfo && refundInfo.credits > 0) {
+          try {
+            await refundCredits(refundInfo.userId, refundInfo.credits);
+          } catch (refundError) {
+            console.error('Failed to refund credits:', refundError);
+          }
+        }
+
+        if (apiError instanceof Error) {
+          // Handle specific OpenAI errors
+          if (apiError.message.includes('429') || apiError.message.includes('rate limit')) {
+            throw new Error('Service temporarily busy - rate limit exceeded');
+          }
+
+          if (apiError.message.includes('401') || apiError.message.includes('unauthorized')) {
+            throw new Error('AI service authentication failed');
+          }
+
+          if (apiError.message.includes('400') || apiError.message.includes('bad request')) {
+            throw new Error('Invalid request format for AI service');
+          }
+
+          if (apiError.message.includes('413') || apiError.message.includes('payload too large')) {
+            throw new Error('Content too large for AI service processing');
+          }
+
+          if (apiError.message.includes('500') || apiError.message.includes('502') || apiError.message.includes('503')) {
+            throw new Error('AI service temporarily unavailable');
+          }
+
+          if (apiError.message.includes('content') && apiError.message.includes('policy')) {
+            throw new Error('Content violates AI service usage policy');
+          }
+        }
+
+        // Generic API error
+        throw new Error('Failed to communicate with AI service');
+      }
 
       let anyChunkSent = false;
       let anyCardSent = false;
@@ -348,12 +428,27 @@ export async function POST(req: NextRequest) {
               }
             }
           } catch (err) {
+            console.error('Streaming error:', err);
+
             if (!anyCardSent) {
+              // If no cards were sent, refund credits and return error response
               if (refundInfo && refundInfo.credits > 0) {
-                try { await refundCredits(refundInfo.userId, refundInfo.credits); } catch {}
+                try {
+                  await refundCredits(refundInfo.userId, refundInfo.credits);
+                  console.log(`Refunded ${refundInfo.credits} credits due to streaming failure`);
+                } catch (refundError) {
+                  console.error('Failed to refund credits:', refundError);
+                }
               }
-              controller.error(err);
+
+              // For streaming errors before any content is sent, we need to handle this differently
+              // since we can't use controller.error() with a Response object
+              try { controller.close(); } catch {}
+
+              // The error will be handled by the outer catch block
+              throw err;
             } else {
+              // If some cards were sent, just close the stream gracefully
               try { controller.close(); } catch {}
             }
           }
@@ -370,26 +465,81 @@ export async function POST(req: NextRequest) {
 
     if (contentType.includes('application/json')) {
       // Enhanced JSON path: supports either { markdown } OR { text, images?, prompt?, numCards? }
-      const body = await req.json().catch(() => null) as { markdown?: string; numCards?: number; text?: string; images?: string[]; prompt?: string } | null;
-      if (!body) return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
+      let body: { markdown?: string; numCards?: number; text?: string; images?: string[]; prompt?: string } | null = null;
+
+      try {
+        body = await req.json() as { markdown?: string; numCards?: number; text?: string; images?: string[]; prompt?: string } | null;
+      } catch (jsonError) {
+        return NextResponse.json({
+          error: 'Invalid JSON',
+          message: 'The request body contains invalid JSON. Please check your request format.',
+          code: 'INVALID_JSON'
+        }, { status: 400 });
+      }
+
+      if (!body) {
+        return NextResponse.json({
+          error: 'Empty request body',
+          message: 'The request body is empty. Please provide markdown, text, images, or a prompt.',
+          code: 'EMPTY_REQUEST'
+        }, { status: 400 });
+      }
 
       const hasMarkdown = typeof body.markdown === 'string' && body.markdown.trim().length > 0;
       const hasTextPayload = (typeof body.text === 'string' && body.text.length > 0) || (Array.isArray(body.images) && body.images.length > 0) || (typeof body.prompt === 'string' && body.prompt.trim().length > 0);
 
       if (!hasMarkdown && !hasTextPayload) {
-        return NextResponse.json({ error: 'Provide either markdown or text/images/prompt' }, { status: 400 });
+        return NextResponse.json({
+          error: 'No content provided',
+          message: 'Please provide either markdown content or text/images/prompt content to process.',
+          code: 'NO_CONTENT'
+        }, { status: 400 });
       }
 
       const ONE_CREDIT_CHARS = 3800;
       const userIdForCredits = await getUserIdFromAuthHeader(req);
-      if (userIdForCredits) { try { await ensureFreeMonthlyCredits(userIdForCredits); } catch {} }
+      if (userIdForCredits) {
+        try {
+          await ensureFreeMonthlyCredits(userIdForCredits);
+        } catch (creditError) {
+          console.warn('Failed to ensure free monthly credits:', creditError);
+          // Continue processing - don't fail the request for credit setup issues
+        }
+      }
 
       if (hasMarkdown) {
         const totalRawChars = body.markdown!.length;
         const creditsNeeded = totalRawChars > 0 ? (totalRawChars / ONE_CREDIT_CHARS) : 0;
         if (userIdForCredits && creditsNeeded > 0) {
+          const currentCredits = await getCurrentCredits(userIdForCredits);
+          if (currentCredits === null) {
+            return NextResponse.json({
+              error: 'Credits service unavailable',
+              message: 'Unable to check your credit balance. Please try again later.',
+              code: 'CREDITS_SERVICE_ERROR'
+            }, { status: 503 });
+          }
+
+          if (currentCredits < creditsNeeded) {
+            const shortfall = creditsNeeded - currentCredits;
+            return NextResponse.json({
+              error: 'Insufficient credits',
+              message: `You need ${creditsNeeded.toFixed(1)} credits but only have ${currentCredits.toFixed(1)}. Please upload a smaller file or upgrade your plan.`,
+              code: 'INSUFFICIENT_CREDITS',
+              creditsNeeded: creditsNeeded,
+              creditsAvailable: currentCredits,
+              shortfall: shortfall
+            }, { status: 402 });
+          }
+
           const ok = await deductCredits(userIdForCredits, creditsNeeded);
-          if (!ok) return NextResponse.json({ error: 'Insufficient credits. Upload a smaller file or' }, { status: 402 });
+          if (!ok) {
+            return NextResponse.json({
+              error: 'Credit deduction failed',
+              message: 'Failed to deduct credits from your account. Please try again.',
+              code: 'CREDIT_DEDUCTION_ERROR'
+            }, { status: 500 });
+          }
         }
         if (shouldStream) {
           const streamingPrompt = buildFlashcardPrompt({ mode: 'stream', sourceType: 'markmap', sourceContent: body.markdown!, numCards: body.numCards });
@@ -405,8 +555,36 @@ export async function POST(req: NextRequest) {
           const result = await generateJsonFromModel(prompt);
           return NextResponse.json(result);
         } catch (e) {
-          const msg = e instanceof Error ? e.message : 'Failed to generate flashcards';
-          return NextResponse.json({ error: msg }, { status: 502 });
+          console.error('Flashcard generation error:', e);
+          if (e instanceof Error) {
+            if (e.message.includes('No content returned')) {
+              return NextResponse.json({
+                error: 'No content generated',
+                message: 'The AI service returned no content. Please try again with different content.',
+                code: 'NO_CONTENT_GENERATED'
+              }, { status: 502 });
+            }
+            if (e.message.includes('Failed to generate flashcards')) {
+              return NextResponse.json({
+                error: 'Generation failed',
+                message: 'Unable to generate flashcards from the provided content. Please try with different content.',
+                code: 'GENERATION_FAILED'
+              }, { status: 502 });
+            }
+            if (e.message.includes('Model response was not valid JSON')) {
+              return NextResponse.json({
+                error: 'Invalid response format',
+                message: 'The AI service returned an invalid response. Please try again.',
+                code: 'INVALID_RESPONSE_FORMAT'
+              }, { status: 502 });
+            }
+          }
+          const sanitizedMessage = e instanceof Error ? e.message.replace(/API key|token|secret/gi, '[REDACTED]') : 'Unknown error occurred';
+          return NextResponse.json({
+            error: 'Flashcard generation failed',
+            message: sanitizedMessage.length > 200 ? sanitizedMessage.substring(0, 200) + '...' : sanitizedMessage,
+            code: 'FLASHCARD_GENERATION_ERROR'
+          }, { status: 502 });
         }
       }
 
@@ -421,8 +599,35 @@ export async function POST(req: NextRequest) {
       if (images.length > 0 && creditsNeeded < 0.5) creditsNeeded = 0.5;
       if (!text && images.length === 0 && promptText && creditsNeeded < 1) creditsNeeded = 1;
       if (userIdForCredits && creditsNeeded > 0) {
+        const currentCredits = await getCurrentCredits(userIdForCredits);
+        if (currentCredits === null) {
+          return NextResponse.json({
+            error: 'Credits service unavailable',
+            message: 'Unable to check your credit balance. Please try again later.',
+            code: 'CREDITS_SERVICE_ERROR'
+          }, { status: 503 });
+        }
+
+        if (currentCredits < creditsNeeded) {
+          const shortfall = creditsNeeded - currentCredits;
+          return NextResponse.json({
+            error: 'Insufficient credits',
+            message: `You need ${creditsNeeded.toFixed(1)} credits but only have ${currentCredits.toFixed(1)}. Please upload a smaller file or upgrade your plan.`,
+            code: 'INSUFFICIENT_CREDITS',
+            creditsNeeded: creditsNeeded,
+            creditsAvailable: currentCredits,
+            shortfall: shortfall
+          }, { status: 402 });
+        }
+
         const ok = await deductCredits(userIdForCredits, creditsNeeded);
-        if (!ok) return NextResponse.json({ error: 'Insufficient credits. Upload a smaller file or' }, { status: 402 });
+        if (!ok) {
+          return NextResponse.json({
+            error: 'Credit deduction failed',
+            message: 'Failed to deduct credits from your account. Please try again.',
+            code: 'CREDIT_DEDUCTION_ERROR'
+          }, { status: 500 });
+        }
       }
       const streamingPrompt = buildFlashcardPrompt({ mode: shouldStream ? 'stream' : 'json', sourceType: 'text', sourceContent: text || 'No text provided. Analyze the attached image(s) only and build flashcards from their content.', userInstruction: promptText, imagesCount: images.length, numCards: body.numCards });
 
@@ -437,24 +642,104 @@ export async function POST(req: NextRequest) {
         const result = await generateJsonFromModel(userContent);
         return NextResponse.json(result);
       } catch (e) {
-        const msg = e instanceof Error ? e.message : 'Failed to generate flashcards';
-        return NextResponse.json({ error: msg }, { status: 502 });
+        console.error('Flashcard generation error:', e);
+        if (e instanceof Error) {
+          if (e.message.includes('No content returned')) {
+            return NextResponse.json({
+              error: 'No content generated',
+              message: 'The AI service returned no content. Please try again with different content.',
+              code: 'NO_CONTENT_GENERATED'
+            }, { status: 502 });
+          }
+          if (e.message.includes('Failed to generate flashcards')) {
+            return NextResponse.json({
+              error: 'Generation failed',
+              message: 'Unable to generate flashcards from the provided content. Please try with different content.',
+              code: 'GENERATION_FAILED'
+            }, { status: 502 });
+          }
+          if (e.message.includes('Model response was not valid JSON')) {
+            return NextResponse.json({
+              error: 'Invalid response format',
+              message: 'The AI service returned an invalid response. Please try again.',
+              code: 'INVALID_RESPONSE_FORMAT'
+            }, { status: 502 });
+          }
+        }
+        const sanitizedMessage = e instanceof Error ? e.message.replace(/API key|token|secret/gi, '[REDACTED]') : 'Unknown error occurred';
+        return NextResponse.json({
+          error: 'Flashcard generation failed',
+          message: sanitizedMessage.length > 200 ? sanitizedMessage.substring(0, 200) + '...' : sanitizedMessage,
+          code: 'FLASHCARD_GENERATION_ERROR'
+        }, { status: 502 });
       }
     }
 
     // Multipart form-data path: files + optional prompt
-    const formData = await req.formData();
+    let formData;
+    try {
+      formData = await req.formData();
+    } catch (formError) {
+      return NextResponse.json({
+        error: 'Invalid form data',
+        message: 'The multipart form data is malformed. Please check your file upload.',
+        code: 'INVALID_FORM_DATA'
+      }, { status: 400 });
+    }
+
     const files = formData.getAll('files') as File[];
     const promptText = (formData.get('prompt') as string | null) || '';
+
     if (!files || files.length === 0) {
-      return NextResponse.json({ error: 'Please upload at least one file' }, { status: 400 });
+      return NextResponse.json({
+        error: 'No files uploaded',
+        message: 'Please upload at least one file to process.',
+        code: 'NO_FILES_UPLOADED'
+      }, { status: 400 });
     }
 
     const userId = await getUserIdFromAuthHeader(req);
     const userTier = await getUserTier(userId);
 
     // Use the new cumulative file processing logic
-    const result = await processMultipleFiles(files, userTier);
+    let result;
+    try {
+      result = await processMultipleFiles(files, userTier);
+    } catch (fileError) {
+      console.error('File processing error:', fileError);
+
+      if (fileError instanceof Error) {
+        if (fileError.message.includes('size') || fileError.message.includes('limit')) {
+          return NextResponse.json({
+            error: 'File too large',
+            message: 'The uploaded file(s) are too large. Please try with smaller files or fewer files.',
+            code: 'FILE_SIZE_EXCEEDED'
+          }, { status: 413 });
+        }
+
+        if (fileError.message.includes('format') || fileError.message.includes('type')) {
+          return NextResponse.json({
+            error: 'Unsupported file format',
+            message: 'One or more files have an unsupported format. Please use PDF, DOCX, PPTX, or plain text files.',
+            code: 'UNSUPPORTED_FORMAT'
+          }, { status: 400 });
+        }
+
+        if (fileError.message.includes('corrupt') || fileError.message.includes('invalid')) {
+          return NextResponse.json({
+            error: 'File corrupted',
+            message: 'One or more files appear to be corrupted or invalid. Please check your files and try again.',
+            code: 'CORRUPTED_FILE'
+          }, { status: 400 });
+        }
+      }
+
+      return NextResponse.json({
+        error: 'File processing failed',
+        message: 'Unable to process the uploaded files. Please try again with different files.',
+        code: 'FILE_PROCESSING_ERROR'
+      }, { status: 400 });
+    }
 
     const extractedText = result.extractedParts.join('\n\n');
     const imageParts: { type: 'image_url'; image_url: { url: string } }[] = result.imageDataUrls.map(url => ({
@@ -465,17 +750,56 @@ export async function POST(req: NextRequest) {
     let totalRawChars = result.totalRawChars;
 
     if (!extractedText && imageParts.length === 0) {
-      return NextResponse.json({ error: 'Could not read any supported content from the uploaded files.' }, { status: 400 });
+      return NextResponse.json({
+        error: 'No readable content',
+        message: 'Could not extract any readable content from the uploaded files. Please ensure your files contain text or images.',
+        code: 'NO_READABLE_CONTENT'
+      }, { status: 400 });
     }
 
     // Compute and reserve credits (fractional allowed). Min 0.5 when image-only
     const ONE_CREDIT_CHARS = 3800;
     let creditsNeeded = totalRawChars > 0 ? (totalRawChars / ONE_CREDIT_CHARS) : 0;
     if (imageParts.length > 0 && creditsNeeded < 0.5) creditsNeeded = 0.5;
-    if (userId) { try { await ensureFreeMonthlyCredits(userId); } catch {} }
+    if (userId) {
+      try {
+        await ensureFreeMonthlyCredits(userId);
+      } catch (creditError) {
+        console.warn('Failed to ensure free monthly credits:', creditError);
+        // Continue processing - don't fail the request for credit setup issues
+      }
+    }
+
     if (userId && creditsNeeded > 0) {
+      const currentCredits = await getCurrentCredits(userId);
+      if (currentCredits === null) {
+        return NextResponse.json({
+          error: 'Credits service unavailable',
+          message: 'Unable to check your credit balance. Please try again later.',
+          code: 'CREDITS_SERVICE_ERROR'
+        }, { status: 503 });
+      }
+
+      if (currentCredits < creditsNeeded) {
+        const shortfall = creditsNeeded - currentCredits;
+        return NextResponse.json({
+          error: 'Insufficient credits',
+          message: `You need ${creditsNeeded.toFixed(1)} credits but only have ${currentCredits.toFixed(1)}. Please upload a smaller file or upgrade your plan.`,
+          code: 'INSUFFICIENT_CREDITS',
+          creditsNeeded: creditsNeeded,
+          creditsAvailable: currentCredits,
+          shortfall: shortfall
+        }, { status: 402 });
+      }
+
       const ok = await deductCredits(userId, creditsNeeded);
-      if (!ok) return NextResponse.json({ error: 'Insufficient credits. Upload a smaller file or' }, { status: 402 });
+      if (!ok) {
+        return NextResponse.json({
+          error: 'Credit deduction failed',
+          message: 'Failed to deduct credits from your account. Please try again.',
+          code: 'CREDIT_DEDUCTION_ERROR'
+        }, { status: 500 });
+      }
     }
 
     if (shouldStream) {
@@ -506,12 +830,119 @@ export async function POST(req: NextRequest) {
       const result = await generateJsonFromModel(userContent);
       return NextResponse.json(result);
     } catch (e) {
-      const msg = e instanceof Error ? e.message : 'Failed to generate flashcards';
-      return NextResponse.json({ error: msg }, { status: 502 });
+      console.error('Flashcard generation error:', e);
+      if (e instanceof Error) {
+        if (e.message.includes('No content returned')) {
+          return NextResponse.json({
+            error: 'No content generated',
+            message: 'The AI service returned no content. Please try again with different content.',
+            code: 'NO_CONTENT_GENERATED'
+          }, { status: 502 });
+        }
+        if (e.message.includes('Failed to generate flashcards')) {
+          return NextResponse.json({
+            error: 'Generation failed',
+            message: 'Unable to generate flashcards from the provided content. Please try with different content.',
+            code: 'GENERATION_FAILED'
+          }, { status: 502 });
+        }
+        if (e.message.includes('Model response was not valid JSON')) {
+          return NextResponse.json({
+            error: 'Invalid response format',
+            message: 'The AI service returned an invalid response. Please try again.',
+            code: 'INVALID_RESPONSE_FORMAT'
+          }, { status: 502 });
+        }
+      }
+      const sanitizedMessage = e instanceof Error ? e.message.replace(/API key|token|secret/gi, '[REDACTED]') : 'Unknown error occurred';
+      return NextResponse.json({
+        error: 'Flashcard generation failed',
+        message: sanitizedMessage.length > 200 ? sanitizedMessage.substring(0, 200) + '...' : sanitizedMessage,
+        code: 'FLASHCARD_GENERATION_ERROR'
+      }, { status: 502 });
     }
   } catch (error) {
     console.error('Error in generate-flashcards API:', error);
-    const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred.';
-    return NextResponse.json({ error: 'An internal server error occurred.', details: errorMessage }, { status: 500 });
+
+    // Handle specific error types with appropriate status codes and messages
+    if (error instanceof Error) {
+      // OpenAI API errors
+      if (error.message.includes('API key') || error.message.includes('authentication')) {
+        return NextResponse.json({
+          error: 'Authentication failed',
+          message: 'Unable to authenticate with the AI service. Please try again later.',
+          code: 'AUTH_ERROR'
+        }, { status: 503 });
+      }
+
+      // Rate limiting
+      if (error.message.includes('rate limit') || error.message.includes('429')) {
+        return NextResponse.json({
+          error: 'Service temporarily unavailable',
+          message: 'The AI service is currently busy. Please wait a moment and try again.',
+          code: 'RATE_LIMITED'
+        }, { status: 429 });
+      }
+
+      // Content filtering/moderation
+      if (error.message.includes('content') && error.message.includes('filter')) {
+        return NextResponse.json({
+          error: 'Content not allowed',
+          message: 'The provided content could not be processed due to content restrictions.',
+          code: 'CONTENT_FILTERED'
+        }, { status: 400 });
+      }
+
+      // File processing errors
+      if (error.message.includes('file') || error.message.includes('document')) {
+        return NextResponse.json({
+          error: 'File processing failed',
+          message: 'Unable to process the uploaded file. Please ensure it\'s a valid document format.',
+          code: 'FILE_PROCESSING_ERROR'
+        }, { status: 400 });
+      }
+
+      // Database/Supabase errors
+      if (error.message.includes('supabase') || error.message.includes('database')) {
+        return NextResponse.json({
+          error: 'Database error',
+          message: 'A temporary database issue occurred. Please try again.',
+          code: 'DATABASE_ERROR'
+        }, { status: 503 });
+      }
+
+      // Network/timeout errors
+      if (error.message.includes('timeout') || error.message.includes('network') || error.message.includes('fetch')) {
+        return NextResponse.json({
+          error: 'Request timeout',
+          message: 'The request took too long to process. Please try with a smaller file or simpler content.',
+          code: 'TIMEOUT_ERROR'
+        }, { status: 408 });
+      }
+
+      // Generic OpenAI errors
+      if (error.message.includes('openai') || error.message.includes('gemini')) {
+        return NextResponse.json({
+          error: 'AI service error',
+          message: 'The AI service encountered an issue. Please try again with different content.',
+          code: 'AI_SERVICE_ERROR'
+        }, { status: 503 });
+      }
+
+      // Use the original error message for other cases, but sanitize it
+      const sanitizedMessage = error.message.replace(/API key|token|secret/gi, '[REDACTED]');
+      return NextResponse.json({
+        error: 'Processing failed',
+        message: sanitizedMessage.length > 200 ? sanitizedMessage.substring(0, 200) + '...' : sanitizedMessage,
+        code: 'GENERIC_ERROR'
+      }, { status: 500 });
+    }
+
+    // Non-Error objects
+    return NextResponse.json({
+      error: 'Unexpected error',
+      message: 'An unexpected error occurred. Please try again.',
+      code: 'UNKNOWN_ERROR'
+    }, { status: 500 });
   }
 }
