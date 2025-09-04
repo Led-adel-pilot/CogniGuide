@@ -131,6 +131,28 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
     return fileKeys.sort().join('||');
   }, [getFileKey]);
 
+  async function uploadOneWithRetry(supabaseClient: typeof supabase, bucket: string, file: File, initialPath: string, initialToken: string, getFreshSigned: () => Promise<{ path: string; token: string }>) {
+    const tryUpload = async (path: string, token: string) => {
+      const { error } = await supabaseClient.storage.from(bucket).uploadToSignedUrl(path, token, file, {
+        upsert: true,
+        contentType: file.type || 'application/octet-stream',
+      });
+      return error;
+    };
+
+    let err = await tryUpload(initialPath, initialToken);
+    if (!err) return;
+
+    const msg = String(err?.message || '');
+    const transient = /load failed|network|timeout|expired|token/i.test(msg);
+    if (!transient) throw err;
+
+    // Fresh token then retry once
+    const fresh = await getFreshSigned();
+    err = await tryUpload(fresh.path, fresh.token);
+    if (err) throw err;
+  }
+
   // Upload files to Supabase Storage using signed URLs, then call JSON preparse
   const uploadAndPreparse = useCallback(async (selectedFiles: File[]) => {
     const { data: sessionData } = await supabase.auth.getSession();
@@ -153,9 +175,27 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
     // Upload each file via signed URL
     for (let i = 0; i < selectedFiles.length; i++) {
       const file = selectedFiles[i];
-      const { path, token } = items[i];
-      const { error: upErr } = await supabase.storage.from(bucket).uploadToSignedUrl(path, token, file, { upsert: true, contentType: file.type || 'application/octet-stream' });
-      if (upErr) throw upErr;
+      const first = items[i];
+      await uploadOneWithRetry(
+        supabase,
+        bucket,
+        file,
+        first.path,
+        first.token,
+        async () => {
+          // re-fetch a fresh signed URL for this single file
+          const meta = { name: file.name, size: file.size, type: file.type || 'application/octet-stream', key: keys[i] };
+          const accessToken = sessionData?.session?.access_token;
+          const signedRes2 = await fetch('/api/storage/get-signed-uploads', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}) },
+            body: JSON.stringify({ files: [meta], anonId }),
+          });
+          if (!signedRes2.ok) throw new Error('Failed to refresh upload URL');
+          const fresh = await signedRes2.json();
+          return fresh.items[0];
+        }
+      );
     }
     // Build objects descriptor and call JSON preparse
     const objects = items.map((it: any, i: number) => ({ path: it.path, name: selectedFiles[i].name, type: selectedFiles[i].type || 'application/octet-stream', size: selectedFiles[i].size }));
