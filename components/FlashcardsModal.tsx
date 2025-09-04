@@ -298,6 +298,9 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
         // If P is beyond the filtered list length, wrap to the beginning
         const nextPos = currentPos < filtered.length ? currentPos : 0;
         setIndex(filtered[nextPos]);
+      } else {
+        // We've completed all due cards
+        setFinished(true);
       }
       return filtered;
     });
