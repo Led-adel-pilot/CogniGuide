@@ -623,16 +623,16 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
                     study_due_only: studyDueOnly,
                   });
 
-                  // Check if we should show exam date popup
-                  const shouldShowExamDatePopup = !deckExamDate && !hasExamDatePopupBeenShown(deckIdentifier);
+                  // Check if we should show exam date popup (skip for embedded mode)
+                  const shouldShowExamDatePopup = !isEmbedded && !deckExamDate && !hasExamDatePopupBeenShown(deckIdentifier);
                   if (shouldShowExamDatePopup) {
                     setShowExamDatePopup(true);
                   } else {
                     setShowAnswer(true);
                   }
 
-                  // Track cards viewed for non-auth users
-                  if (!userId) {
+                  // Track cards viewed for non-auth users (skip popups for embedded mode)
+                  if (!userId && !isEmbedded) {
                     setCardsViewedCount(prev => {
                       const newCount = prev + 1;
                       // Show signup popup after viewing 10 cards
