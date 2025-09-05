@@ -391,15 +391,15 @@ function parseMarkmap(markdown: string): MindMapNode {
         if (headingMatch) {
             level = headingMatch[1].length;
             text = headingMatch[2].trim();
-            // Make level 3 and 4 headings bold
-            if (level === 3 || level === 4) {
+            // Make level 2, 3 and 4 headings bold
+            if (level >= 2 && level <= 4) {
                 text = `**${text}**`;
             }
             lastHeadingLevel = level;
         } else if (listItemMatch) {
             text = listItemMatch[3].trim();
-            // Treat leading ###/#### in list items as bold markers and strip them from display
-            const pseudoHeading = text.match(/^#{3,4}\s+(.*)$/);
+            // Treat leading ##/###/#### in list items as bold markers and strip them from display
+            const pseudoHeading = text.match(/^#{2,4}\s+(.*)$/);
             if (pseudoHeading) {
                 text = `**${pseudoHeading[1].trim()}**`;
             }
