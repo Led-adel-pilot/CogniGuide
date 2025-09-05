@@ -12,7 +12,7 @@ CogniGuide comprehensive AI-powered study assistant. It uses an LLM to convert t
 *   **Realtime Streaming Rendering:** The backend can stream model output token-by-token and the frontend progressively renders the Markmap markdown as tokens arrive so the mind map begins appearing immediately instead of waiting for the full generation to finish.
 *   **Smart File Caching & Pre-processing:** Advanced caching system prevents redundant file processing when users add/remove files. Files are automatically pre-processed immediately upon upload to extract text and images, eliminating the wait time when clicking Generate. Uses content-based hashing to ensure consistent caching across different environments (localhost/production) and browsers. Only changed file combinations trigger re-processing, significantly improving performance for multi-file uploads. Uploads are offloaded to Supabase Storage to bypass Vercel's ~4.5 MB body limit; client-side validation now allows up to 50 MB per file.
 *   **Credit Loading Optimization:** Instant credit balance display with intelligent caching system. Credits load immediately on dashboard refresh using localStorage cache (5-minute expiration) with background refresh for accuracy. Eliminates the brief "0.0" flash that occurred during sequential API calls.
-*   **Multiple Export Options:** Users can download the generated mind maps in various formats including HTML, SVG, PNG, and PDF.
+*   **Multiple Export Options:** Users can download the generated mind maps in various formats including SVG, PNG, and PDF.
 *   **Flashcards Generation (Two ways):**
     - From Mind Map: After a mind map is generated, users can generate study flashcards from the Markmap markdown and switch between the mind map view and a flashcards study mode.
     - Direct from Files: On the generator, a selector lets users choose "Flashcards" to generate flashcards directly from uploaded documents/images (without first creating a mind map). The backend accepts `FormData` uploads and streams NDJSON lines for incremental flashcards.
@@ -60,8 +60,8 @@ CogniGuide comprehensive AI-powered study assistant. It uses an LLM to convert t
 *   **Spaced Repetition:** TS-FSRS (Free Spaced Repetition Scheduler) algorithm implementation for optimal flashcard scheduling. The `ts-fsrs` library provides FSRS-6 algorithm with configurable parameters for difficulty, stability, and optimal review timing.
 *   **Analytics & Event Tracking:** PostHog integration for comprehensive user behavior analytics, feature flag management, and A/B testing capabilities.
 *   **Authentication & DB:** Supabase is used for authentication (email magic link and Google OAuth) and to persist user mind map history and flashcard data (only markdown is stored for mind maps, full flashcard data with scheduling state).
-*   **Image Generation:** `dom-to-image-more` is used in `components/MindMapModal.tsx` to convert the rendered mind map (a DOM element) into SVG or PNG images for export.
- *   **PDF Generation:** Users can export to PDF via the browser's print dialog directly from `components/MindMapModal.tsx`. The modal opens a print-friendly window that clones the live HTML+SVG mind map, auto-fits and centers it to the page, so the resulting PDF preserves selectable text and vector connectors (no rasterization). Default scale is 180% of best fit; you can override per mind map by adding frontmatter `print_scale: <number>` (e.g., `print_scale: 1.2` for 120%).
+*   **Image Generation:** `html-to-image` is used in `components/MindMapModal.tsx` to convert the rendered mind map (a DOM element) into SVG or PNG images for export.
+ *   **PDF Generation:** Users can export to PDF from `components/MindMapModal.tsx`. The export functionality generates a PNG image of the mind map, cropped to its contents, and embeds it into a PDF document using `jsPDF`. This creates a rasterized, non-interactive PDF of the mind map.
 
 ## PostHog Analytics Integration
 
@@ -136,7 +136,7 @@ Each flashcard tracks:
 *   `app/page.tsx`: The main client-side page (`'use client'`). It serves as the orchestrator for the application's UI and logic. It manages the core state (selected file, prompt text, loading status, errors, generated markdown) and handles the submission process to the backend API. It also includes the hero section, "Why Mind Maps" section, "Generator" section, "How It Works" section, and "Features" section, providing a comprehensive user experience. Requires user authentication before allowing any generations - when users click generate without signing in, it opens the sign-up modal. When signed in, it saves the generated markdown to Supabase.
 *   `components/Dropzone.tsx`: A React component that provides a drag-and-drop area for file uploads. It supports PDF, DOCX, PPTX, TXT, and MD file types. It displays the selected file's name and size, and allows users to remove the file. It manages drag-and-drop states and visually indicates when a file is being dragged over.
 *   `components/PromptForm.tsx`: A React component for users to input text prompts. It includes a `textarea` that auto-resizes and a "Generate Mind Map" button with a loading spinner. It handles form submission and passes the prompt text to the parent component.
-*   `components/MindMapModal.tsx`: A modal component that displays the generated mind map and handles flashcard generation from mind map content. It integrates the custom Markmap renderer (`initializeMindMap` from `lib/markmap-renderer.ts`) to visualize the markdown. It provides functionality to download the mind map in HTML, SVG, PNG, and PDF formats. The HTML export includes the full renderer script for a standalone interactive map. It also handles the modal's open/close state and cleanup of event listeners.
+*   `components/MindMapModal.tsx`: A modal component that displays the generated mind map and handles flashcard generation from mind map content. It integrates the custom Markmap renderer (`initializeMindMap` from `lib/markmap-renderer.ts`) to visualize the markdown. It provides functionality to download the mind map in SVG, PNG, and PDF formats. For PNG and PDF exports, the mind map is automatically cropped to its content to avoid empty margins. The PDF export embeds a rasterized PNG image of the mind map. It also handles the modal's open/close state and cleanup of event listeners.
     * **Flashcard Integration**: Includes a "Generate Flashcards" button that generates study flashcards from the current Markmap markdown using the `/api/generate-flashcards` endpoint. The generation logic is handled locally while the UI presentation is delegated to `FlashcardsModal` for consistency. When in flashcard mode, the mind map viewport is hidden and the renderer is cleaned up; it re-initializes when returning to the map view.
 *   `components/FlashcardsModal.tsx`: **Centralized flashcard component** used by both the dashboard (for direct file generation) and `MindMapModal` (for mind map-derived flashcards). Provides a unified, consistent flashcard study experience across the application.
     * **Unified UI**: Features a sleek, colorful study interface with gradient progress bar and color-coded rating buttons (Again/Hard/Good/Easy).
@@ -567,9 +567,9 @@ The sidebar history uses a sophisticated pagination system with infinite scroll.
 2. The cloned container not enforcing a transparent background during rendering.
 
 **Solution**:
-1. Set the margin to `0` in the PNG export crop to eliminate extra space.
-2. Explicitly set a transparent background on the cloned container and the SVG element during export.
-3. Remove any residual borders, shadows, or outlines that could be captured in the export.
+1. The export logic now measures the bounds of the mind map content and crops the PNG to these bounds, with a small margin to avoid cutting off nodes.
+2. It explicitly clears any background on the mind map container during rendering to ensure a transparent background.
+3. It removes any residual borders, shadows, or outlines that could be captured in the export.
 
 **Files Affected**:
 - `components/MindMapModal.tsx`

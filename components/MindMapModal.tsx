@@ -5,7 +5,7 @@ import { initializeMindMap, cleanup, getFullMindMapBounds, updateMindMap, recomm
 import { Download, X, FileImage, Loader2, Map as MapIcon } from 'lucide-react';
 import FlashcardIcon from '@/components/FlashcardIcon';
 import FlashcardsModal from '@/components/FlashcardsModal';
-import domtoimage from 'dom-to-image-more';
+import { toSvg, toPng } from 'html-to-image';
 import { supabase } from '@/lib/supabaseClient';
 import { loadDeckSchedule, saveDeckSchedule, loadDeckScheduleAsync, saveDeckScheduleAsync } from '@/lib/sr-store';
 import posthog from 'posthog-js';
@@ -139,27 +139,26 @@ export default function MindMapModal({ markdown, onClose }: MindMapModalProps) {
         };
 
         if (format === 'svg') {
-            // Capture from an off-screen clone as well to avoid live transform side effects
-            const clone = container.cloneNode(true) as HTMLElement;
-            clone.style.transform = 'none';
-            if (computedFontFamily) clone.style.fontFamily = computedFontFamily;
-            const wrapper = document.createElement('div');
-            wrapper.style.position = 'fixed';
-            wrapper.style.left = '-10000px';
-            wrapper.style.top = '-10000px';
-            wrapper.style.width = `${container.scrollWidth}px`;
-            wrapper.style.height = `${container.scrollHeight}px`;
-            wrapper.style.overflow = 'hidden';
-            wrapper.appendChild(clone);
-            document.body.appendChild(wrapper);
+            const svgEl = container.querySelector('#mindmap-svg') as SVGElement | null;
+            if (!svgEl) {
+                alert('Mind map SVG element not found.');
+                return;
+            }
+            const originalTransform = svgEl.style.transform;
+            svgEl.style.transform = 'none';
             try {
-              const dataUrl = await domtoimage.toSvg(wrapper, options);
-              const link = document.createElement('a');
-              link.download = `${sanitizedTitle}.svg`;
-              link.href = dataUrl;
-              link.click();
+                await new Promise(resolve => setTimeout(resolve, 100));
+                const dataUrl = await toSvg(container, {
+                    width: container.scrollWidth,
+                    height: container.scrollHeight,
+                    filter: () => true
+                });
+                const link = document.createElement('a');
+                link.download = `${sanitizedTitle}.svg`;
+                link.href = dataUrl;
+                link.click();
             } finally {
-              document.body.removeChild(wrapper);
+                svgEl.style.transform = originalTransform;
             }
         } else if (format === 'png' || format === 'pdf') {
             // Use a detached wrapper and crop to the exact content bounds to prevent tinted edges
@@ -203,54 +202,47 @@ export default function MindMapModal({ markdown, onClose }: MindMapModalProps) {
               }
             } catch {}
 
-            // 2) Clone the container and shift content so the crop starts at (0,0)
-            const clone = container.cloneNode(true) as HTMLElement;
-            const cloneSvg = clone.querySelector('#mindmap-svg') as SVGElement | null;
-            clone.style.transform = 'none';
-            clone.style.position = 'absolute';
-            clone.style.left = `${-minLeft + margin}px`;
-            clone.style.top = `${-minTop + margin}px`;
-            // Set theme-aware background for PNG export
-            clone.style.background = themeBackground;
-            clone.style.backgroundColor = themeBackground;
-            clone.style.border = '0';
-            clone.style.boxShadow = 'none';
-            clone.style.outline = 'none';
+            // Temporarily modify container for clean capture
+            const originalContainerStyles = {
+              background: container.style.background,
+              backgroundColor: container.style.backgroundColor,
+              transform: container.style.transform,
+              position: container.style.position,
+              left: container.style.left,
+              top: container.style.top
+            };
+
+            const originalSvgZIndex = svg ? svg.style.zIndex : '';
+
+            // Clear backgrounds and reset positioning
+            container.style.background = '';
+            container.style.backgroundColor = '';
+            container.style.transform = 'none';
+            container.style.position = 'absolute';
+            container.style.left = '0';
+            container.style.top = '0';
+            if (svg) svg.style.zIndex = '0';
+
             // Remove node drop-shadows for clean edges
             try {
-              const cNodes = Array.from(clone.querySelectorAll('.mindmap-node')) as HTMLElement[];
-              cNodes.forEach(n => { n.style.boxShadow = 'none'; n.style.backgroundClip = 'padding-box'; });
+              const nodes = Array.from(container.querySelectorAll('.mindmap-node')) as HTMLElement[];
+              nodes.forEach(n => { n.style.boxShadow = 'none'; n.style.backgroundClip = 'padding-box'; });
+              const paths = Array.from(container.querySelectorAll('path')) as SVGPathElement[];
+              paths.forEach(p => {
+                p.style.fill = 'none';
+                const strokeColor = window.getComputedStyle(p).stroke;
+                p.style.stroke = strokeColor || 'var(--connector-color)';
+              });
             } catch {}
-            if (cloneSvg) {
-              (cloneSvg.style as any).zIndex = '0';
-              (cloneSvg.style as any).background = themeBackground;
-              (cloneSvg.style as any).backgroundColor = themeBackground;
-            }
-
-            // 3) Build off-screen wrapper sized to the crop
-            const wrapper = document.createElement('div');
-            wrapper.style.position = 'fixed';
-            wrapper.style.left = '-10000px';
-            wrapper.style.top = '-10000px';
-            wrapper.style.width = `${cropWidth}px`;
-            wrapper.style.height = `${cropHeight}px`;
-            wrapper.style.overflow = 'hidden';
-            wrapper.style.background = themeBackground;
-            wrapper.style.backgroundColor = themeBackground;
-            wrapper.style.border = '0';
-            wrapper.style.boxShadow = 'none';
-            wrapper.style.outline = 'none';
-            wrapper.appendChild(clone);
-            document.body.appendChild(wrapper);
 
             try {
-              const dataUrl = await domtoimage.toPng(wrapper, {
-                width: cropWidth,
-                height: cropHeight,
+              await new Promise(resolve => setTimeout(resolve, 100));
+              const dataUrl = await toPng(container, {
                 quality: 1.0,
-                bgcolor: themeBackground,
-                style: { background: themeBackground, backgroundColor: themeBackground, ...(options.style || {}) },
-                cacheBust: true
+                style: options.style || {},
+                backgroundColor: themeBackground,
+                cacheBust: true,
+                filter: () => true
               });
               if (format === 'png') {
                 const link = document.createElement('a');
@@ -276,7 +268,10 @@ export default function MindMapModal({ markdown, onClose }: MindMapModalProps) {
                 pdf.save(`${sanitizedTitle}.pdf`);
               }
             } finally {
-              document.body.removeChild(wrapper);
+              // Restore original container styles
+              Object.assign(container.style, originalContainerStyles);
+              if (svg) svg.style.zIndex = originalSvgZIndex;
+              // Note: node box-shadows will be restored when the component re-renders
             }
         }
     } catch (error) {
@@ -806,13 +801,13 @@ export default function MindMapModal({ markdown, onClose }: MindMapModalProps) {
                         role="menu"
                       >
                         <div className="flex flex-col gap-1.5">
-                          <button
+                          {/* <button
                             type="button"
                             onClick={() => { posthog.capture('mindmap_exported', { format: 'svg' }); handleDownload('svg'); setDropdownOpen(false); }}
                             className="w-full flex items-center gap-2 px-3 py-1.5 text-sm text-foreground hover:bg-muted rounded-xl focus:outline-none"
                           >
                             <FileImage className="h-4 w-4" /> SVG
-                          </button>
+                          </button> */}
                           <button
                             type="button"
                             onClick={() => { posthog.capture('mindmap_exported', { format: 'png' }); handleDownload('png'); setDropdownOpen(false); }}

@@ -187,10 +187,14 @@
     position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none;
 }
 
+#mindmap-svg path {
+    fill: none !important;
+}
+
 .connector-path {
     stroke: var(--connector-color);
     stroke-width: 2px;
-    fill: none;
+    fill: none !important;
     stroke-linecap: round;
     stroke-linejoin: round;
     transition: stroke 0.2s ease,
