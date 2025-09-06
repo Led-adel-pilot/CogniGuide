@@ -46,6 +46,7 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
   const [freeGenerationsLeft, setFreeGenerationsLeft] = useState<number>(NON_AUTH_FREE_LIMIT);
   const [allowedNameSizes, setAllowedNameSizes] = useState<{ name: string; size: number }[] | undefined>(undefined);
   const [previewLoading, setPreviewLoading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState<number | undefined>(undefined);
   const router = useRouter();
 
   useEffect(() => {
@@ -131,13 +132,44 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
     return fileKeys.sort().join('||');
   }, [getFileKey]);
 
-  async function uploadOneWithRetry(supabaseClient: typeof supabase, bucket: string, file: File, initialPath: string, initialToken: string, getFreshSigned: () => Promise<{ path: string; token: string }>) {
+  async function uploadOneWithRetry(supabaseClient: typeof supabase, bucket: string, file: File, initialPath: string, initialToken: string, getFreshSigned: () => Promise<{ path: string; token: string }>, onProgress?: (progress: number) => void) {
     const tryUpload = async (path: string, token: string) => {
-      const { error } = await supabaseClient.storage.from(bucket).uploadToSignedUrl(path, token, file, {
-        upsert: true,
-        contentType: file.type || 'application/octet-stream',
+      return new Promise<Error | null>((resolve) => {
+        const xhr = new XMLHttpRequest();
+
+        xhr.upload.addEventListener('progress', (event) => {
+          if (event.lengthComputable && onProgress) {
+            const progress = Math.round((event.loaded / event.total) * 100);
+            onProgress(progress);
+          }
+        });
+
+        xhr.addEventListener('load', () => {
+          if (xhr.status >= 200 && xhr.status < 300) {
+            resolve(null);
+          } else {
+            let message = `Upload failed with status ${xhr.status}`;
+            try {
+              const res = JSON.parse(xhr.responseText);
+              message = res.message || message;
+            } catch {}
+            resolve(new Error(message));
+          }
+        });
+
+        xhr.addEventListener('error', (e) => {
+          resolve(new Error('Upload failed due to a network error.'));
+        });
+
+        const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+        const uploadUrl = new URL(`${supabaseUrl}/storage/v1/object/upload/signed/${bucket}/${path}`);
+        uploadUrl.searchParams.set('token', token);
+
+        xhr.open('PUT', uploadUrl.toString());
+        xhr.setRequestHeader('Content-Type', file.type || 'application/octet-stream');
+        xhr.setRequestHeader('x-upsert', 'true');
+        xhr.send(file);
       });
-      return error;
     };
 
     let err = await tryUpload(initialPath, initialToken);
@@ -154,7 +186,7 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
   }
 
   // Upload files to Supabase Storage using signed URLs, then call JSON preparse
-  const uploadAndPreparse = useCallback(async (selectedFiles: File[]) => {
+  const uploadAndPreparse = useCallback(async (selectedFiles: File[], onProgress?: (progress: number) => void) => {
     const { data: sessionData } = await supabase.auth.getSession();
     const accessToken = sessionData?.session?.access_token;
     // Generate stable keys per file for deterministic storage paths
@@ -172,10 +204,11 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
       throw new Error(j?.error || 'Failed to prepare uploads');
     }
     const { bucket, items } = await signedRes.json();
-    // Upload each file via signed URL
+    // Upload each file via signed URL with progress tracking
     for (let i = 0; i < selectedFiles.length; i++) {
       const file = selectedFiles[i];
       const first = items[i];
+
       await uploadOneWithRetry(
         supabase,
         bucket,
@@ -194,7 +227,14 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
           if (!signedRes2.ok) throw new Error('Failed to refresh upload URL');
           const fresh = await signedRes2.json();
           return fresh.items[0];
-        }
+        },
+        onProgress ? (fileProgress) => {
+          // Calculate overall progress across all files
+          const baseProgress = (i / selectedFiles.length) * 100;
+          const currentFileProgress = fileProgress / selectedFiles.length;
+          const overallProgress = Math.round(baseProgress + currentFileProgress);
+          onProgress(overallProgress);
+        } : undefined
       );
     }
     // Build objects descriptor and call JSON preparse
@@ -271,9 +311,12 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
     // No valid cache, pre-parse now using Supabase Storage JSON flow (fallback to legacy on failure)
     try {
       setIsPreParsing(true);
+      setUploadProgress(0);
       let j: any;
       try {
-        j = await uploadAndPreparse(selectedFiles);
+        j = await uploadAndPreparse(selectedFiles, (progress) => {
+          setUploadProgress(progress);
+        });
       } catch (e) {
         // Fallback: legacy small-upload path if JSON/storage fails
         const totalBytes = selectedFiles.reduce((sum, f) => sum + (f.size || 0), 0);
@@ -344,6 +387,7 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
       // Non-fatal
     } finally {
       setIsPreParsing(false);
+      setUploadProgress(undefined);
     }
   }, [getFileSetKey, debugLog, MAX_FILE_BYTES, isAuthed, uploadAndPreparse]);
 
@@ -383,14 +427,20 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
         if (!effectivePreParsed && files.length > 0) {
           try {
             setIsPreParsing(true);
-            const j = await uploadAndPreparse(files);
+            setUploadProgress(0);
+            const j = await uploadAndPreparse(files, (progress) => {
+              setUploadProgress(progress);
+            });
             const text = typeof j?.text === 'string' ? j.text : '';
             const images = Array.isArray(j?.images) ? j.images as string[] : [];
             const rawCharCount = typeof j?.totalRawChars === 'number' ? j.totalRawChars as number : undefined;
             effectivePreParsed = { text, images, rawCharCount };
             setPreParsed(effectivePreParsed);
           } catch {}
-          finally { setIsPreParsing(false); }
+          finally {
+            setIsPreParsing(false);
+            setUploadProgress(undefined);
+          }
         }
         if (effectivePreParsed) {
           const payload = { text: effectivePreParsed.text || '', images: effectivePreParsed.images || [], prompt: prompt.trim() || '', rawCharCount: effectivePreParsed.rawCharCount };
@@ -568,14 +618,20 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
       if (!effectivePreParsed && files.length > 0) {
         try {
           setIsPreParsing(true);
-          const j = await uploadAndPreparse(files);
+          setUploadProgress(0);
+          const j = await uploadAndPreparse(files, (progress) => {
+            setUploadProgress(progress);
+          });
           const text = typeof j?.text === 'string' ? j.text : '';
           const images = Array.isArray(j?.images) ? j.images as string[] : [];
           const rawCharCount = typeof j?.totalRawChars === 'number' ? j.totalRawChars as number : undefined;
           effectivePreParsed = { text, images, rawCharCount };
           setPreParsed(effectivePreParsed);
         } catch {}
-        finally { setIsPreParsing(false); }
+        finally {
+          setIsPreParsing(false);
+          setUploadProgress(undefined);
+        }
       }
       if (effectivePreParsed) {
         const payload = { text: effectivePreParsed.text || '', images: effectivePreParsed.images || [], prompt: prompt.trim() || '', rawCharCount: effectivePreParsed.rawCharCount };
@@ -767,6 +823,7 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
                 onFileChange={handleFileChange}
                 disabled={isLoading || markdown !== null || flashcardsOpen}
                 isPreParsing={isPreParsing}
+                uploadProgress={uploadProgress}
                 allowedNameSizes={allowedNameSizes}
                 size={compact ? 'compact' : 'default'}
                 onOpen={() => {

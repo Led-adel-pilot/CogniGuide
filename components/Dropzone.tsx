@@ -11,13 +11,15 @@ interface DropzoneProps {
   onOpen?: () => boolean | void;
   // Show loading state for pre-parsing
   isPreParsing?: boolean;
+  // Upload progress percentage (0-100)
+  uploadProgress?: number;
   // Optional whitelist of files to keep by name+size (used to prune overflow files)
   allowedNameSizes?: { name: string; size: number }[];
   // Visual size variant
   size?: 'default' | 'compact';
 }
 
-export default function Dropzone({ onFileChange, disabled = false, onOpen, isPreParsing = false, allowedNameSizes, size = 'default' }: DropzoneProps) {
+export default function Dropzone({ onFileChange, disabled = false, onOpen, isPreParsing = false, uploadProgress, allowedNameSizes, size = 'default' }: DropzoneProps) {
   const [dragIsOver, setDragIsOver] = useState(false);
   const [files, setFiles] = useState<File[]>([]);
   const inputRef = useRef<HTMLInputElement | null>(null);
@@ -175,7 +177,9 @@ export default function Dropzone({ onFileChange, disabled = false, onOpen, isPre
                   {isPreParsing && (
                     <div className="absolute inset-0 bg-background/80 backdrop-blur-sm rounded-[1.25rem] flex flex-col items-center justify-center z-20">
                       <div className="animate-spin rounded-full h-6 w-6 border-2 border-primary border-t-transparent mb-2"></div>
-                      <p className="text-xs text-muted-foreground font-medium">Uploading...</p>
+                      <p className="text-xs text-muted-foreground font-medium">
+                        Uploading{uploadProgress !== undefined ? ` (${uploadProgress}%)` : '...'}
+                      </p>
                     </div>
                   )}
                 </div>
