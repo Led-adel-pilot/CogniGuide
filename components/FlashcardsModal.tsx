@@ -73,6 +73,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
   const [showSignupPopup, setShowSignupPopup] = React.useState(false);
   const [showExamDatePopup, setShowExamDatePopup] = React.useState(false);
   const [cardsViewedCount, setCardsViewedCount] = React.useState(0);
+  const [answerShownTime, setAnswerShownTime] = React.useState<number | null>(null);
   const current = scheduledCards && scheduledCards[index] ? scheduledCards[index] : null;
 
   const hasCards = Boolean(cards && cards.length > 0);
@@ -124,6 +125,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
       setShowSignupPopup(false);
       setShowExamDatePopup(false);
       setCardsViewedCount(0);
+      setAnswerShownTime(null);
     }
   }, [open]);
 
@@ -262,6 +264,11 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
   };
 
   const handleGrade = (g: Grade) => {
+    // Prevent accidental clicks immediately after showing answer
+    if (answerShownTime && Date.now() - answerShownTime < 200) {
+      return;
+    }
+
     setScheduledCards((prev) => {
       if (!prev) return prev;
       const next = [...prev];
@@ -287,6 +294,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
     setHoveredGrade(null);
     setPredictedDueByGrade({});
     setPredictedDueDatesByGrade({});
+    setAnswerShownTime(null);
     // If studying due-only, remove current index from due list and move to next due
     setDueList((list) => {
       if (!studyDueOnly) return list;
@@ -433,6 +441,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
                           setPredictedDueDatesByGrade({});
                           setCardsViewedCount(0);
                           setShowSignupPopup(false);
+                          setAnswerShownTime(null);
                         }}
                         className="mt-6 inline-flex items-center h-10 px-6 rounded-full text-white bg-gradient-primary shadow-sm hover:bg-gradient-primary-hover transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/50 whitespace-nowrap"
                       >
@@ -474,6 +483,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
                           setPredictedDueDatesByGrade({});
                           setCardsViewedCount(0);
                           setShowSignupPopup(false);
+                          setAnswerShownTime(null);
                         }}
                         className="flex-1 h-auto sm:h-10 py-2 sm:py-0 px-6 text-base font-medium text-muted-foreground bg-muted rounded-full hover:bg-muted/70 transition-colors"
                       >
@@ -512,6 +522,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
                           setPredictedDueDatesByGrade({});
                           setCardsViewedCount(0);
                           setShowSignupPopup(false);
+                          setAnswerShownTime(null);
                         }}
                         className="flex-1 h-auto sm:h-10 py-2 sm:py-0 px-6 text-base font-medium text-muted-foreground bg-muted rounded-full hover:bg-muted/70 transition-colors"
                       >
@@ -559,7 +570,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
             {!showAnswer ? (
               <div className="justify-self-start">
                 <button
-                  onClick={() => { if (!cards) return; setIndex(getPrevIndex()); setShowAnswer(false); setHoveredGrade(null); setPredictedDueByGrade({}); setPredictedDueDatesByGrade({}); }}
+                  onClick={() => { if (!cards) return; setIndex(getPrevIndex()); setShowAnswer(false); setHoveredGrade(null); setPredictedDueByGrade({}); setPredictedDueDatesByGrade({}); setAnswerShownTime(null); }}
                   className="inline-flex items-center justify-center h-10 w-10 sm:w-auto sm:px-4 rounded-full border border-border bg-background text-foreground hover:bg-muted/50 dark:hover:bg-muted/80 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400/50"
                 >
                   <ChevronLeft className="h-5 w-5 sm:mr-2" />
@@ -629,6 +640,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
                     setShowExamDatePopup(true);
                   } else {
                     setShowAnswer(true);
+                    setAnswerShownTime(Date.now());
                   }
 
                   // Track cards viewed for non-auth users (skip popups for embedded mode)
@@ -650,7 +662,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
             {!showAnswer ? (
               <div className="justify-self-end">
                 <button
-                  onClick={() => { if (!cards) return; setIndex(getNextIndex()); setShowAnswer(false); setHoveredGrade(null); setPredictedDueByGrade({}); setPredictedDueDatesByGrade({}); }}
+                  onClick={() => { if (!cards) return; setIndex(getNextIndex()); setShowAnswer(false); setHoveredGrade(null); setPredictedDueByGrade({}); setPredictedDueDatesByGrade({}); setAnswerShownTime(null); }}
                   className="inline-flex items-center justify-center h-10 w-10 sm:w-auto sm:px-4 rounded-full border border-border bg-background text-foreground hover:bg-muted/50 dark:hover:bg-muted/80 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400/50"
                 >
                   <span className="hidden sm:inline">Next</span>
@@ -771,6 +783,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
                     markExamDatePopupAsShown(deckIdentifier);
                     setShowExamDatePopup(false);
                     setShowAnswer(true);
+                    setAnswerShownTime(Date.now());
                     posthog.capture('exam_date_set', {
                       deckId: deckId,
                       exam_datetime: examDateInput.toISOString(),
@@ -787,6 +800,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
                   markExamDatePopupAsShown(deckIdentifier);
                   setShowExamDatePopup(false);
                   setShowAnswer(true);
+                  setAnswerShownTime(Date.now());
                   posthog.capture('exam_date_skipped', {
                     deckId: deckId,
                   });
