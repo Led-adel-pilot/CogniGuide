@@ -5,7 +5,9 @@ import { createClient } from '@supabase/supabase-js';
 
 const openai = new OpenAI({
     apiKey: process.env.GEMINI_API_KEY,
-    baseURL: "https://generativelanguage.googleapis.com/v1beta/openai/"
+    baseURL: "https://generativelanguage.googleapis.com/v1beta/openai/",
+    timeout: 5 * 60 * 1000, // 5 minutes timeout for slow models
+    maxRetries: 0, // Disable retries for streaming
 });
 
 // --- Supabase Server Client & Credit Helpers ---
@@ -266,11 +268,12 @@ export async function POST(req: NextRequest) {
       let stream;
       try {
         stream = await openai.chat.completions.create({
-          model: 'gemini-2.5-flash-lite',
+          model: 'gemini-2.5-pro',
           // @ts-ignore
-          reasoning_effort: 'none',
+          reasoning_effort: 'low', // Reduce thinking time for faster responses
           messages: [{ role: 'user', content: userContent }],
           stream: true,
+          stream_options: { include_usage: false }, // Reduce overhead
         });
       } catch (apiError) {
         console.error('OpenAI API error:', apiError);

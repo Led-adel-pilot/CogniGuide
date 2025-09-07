@@ -5,7 +5,9 @@ import { createClient } from '@supabase/supabase-js';
 
 const openai = new OpenAI({
   apiKey: process.env.GEMINI_API_KEY,
-  baseURL: 'https://generativelanguage.googleapis.com/v1beta/openai/'
+  baseURL: 'https://generativelanguage.googleapis.com/v1beta/openai/',
+  timeout: 5 * 60 * 1000, // 5 minutes timeout for slow models
+  maxRetries: 0, // Disable retries for streaming
 });
 
 // --- Supabase Server Client & Credit Helpers ---
@@ -177,9 +179,9 @@ function buildFlashcardPrompt(opts: {
     : `You will be given source content. Generate high-quality active-recall flashcards that help a learner master the content.`;
 
   const languageAndCount = sourceType === 'markmap'
-    ? `- Produce about 15 to 100 cards depending on content size.
+    ? `- Produce about 20 to 100 cards depending on content size.
 - The flashcards MUST be in the same language as the mind map.`
-    : `- Produce about 15 to 100 cards depending on content size.
+    : `- Produce about 20 to 100 cards depending on content size.
 - The flashcards MUST be in the same language as the source content.`;
 
   const body = `You are an expert instructional designer.
@@ -239,9 +241,9 @@ async function generateJsonFromModel(userContent: any): Promise<{ title: string 
   let completion;
   try {
     completion = await openai.chat.completions.create({
-      model: 'gemini-2.5-flash-lite',
+      model: 'gemini-2.5-pro',
       // @ts-ignore
-      reasoning_effort: 'none',
+      //reasoning_effort: 'low',
       messages: [{ role: 'user', content: userContent }],
       stream: false,
       // @ts-ignore
@@ -303,11 +305,12 @@ export async function POST(req: NextRequest) {
       let stream;
       try {
         stream = await openai.chat.completions.create({
-          model: 'gemini-2.5-flash-lite',
+          model: 'gemini-2.5-pro',
           // @ts-ignore
-          reasoning_effort: 'none',
+          reasoning_effort: 'low', // Reduce thinking time for faster responses
           messages: [{ role: 'user', content: promptContent }],
           stream: true,
+          stream_options: { include_usage: false }, // Reduce overhead
         });
       } catch (apiError) {
         console.error('OpenAI API error in streamNdjson:', apiError);
@@ -356,6 +359,9 @@ export async function POST(req: NextRequest) {
       let anyCardSent = false;
       let buffer = '';
       let pendingLine: string | null = null;
+      let lastHeartbeat = Date.now();
+      const HEARTBEAT_INTERVAL = 30000; // 30 seconds
+      const STREAM_TIMEOUT = 4 * 60 * 1000; // 4 minutes total timeout for the entire stream
 
       // Extract file paths from images for cleanup
       const filesToCleanup: string[] = [];
@@ -379,11 +385,30 @@ export async function POST(req: NextRequest) {
               const earlyMeta = JSON.stringify({ type: 'meta', title: 'flashcards' }) + '\n';
               controller.enqueue(encoder.encode(earlyMeta));
               anyChunkSent = true; // do not count as card
+              console.log('Stream started, sent meta line');
             } catch {}
             for await (const chunk of stream as any) {
               const token: string = chunk?.choices?.[0]?.delta?.content || '';
               if (!token) continue;
+
+              // Check for overall stream timeout
+              const now = Date.now();
+              if (now - lastHeartbeat > STREAM_TIMEOUT) {
+                console.warn('Stream timeout detected, ending stream');
+                controller.close();
+                break;
+              }
+
               buffer += token;
+
+              // Send heartbeat if it's been too long since last activity
+              if (now - lastHeartbeat > HEARTBEAT_INTERVAL) {
+                try {
+                  const heartbeat = JSON.stringify({ type: 'heartbeat', timestamp: now }) + '\n';
+                  controller.enqueue(encoder.encode(heartbeat));
+                  lastHeartbeat = now;
+                } catch {}
+              }
 
               let newlineIndex = buffer.indexOf('\n');
               while (newlineIndex !== -1) {
@@ -399,7 +424,14 @@ export async function POST(req: NextRequest) {
                   const obj = JSON.parse(line);
                   controller.enqueue(encoder.encode(line + '\n'));
                   anyChunkSent = true;
-                  if (obj && obj.type === 'card') anyCardSent = true;
+                  if (obj && obj.type === 'card') {
+                    anyCardSent = true;
+                    if (!anyCardSent) console.log('First card received from model');
+                  }
+                  if (obj && obj.type === 'done') {
+                    console.log('Stream completed successfully');
+                  }
+                  lastHeartbeat = Date.now(); // Reset heartbeat on successful message
                 } catch {
                   pendingLine = line;
                 }

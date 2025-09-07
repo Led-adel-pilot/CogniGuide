@@ -378,7 +378,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
       <div className="w-full h-full grid grid-rows-[auto,1fr,auto] bg-background p-4 sm:p-6">
         <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 items-center gap-2 sm:gap-3">
           <div className="text-center md:text-left text-sm font-medium truncate text-foreground">{title || 'Flashcards'}</div>
-          <div className="text-sm text-muted-foreground text-center hidden md:block">{hasCards ? (finished ? 'Completed' : `${index + 1} / ${cards!.length}`) : ''}</div>
+          <div className="text-sm text-muted-foreground text-center hidden md:block">{hasCards ? (finished ? 'Completed' : studyDueOnly ? `${dueList.indexOf(index) + 1} / ${dueList.length} due` : `${index + 1} / ${cards!.length}`) : ''}</div>
           <div className="justify-self-center md:justify-self-end">
             {hasCards && (
               <div className="inline-flex items-center gap-2 text-sm">
@@ -398,7 +398,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
               </div>
             )}
           </div>
-          <div className="text-sm text-muted-foreground text-center md:hidden">{hasCards ? (finished ? 'Completed' : `${index + 1} / ${cards!.length}`) : ''}</div>
+          <div className="text-sm text-muted-foreground text-center md:hidden">{hasCards ? (finished ? 'Completed' : studyDueOnly ? `${dueList.indexOf(index) + 1} / ${dueList.length} due` : `${index + 1} / ${cards!.length}`) : ''}</div>
         </div>
         {hasCards ? (
           <div className="w-full max-w-5xl mx-auto mt-2">
@@ -411,7 +411,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
           </div>
         ) : null}
 
-        <div className="w-full max-w-3xl mx-auto overflow-auto flex items-center justify-center py-2">
+        <div className="w-full max-w-3xl mx-auto overflow-auto py-2 mt-0 sm:mt-0 sm:flex sm:items-center sm:justify-center">
           {error ? (
             <div className="w-full text-sm text-red-600">{error}</div>
           ) : !hasCards ? (
