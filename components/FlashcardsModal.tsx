@@ -74,6 +74,8 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
   const [showExamDatePopup, setShowExamDatePopup] = React.useState(false);
   const [cardsViewedCount, setCardsViewedCount] = React.useState(0);
   const [answerShownTime, setAnswerShownTime] = React.useState<number | null>(null);
+  const [originalDueCount, setOriginalDueCount] = React.useState(0);
+  const [cardsReviewed, setCardsReviewed] = React.useState(0);
   const current = scheduledCards && scheduledCards[index] ? scheduledCards[index] : null;
 
   const hasCards = Boolean(cards && cards.length > 0);
@@ -168,7 +170,10 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
             setShowAnswer(false);
           }
           // Initialize due list from props if provided
-          setDueList(Array.isArray(dueIndices) ? dueIndices.slice() : []);
+          const initialDueList = Array.isArray(dueIndices) ? dueIndices.slice() : [];
+          setDueList(initialDueList);
+          setOriginalDueCount(initialDueList.length);
+          setCardsReviewed(0);
           return;
         }
         setScheduledCards(cards.map((c) => ({ ...c, schedule: createInitialSchedule() })));
@@ -176,7 +181,10 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
           setIndex(Math.max(0, Math.min(cards.length - 1, initialIndex)));
           setShowAnswer(false);
         }
-        setDueList(Array.isArray(dueIndices) ? dueIndices.slice() : []);
+        const initialDueList = Array.isArray(dueIndices) ? dueIndices.slice() : [];
+        setDueList(initialDueList);
+        setOriginalDueCount(initialDueList.length);
+        setCardsReviewed(0);
       })();
       return;
     }
@@ -185,7 +193,10 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
       setIndex(Math.max(0, Math.min(cards.length - 1, initialIndex)));
       setShowAnswer(false);
     }
-    setDueList(Array.isArray(dueIndices) ? dueIndices.slice() : []);
+    const initialDueList = Array.isArray(dueIndices) ? dueIndices.slice() : [];
+    setDueList(initialDueList);
+    setOriginalDueCount(initialDueList.length);
+    setCardsReviewed(0);
   }, [cards, deckId, initialIndex, dueIndices, title]);
 
   React.useEffect(() => {
@@ -296,6 +307,9 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
     setPredictedDueDatesByGrade({});
     setAnswerShownTime(null);
     // If studying due-only, remove current index from due list and move to next due
+    if (studyDueOnly) {
+      setCardsReviewed(prev => prev + 1);
+    }
     setDueList((list) => {
       if (!studyDueOnly) return list;
       const currentPos = list.indexOf(index);
@@ -378,7 +392,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
       <div className="w-full h-full grid grid-rows-[auto,1fr,auto] bg-background p-4 sm:p-6">
         <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 items-center gap-2 sm:gap-3">
           <div className="text-center md:text-left text-sm font-medium truncate text-foreground">{title || 'Flashcards'}</div>
-          <div className="text-sm text-muted-foreground text-center hidden md:block">{hasCards ? (finished ? 'Completed' : studyDueOnly ? `${dueList.indexOf(index) + 1} / ${dueList.length} due` : `${index + 1} / ${cards!.length}`) : ''}</div>
+          <div className="text-sm text-muted-foreground text-center hidden md:block">{hasCards ? (finished ? 'Completed' : studyDueOnly ? `${Math.min(cardsReviewed + 1, originalDueCount)} / ${originalDueCount} due` : `${index + 1} / ${cards!.length}`) : ''}</div>
           <div className="justify-self-center md:justify-self-end">
             {hasCards && (
               <div className="inline-flex items-center gap-2 text-sm">
@@ -398,7 +412,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
               </div>
             )}
           </div>
-          <div className="text-sm text-muted-foreground text-center md:hidden">{hasCards ? (finished ? 'Completed' : studyDueOnly ? `${dueList.indexOf(index) + 1} / ${dueList.length} due` : `${index + 1} / ${cards!.length}`) : ''}</div>
+          <div className="text-sm text-muted-foreground text-center md:hidden">{hasCards ? (finished ? 'Completed' : studyDueOnly ? `${Math.min(cardsReviewed + 1, originalDueCount)} / ${originalDueCount} due` : `${index + 1} / ${cards!.length}`) : ''}</div>
         </div>
         {hasCards ? (
           <div className="w-full max-w-5xl mx-auto mt-2">
