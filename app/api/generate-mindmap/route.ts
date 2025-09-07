@@ -268,7 +268,7 @@ export async function POST(req: NextRequest) {
       let stream;
       try {
         stream = await openai.chat.completions.create({
-          model: 'gemini-2.5-pro',
+          model: 'gemini-2.5-flash-lite',
           // @ts-ignore
           reasoning_effort: 'low', // Reduce thinking time for faster responses
           messages: [{ role: 'user', content: userContent }],
