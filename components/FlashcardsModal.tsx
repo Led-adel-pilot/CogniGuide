@@ -418,7 +418,17 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
             <div className="h-1.5 rounded-full bg-muted overflow-hidden">
               <div
                 className="h-full bg-gradient-to-r from-indigo-500 via-sky-500 to-emerald-500"
-                style={{ width: `${finished ? 100 : ((index + 1) / cards!.length) * 100}%` }}
+                style={{
+                  width: `${
+                    finished
+                      ? 100
+                      : studyDueOnly
+                      ? originalDueCount > 0
+                        ? ((originalDueList.indexOf(index) + 1) / originalDueCount) * 100
+                        : 0
+                      : ((index + 1) / cards!.length) * 100
+                  }%`,
+                }}
               />
             </div>
           </div>
