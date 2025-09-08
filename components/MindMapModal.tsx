@@ -107,7 +107,12 @@ export default function MindMapModal({ markdown, onClose }: MindMapModalProps) {
   const handleDownload = async (format: 'svg' | 'png' | 'pdf') => {
     if (!containerRef.current) return;
     const title = getTitle(markdown || '');
-    const sanitizedTitle = title.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+    // Better sanitization that preserves accented characters, case, and uses spaces
+    const sanitizedTitle = title
+      .replace(/[^a-zA-Z0-9À-ÿ\s()]/g, '') // Keep letters (including accented), numbers, spaces, and parentheses
+      .replace(/\s+/g, ' ') // Normalize multiple spaces to single space
+      .trim() // Remove leading/trailing spaces
+      .substring(0, 100); // Limit length to prevent overly long filenames
     const container = containerRef.current;
     const svg = container.querySelector('#mindmap-svg') as SVGElement | null;
 
