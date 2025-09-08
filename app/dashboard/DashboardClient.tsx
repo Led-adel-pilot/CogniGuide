@@ -602,14 +602,16 @@ export default function DashboardClient() {
             // Legacy date-only string, assume end of day
             examDateTime = new Date(examDate + 'T23:59:59');
           }
-          if (examDateTime >= now) {
-            // Exam date is in future or today - include due cards
+          const twentyFourHoursAfterExam = new Date(examDateTime.getTime() + 24 * 60 * 60 * 1000);
+
+          if (twentyFourHoursAfterExam >= now) {
+            // Exam date is in future, today, or within the last 24 hours - include due cards
             dIdx = schedules
               .map((s: any, i: number) => ({ i, due: s?.due ? new Date(s.due) : now }))
               .filter((x: any) => x.due <= now)
               .map((x: any) => x.i);
           }
-          // If exam date has passed, dIdx remains empty - cards won't show as due
+          // If more than 24 hours have passed since the exam, dIdx remains empty
         } else {
           // No exam date set - include due cards normally
           dIdx = schedules
@@ -668,14 +670,16 @@ export default function DashboardClient() {
           // Legacy date-only string, assume end of day
           examDateTime = new Date(examDate + 'T23:59:59');
         }
-        if (examDateTime >= now) {
-          // Exam date is in future or today - include due cards
+        const twentyFourHoursAfterExam = new Date(examDateTime.getTime() + 24 * 60 * 60 * 1000);
+
+        if (twentyFourHoursAfterExam >= now) {
+          // Exam date is in future, today, or within the last 24 hours - include due cards
           dIdx = schedules
             .map((s: any, i: number) => ({ i, due: s?.due ? new Date(s.due) : now }))
             .filter((x: any) => x.due <= now)
             .map((x: any) => x.i);
         }
-        // If exam date has passed, dIdx remains empty - cards won't show as due
+        // If more than 24 hours have passed since the exam, dIdx remains empty
       } else {
         // No exam date set - include due cards normally
         dIdx = schedules

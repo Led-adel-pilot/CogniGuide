@@ -75,8 +75,10 @@ export function nextSchedule(
   const updated = result.card;
   let due = updated.due instanceof Date ? updated.due : new Date(updated.due);
 
-  // If an exam date exists and is in the future, clamp due date to the exam date
-  // If exam date has passed, ignore the constraint and let FSRS work normally
+  // If an exam date exists, apply special scheduling rules.
+  // If exam date has passed by more than 24h, it's erased.
+  // If within 24h of exam, cards become due immediately for cramming.
+  let nextExamDate = current?.examDate;
   const examDate = current?.examDate;
   if (examDate) {
     let exam: Date;
@@ -88,11 +90,18 @@ export function nextSchedule(
       exam = new Date(examDate + 'T23:59:59');
     }
 
-    if (exam >= now && due > exam) {
-      // Exam date is in future or today, and FSRS would overshoot it - clamp
+    const twentyFourHoursAfterExam = new Date(exam.getTime() + 24 * 60 * 60 * 1000);
+
+    if (now > twentyFourHoursAfterExam) {
+      // More than 24 hours after the exam, clear the exam date for future scheduling
+      nextExamDate = undefined;
+    } else if (now >= exam) {
+      // Within the 24-hour grace period, schedule for 'now' to make it due immediately for cramming
+      due = now;
+    } else if (due > exam) {
+      // Exam date is in the future, and FSRS would overshoot it - clamp
       due = exam;
     }
-    // If exam date has passed (exam < now), ignore constraint and let FSRS work normally
   }
 
   return {
@@ -105,7 +114,7 @@ export function nextSchedule(
     due: due.toISOString(),
     last_review: now.toISOString(),
     state: updated.state as any,
-    examDate: current?.examDate,
+    examDate: nextExamDate,
   };
 }
 

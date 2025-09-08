@@ -162,9 +162,21 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
       (async () => {
         const stored = (await loadDeckScheduleAsync(deckId)) || loadDeckSchedule(deckId);
         if (stored && Array.isArray(stored.schedules) && stored.schedules.length === cards.length) {
-          setDeckExamDate(stored.examDate || '');
-          setExamDateInput(stored.examDate ? new Date(stored.examDate) : undefined);
-          setScheduledCards(cards.map((c, i) => ({ ...c, schedule: stored.schedules[i] || createInitialSchedule() })));
+          let finalExamDate = stored.examDate || '';
+          if (finalExamDate) {
+            let exam;
+            if (finalExamDate.includes('T')) exam = new Date(finalExamDate);
+            else exam = new Date(finalExamDate + 'T23:59:59');
+            const twentyFourHoursAfterExam = new Date(exam.getTime() + 24 * 60 * 60 * 1000);
+            if (new Date() > twentyFourHoursAfterExam) {
+              finalExamDate = ''; // Clear if more than 24h past
+            }
+          }
+
+          setDeckExamDate(finalExamDate);
+          setExamDateInput(finalExamDate ? new Date(finalExamDate) : undefined);
+          setScheduledCards(cards.map((c, i) => ({ ...c, schedule: { ...(stored.schedules[i] || createInitialSchedule()), examDate: finalExamDate } })));
+
           if (typeof initialIndex === 'number' && Number.isFinite(initialIndex)) {
             setIndex(Math.max(0, Math.min(cards.length - 1, initialIndex)));
             setShowAnswer(false);

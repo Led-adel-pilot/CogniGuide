@@ -105,7 +105,7 @@ CogniGuide implements the advanced TS-FSRS (Free Spaced Repetition Scheduler) al
 *   **Adaptive Scheduling:** Dynamically adjusts review intervals based on individual card performance
 *   **Difficulty Tracking:** Maintains difficulty scores for each flashcard
 *   **Stability Metrics:** Tracks memory stability over time
-*   **Exam Date Constraints:** Prevents review scheduling beyond specified exam dates
+*   **Exam Date Constraints:** Prevents review scheduling beyond specified exam dates, with a 24-hour grace period after exam completion during which due cards continue to appear in spaced repetition. After the 24-hour grace period, the exam date is automatically cleared and the deck reverts to standard FSRS scheduling without exam constraints
 *   **Cross-Device Synchronization:** Maintains scheduling state across devices via Supabase
 
 ### Implementation Details
@@ -130,6 +130,28 @@ Each flashcard tracks:
 - **Good (3):** Moderate effort, standard interval
 - **Easy (4):** Effortless recall, extended interval
 
+### Exam Date User Flow
+The exam date feature provides intelligent scheduling that adapts to your study needs:
+
+1. **Before Exam:** When you set an exam date, the FSRS algorithm ensures all reviews are scheduled before your exam date. Cards that would normally be scheduled after your exam are automatically clamped to your exam date.
+
+2. **During Exam Day:** On your exam date, due cards continue to appear normally in your spaced repetition queue.
+
+3. **Post-Exam Grace Period (0-24 hours after exam):**
+   - Cards that become due during this period are scheduled for immediate review (due now)
+   - This creates intensive cramming sessions to reinforce material immediately after the exam
+   - All cards appear as "due now" regardless of their normal FSRS schedule
+
+4. **After 24-Hour Grace Period:**
+   - When you next open the deck after 24 hours have passed since your exam
+   - The exam date is automatically cleared from all cards
+   - Future scheduling reverts to standard FSRS algorithm without exam constraints
+   - Cards resume their normal spaced repetition intervals based on difficulty and stability
+
+5. **Automatic Cleanup:** If you haven't opened a deck for more than 24 hours after its exam date, the next time you open it, the system automatically removes the exam constraint and lets FSRS work normally.
+
+This behavior ensures you get the benefits of exam-focused scheduling during preparation, intensive review immediately after the exam, and seamless transition back to optimal long-term retention scheduling afterward.
+
 ## Project Structure Highlights
 
 ### Frontend (`app/page.tsx` and `components/`)
@@ -142,7 +164,7 @@ Each flashcard tracks:
     * **Unified UI**: Features a sleek, colorful study interface with gradient progress bar and color-coded rating buttons (Again/Hard/Good/Easy).
     * **Date Picker Integration**: Uses a custom DatePicker component (`components/DatePicker.tsx`) that wraps React Day Picker with theme-aware styling to match the app's color scheme for both light and dark modes. Enables setting exam dates that influence FSRS scheduling algorithms.
     * **Streaming Support**: Supports real-time streaming display (NDJSON) for incremental flashcard generation.
-    * **Spaced Repetition**: Implements FSRS-6 algorithm with Supabase-backed persistence. Includes deck-level exam date constraints that are ignored after the exam date has passed (allowing normal FSRS scheduling), per-card scheduling (difficulty, stability, reps, lapses, last_review, due), and cross-device synchronization via Supabase (`flashcards_schedule`) table.
+    * **Spaced Repetition**: Implements FSRS-6 algorithm with Supabase-backed persistence. Includes deck-level exam date constraints that are ignored after the exam date has passed (allowing normal FSRS scheduling), with a 24-hour grace period during which due cards continue to appear in spaced repetition. Per-card scheduling includes difficulty, stability, reps, lapses, last_review, due dates, and cross-device synchronization via Supabase (`flashcards_schedule`) table.
     * **Performance Optimizations**: Uses prefetched scheduling data cached in memory and localStorage for instant loading. Includes cache-only recompute paths for offline functionality.
     * **Clean Interface**: Hides internal FSRS metrics while maintaining powerful spaced repetition capabilities.
 *   `components/Generator.tsx`: The core file upload and generation component that powers both mind map and flashcard creation. Features intelligent file processing with smart caching to prevent redundant re-processing when users add/remove files. Handles file validation, pre-processing via the `/api/preparse` endpoint, credit checking, and orchestrates the generation workflow for both mind maps and flashcards.
@@ -409,7 +431,7 @@ For consistent branding across the application, use the `CogniGuide_logo.png` fi
     - **Fast Auth Redirects:** Lightweight first-party cookies (`cg_authed`) eliminate 2-3 second delays for authenticated users visiting the landing page
 *   Spaced repetition prefetch & caching:
     - On dashboard load (after history fetch), all schedules are loaded in a single bulk request from `flashcards_schedule`, normalized to deck card counts, and cached (in‑memory + `localStorage`).
-    - The due‑now queue and a `window.__cogniguide_due_map` are computed up‑front so opening the modal is instant.
+    - The due‑now queue and a `window.__cogniguide_due_map` are computed up‑front so opening the modal is instant, including cards due within 24 hours after exam completion.
     - If the network is unavailable, due lists are recomputed from the cache to maintain responsiveness.
     - When new flashcards are created, history reloads and the prefetch runs again to refresh dues.
 
