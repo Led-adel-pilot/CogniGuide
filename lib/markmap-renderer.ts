@@ -19,7 +19,7 @@ export interface MindMapNode {
     isExpanding?: boolean;
     isAnimating?: boolean;
     parent: MindMapNode | null;
-    color: string | null;
+    themeColor: string | null;
     textColor?: string | null;
     // Properties calculated during layout
     width: number;
@@ -53,51 +53,51 @@ const PADDING = 50;
 const ANIMATION_DURATION = 300;
 
 // Light Mode Color Palette
-const L_NODE_COLOR_PALETTE = [
-    'hsla(0, 56%, 92%, 1.00)',
-    'hsla(83, 56%, 92%, 1.00)',
-    'hsla(305, 56%, 92%, 1.00)',
-    'hsla(206, 56%, 92%, 1.00)',
-    'hsla(154, 56%, 92%, 1.00)',
-    'hsla(342, 56%, 92%, 1.00)',
-    'hsla(284, 56%, 92%, 1.00)',
-    'hsla(54, 71%, 92%, 1.00)',
-    'hsla(9, 54%, 95%, 1.00)'
-];
 const L_TEXT_COLOR_PALETTE = [
+    'hsla(0, 65%, 35%, 1.00)',
+    'hsla(83, 82%, 25%, 1.00)',
+    'hsla(208, 82%, 29%, 1.00)',
+    'hsla(162, 82%, 25%, 1.00)',
+    'hsla(341, 70%, 29%, 1.00)',
+    'hsla(285, 70%, 29%, 1.00)',
+    'hsla(100, 85%, 29%, 1.00)',
+    'hsla(54, 85%, 31%, 1.00)',
+    'hsla(354, 82%, 29%, 1.00)'
+];
+const L_THEME_COLOR_PALETTE = [
     'hsla(0, 65%, 45%, 1.00)',
     'hsla(83, 82%, 35%, 1.00)',
-    'hsla(305, 85%, 39%, 1.00)',
     'hsla(208, 82%, 39%, 1.00)',
     'hsla(162, 82%, 35%, 1.00)',
     'hsla(341, 70%, 39%, 1.00)',
     'hsla(285, 70%, 39%, 1.00)',
+    'hsla(100, 85%, 39%, 1.00)',
     'hsla(54, 85%, 41%, 1.00)',
     'hsla(354, 82%, 39%, 1.00)'
 ];
 
 // Dark Mode Color Palette
-const D_NODE_COLOR_PALETTE = [
-    'hsla(12, 56%, 22%, 1.00)',
-    'hsla(83, 56%, 22%, 1.00)',
-    'hsla(305, 56%, 22%, 1.00)',
-    'hsla(206, 56%, 22%, 1.00)',
-    'hsla(154, 56%, 22%, 1.00)',
-    'hsla(342, 56%, 22%, 1.00)',
-    'hsla(284, 56%, 22%, 1.00)',
-    'hsla(54, 71%, 22%, 1.00)',
-    'hsla(9, 54%, 25%, 1.00)'
-];
 const D_TEXT_COLOR_PALETTE = [
-    'hsla(04, 65%, 85%, 1.00)',
-    'hsla(83, 82%, 85%, 1.00)',
-    'hsla(305, 85%, 85%, 1.00)',
-    'hsla(208, 82%, 85%, 1.00)',
-    'hsla(162, 82%, 85%, 1.00)',
-    'hsla(341, 70%, 85%, 1.00)',
-    'hsla(285, 70%, 85%, 1.00)',
-    'hsla(54, 85%, 85%, 1.00)',
-    'hsla(354, 82%, 85%, 1.00)'
+    'hsla(04, 65%, 95%, 1.00)',
+    'hsla(83, 82%, 95%, 1.00)',
+    'hsla(208, 82%, 95%, 1.00)',
+    'hsla(162, 82%, 95%, 1.00)',
+    'hsla(341, 70%, 95%, 1.00)',
+    'hsla(285, 70%, 95%, 1.00)',
+    'hsla(100, 85%, 95%, 1.00)',
+    'hsla(54, 85%, 95%, 1.00)',
+    'hsla(354, 82%, 95%, 1.00)'
+];
+const D_THEME_COLOR_PALETTE = [
+    'hsla(04, 100%, 85%, 1.00)',
+    'hsla(83, 100%, 85%, 1.00)',
+    'hsla(208, 100%, 85%, 1.00)',
+    'hsla(162, 100%, 85%, 1.00)',
+    'hsla(341, 100%, 85%, 1.00)',
+    'hsla(285, 100%, 85%, 1.00)',
+    'hsla(100, 100%, 85%, 1.00)',
+    'hsla(54, 100%, 85%, 1.00)',
+    'hsla(354, 100%, 85%, 1.00)'
 ];
 
 // Dynamically select palette based on dark mode media query
@@ -109,7 +109,7 @@ const isDarkMode = () => {
     // 2. Fallback to system preference
     return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
 };
-const getNodeColorPalette = () => isDarkMode() ? D_NODE_COLOR_PALETTE : L_NODE_COLOR_PALETTE;
+const getThemeColorPalette = () => isDarkMode() ? D_THEME_COLOR_PALETTE : L_THEME_COLOR_PALETTE;
 const getTextColorPalette = () => isDarkMode() ? D_TEXT_COLOR_PALETTE : L_TEXT_COLOR_PALETTE;
 
 
@@ -335,10 +335,10 @@ function parseFrontmatter(markdown: string): { frontmatter: Record<string, strin
 
 function applyColorVariations(node: MindMapNode) {
     const childrenWithSubtrees = node.children.filter(child => child.children.length > 0);
-    if (node.color && childrenWithSubtrees.length >= 2) {
+    if (node.themeColor && childrenWithSubtrees.length >= 2) {
         const n = childrenWithSubtrees.length;
         const HUE_VARIATION = 0.03;
-        const baseColor = node.color;
+        const baseColor = node.themeColor;
         const baseTextColor = node.textColor ?? (baseColor ? darkenColor(baseColor, 70) : null);
         childrenWithSubtrees.forEach((childNode, index) => {
             const variationStep = n === 1 ? 0 : (index / (n - 1)) * 2 - 1;
@@ -346,7 +346,7 @@ function applyColorVariations(node: MindMapNode) {
             const variedColor = varyHue(baseColor, hueShift);
             const variedTextColor = baseTextColor ? varyHue(baseTextColor, hueShift) : null;
             function setSubtreeStyle(subtreeNode: MindMapNode, color: string, textColor: string | null) {
-                subtreeNode.color = color;
+                subtreeNode.themeColor = color;
                 if (textColor) subtreeNode.textColor = textColor;
                 subtreeNode.children.forEach(child => setSubtreeStyle(child, color, textColor));
             }
@@ -368,11 +368,11 @@ function parseMarkmap(markdown: string): MindMapNode {
         rootText = lines[h1Index].trim().substring(2);
         lines.splice(h1Index, 1);
     }
-    const rootBaseColor = isDarkMode() ? 'hsla(214, 56%, 23%, 1.00)' : 'hsla(206, 56%, 92%, 1.00)';
-    const rootTextColor = isDarkMode() ? 'hsla(213, 82%, 85%, 1.00)' : 'hsla(208, 82%, 39%, 1.00)';
+    const rootThemeColor = isDarkMode() ? 'hsla(213, 82%, 85%, 1.00)' : 'hsla(208, 82%, 39%, 1.00)';
+    const rootTextColor = isDarkMode() ? 'hsla(213, 82%, 95%, 1.00)' : 'hsla(208, 82%, 29%, 1.00)';
     const root: MindMapNode = {
         id: 'node-0', text: rootText, html: renderMarkdownToHTML(rootText),
-        children: [], level: 0, isRoot: true, color: rootBaseColor, textColor: rootTextColor, parent: null,
+        children: [], level: 0, isRoot: true, themeColor: rootThemeColor, textColor: rootTextColor, parent: null,
         width: 0, height: 0, x: 0, y: 0
     };
     const parentStack = [root];
@@ -412,17 +412,17 @@ function parseMarkmap(markdown: string): MindMapNode {
             parentStack.pop();
         }
         const parent = parentStack[parentStack.length - 1];
-        let nodeColor: string | null;
+        let nodeThemeColor: string | null;
         let nodeTextColor: string | null;
         if (parent.isRoot) {
-            const NODE_COLOR_PALETTE = getNodeColorPalette();
+            const THEME_COLOR_PALETTE = getThemeColorPalette();
             const TEXT_COLOR_PALETTE = getTextColorPalette();
-            const idx = colorIndex++ % NODE_COLOR_PALETTE.length;
-            nodeColor = NODE_COLOR_PALETTE[idx];
-            nodeTextColor = TEXT_COLOR_PALETTE[idx] ?? darkenColor(nodeColor, 70);
+            const idx = colorIndex++ % THEME_COLOR_PALETTE.length;
+            nodeThemeColor = THEME_COLOR_PALETTE[idx];
+            nodeTextColor = TEXT_COLOR_PALETTE[idx] ?? darkenColor(nodeThemeColor, 70);
         } else {
-            nodeColor = parent.color;
-            nodeTextColor = parent.textColor ?? (nodeColor ? darkenColor(nodeColor, 70) : null);
+            nodeThemeColor = parent.themeColor;
+            nodeTextColor = parent.textColor ?? (nodeThemeColor ? darkenColor(nodeThemeColor, 70) : null);
         }
         const newNode: MindMapNode = {
             id: `node-${nodeCounter++}`, text: text, html: renderMarkdownToHTML(text),
@@ -431,7 +431,7 @@ function parseMarkmap(markdown: string): MindMapNode {
             isCollapsed: isFolded,
             level: level,
             parent: parent,
-            color: nodeColor,
+            themeColor: nodeThemeColor,
             textColor: nodeTextColor,
             width: 0, height: 0, x: 0, y: 0
         };
@@ -627,7 +627,7 @@ function drawConnector(parent: MindMapNode, child: MindMapNode, svgEl: SVGSVGEle
     const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
     path.setAttribute('class', 'connector-path');
     // Match connector color to the node's text color for visual consistency
-    const connectorStroke = child.textColor ?? (child.color ? darkenColor(child.color, 70) : '#000000');
+    const connectorStroke = child.themeColor ?? '#000000';
     path.style.stroke = connectorStroke;
     const p1 = { x: parent.x + parent.width + xOffset, y: parent.y + parent.height / 2 + yOffset };
     const p2 = { x: child.x + xOffset, y: child.y + child.height / 2 + yOffset };
@@ -676,18 +676,17 @@ function renderNodeAndChildren(node: MindMapNode, container: HTMLElement, svgEl:
         nodeEl.style.top = `${node.y + yOffset}px`;
     }
     
-    if (node.color) {
-        const borderColor = node.textColor ?? saturateColor(darkenColor(node.color, 25), 60);
-        nodeEl.style.backgroundColor = node.color;
+    if (node.themeColor) {
+        const borderColor = node.themeColor;
         nodeEl.style.borderColor = borderColor;
-        nodeEl.style.color = node.textColor ?? darkenColor(node.color, 70);
+        nodeEl.style.color = node.textColor ?? darkenColor(node.themeColor, 70);
         nodeEl.style.setProperty('--indicator-border-color', borderColor);
-        nodeEl.style.setProperty('--collapsed-indicator-color', node.color);
+        nodeEl.style.setProperty('--collapsed-indicator-color', node.themeColor);
     }
     if (node.isRoot) {
         nodeEl.classList.add('root');
         // Use explicit text color if provided, otherwise derive from background
-        nodeEl.style.color = node.textColor ?? darkenColor(node.color || '#b5d9ffff', 70);
+        nodeEl.style.color = node.textColor ?? darkenColor(node.themeColor || '#b5d9ffff', 70);
     }
     if (node.children.length > 0) nodeEl.classList.add('has-children');
     if (node.isCollapsed) nodeEl.classList.add('collapsed');

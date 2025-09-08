@@ -30,20 +30,6 @@
   --color-border: oklch(34% 0.02 250);
   --color-ring: oklch(72% 0.19 260);
 
-  /* Mind map dark mode overrides */
-  --background-color: oklch(22% 0.02 250);
-  --node-bg-color: oklch(26% 0.02 250);
-  --node-border-color: oklch(36% 0.02 250);
-  --node-shadow: none;
-  --root-bg-color: oklch(72% 0.19 260);
-  --root-text-color: oklch(18% 0.01 250);
-  --connector-color: oklch(42% 0.02 250);
-  --text-color: oklch(94% 0.01 240);
-  --hover-border-color: oklch(72% 0.19 260);
-  --code-bg-color: oklch(30% 0.015 250);
-  --indicator-border-color: oklch(42% 0.02 250);
-  --collapsed-indicator-color: oklch(72% 0.19 260);
-
   /* Dark mode button overrides */
   .upgrade-plan-btn {
     background-color: rgba(30, 64, 175, 0.5); /* dark blue background */
@@ -89,16 +75,16 @@
 
 /* Mind Map Styles - Unchanged */
 :root {
-    --background-color: #f8f9fa;
-    --node-bg-color: #ffffff;
-    --node-border-color: #dee2e6;
+    --background-color: var(--color-background);
+    --node-bg-color: var(--color-background);
+    --node-border-color: var(--color-border);
     --node-shadow: none;
-    --root-bg-color: #007bff;
-    --root-text-color: #ffffff;
-    --connector-color: #cbd5e0;
-    --text-color: #2d3748;
-    --hover-border-color: #007bff;
-    --code-bg-color: #edf2f7;
+    --root-border-color: var(--color-primary);
+    --root-text-color: var(--color-primary);
+    --connector-color: var(--color-border);
+    --text-color: var(--color-foreground);
+    --hover-border-color: var(--color-primary);
+    --code-bg-color: var(--color-muted);
 }
 
 .map-viewport {
@@ -154,10 +140,10 @@
 }
 
 .mindmap-node.root {
-    background-color: var(--root-bg-color);
+    background-color: var(--node-bg-color);
     color: var(--root-text-color, #ffffff);
     font-weight: bold;
-    border-color: var(--root-bg-color);
+    border-color: var(--root-border-color, var(--root-bg-color));
 }
 
 .mindmap-node.has-children::after {
