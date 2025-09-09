@@ -46,7 +46,7 @@ function RadialProgressBar({ progress = 0, size = 48, strokeWidth = 5 }: RadialP
           strokeDasharray={strokeDasharray}
           strokeDashoffset={strokeDashoffset}
           strokeLinecap="round"
-          className="text-primary transition-all duration-500 ease-out"
+          className="text-muted-foreground transition-all duration-500 ease-out"
           style={{
             filter: 'drop-shadow(0 0 4px rgba(var(--primary), 0.3))'
           }}
@@ -75,9 +75,11 @@ interface DropzoneProps {
   allowedNameSizes?: { name: string; size: number }[];
   // Visual size variant
   size?: 'default' | 'compact';
+  // Callback when a file is removed (useful for resetting upload states)
+  onFileRemove?: () => void;
 }
 
-export default function Dropzone({ onFileChange, disabled = false, onOpen, isPreParsing = false, uploadProgress, allowedNameSizes, size = 'default' }: DropzoneProps) {
+export default function Dropzone({ onFileChange, disabled = false, onOpen, isPreParsing = false, uploadProgress, allowedNameSizes, size = 'default', onFileRemove }: DropzoneProps) {
   const [dragIsOver, setDragIsOver] = useState(false);
   const [files, setFiles] = useState<File[]>([]);
   const inputRef = useRef<HTMLInputElement | null>(null);
@@ -181,6 +183,8 @@ export default function Dropzone({ onFileChange, disabled = false, onOpen, isPre
       file_size_kb: fileToRemove.size / 1024,
     });
     setFiles(prevFiles => prevFiles.filter(file => file !== fileToRemove));
+    // Notify parent component to reset upload states
+    onFileRemove?.();
   }
 
   const dropzoneClassName = useMemo(() => {
@@ -227,22 +231,17 @@ export default function Dropzone({ onFileChange, disabled = false, onOpen, isPre
                       e.stopPropagation();
                       handleRemoveFile(file);
                     }}
-                    className="absolute top-2 right-2 w-7 h-7 inline-flex items-center justify-center bg-red-500 text-white rounded-full hover:bg-red-600 focus:outline-none z-10"
+                    className="absolute top-2 right-2 w-6 h-6 inline-flex items-center justify-center bg-white text-black border border-gray-300 rounded-full hover:bg-gray-50 focus:outline-none z-30"
                     aria-label="Remove file"
                   >
-                    <X className="w-3 h-3" />
+                    <X className="w-4 h-4" />
                   </button>
                   {isPreParsing && (
-                    <div className="absolute inset-0 bg-background/90 backdrop-blur-md rounded-[1.25rem] flex flex-col items-center justify-center z-20 transition-all duration-200">
+                    <div className="absolute inset-4 bg-background/90 backdrop-blur-md rounded-[1rem] flex flex-col items-center justify-center z-10 transition-all duration-200">
                       <RadialProgressBar progress={uploadProgress ?? 0} />
                       <p className="text-xs text-muted-foreground font-medium mt-3 text-center">
                         {uploadProgress !== undefined && uploadProgress < 100 ? 'Uploading...' : 'Processing...'}
                       </p>
-                      {uploadProgress !== undefined && uploadProgress < 100 && (
-                        <p className="text-xs text-muted-foreground/80 mt-1">
-                          {uploadProgress}% complete
-                        </p>
-                      )}
                     </div>
                   )}
                 </div>

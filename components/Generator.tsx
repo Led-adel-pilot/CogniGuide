@@ -871,6 +871,17 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
                   }
                   return true;
                 }}
+                onFileRemove={() => {
+                  // Reset upload states when a file is removed during upload
+                  setIsPreParsing(false);
+                  setUploadProgress(undefined);
+                  // Clear any cached pre-parsed results since file set changed
+                  setPreParsed(null);
+                  setAllowedNameSizes(undefined);
+                  // Clear last preparse key to force re-processing
+                  lastPreparseKeyRef.current = null;
+                  debugLog('Upload states reset due to file removal');
+                }}
               />
               <PromptForm
                 onSubmit={handleSubmit}
