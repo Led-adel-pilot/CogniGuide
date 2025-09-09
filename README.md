@@ -17,6 +17,7 @@ CogniGuide comprehensive AI-powered study assistant. It uses an LLM to convert t
     - From Mind Map: After a mind map is generated, users can generate study flashcards from the Markmap markdown and switch between the mind map view and a flashcards study mode.
     - Direct from Files: On the generator, a selector lets users choose "Flashcards" to generate flashcards directly from uploaded documents/images (without first creating a mind map). The backend accepts `FormData` uploads and streams NDJSON lines for incremental flashcards.
 *   **Persistent Study Progress:** The flashcard study interface automatically remembers the user's last viewed card position, even after closing the modal, refreshing the page, or reopening the browser. This works for both saved decks (using deck ID) and unsaved decks (using a unique identifier based on deck content). Progress is stored locally and persists across sessions.
+*   **Interleaved Study Mode:** Advanced spaced repetition feature that interleaves cards from multiple decks to maximize learning effectiveness. When you have due cards from different subjects, this mode presents them in a randomized order while ensuring no two consecutive cards are from the same deck, forcing beneficial context switching that improves long-term retention. Each card maintains its individual deck's exam date and scheduling preferences.
 *   **Auth & History:** Users must sign in (Email magic link or Google) to generate mind maps or flashcards. Signed-in users get a dashboard with a unified reverse-chronological history of both mind maps and flashcards. Items show lucide icons (map vs card). Mind maps are stored as Markmap markdown; flashcards are stored as a JSON array (and may omit markdown when generated directly from files/prompts).
 *   **Seamless Save on Sign-Up:** When a non-authenticated user generates a mind map and then signs up to save it, the mind map is automatically saved to their new account and appears in their history, ensuring no work is lost.
 
@@ -151,6 +152,35 @@ The exam date feature provides intelligent scheduling that adapts to your study 
 5. **Automatic Cleanup:** If you haven't opened a deck for more than 24 hours after its exam date, the next time you open it, the system automatically removes the exam constraint and lets FSRS work normally.
 
 This behavior ensures you get the benefits of exam-focused scheduling during preparation, intensive review immediately after the exam, and seamless transition back to optimal long-term retention scheduling afterward.
+
+### Interleaved Study Mode
+CogniGuide implements an advanced interleaved study feature that maximizes learning effectiveness by forcing beneficial context switching:
+
+#### How It Works
+1. **Multi-Deck Collection:** When you have due cards from multiple flashcard decks, the "Study All Due Cards (Interleaved)" option collects all due cards across all your decks.
+
+2. **Intelligent Shuffling:** Cards are randomized while ensuring no two consecutive cards belong to the same deck, creating optimal context switching.
+
+3. **Preserved Individuality:** Each card maintains its parent deck's properties:
+   - **Exam Date:** Individual deck exam dates are respected and applied during grading
+   - **Scheduling State:** Progress updates are saved back to the original deck's schedule
+   - **Deck Identity:** The modal title shows the current card's parent deck name
+
+4. **Research-Backed Benefits:** This interleaving approach leverages "discriminative contrast" - the cognitive benefit of switching between different topics, which strengthens memory and improves the ability to apply knowledge in new situations.
+
+#### Usage
+- Access interleaved study from the Spaced Repetition modal on the dashboard
+- Click "Study All Due Cards (Interleaved)" to begin
+- Cards will be presented in an optimal mixed order
+- Progress on each card updates its original deck's spaced repetition schedule
+- The modal title dynamically shows which deck each card belongs to
+
+#### Technical Implementation
+- Uses lodash.shuffle for randomization
+- Maintains due card queue integrity across decks
+- Preserves individual deck exam date constraints
+- Syncs grading results back to parent deck schedules
+- Tracks interleaved sessions in analytics for optimization
 
 ## Project Structure Highlights
 

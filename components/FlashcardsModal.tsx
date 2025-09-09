@@ -25,7 +25,7 @@ const getDeckIdentifier = (deckId?: string, title?: string | null, cards?: Flash
 };
 
 export type Flashcard = { question: string; answer: string };
-type CardWithSchedule = Flashcard & { schedule?: FsrsScheduleState };
+type CardWithSchedule = Flashcard & { schedule?: FsrsScheduleState; deckId?: string; cardIndex?: number; deckTitle?: string; };
 
 const markdownComponents: Components = {
   ul({ node, ...props }) {
@@ -52,11 +52,13 @@ type Props = {
   deckId?: string; // id from DB record when opened from history
   initialIndex?: number;
   studyDueOnly?: boolean;
+  studyInterleaved?: boolean;
+  interleavedDecks?: Array<{ id: string; title: string | null; cards: Flashcard[] }>;
   dueIndices?: number[];
   isEmbedded?: boolean;
 };
 
-export default function FlashcardsModal({ open, title, cards, isGenerating = false, error, onClose, deckId, initialIndex, studyDueOnly = false, dueIndices, isEmbedded = false }: Props) {
+export default function FlashcardsModal({ open, title, cards, isGenerating = false, error, onClose, deckId, initialIndex, studyDueOnly = false, studyInterleaved = false, interleavedDecks, dueIndices, isEmbedded = false }: Props) {
   const [index, setIndex] = React.useState(0);
   const [showAnswer, setShowAnswer] = React.useState(false);
   const [scheduledCards, setScheduledCards] = React.useState<CardWithSchedule[] | null>(null);
@@ -158,7 +160,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
   React.useEffect(() => {
     if (!cards || cards.length === 0) { setScheduledCards(null); return; }
     // Try load stored schedule by deckId; fallback to fresh
-    if (deckId) {
+    if (deckId && !studyInterleaved) {
       (async () => {
         const stored = (await loadDeckScheduleAsync(deckId)) || loadDeckSchedule(deckId);
         if (stored && Array.isArray(stored.schedules) && stored.schedules.length === cards.length) {
@@ -200,6 +202,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
       })();
       return;
     }
+    // For interleaved or unsaved decks, create initial schedules
     setScheduledCards(cards.map((c) => ({ ...c, schedule: createInitialSchedule() })));
     if (typeof initialIndex === 'number' && Number.isFinite(initialIndex)) {
       setIndex(Math.max(0, Math.min(cards.length - 1, initialIndex)));
@@ -209,17 +212,17 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
     setDueList(initialDueList);
     setOriginalDueList(initialDueList);
     setOriginalDueCount(initialDueList.length);
-  }, [cards, deckId, initialIndex, dueIndices, title]);
+  }, [cards, deckId, initialIndex, dueIndices, title, studyInterleaved]);
 
   React.useEffect(() => {
-    if (!deckId || !scheduledCards) return;
+    if (!deckId || !scheduledCards || studyInterleaved) return;
     const payload = { examDate: deckExamDate || undefined, schedules: scheduledCards.map((c) => c.schedule) };
     // Save remotely when possible; always mirror to local as fallback
     saveDeckSchedule(deckId, payload);
     saveDeckScheduleAsync(deckId, payload).catch((err) => {
       console.error(`Failed to save deck schedule async for deck ${deckId}:`, err);
     });
-  }, [deckId, scheduledCards, deckExamDate]);
+  }, [deckId, scheduledCards, deckExamDate, studyInterleaved]);
 
   // Predict next due labels per grade once the answer is shown
   React.useEffect(() => {
@@ -228,21 +231,48 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
       setPredictedDueDatesByGrade({});
       return;
     }
-    const now = new Date();
-    const base = current.schedule ?? createInitialSchedule();
-    const withDeckExam = { ...base, examDate: deckExamDate || base.examDate } as FsrsScheduleState;
-    const map: Record<number, string> = {};
-    const dateMap: Record<number, Date> = {};
-    const grades = [1, 2, 3, 4] as Grade[];
-    for (const g of grades) {
-      const s = nextSchedule(withDeckExam, g, now);
-      const due = new Date(s.due);
-      map[g as number] = formatTimeUntil(due, now);
-      dateMap[g as number] = due;
+
+    const predict = async () => {
+      const now = new Date();
+      const base = current.schedule ?? createInitialSchedule();
+      let examDate: string | undefined = deckExamDate || base.examDate;
+
+      if (studyInterleaved && current.deckId) {
+        const stored = await loadDeckScheduleAsync(current.deckId);
+        examDate = stored?.examDate;
+      }
+
+      const withDeckExam = { ...base, examDate } as FsrsScheduleState;
+      const map: Record<number, string> = {};
+      const dateMap: Record<number, Date> = {};
+      const grades = [1, 2, 3, 4] as Grade[];
+      for (const g of grades) {
+        const s = nextSchedule(withDeckExam, g, now);
+        const due = new Date(s.due);
+        map[g as number] = formatTimeUntil(due, now);
+        dateMap[g as number] = due;
+      }
+      setPredictedDueByGrade(map);
+      setPredictedDueDatesByGrade(dateMap);
+    };
+
+    predict();
+  }, [showAnswer, current, deckExamDate, studyInterleaved]);
+
+  React.useEffect(() => {
+    if (studyInterleaved && current?.deckId) {
+      (async () => {
+        if (current.deckId) {
+          const stored = await loadDeckScheduleAsync(current.deckId);
+          if (stored?.examDate) {
+            setExamDateInput(new Date(stored.examDate));
+          } else {
+            setExamDateInput(undefined);
+          }
+        }
+      })();
     }
-    setPredictedDueByGrade(map);
-    setPredictedDueDatesByGrade(dateMap);
-  }, [showAnswer, current, deckExamDate]);
+  }, [studyInterleaved, current]);
 
   function formatTimeUntil(dueDate: Date, now: Date = new Date()): string {
     const ms = Math.max(0, dueDate.getTime() - now.getTime());
@@ -263,11 +293,27 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
   const handleSetDeckExamDate = (dateTimeValue?: Date) => {
     const dateTime = dateTimeValue || examDateInput;
 
+    if (studyInterleaved && current?.deckId) {
+      const sourceDeckId = current.deckId;
+      (async () => {
+        const stored = await loadDeckScheduleAsync(sourceDeckId);
+        const schedules = stored?.schedules || interleavedDecks?.find(d => d.id === sourceDeckId)?.cards.map(() => createInitialSchedule()) || [];
+        const newPayload = { examDate: dateTime?.toISOString(), schedules };
+        await saveDeckScheduleAsync(sourceDeckId, newPayload);
+        saveDeckSchedule(sourceDeckId, newPayload); // Also update local cache
+      })();
+      return;
+    }
+
     if (dateTime) {
       const isoString = dateTime.toISOString();
       setDeckExamDate(isoString);
       // Also copy this onto existing schedules so clamping works immediately
       setScheduledCards((prev) => prev ? prev.map((c) => ({ ...c, schedule: { ...(c.schedule ?? createInitialSchedule()), examDate: isoString } })) : prev);
+    } else {
+      // Handle clearing the date
+      setDeckExamDate('');
+      setScheduledCards((prev) => prev ? prev.map((c) => ({ ...c, schedule: { ...(c.schedule ?? createInitialSchedule()), examDate: undefined } })) : prev);
     }
   };
 
@@ -292,27 +338,64 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
       return;
     }
 
-    setScheduledCards((prev) => {
-      if (!prev) return prev;
-      const next = [...prev];
-      const item = { ...next[index] };
-      const base = item.schedule ?? createInitialSchedule();
-      // Ensure deck-level examDate is applied
-      const withDeckExam = { ...base, examDate: deckExamDate || base.examDate } as FsrsScheduleState;
-      const newSchedule = nextSchedule(withDeckExam, g, new Date());
-      item.schedule = newSchedule;
-      next[index] = item;
+    if (studyInterleaved && current?.deckId && typeof current?.cardIndex === 'number') {
+      // Interleaved: update the source deck's schedule
+      const sourceDeckId = current.deckId;
+      const sourceCardIndex = current.cardIndex;
+      const sourceDeck = interleavedDecks?.find(d => d.id === sourceDeckId);
+      if (!sourceDeck) return;
+
+      const stored = loadDeckSchedule(sourceDeckId);
+      const originalSchedule = stored?.schedules[sourceCardIndex] || createInitialSchedule();
+      const examDate = stored?.examDate;
+      const scheduleWithExam = { ...originalSchedule, examDate };
+
+      const newSchedule = nextSchedule(scheduleWithExam, g, new Date());
+
+      // Update in local storage
+      const newSchedules = [...(stored?.schedules || sourceDeck.cards.map(() => createInitialSchedule()))];
+      newSchedules[sourceCardIndex] = newSchedule;
+      const payload = { examDate: newSchedule.examDate, schedules: newSchedules };
+      saveDeckSchedule(sourceDeckId, payload);
+      saveDeckScheduleAsync(sourceDeckId, payload);
 
       posthog.capture('flashcard_graded', {
-        deckId: deckId,
-        card_index: index,
+        deckId: sourceDeckId,
+        card_index: sourceCardIndex,
         grade: g,
         study_due_only: studyDueOnly,
+        study_interleaved: studyInterleaved,
         next_due_date: newSchedule.due,
       });
 
-      return next;
-    });
+    } else {
+      setScheduledCards((prev) => {
+        if (!prev) return prev;
+        const next = [...prev];
+        const item = { ...next[index] };
+        const base = item.schedule ?? createInitialSchedule();
+        // Ensure deck-level examDate is applied
+        const withDeckExam = { ...base, examDate: deckExamDate || base.examDate } as FsrsScheduleState;
+        const newSchedule = nextSchedule(withDeckExam, g, new Date());
+        item.schedule = newSchedule;
+        next[index] = item;
+
+        if (deckId && newSchedule.examDate !== deckExamDate) {
+          setDeckExamDate(newSchedule.examDate || '');
+        }
+
+        posthog.capture('flashcard_graded', {
+          deckId: deckId,
+          card_index: index,
+          grade: g,
+          study_due_only: studyDueOnly,
+          study_interleaved: studyInterleaved,
+          next_due_date: newSchedule.due,
+        });
+
+        return next;
+      });
+    }
     setShowAnswer(false);
     setHoveredGrade(null);
     setPredictedDueByGrade({});
@@ -325,11 +408,30 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
         const currentPos = list.indexOf(index);
         const filtered = list.filter((i) => i !== index);
         if (filtered.length > 0) {
-          // Maintain forward progression: move to the next card in sequence
-          // If we were at position P in the original list, move to position P in the filtered list
-          // If P is beyond the filtered list length, wrap to the beginning
-          const nextPos = currentPos < filtered.length ? currentPos : 0;
-          setIndex(filtered[nextPos]);
+          if (studyInterleaved) {
+            // Interleaving logic
+            const lastCard = scheduledCards ? scheduledCards[index] : null;
+            let nextIdx = -1;
+            // Find the first card in the remaining list that is from a different deck
+            for (let i = 0; i < filtered.length; i++) {
+              const potentialNextCard = scheduledCards ? scheduledCards[filtered[i]] : null;
+              if (potentialNextCard && potentialNextCard.deckId !== lastCard?.deckId) {
+                nextIdx = filtered[i];
+                break;
+              }
+            }
+            // If all remaining cards are from the same deck, just take the next one
+            if (nextIdx === -1) {
+              nextIdx = filtered[0];
+            }
+            setIndex(nextIdx);
+          } else {
+            // Maintain forward progression: move to the next card in sequence
+            // If we were at position P in the original list, move to position P in the filtered list
+            // If P is beyond the filtered list length, wrap to the beginning
+            const nextPos = currentPos < filtered.length ? currentPos : 0;
+            setIndex(filtered[nextPos]);
+          }
         } else {
           // We've completed all due cards
           setFinished(true);
@@ -352,7 +454,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
     if (studyDueOnly && dueList.length > 0) {
       const pos = dueList.indexOf(index);
       const nextPos = (pos + 1) % dueList.length;
-      if (nextPos === 0) {
+      if (nextPos === 0 && !studyInterleaved) {
         // We've completed all due cards
         setFinished(true);
         return index; // Stay on current card
@@ -402,10 +504,10 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
 
       <div className="w-full h-full grid grid-rows-[auto,1fr,auto] bg-background p-4 sm:p-6">
         <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 items-center gap-2 sm:gap-3">
-          <div className="text-center md:text-left text-sm font-medium truncate text-foreground">{title || 'Flashcards'}</div>
+          <div className="text-center md:text-left text-sm font-medium truncate text-foreground">{studyInterleaved ? (current?.deckTitle || title) : (title || 'Flashcards')}</div>
           <div className="text-sm text-muted-foreground text-center hidden md:block">{hasCards ? (finished ? 'Completed' : studyDueOnly ? `${originalDueList.indexOf(index) + 1} / ${originalDueCount} due` : `${index + 1} / ${cards!.length}`) : ''}</div>
           <div className="justify-self-center md:justify-self-end">
-            {hasCards && (
+            {hasCards && !studyInterleaved && (
               <div className="inline-flex items-center gap-2 text-sm">
                 <span className="text-foreground font-medium">Exam date</span>
                 <div className="w-32">

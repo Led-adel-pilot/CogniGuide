@@ -16,6 +16,7 @@ import CogniGuideLogo from '../../CogniGuide_logo.png';
 import Image from 'next/image';
 import posthog from 'posthog-js';
 import ThemeToggle from '@/components/ThemeToggle';
+import { shuffle } from 'lodash';
 
 type SessionUser = {
   id: string;
@@ -85,6 +86,7 @@ export default function DashboardClient() {
   const [spacedOpen, setSpacedOpen] = useState(false);
   const [dueQueue, setDueQueue] = useState<Array<{ id: string; title: string | null; cards: FlashcardType[] }>>([]);
   const [studyDueOnly, setStudyDueOnly] = useState(false);
+  const [studyInterleaved, setStudyInterleaved] = useState(false);
   const [dueIndices, setDueIndices] = useState<number[] | undefined>(undefined);
   const [initialDueIndex, setInitialDueIndex] = useState<number | undefined>(undefined);
   const [activeDeckId, setActiveDeckId] = useState<string | undefined>(undefined);
@@ -1070,9 +1072,11 @@ export default function DashboardClient() {
         cards={flashcardsCards}
         isGenerating={false}
         error={flashcardsError}
-        onClose={() => { setFlashcardsOpen(false); setFlashcardsCards(null); setFlashcardsError(null); setStudyDueOnly(false); setDueIndices(undefined); setInitialDueIndex(undefined); }}
+        onClose={() => { setFlashcardsOpen(false); setFlashcardsCards(null); setFlashcardsError(null); setStudyDueOnly(false); setStudyInterleaved(false); setDueIndices(undefined); setInitialDueIndex(undefined); }}
         deckId={activeDeckId || (flashcardsCards as any)?.__deckId}
         studyDueOnly={studyDueOnly}
+        studyInterleaved={studyInterleaved}
+        interleavedDecks={studyInterleaved ? dueQueue : undefined}
         dueIndices={dueIndices}
         initialIndex={initialDueIndex}
       />
@@ -1098,12 +1102,67 @@ export default function DashboardClient() {
             )}
             {!spacedError && (
               <div className="text-sm text-muted-foreground">
-                Select a deck with cards due now.
+                Select a deck with cards due now, or study all due cards interleaved for best results.
               </div>
             )}
-            <div className="mt-4 grid gap-2 max-h-80 overflow-y-auto">
+            <div className="mt-4 flex flex-col gap-2 max-h-80 overflow-y-auto">
               {spacedLoading && (
                 <div className="text-sm text-muted-foreground">Loading due decks…</div>
+              )}
+              {!spacedLoading && dueQueue.length > 0 && (
+                <div className="p-2 rounded-xl border flex items-center justify-between">
+                  <div className="flex-1">
+                    <div className="font-medium line-clamp-1 flex items-center gap-2">
+                      <Sparkles className="h-4 w-4 text-primary" />
+                      Interleaving Mode
+                    </div>
+                    <div className="text-xs text-muted-foreground">Shuffle cards from multiple decks for better retention and learning efficiency</div>
+                  </div>
+                  <button
+                    className="px-3 py-1.5 text-xs rounded-full border bg-primary text-primary-foreground hover:bg-primary/90 ml-3 flex-shrink-0"
+                    onClick={() => {
+                      const dueMap = (typeof window !== 'undefined' && (window as any).__cogniguide_due_map) || {};
+                      const allDueCards = dueQueue.flatMap(deck => {
+                        const dueIndexes = (dueMap[deck.id] as number[]) || [];
+                        return dueIndexes.map(cardIndex => ({
+                          ...deck.cards[cardIndex],
+                          deckId: deck.id,
+                          cardIndex: cardIndex,
+                          deckTitle: deck.title || 'flashcards'
+                        }));
+                      });
+
+                      // Simple shuffle for now, will implement proper interleaving in FlashcardsModal
+                      const shuffledCards = shuffle(allDueCards);
+
+                      // Create a composite deck for the modal
+                      const interleavedDeck = {
+                        id: 'interleaved-session',
+                        title: 'Interleaved Study',
+                        cards: shuffledCards
+                      };
+
+                      const interleavedIndices = shuffledCards.map((_: any, i: number) => i);
+
+                      posthog.capture('spaced_repetition_interleaved_started', {
+                        deck_count: dueQueue.length,
+                        total_due_card_count: shuffledCards.length,
+                      });
+
+                      setFlashcardsTitle(interleavedDeck.title);
+                      setFlashcardsCards(interleavedDeck.cards as any); // cast needed due to deckId
+                      setActiveDeckId(interleavedDeck.id);
+                      setStudyDueOnly(true); // to enable SR logic
+                      setStudyInterleaved(true);
+                      setDueIndices(interleavedIndices);
+                      setInitialDueIndex(0);
+                      setSpacedOpen(false);
+                      setFlashcardsOpen(true);
+                    }}
+                  >
+                    Study
+                  </button>
+                </div>
               )}
               {!spacedLoading && dueQueue.map((f) => {
                 const dueMap = (typeof window !== 'undefined' && (window as any).__cogniguide_due_map) || {};
@@ -1115,7 +1174,7 @@ export default function DashboardClient() {
                       <div className="text-xs text-muted-foreground">{count} due now</div>
                     </div>
                     <button
-                      className="px-3 py-1.5 text-xs rounded-full border bg-background hover:bg-muted/50"
+                      className="px-3 py-1.5 text-xs rounded-full border bg-primary text-primary-foreground hover:bg-primary/90"
                       onClick={() => {
                         const list = (dueMap[f.id] as number[]) || [];
                         posthog.capture('spaced_repetition_deck_studied', {
