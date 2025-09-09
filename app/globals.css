@@ -56,6 +56,9 @@
   .flashcard-grade-hard { @apply dark:border-amber-800 dark:bg-amber-900/30 dark:text-amber-300 dark:hover:bg-amber-900/50; }
   .flashcard-grade-good { @apply dark:border-sky-800 dark:bg-sky-900/30 dark:text-sky-300 dark:hover:bg-sky-900/50; }
   .flashcard-grade-easy { @apply dark:border-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300 dark:hover:bg-emerald-900/50; }
+
+  /* Spaced repetition due badge dark-mode override */
+  .spaced-due-badge { @apply dark:border-blue-800 dark:bg-blue-900/30 dark:text-blue-300; }
 }
 
 @layer base {

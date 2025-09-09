@@ -738,120 +738,130 @@ export default function DashboardClient() {
       )}
       {/* Sidebar */}
       <aside
-        className={`fixed inset-y-0 left-0 z-40 w-72 border-r bg-background p-4 flex flex-col h-screen min-h-0 transform transition-transform duration-300 md:relative md:translate-x-0 md:flex ${
+        className={`fixed inset-y-0 left-0 z-40 w-72 border-r bg-background pl-2 pt-2 pb-2 pr-0 flex flex-col h-screen min-h-0 transform transition-transform duration-300 md:relative md:translate-x-0 md:flex ${
           isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
-        <div className="flex items-center justify-between gap-2 mb-4">
-          <div className="flex items-center gap-2">
-            <Image src={CogniGuideLogo} alt="CogniGuide" width={24} height={24} className="h-6 w-6" />
-            <span className="font-bold">Your History</span>
-          </div>
-          <button onClick={() => setIsSidebarOpen(false)} className="p-1 rounded-full hover:bg-muted md:hidden">
-            <X className="h-5 w-5" />
-          </button>
-        </div>
-        <div className="flex-1 overflow-y-auto space-y-2 pr-1" ref={listRef}>
-          {isHistoryInitialLoading && (
-            <div className="space-y-2">
-              {Array.from({ length: 6 }).map((_, i) => (
-                <div key={i} className="p-2 rounded-xl border bg-muted/20 animate-pulse">
-                  <div className="h-4 w-24 bg-muted rounded mb-2" />
-                  <div className="h-3 w-40 bg-muted rounded" />
-                </div>
-              ))}
-            </div>
-          )}
-          {!isHistoryInitialLoading && combinedHistory.length === 0 && (
-            <div className="text-sm text-muted-foreground">No history yet.</div>
-          )}
-          {combinedHistory.map((item) => (
+        <div className="flex-1 overflow-y-auto" ref={listRef}>
+          <div className="flex items-center justify-between gap-2 mb-4 pl-0 pr-2">
             <button
-              key={`${item.type}:${item.id}`}
-              onClick={() => {
-                posthog.capture('history_item_opened', {
-                  type: item.type,
-                  item_id: item.id,
-                });
-                if (item.type === 'mindmap') {
-                  setMarkdown(item.markdown);
-                } else {
-                  setFlashcardsTitle(item.title || 'flashcards');
-                  // Attach a temporary symbol on cards array to carry deck id into modal
-                  const arr = (item.cards as FlashcardType[]) as any;
-                  (arr as any).__deckId = item.id;
-                  setActiveDeckId(item.id);
-                  setFlashcardsCards(arr as FlashcardType[]);
-                  setFlashcardsError(null);
-                  setFlashcardsOpen(true);
-                }
-              }}
-              className="w-full text-left p-2 rounded-xl border bg-background hover:bg-muted/50 flex items-start gap-3"
+              onClick={() => window.location.reload()}
+              className="flex items-center gap-2 p-1 rounded-xl hover:bg-muted/50 transition-colors"
+              title="Refresh page"
             >
-              <div className="mt-0.5 text-gray-600">
-                {(() => {
-                  const e = extractFirstEmoji(item.title);
-                  if (e) {
-                    return (
-                      <span className="inline-flex h-5 w-5 items-center justify-center text-[18px] leading-none">
-                        {e}
-                      </span>
-                    );
-                  }
-                  return item.type === 'mindmap' ? (
-                    <MapIcon className="h-5 w-5 text-primary" />
-                  ) : (
-                    <FlashcardIcon className="h-5 w-5 text-primary" />
-                  );
-                })()}
+              <Image src={CogniGuideLogo} alt="CogniGuide" width={24} height={24} className="h-6 w-6" />
+            </button>
+            <button onClick={() => setIsSidebarOpen(false)} className="p-1 rounded-full hover:bg-muted md:hidden">
+              <X className="h-5 w-5" />
+            </button>
+          </div>
+          <div className="mb-4 pl-0 pr-2">
+            <button
+              onClick={async () => {
+                setSpacedOpen(true);
+                setSpacedError(null);
+                if (!spacedPrefetched) {
+                  setSpacedLoading(true);
+                  try { await prefetchSpacedData(flashcardsHistory); } catch (err: any) { setSpacedError(err?.message || 'Failed to load due decks'); } finally { setSpacedLoading(false); }
+                }
+                // Ensure UI reflects latest due based on cached schedules even if no network
+                recomputeDueFromCache(flashcardsHistory);
+              }}
+              className="w-full text-left pl-2 pr-2 py-3 rounded-xl border hover:bg-muted/50 flex items-center gap-3 transition-colors"
+            >
+              <CalendarClock className="h-5 w-5 text-primary" />
+              <span className="font-medium">Spaced repetition</span>
+              {totalDueCount > 0 && (
+                <span className="ml-auto inline-flex items-center justify-center rounded-full bg-blue-100 text-blue-700 border border-blue-200 text-xs font-semibold min-w-[20px] h-5 px-1 spaced-due-badge">
+                  {totalDueCount > 99 ? '99+' : totalDueCount}
+                </span>
+              )}
+            </button>
+          </div>
+          <div className="mb-4 pl-2 pr-2">
+            <span className="text-muted-foreground text-sm">Your History</span>
+          </div>
+          <div className="space-y-2 pl-0 pr-2">
+            {isHistoryInitialLoading && (
+              <div className="space-y-2 pl-0 pr-0">
+                {Array.from({ length: 6 }).map((_, i) => (
+                  <div key={i} className="pl-2 pr-2 py-3 rounded-xl border bg-muted/20 animate-pulse">
+                    <div className="h-4 w-24 bg-muted rounded mb-2" />
+                    <div className="h-3 w-40 bg-muted rounded" />
+                  </div>
+                ))}
               </div>
-              <div className="min-w-0">
-                <div className="font-medium line-clamp-1">
+            )}
+            {!isHistoryInitialLoading && combinedHistory.length === 0 && (
+              <div className="text-sm text-muted-foreground pl-0 pr-0">No history yet.</div>
+            )}
+            {combinedHistory.map((item) => (
+              <button
+                key={`${item.type}:${item.id}`}
+                onClick={() => {
+                  posthog.capture('history_item_opened', {
+                    type: item.type,
+                    item_id: item.id,
+                  });
+                  if (item.type === 'mindmap') {
+                    setMarkdown(item.markdown);
+                  } else {
+                    setFlashcardsTitle(item.title || 'flashcards');
+                    // Attach a temporary symbol on cards array to carry deck id into modal
+                    const arr = (item.cards as FlashcardType[]) as any;
+                    (arr as any).__deckId = item.id;
+                    setActiveDeckId(item.id);
+                    setFlashcardsCards(arr as FlashcardType[]);
+                    setFlashcardsError(null);
+                    setFlashcardsOpen(true);
+                  }
+                }}
+                className="w-full text-left pl-2 pr-2 py-3 rounded-xl border hover:bg-muted/50 flex items-start gap-2 transition-colors"
+              >
+                <div className="mt-0.5 text-gray-600">
                   {(() => {
-                    const cleaned = removeFirstEmoji(item.title);
-                    return cleaned && cleaned.length > 0
-                      ? cleaned
-                      : (item.type === 'mindmap' ? 'mindmap' : 'flashcards');
+                    const e = extractFirstEmoji(item.title);
+                    if (e) {
+                      return (
+                        <span className="inline-flex h-5 w-5 items-center justify-center text-[18px] leading-none">
+                          {e}
+                        </span>
+                      );
+                    }
+                    return item.type === 'mindmap' ? (
+                      <MapIcon className="h-5 w-5 text-primary" />
+                    ) : (
+                      <FlashcardIcon className="h-5 w-5 text-primary" />
+                    );
                   })()}
                 </div>
-                <div className="text-xs text-muted-foreground">{new Date(item.created_at).toLocaleString()}</div>
+                <div className="min-w-0">
+                  <div className="font-medium line-clamp-1">
+                    {(() => {
+                      const cleaned = removeFirstEmoji(item.title);
+                      return cleaned && cleaned.length > 0
+                        ? cleaned
+                        : (item.type === 'mindmap' ? 'mindmap' : 'flashcards');
+                    })()}
+                  </div>
+                  <div className="text-xs text-muted-foreground">{new Date(item.created_at).toLocaleDateString()} {new Date(item.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
+                </div>
+              </button>
+            ))}
+            {isHistoryLoadingMore && (
+              <div className="flex items-center justify-center py-3 text-muted-foreground">
+                <Loader2 className="h-4 w-4 animate-spin mr-2" /> Loading more…
               </div>
-            </button>
-          ))}
-          {isHistoryLoadingMore && (
-            <div className="flex items-center justify-center py-3 text-muted-foreground">
-              <Loader2 className="h-4 w-4 animate-spin mr-2" /> Loading more…
-            </div>
-          )}
-          {hasMoreHistory && !isHistoryInitialLoading && (
-            <div ref={loadMoreRef} className="h-4" />
-          )}
-        </div>
-        <div className="mt-auto border-t pt-4">
-          <button
-            onClick={async () => {
-              setSpacedOpen(true);
-              setSpacedError(null);
-              if (!spacedPrefetched) {
-                setSpacedLoading(true);
-                try { await prefetchSpacedData(flashcardsHistory); } catch (err: any) { setSpacedError(err?.message || 'Failed to load due decks'); } finally { setSpacedLoading(false); }
-              }
-              // Ensure UI reflects latest due based on cached schedules even if no network
-              recomputeDueFromCache(flashcardsHistory);
-            }}
-            className="w-full text-left p-2 rounded-xl border bg-background hover:bg-muted/50 flex items-center gap-3 mb-2"
-          >
-            <CalendarClock className="h-5 w-5 text-primary" />
-            <span className="font-medium">Spaced repetition</span>
-            {totalDueCount > 0 && (
-              <span className="ml-auto inline-flex items-center justify-center rounded-full bg-blue-100 text-blue-700 border border-blue-200 text-xs font-semibold min-w-[20px] h-5 px-1">
-                {totalDueCount > 99 ? '99+' : totalDueCount}
-              </span>
             )}
-          </button>
+            {hasMoreHistory && !isHistoryInitialLoading && (
+              <div ref={loadMoreRef} className="h-4" />
+            )}
+          </div>
+        </div>
+        <div className="border-t pt-2 space-y-2 pl-0 pr-2">
           <button
             onClick={() => setIsSettingsOpen(true)}
-            className="w-full text-left p-2 rounded-xl border bg-background hover:bg-muted/50 flex items-center gap-3"
+            className="w-full text-left pl-2 pr-2 py-3 rounded-xl border hover:bg-muted/50 flex items-center gap-3 transition-colors"
           >
             <div className="min-w-0 flex-1">
               <div className="font-medium line-clamp-1">{user?.email || 'User'}</div>

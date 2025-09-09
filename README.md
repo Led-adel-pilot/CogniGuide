@@ -832,9 +832,9 @@ create index IF not exists mindmaps_user_id_created_at_idx on public.mindmaps us
 create table public.flashcards_schedule (
   user_id uuid not null,
   deck_id uuid not null,
-  exam_date timestamp with time zone null,
   schedules jsonb not null default '[]'::jsonb,
   updated_at timestamp with time zone not null default now(),
+  exam_date timestamp with time zone null,
   constraint flashcards_schedule_pkey primary key (user_id, deck_id),
   constraint flashcards_schedule_user_id_fkey foreign KEY (user_id) references auth.users (id) on delete CASCADE
 ) TABLESPACE pg_default;
