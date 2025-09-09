@@ -17,9 +17,14 @@ async function getUserIdFromAuthHeader(req: NextRequest): Promise<string | null>
     const authHeader = req.headers.get('authorization') || '';
     const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : '';
     if (!token || !supabaseAdmin) return null;
-    const { data } = await supabaseAdmin.auth.getUser(token);
+    const { data, error } = await supabaseAdmin.auth.getUser(token);
+    if (error) {
+        console.error('Error getting user from token in preparse:', error.message);
+        return null;
+    }
     return data.user?.id || null;
-  } catch {
+  } catch(e) {
+    if (e instanceof Error) console.error('Exception in getUserIdFromAuthHeader in preparse:', e.message);
     return null;
   }
 }
@@ -72,7 +77,7 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: 'No objects provided' }, { status: 400 });
       }
       if (!supabaseAdmin) {
-        return NextResponse.json({ error: 'Storage not configured' }, { status: 500 });
+        return NextResponse.json({ error: 'Storage not configured. The SUPABASE_SERVICE_ROLE_KEY is likely missing.' }, { status: 500 });
       }
 
       const pseudoFiles: File[] = [] as any;

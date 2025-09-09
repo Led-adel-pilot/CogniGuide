@@ -12,9 +12,14 @@ async function getUserIdFromAuthHeader(req: NextRequest): Promise<string | null>
     const authHeader = req.headers.get('authorization') || '';
     const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : '';
     if (!token || !supabaseAdmin) return null;
-    const { data } = await supabaseAdmin.auth.getUser(token);
+    const { data, error } = await supabaseAdmin.auth.getUser(token);
+    if (error) {
+        console.error('Error getting user from token:', error.message);
+        return null;
+    }
     return data.user?.id || null;
-  } catch {
+  } catch(e) {
+    if (e instanceof Error) console.error('Exception in getUserIdFromAuthHeader:', e.message);
     return null;
   }
 }
@@ -64,12 +69,12 @@ export async function POST(req: NextRequest) {
     }
     const anonId = typeof body?.anonId === 'string' && body.anonId.trim().length > 0 ? body.anonId.trim() : null;
     const userId = await getUserIdFromAuthHeader(req);
+    const ownerPrefix = userId ? `users/${userId}` : (anonId ? `anon/${anonId}` : `anon/${Date.now().toString(36)}`);
 
     const bucket = 'uploads';
     const dateDir = yyyymmdd();
-    const ownerPrefix = userId ? `users/${userId}` : (anonId ? `anon/${anonId}` : `anon/${Date.now().toString(36)}`);
 
-    const items: { path: string; token: string }[] = [];
+    const items: { path: string; signedUrl: string }[] = [];
     for (let i = 0; i < files.length; i++) {
       const f = files[i];
       const safeName = sanitizeFileName(String(f.name || `file-${i}`));
@@ -113,7 +118,7 @@ export async function POST(req: NextRequest) {
         }
 
         if (data) {
-          items.push({ path, token: data.token });
+          items.push({ path, signedUrl: data.signedUrl });
           break;
         }
 
@@ -138,7 +143,7 @@ export async function POST(req: NextRequest) {
       userFriendlyError = 'File upload conflict detected. Please try again.';
     } else if (errorMessage.includes('storage')) {
       userFriendlyError = 'Storage service temporarily unavailable. Please try again later.';
-    } else if (errorMessage.includes('permission')) {
+    } else if (errorMessage.includes('permission') || errorMessage.includes('authorization')) {
       userFriendlyError = 'Upload permission denied. Please check your authentication.';
     }
 

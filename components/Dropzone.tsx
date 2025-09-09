@@ -4,6 +4,64 @@ import posthog from 'posthog-js';
 import { useState, useCallback, useMemo, useEffect, useRef } from 'react';
 import { UploadCloud, File, X } from 'lucide-react';
 
+interface RadialProgressBarProps {
+  progress?: number;
+  size?: number;
+  strokeWidth?: number;
+}
+
+function RadialProgressBar({ progress = 0, size = 48, strokeWidth = 5 }: RadialProgressBarProps) {
+  const normalizedProgress = Math.min(Math.max(progress, 0), 100);
+  const radius = (size - strokeWidth) / 2;
+  const circumference = radius * 2 * Math.PI;
+  const strokeDasharray = circumference;
+  const strokeDashoffset = circumference - (normalizedProgress / 100) * circumference;
+
+  return (
+    <div className="relative inline-flex items-center justify-center">
+      <svg
+        width={size}
+        height={size}
+        className="transform -rotate-90 drop-shadow-sm"
+        viewBox={`0 0 ${size} ${size}`}
+      >
+        {/* Background circle */}
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={radius}
+          stroke="currentColor"
+          strokeWidth={strokeWidth}
+          fill="none"
+          className="text-muted-foreground/25"
+        />
+        {/* Progress circle */}
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={radius}
+          stroke="currentColor"
+          strokeWidth={strokeWidth}
+          fill="none"
+          strokeDasharray={strokeDasharray}
+          strokeDashoffset={strokeDashoffset}
+          strokeLinecap="round"
+          className="text-primary transition-all duration-500 ease-out"
+          style={{
+            filter: 'drop-shadow(0 0 4px rgba(var(--primary), 0.3))'
+          }}
+        />
+      </svg>
+      {/* Center text */}
+      <div className="absolute inset-0 flex items-center justify-center">
+        <span className="text-sm font-bold text-foreground transition-all duration-200">
+          {Math.round(normalizedProgress)}
+        </span>
+      </div>
+    </div>
+  );
+}
+
 interface DropzoneProps {
   onFileChange: (files: File[]) => void;
   disabled?: boolean;
@@ -175,11 +233,16 @@ export default function Dropzone({ onFileChange, disabled = false, onOpen, isPre
                     <X className="w-3 h-3" />
                   </button>
                   {isPreParsing && (
-                    <div className="absolute inset-0 bg-background/80 backdrop-blur-sm rounded-[1.25rem] flex flex-col items-center justify-center z-20">
-                      <div className="animate-spin rounded-full h-6 w-6 border-2 border-primary border-t-transparent mb-2"></div>
-                      <p className="text-xs text-muted-foreground font-medium">
-                        Uploading{uploadProgress !== undefined ? ` (${uploadProgress}%)` : '...'}
+                    <div className="absolute inset-0 bg-background/90 backdrop-blur-md rounded-[1.25rem] flex flex-col items-center justify-center z-20 transition-all duration-200">
+                      <RadialProgressBar progress={uploadProgress ?? 0} />
+                      <p className="text-xs text-muted-foreground font-medium mt-3 text-center">
+                        {uploadProgress !== undefined && uploadProgress < 100 ? 'Uploading...' : 'Processing...'}
                       </p>
+                      {uploadProgress !== undefined && uploadProgress < 100 && (
+                        <p className="text-xs text-muted-foreground/80 mt-1">
+                          {uploadProgress}% complete
+                        </p>
+                      )}
                     </div>
                   )}
                 </div>

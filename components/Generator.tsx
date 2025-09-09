@@ -132,8 +132,8 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
     return fileKeys.sort().join('||');
   }, [getFileKey]);
 
-  async function uploadOneWithRetry(supabaseClient: typeof supabase, bucket: string, file: File, initialPath: string, initialToken: string, getFreshSigned: () => Promise<{ path: string; token: string }>, onProgress?: (progress: number) => void) {
-    const tryUpload = async (path: string, token: string) => {
+  async function uploadOneWithRetry(file: File, initialSignedUrl: string, getFreshSigned: () => Promise<string>, onProgress?: (progress: number) => void) {
+    const tryUpload = async (signedUrl: string) => {
       return new Promise<Error | null>((resolve) => {
         const xhr = new XMLHttpRequest();
 
@@ -153,26 +153,24 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
               const res = JSON.parse(xhr.responseText);
               message = res.message || message;
             } catch {}
+            console.error(`XHR Upload Error: ${xhr.status}`, { response: xhr.responseText, url: signedUrl, file: { name: file.name, size: file.size, type: file.type } });
             resolve(new Error(message));
           }
         });
 
         xhr.addEventListener('error', (e) => {
+          console.error('XHR Upload Network Error:', { error: e, url: signedUrl, file: { name: file.name, size: file.size, type: file.type } });
           resolve(new Error('Upload failed due to a network error.'));
         });
 
-        const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-        const uploadUrl = new URL(`${supabaseUrl}/storage/v1/object/upload/signed/${bucket}/${path}`);
-        uploadUrl.searchParams.set('token', token);
-
-        xhr.open('PUT', uploadUrl.toString());
+        xhr.open('PUT', signedUrl);
         xhr.setRequestHeader('Content-Type', file.type || 'application/octet-stream');
         xhr.setRequestHeader('x-upsert', 'true');
         xhr.send(file);
       });
     };
 
-    let err = await tryUpload(initialPath, initialToken);
+    let err = await tryUpload(initialSignedUrl);
     if (!err) return;
 
     const msg = String(err?.message || '');
@@ -180,15 +178,19 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
     if (!transient) throw err;
 
     // Fresh token then retry once
-    const fresh = await getFreshSigned();
-    err = await tryUpload(fresh.path, fresh.token);
+    const freshUrl = await getFreshSigned();
+    err = await tryUpload(freshUrl);
     if (err) throw err;
   }
 
   // Upload files to Supabase Storage using signed URLs, then call JSON preparse
-  const uploadAndPreparse = useCallback(async (selectedFiles: File[], onProgress?: (progress: number) => void) => {
+  const uploadAndPreparse = useCallback(async (selectedFiles: File[], onProgress?: (progress?: number) => void) => {
     const { data: sessionData } = await supabase.auth.getSession();
     const accessToken = sessionData?.session?.access_token;
+    const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+    if (accessToken) {
+      headers['Authorization'] = `Bearer ${accessToken}`;
+    }
     // Generate stable keys per file for deterministic storage paths
     const keys = await Promise.all(selectedFiles.map(f => getFileKey(f)));
     const filesMeta = selectedFiles.map((f, i) => ({ name: f.name, size: f.size, type: f.type || 'application/octet-stream', key: keys[i] }));
@@ -196,7 +198,7 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
     // Request signed upload URLs
     const signedRes = await fetch('/api/storage/get-signed-uploads', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}) },
+      headers: headers,
       body: JSON.stringify({ files: filesMeta, anonId }),
     });
     if (!signedRes.ok) {
@@ -210,23 +212,25 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
       const first = items[i];
 
       await uploadOneWithRetry(
-        supabase,
-        bucket,
         file,
-        first.path,
-        first.token,
+        first.signedUrl,
         async () => {
           // re-fetch a fresh signed URL for this single file
           const meta = { name: file.name, size: file.size, type: file.type || 'application/octet-stream', key: keys[i] };
+          const { data: sessionData } = await supabase.auth.getSession();
           const accessToken = sessionData?.session?.access_token;
+          const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+          if (accessToken) {
+            headers['Authorization'] = `Bearer ${accessToken}`;
+          }
           const signedRes2 = await fetch('/api/storage/get-signed-uploads', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json', ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}) },
+            headers: headers,
             body: JSON.stringify({ files: [meta], anonId }),
           });
           if (!signedRes2.ok) throw new Error('Failed to refresh upload URL');
           const fresh = await signedRes2.json();
-          return fresh.items[0];
+          return fresh.items[0].signedUrl;
         },
         onProgress ? (fileProgress) => {
           // Calculate overall progress across all files
@@ -237,11 +241,17 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
         } : undefined
       );
     }
+
+    // Signal that upload is complete and server processing is starting
+    if (onProgress) {
+      onProgress(100); // Set progress to 100% to indicate upload complete, processing started
+    }
+    
     // Build objects descriptor and call JSON preparse
     const objects = items.map((it: any, i: number) => ({ path: it.path, name: selectedFiles[i].name, type: selectedFiles[i].type || 'application/octet-stream', size: selectedFiles[i].size }));
     const preRes = await fetch('/api/preparse', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}) },
+      headers: headers,
       body: JSON.stringify({ bucket, objects }),
     });
     if (!preRes.ok) {
@@ -325,6 +335,8 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
           setError(`Storage pre-parse failed: ${reason}. Large files cannot be sent directly; please retry later or check storage configuration.`);
           setPreParsed(null);
           setAllowedNameSizes(undefined);
+          setIsPreParsing(false);
+          setUploadProgress(undefined);
           return;
         }
         const formData = new FormData();
@@ -340,6 +352,8 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
           try { const jj = await res.json(); setError(jj?.error || 'Failed to prepare files.'); } catch {}
           setPreParsed(null);
           setAllowedNameSizes(undefined);
+          setIsPreParsing(false);
+          setUploadProgress(undefined);
           return;
         }
         j = await res.json();
@@ -383,7 +397,8 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
       } else {
         setAllowedNameSizes(undefined);
       }
-    } catch {
+    } catch(e) {
+      if (e instanceof Error) setError(`Pre-parse failed: ${e.message}`);
       // Non-fatal
     } finally {
       setIsPreParsing(false);
@@ -436,7 +451,10 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
             const rawCharCount = typeof j?.totalRawChars === 'number' ? j.totalRawChars as number : undefined;
             effectivePreParsed = { text, images, rawCharCount };
             setPreParsed(effectivePreParsed);
-          } catch {}
+          } catch(e) {
+            const msg = (e instanceof Error) ? e.message : 'An unknown error occurred during pre-parse.';
+            setError(msg);
+          }
           finally {
             setIsPreParsing(false);
             setUploadProgress(undefined);
@@ -444,10 +462,14 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
         }
         if (effectivePreParsed) {
           const payload = { text: effectivePreParsed.text || '', images: effectivePreParsed.images || [], prompt: prompt.trim() || '', rawCharCount: effectivePreParsed.rawCharCount };
+          const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+          if (accessToken) {
+            headers['Authorization'] = `Bearer ${accessToken}`;
+          }
           res = await fetch('/api/generate-flashcards?stream=1', {
             method: 'POST',
             body: JSON.stringify(payload),
-            headers: { 'Content-Type': 'application/json', ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}) },
+            headers: headers,
           });
         } else {
           // As a last resort, fall back to legacy multipart for very small sets
@@ -458,10 +480,14 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
           const formData = new FormData();
           files.forEach((file) => formData.append('files', file));
           if (prompt.trim()) formData.append('prompt', prompt.trim());
+          const headers: Record<string, string> = {};
+          if (accessToken) {
+            headers['Authorization'] = `Bearer ${accessToken}`;
+          }
           res = await fetch('/api/generate-flashcards?stream=1', {
             method: 'POST',
             body: formData,
-            headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : undefined,
+            headers: headers,
           });
         }
         // Handle insufficient credits the same way as mind maps: show inline error and do not open modal
@@ -627,7 +653,10 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
           const rawCharCount = typeof j?.totalRawChars === 'number' ? j.totalRawChars as number : undefined;
           effectivePreParsed = { text, images, rawCharCount };
           setPreParsed(effectivePreParsed);
-        } catch {}
+        } catch(e) {
+            const msg = (e instanceof Error) ? e.message : 'An unknown error occurred during pre-parse.';
+            setError(msg);
+        }
         finally {
           setIsPreParsing(false);
           setUploadProgress(undefined);
@@ -635,10 +664,14 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
       }
       if (effectivePreParsed) {
         const payload = { text: effectivePreParsed.text || '', images: effectivePreParsed.images || [], prompt: prompt.trim() || '', rawCharCount: effectivePreParsed.rawCharCount };
+        const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+        if (accessToken) {
+            headers['Authorization'] = `Bearer ${accessToken}`;
+        }
         response = await fetch('/api/generate-mindmap', {
           method: 'POST',
           body: JSON.stringify(payload),
-          headers: { 'Content-Type': 'application/json', ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}) },
+          headers: headers,
         });
       } else {
         // As a last resort, fallback to legacy multipart
@@ -649,10 +682,14 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
         const formData = new FormData();
         if (files.length > 0) { files.forEach(file => { formData.append('files', file); }); }
         if (prompt.trim()) formData.append('prompt', prompt.trim());
+        const headers: Record<string, string> = {};
+        if (accessToken) {
+            headers['Authorization'] = `Bearer ${accessToken}`;
+        }
         response = await fetch('/api/generate-mindmap', {
           method: 'POST',
           body: formData,
-          headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : undefined,
+          headers: headers,
         });
       }
       const contentType = response.headers.get('content-type') || '';
