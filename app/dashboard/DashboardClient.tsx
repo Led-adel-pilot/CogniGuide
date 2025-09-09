@@ -960,7 +960,7 @@ export default function DashboardClient() {
                           setMenuPosition({ x: rect.left, y: rect.bottom });
                         }
                       }}
-                      className="p-1 rounded-full text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+                      className="p-1 rounded-full text-foreground"
                     >
                       <MoreHorizontal className="h-4 w-4" />
                     </button>
