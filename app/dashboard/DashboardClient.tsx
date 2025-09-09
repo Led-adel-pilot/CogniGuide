@@ -329,6 +329,12 @@ export default function DashboardClient() {
     const { data: sub } = supabase.auth.onAuthStateChange(async (_event, session) => {
       if (!session?.user) {
         setUser(null);
+        // CRITICAL: Clear auth cookie to prevent middleware redirect loop
+        try {
+          if (typeof document !== 'undefined') {
+            document.cookie = 'cg_authed=; Path=/; Max-Age=0; SameSite=Lax; Secure';
+          }
+        } catch {}
         router.replace('/');
       }
     });

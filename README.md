@@ -526,11 +526,11 @@ The sidebar history uses a sophisticated pagination system with infinite scroll.
 ### Common Issues & Solutions
 
 #### Authentication Redirect Delays
-**Symptoms**: Signed-in users experience 2-3 second delays when visiting the landing page before being redirected to dashboard.
+**Symptoms**: Signed-in users experience 2-3 second delays when visiting the landing page before being redirected to dashboard. Additionally, users may get stuck in the dashboard after signing out, with the credit balance showing 0.00, history not loading, and inability to sign out, requiring manual deletion of site data.
 
-**Root Cause**: Relying solely on client-side Supabase auth verification without server-side cookie checks.
+**Root Cause**: Relying solely on client-side Supabase auth verification without server-side cookie checks, and the `cg_authed` cookie not being cleared during sign out.
 
-**Solution**: Use lightweight first-party cookies (`cg_authed`) synced with auth state for instant server-side detection.
+**Solution**: Use lightweight first-party cookies (`cg_authed`) synced with auth state for instant server-side detection. The `cg_authed` cookie is now also explicitly cleared in `handleSignOut` and `supabase.auth.onAuthStateChange` to prevent redirect loops and ensure proper sign-out behavior.
 
 **Prevention**:
 - Always check `cg_authed` cookie first in middleware and server components
