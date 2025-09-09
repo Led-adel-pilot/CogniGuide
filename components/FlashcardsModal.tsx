@@ -408,30 +408,11 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
         const currentPos = list.indexOf(index);
         const filtered = list.filter((i) => i !== index);
         if (filtered.length > 0) {
-          if (studyInterleaved) {
-            // Interleaving logic
-            const lastCard = scheduledCards ? scheduledCards[index] : null;
-            let nextIdx = -1;
-            // Find the first card in the remaining list that is from a different deck
-            for (let i = 0; i < filtered.length; i++) {
-              const potentialNextCard = scheduledCards ? scheduledCards[filtered[i]] : null;
-              if (potentialNextCard && potentialNextCard.deckId !== lastCard?.deckId) {
-                nextIdx = filtered[i];
-                break;
-              }
-            }
-            // If all remaining cards are from the same deck, just take the next one
-            if (nextIdx === -1) {
-              nextIdx = filtered[0];
-            }
-            setIndex(nextIdx);
-          } else {
-            // Maintain forward progression: move to the next card in sequence
-            // If we were at position P in the original list, move to position P in the filtered list
-            // If P is beyond the filtered list length, wrap to the beginning
-            const nextPos = currentPos < filtered.length ? currentPos : 0;
-            setIndex(filtered[nextPos]);
-          }
+          // Maintain forward progression: move to the next card in sequence
+          // If we were at position P in the original list, move to position P in the filtered list
+          // If P is beyond the filtered list length, wrap to the beginning
+          const nextPos = currentPos < filtered.length ? currentPos : 0;
+          setIndex(filtered[nextPos]);
         } else {
           // We've completed all due cards
           setFinished(true);
@@ -466,9 +447,9 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
       if (nextIndex === 0) {
         // We've completed the full deck
         setFinished(true);
-        return index; // Stay on current card
+      } else {
+        setIndex(nextIndex);
       }
-      return nextIndex;
     }
     return index;
   };

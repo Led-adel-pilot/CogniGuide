@@ -16,7 +16,6 @@ import CogniGuideLogo from '../../CogniGuide_logo.png';
 import Image from 'next/image';
 import posthog from 'posthog-js';
 import ThemeToggle from '@/components/ThemeToggle';
-import { shuffle } from 'lodash';
 
 type SessionUser = {
   id: string;
@@ -1125,7 +1124,7 @@ export default function DashboardClient() {
                     <div className="text-xs text-muted-foreground">Shuffle cards from multiple decks for better retention and learning efficiency</div>
                   </div>
                   <button
-                    className="px-3 py-1.5 text-xs rounded-full border bg-primary text-primary-foreground hover:bg-primary/90 ml-3 flex-shrink-0"
+                    className="w-full px-3 py-2 text-sm rounded-full border bg-primary text-primary-foreground hover:bg-primary/90"
                     onClick={() => {
                       const dueMap = (typeof window !== 'undefined' && (window as any).__cogniguide_due_map) || {};
                       const allDueCards = dueQueue.flatMap(deck => {
@@ -1138,21 +1137,52 @@ export default function DashboardClient() {
                         }));
                       });
 
-                      // Simple shuffle for now, will implement proper interleaving in FlashcardsModal
-                      const shuffledCards = shuffle(allDueCards);
+                      // Intelligent interleaving to avoid consecutive cards from the same deck
+                      const interleavedCards = [];
+                      if (allDueCards.length > 0) {
+                          const cardsByDeck = new Map<string, any[]>();
+                          for (const card of allDueCards) {
+                              if (!cardsByDeck.has(card.deckId)) {
+                                  cardsByDeck.set(card.deckId, []);
+                              }
+                              cardsByDeck.get(card.deckId)!.push(card);
+                          }
+
+                          let lastDeckId: string | null = null;
+                          const totalCards = allDueCards.length;
+                          while (interleavedCards.length < totalCards) {
+                              let availableDeckIds = Array.from(cardsByDeck.keys()).filter(id => cardsByDeck.get(id)!.length > 0);
+                              let candidateDeckIds = availableDeckIds.filter(id => id !== lastDeckId);
+                              
+                              if (candidateDeckIds.length === 0) {
+                                  candidateDeckIds = availableDeckIds;
+                              }
+                      
+                              if (candidateDeckIds.length === 0) {
+                                  break; 
+                              }
+                      
+                              const nextDeckId = candidateDeckIds[Math.floor(Math.random() * candidateDeckIds.length)];
+                              const deckCards = cardsByDeck.get(nextDeckId)!;
+                              const nextCard = deckCards.shift()!;
+                              
+                              interleavedCards.push(nextCard);
+                              lastDeckId = nextDeckId;
+                          }
+                      }
 
                       // Create a composite deck for the modal
                       const interleavedDeck = {
                         id: 'interleaved-session',
                         title: 'Interleaved Study',
-                        cards: shuffledCards
+                        cards: interleavedCards
                       };
 
-                      const interleavedIndices = shuffledCards.map((_: any, i: number) => i);
+                      const interleavedIndices = interleavedCards.map((_: any, i: number) => i);
 
                       posthog.capture('spaced_repetition_interleaved_started', {
                         deck_count: dueQueue.length,
-                        total_due_card_count: shuffledCards.length,
+                        total_due_card_count: interleavedCards.length,
                       });
 
                       setFlashcardsTitle(interleavedDeck.title);
