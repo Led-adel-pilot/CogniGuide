@@ -7,7 +7,7 @@ import { supabase, MindmapRecord, FlashcardsRecord } from '@/lib/supabaseClient'
 import Generator from '@/components/Generator';
 import MindMapModal from '@/components/MindMapModal';
 import FlashcardsModal, { Flashcard as FlashcardType } from '@/components/FlashcardsModal';
-import { BrainCircuit, LogOut, Loader2, Map as MapIcon, Coins, Zap, Sparkles, CalendarClock, Menu, X, ChevronRight } from 'lucide-react';
+import { BrainCircuit, LogOut, Loader2, Map as MapIcon, Coins, Zap, Sparkles, CalendarClock, Menu, X, ChevronRight, MoreHorizontal, Edit, Trash2 } from 'lucide-react';
 import FlashcardIcon from '@/components/FlashcardIcon';
 import { loadDeckSchedule, saveDeckSchedule, loadDeckScheduleAsync, saveDeckScheduleAsync, loadAllDeckSchedulesAsync, upsertDeckSchedulesBulkAsync, type StoredDeckSchedule } from '@/lib/sr-store';
 import { createInitialSchedule } from '@/lib/spaced-repetition';
@@ -96,6 +96,9 @@ export default function DashboardClient() {
   const [totalDueCount, setTotalDueCount] = useState<number>(0);
   const listRef = useRef<HTMLDivElement | null>(null);
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
+  const [openMenuId, setOpenMenuId] = useState<string | null>(null);
+  const [menuPosition, setMenuPosition] = useState<{ x: number; y: number } | null>(null);
+  const [renamingItem, setRenamingItem] = useState<{ id: string; type: 'mindmap' | 'flashcards'; title: string } | null>(null);
 
   // Refs mirroring pagination state for async safety
   const historyBufferRef = useRef(historyBuffer);
@@ -374,6 +377,19 @@ export default function DashboardClient() {
       };
     }
   }, [user]);
+
+  useEffect(() => {
+    const handleOutsideClick = () => {
+      setOpenMenuId(null);
+      setMenuPosition(null);
+    };
+    if (openMenuId) {
+      document.addEventListener('click', handleOutsideClick);
+    }
+    return () => {
+      document.removeEventListener('click', handleOutsideClick);
+    };
+  }, [openMenuId]);
 
   // Infinite scroll: observe sentinel inside sidebar list
   useEffect(() => {
@@ -698,6 +714,65 @@ export default function DashboardClient() {
     setTotalDueCount(totalDue);
   };
 
+  const handleDeleteItem = async (itemType: 'mindmap' | 'flashcards', itemId: string) => {
+    if (!user) return;
+    posthog.capture('history_item_deleted', { type: itemType, item_id: itemId });
+    const confirmation = window.confirm('Are you sure you want to delete this item? This action cannot be undone.');
+    if (confirmation) {
+      const tableName = itemType === 'mindmap' ? 'mindmaps' : 'flashcards';
+      const { error } = await supabase
+        .from(tableName)
+        .delete()
+        .eq('id', itemId);
+
+      if (error) {
+        alert('Failed to delete item. Please try again.');
+        console.error('Deletion error:', error);
+      } else {
+        setCombinedHistory((prev) => prev.filter((item) => item.id !== itemId));
+        if (itemType === 'flashcards') {
+          setFlashcardsHistory((prev) => {
+            const newHistory = prev.filter((f) => f.id !== itemId);
+            recomputeDueFromCache(newHistory);
+            return newHistory;
+          });
+        }
+      }
+    }
+    setOpenMenuId(null);
+    setMenuPosition(null);
+  };
+
+  const handleRenameItem = async (itemId: string, itemType: 'mindmap' | 'flashcards', newTitle: string) => {
+    if (!user) return;
+
+    posthog.capture('history_item_renamed', { type: itemType, item_id: itemId });
+
+    const tableName = itemType === 'mindmap' ? 'mindmaps' : 'flashcards';
+    const { data, error } = await supabase
+        .from(tableName)
+        .update({ title: newTitle })
+        .eq('id', itemId)
+        .select();
+
+    if (error || !data) {
+        alert('Failed to rename item. Please try again.');
+        console.error('Rename error:', error);
+    } else {
+        setCombinedHistory((prev) =>
+          prev.map((item) => (item.id === itemId ? { ...item, title: newTitle } : item))
+        );
+        if (itemType === 'flashcards') {
+          setFlashcardsHistory((prev) =>
+            prev.map((item) => (item.id === itemId ? { ...item, title: newTitle } : item))
+          );
+        }
+    }
+    setRenamingItem(null);
+    setOpenMenuId(null);
+    setMenuPosition(null);
+  };
+
   useEffect(() => {
     try {
       const dueMap = (typeof window !== 'undefined' && (window as any).__cogniguide_due_map) || {};
@@ -795,59 +870,104 @@ export default function DashboardClient() {
             {!isHistoryInitialLoading && combinedHistory.length === 0 && (
               <div className="text-sm text-muted-foreground pl-0 pr-0">No history yet.</div>
             )}
-            {combinedHistory.map((item) => (
-              <button
-                key={`${item.type}:${item.id}`}
-                onClick={() => {
-                  posthog.capture('history_item_opened', {
-                    type: item.type,
-                    item_id: item.id,
-                  });
-                  if (item.type === 'mindmap') {
-                    setMarkdown(item.markdown);
-                  } else {
-                    setFlashcardsTitle(item.title || 'flashcards');
-                    // Attach a temporary symbol on cards array to carry deck id into modal
-                    const arr = (item.cards as FlashcardType[]) as any;
-                    (arr as any).__deckId = item.id;
-                    setActiveDeckId(item.id);
-                    setFlashcardsCards(arr as FlashcardType[]);
-                    setFlashcardsError(null);
-                    setFlashcardsOpen(true);
-                  }
-                }}
-                className="w-full text-left pl-2 pr-2 py-3 rounded-xl border hover:bg-muted/50 flex items-start gap-2 transition-colors"
-              >
-                <div className="mt-0.5 text-gray-600">
-                  {(() => {
-                    const e = extractFirstEmoji(item.title);
-                    if (e) {
-                      return (
-                        <span className="inline-flex h-5 w-5 items-center justify-center text-[18px] leading-none">
-                          {e}
-                        </span>
-                      );
-                    }
-                    return item.type === 'mindmap' ? (
-                      <MapIcon className="h-5 w-5 text-primary" />
-                    ) : (
-                      <FlashcardIcon className="h-5 w-5 text-primary" />
-                    );
-                  })()}
-                </div>
-                <div className="min-w-0">
-                  <div className="font-medium line-clamp-1">
-                    {(() => {
-                      const cleaned = removeFirstEmoji(item.title);
-                      return cleaned && cleaned.length > 0
-                        ? cleaned
-                        : (item.type === 'mindmap' ? 'mindmap' : 'flashcards');
-                    })()}
+            {combinedHistory.map((item) => {
+              const itemKey = `${item.type}:${item.id}`;
+              const isRenaming = renamingItem?.id === item.id;
+              return (
+                <div key={itemKey} className="relative group">
+                  <button
+                    onClick={() => {
+                      if (openMenuId === itemKey || isRenaming) return;
+                      posthog.capture('history_item_opened', {
+                        type: item.type,
+                        item_id: item.id,
+                      });
+                      if (item.type === 'mindmap') {
+                        setMarkdown(item.markdown);
+                      } else {
+                        setFlashcardsTitle(item.title || 'flashcards');
+                        // Attach a temporary symbol on cards array to carry deck id into modal
+                        const arr = (item.cards as FlashcardType[]) as any;
+                        (arr as any).__deckId = item.id;
+                        setActiveDeckId(item.id);
+                        setFlashcardsCards(arr as FlashcardType[]);
+                        setFlashcardsError(null);
+                        setFlashcardsOpen(true);
+                      }
+                    }}
+                    className={`w-full text-left pl-2 py-3 rounded-xl border flex items-start gap-2 transition-all ${
+                      openMenuId === itemKey
+                        ? 'pr-8 bg-muted/50'
+                        : 'pr-2 group-hover:pr-8 hover:bg-muted/50'
+                    }`}
+                  >
+                    <div className="mt-0.5 text-gray-600">
+                      {(() => {
+                        const e = extractFirstEmoji(item.title);
+                        if (e) {
+                          return (
+                            <span className="inline-flex h-5 w-5 items-center justify-center text-[18px] leading-none">
+                              {e}
+                            </span>
+                          );
+                        }
+                        return item.type === 'mindmap' ? (
+                          <MapIcon className="h-5 w-5 text-primary" />
+                        ) : (
+                          <FlashcardIcon className="h-5 w-5 text-primary" />
+                        );
+                      })()}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      {isRenaming ? (
+                        <input
+                          type="text"
+                          defaultValue={renamingItem.title}
+                          autoFocus
+                          onBlur={(e) => handleRenameItem(item.id, item.type, e.target.value)}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
+                              handleRenameItem(item.id, item.type, e.currentTarget.value);
+                            } else if (e.key === 'Escape') {
+                              setRenamingItem(null);
+                            }
+                          }}
+                          onClick={(e) => e.stopPropagation()}
+                          className="w-full text-sm font-medium bg-transparent border border-primary rounded-md px-1 py-0.5 -ml-1"
+                        />
+                      ) : (
+                        <div className="font-medium line-clamp-1">
+                          {(() => {
+                            const cleaned = removeFirstEmoji(item.title);
+                            return cleaned && cleaned.length > 0
+                              ? cleaned
+                              : (item.type === 'mindmap' ? 'mindmap' : 'flashcards');
+                          })()}
+                        </div>
+                      )}
+                      <div className="text-xs text-muted-foreground">{new Date(item.created_at).toLocaleDateString()} {new Date(item.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
+                    </div>
+                  </button>
+                  <div className={`absolute top-1/2 -translate-y-1/2 right-2 ${openMenuId === itemKey ? 'visible' : 'invisible group-hover:visible'}`} onClick={(e) => e.stopPropagation()}>
+                    <button
+                      onClick={(e) => {
+                        const rect = e.currentTarget.getBoundingClientRect();
+                        if (openMenuId === itemKey) {
+                          setOpenMenuId(null);
+                          setMenuPosition(null);
+                        } else {
+                          setOpenMenuId(itemKey);
+                          setMenuPosition({ x: rect.left, y: rect.bottom });
+                        }
+                      }}
+                      className="p-1 rounded-full text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+                    >
+                      <MoreHorizontal className="h-4 w-4" />
+                    </button>
                   </div>
-                  <div className="text-xs text-muted-foreground">{new Date(item.created_at).toLocaleDateString()} {new Date(item.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
                 </div>
-              </button>
-            ))}
+              )
+            })}
             {isHistoryLoadingMore && (
               <div className="flex items-center justify-center py-3 text-muted-foreground">
                 <Loader2 className="h-4 w-4 animate-spin mr-2" /> Loading more…
@@ -873,6 +993,47 @@ export default function DashboardClient() {
           </button>
         </div>
       </aside>
+
+      {/* History item dropdown menu - positioned outside scrollable sidebar */}
+      {openMenuId && menuPosition && (
+        <div className="fixed inset-0 z-50" onClick={() => { setOpenMenuId(null); setMenuPosition(null); }}>
+          <div
+            className="fixed w-32 bg-background border rounded-lg shadow-lg p-1 z-50"
+            style={{
+              left: `${menuPosition.x}px`,
+              top: `${menuPosition.y}px`,
+            }}
+          >
+            <button
+              onClick={() => {
+                const [type, id] = openMenuId.split(':');
+                // Find the current title from the combinedHistory
+                const currentItem = combinedHistory.find(item => item.id === id);
+                const currentTitle = currentItem?.title || '';
+                setRenamingItem({ id, type: type as 'mindmap' | 'flashcards', title: currentTitle });
+                setOpenMenuId(null);
+                setMenuPosition(null);
+              }}
+              className="w-full text-left px-3 py-1.5 text-sm rounded-md hover:bg-muted flex items-center gap-2"
+            >
+              <Edit className="h-4 w-4" />
+              Rename
+            </button>
+            <button
+              onClick={() => {
+                const [type, id] = openMenuId.split(':');
+                setOpenMenuId(null);
+                setMenuPosition(null);
+                handleDeleteItem(type as 'mindmap' | 'flashcards', id);
+              }}
+              className="w-full text-left px-3 py-1.5 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-md flex items-center gap-2"
+            >
+              <Trash2 className="h-4 w-4" />
+              Delete
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Main content */}
       <main className="flex-1 overflow-y-auto min-h-0">
