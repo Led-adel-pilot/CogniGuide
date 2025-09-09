@@ -1100,7 +1100,7 @@ export default function DashboardClient() {
           <div className="bg-background rounded-[2rem] p-6 w-full max-w-2xl border" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-bold">Spaced repetition</h2>
-              <button onClick={() => setSpacedOpen(false)} className="px-3 py-1.5 rounded-full border">Close</button>
+              <button onClick={() => setSpacedOpen(false)} className="px-3 py-1.5 rounded-full border hover:bg-muted/50 transition-colors">Close</button>
             </div>
             {spacedError && (
               <div className="mb-3 text-sm text-red-600">{spacedError}</div>
@@ -1124,7 +1124,7 @@ export default function DashboardClient() {
                     <div className="text-xs text-muted-foreground">Shuffle cards from multiple decks for better retention and learning efficiency</div>
                   </div>
                   <button
-                    className="w-full px-3 py-2 text-sm rounded-full border bg-primary text-primary-foreground hover:bg-primary/90"
+                    className="px-3 py-1.5 text-xs rounded-full border bg-primary text-primary-foreground hover:bg-primary/90"
                     onClick={() => {
                       const dueMap = (typeof window !== 'undefined' && (window as any).__cogniguide_due_map) || {};
                       const allDueCards = dueQueue.flatMap(deck => {
