@@ -441,7 +441,7 @@ export default function PricingClient({ onPurchaseComplete }: PricingClientProps
 
 
       </div>
-      <AuthModal open={authModalOpen} onClose={() => setAuthModalOpen(false)} />
+      <AuthModal open={authModalOpen} />
     </section>
   );
 }

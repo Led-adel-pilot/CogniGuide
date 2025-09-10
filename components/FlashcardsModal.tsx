@@ -802,7 +802,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
 
   return (
     <div className="fixed inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center z-[100] p-4 font-sans">
-      <AuthModal open={showAuthModal} onClose={() => setShowAuthModal(false)} />
+      <AuthModal open={showAuthModal} />
       <ModalContent />
       {showLossAversionPopup && (
         <div className="absolute inset-0 flex items-center justify-center z-[110]">
@@ -865,7 +865,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
                 onClick={onClose}
                 className="w-full h-10 px-6 text-sm font-medium text-muted-foreground bg-muted rounded-full hover:bg-muted/70 transition-colors whitespace-nowrap"
               >
-                Close without saving
+                Close Flashcard Deck
               </button>
             </div>
           </div>

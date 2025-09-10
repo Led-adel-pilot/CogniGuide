@@ -54,7 +54,7 @@ export default function HomeLanding() {
 
   return (
     <>
-      <AuthModal open={showAuth} onClose={() => setShowAuth(false)} />
+      <AuthModal open={showAuth} />
       <div className="flex flex-col min-h-screen font-sans bg-background text-foreground">
         <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
           <div className="w-full h-16 flex items-center justify-between px-4 sm:px-6 lg:px-10">
@@ -70,7 +70,7 @@ export default function HomeLanding() {
                   <button onClick={() => router.push('/dashboard')} className="px-4 py-2 text-sm rounded-full border hover:bg-muted/50">Dashboard</button>
                 </>
               ) : (
-                <button onClick={() => setShowAuth(true)} className="px-4 py-2 text-sm rounded-full bg-primary text-white hover:bg-primary/90 transition-colors">Sign up</button>
+                <button onClick={() => setShowAuth(true)} className="px-4 py-2 text-sm rounded-full bg-primary text-white hover:bg-primary/90 transition-colors">Free Sign up</button>
               )}
             </div>
           </div>

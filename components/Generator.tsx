@@ -825,7 +825,7 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
     <>
       <MindMapModal markdown={markdown} onClose={handleCloseModal} />
       <FlashcardsModal open={flashcardsOpen} title={flashcardsTitle} cards={flashcardsCards} isGenerating={isLoading && mode==='flashcards'} error={flashcardsError} onClose={handleCloseFlashcards} deckId={flashcardsDeckId} />
-      <AuthModal open={showAuth} onClose={() => setShowAuth(false)} />
+      <AuthModal open={showAuth} />
       <section id="generator" className={showTitle ? (compact ? 'pt-3 pb-5' : 'pt-4 pb-8') : (compact ? 'pb-12' : 'pb-20')}>
         <div className="container">
           {showTitle && (

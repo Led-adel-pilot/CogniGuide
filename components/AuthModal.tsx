@@ -2,15 +2,14 @@
 
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabaseClient';
-import { X, Mail, LogIn } from 'lucide-react';
+import { Mail, LogIn } from 'lucide-react';
 import posthog from 'posthog-js';
 
 interface AuthModalProps {
   open: boolean;
-  onClose: () => void;
 }
 
-export default function AuthModal({ open, onClose }: AuthModalProps) {
+export default function AuthModal({ open }: AuthModalProps) {
   const [email, setEmail] = useState('');
   const [isSending, setIsSending] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
@@ -67,10 +66,7 @@ export default function AuthModal({ open, onClose }: AuthModalProps) {
 
   return (
     <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/40 dark:bg-black/60">
-      <div className="bg-background border w-full max-w-md rounded-[1.5rem] shadow-2xl p-6 relative">
-        <button onClick={onClose} className="absolute top-3 right-3 w-10 h-10 inline-flex items-center justify-center rounded-full border hover:bg-muted/50">
-          <X className="h-5 w-5" />
-        </button>
+      <div className="bg-background border w-full max-w-[460px] rounded-[1.5rem] shadow-2xl p-6 relative">
         <h2 className="text-xl font-bold mb-2">Create a free account</h2>
         <p className="text-sm text-muted-foreground mb-4">Sign up to continue generating and save your history.</p>
 
@@ -92,7 +88,7 @@ export default function AuthModal({ open, onClose }: AuthModalProps) {
               className="flex-shrink-0 inline-flex items-center gap-2 px-5 py-2 bg-blue-600 text-white rounded-full disabled:opacity-60"
             >
               <Mail className="h-4 w-4" />
-              Email link
+              Get Login link
             </button>
           </div>
 
