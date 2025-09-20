@@ -138,6 +138,12 @@ export default function MindMapModal({ markdown, onClose }: MindMapModalProps) {
           clonedContainer.style.fontFamily = computedFontFamily;
         }
 
+        // Prevent scrollbars by temporarily hiding body overflow during export
+        const originalBodyOverflow = document.body.style.overflow;
+        const originalHtmlOverflow = document.documentElement.style.overflow;
+        document.body.style.overflow = 'hidden';
+        document.documentElement.style.overflow = 'hidden';
+
         document.body.appendChild(clonedContainer);
 
         try {
@@ -265,6 +271,10 @@ export default function MindMapModal({ markdown, onClose }: MindMapModalProps) {
                 }
             }
         } finally {
+            // Restore original overflow settings
+            document.body.style.overflow = originalBodyOverflow;
+            document.documentElement.style.overflow = originalHtmlOverflow;
+
             // Clean up the cloned container
             document.body.removeChild(clonedContainer);
         }
