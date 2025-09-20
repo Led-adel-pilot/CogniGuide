@@ -88,12 +88,19 @@ export async function POST(req: NextRequest) {
         const name = obj.name || path.split('/')?.pop() || 'file';
         const type = obj.type || 'application/octet-stream';
 
-        // For images, avoid downloading and return a signed URL to keep response size small
+        // For images, download and convert to base64 data URLs since Gemini API can't access signed URLs
         if (type.startsWith('image/')) {
-          const { data: signed, error: signErr } = await supabaseAdmin.storage.from(bucket).createSignedUrl(path, 60 * 30);
-          if (!signErr && signed?.signedUrl) {
-            imageUrls.push(signed.signedUrl);
+          const { data, error } = await supabaseAdmin.storage.from(bucket).download(path);
+          if (error || !data) {
+            console.error('Failed to download image:', path, error);
+            continue;
           }
+          const blob = data as Blob;
+          const arrayBuffer = await blob.arrayBuffer();
+          const buffer = Buffer.from(arrayBuffer);
+          const base64 = buffer.toString('base64');
+          const dataUrl = `data:${type};base64,${base64}`;
+          imageUrls.push(dataUrl);
           continue;
         }
 

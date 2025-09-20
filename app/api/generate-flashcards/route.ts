@@ -363,15 +363,21 @@ export async function POST(req: NextRequest) {
       const HEARTBEAT_INTERVAL = 30000; // 30 seconds
       const STREAM_TIMEOUT = 4 * 60 * 1000; // 4 minutes total timeout for the entire stream
 
-      // Extract file paths from images for cleanup
+      // Extract file paths from images for cleanup (only for signed URLs, not base64 data URLs)
       const filesToCleanup: string[] = [];
       if (images && images.length > 0) {
         images.forEach((url: string) => {
-          if (typeof url === 'string' && url.includes('supabase') && url.includes('/uploads/')) {
+          if (typeof url === 'string' && url.includes('supabase') && url.includes('/uploads/') && !url.startsWith('data:')) {
             try {
               const urlObj = new URL(url);
-              const path = urlObj.pathname.split('/storage/v1/object/public/uploads/')[1];
-              if (path) filesToCleanup.push(path);
+              // Handle both signed URLs (/sign/) and public URLs (/public/)
+              let path = urlObj.pathname.split('/storage/v1/object/sign/uploads/')[1] ||
+                        urlObj.pathname.split('/storage/v1/object/public/uploads/')[1];
+              if (path) {
+                // Remove query parameters from signed URLs
+                path = path.split('?')[0];
+                filesToCleanup.push(path);
+              }
             } catch {}
           }
         });
@@ -842,9 +848,35 @@ export async function POST(req: NextRequest) {
         userInstruction: promptText,
         imagesCount: imageParts.length,
       });
-      const userContent: any = imageParts.length > 0 ? [{ type: 'text', text: prompt }, ...imageParts] : prompt;
+      // Validate image URLs before sending to API (handle both signed URLs and base64 data URLs)
+      const validImageParts = [];
+      for (const imgPart of imageParts) {
+        try {
+          const url = imgPart.image_url.url;
+          if (url.startsWith('data:')) {
+            // Base64 data URLs are valid
+            validImageParts.push(imgPart);
+          } else {
+            // Validate signed URLs
+            new URL(url);
+            validImageParts.push(imgPart);
+          }
+        } catch {
+          console.warn('Invalid image URL:', imgPart.image_url.url);
+        }
+      }
+
+      if (imageParts.length > 0 && validImageParts.length === 0) {
+        return NextResponse.json({
+          error: 'Invalid image URLs',
+          message: 'All provided image URLs are invalid. Please try uploading your images again.',
+          code: 'INVALID_IMAGE_URLS'
+        }, { status: 400 });
+      }
+
+      const userContent: any = validImageParts.length > 0 ? [{ type: 'text', text: prompt }, ...validImageParts] : prompt;
       logLlmInput('FLASHCARDS STREAMING LLM INPUT', prompt);
-      return streamNdjson(userContent, (userId && creditsNeeded > 0) ? { userId, credits: creditsNeeded } : undefined, imageParts.map(img => img.image_url.url));
+      return streamNdjson(userContent, (userId && creditsNeeded > 0) ? { userId, credits: creditsNeeded } : undefined, validImageParts.map(img => img.image_url.url));
     }
 
     // Non-streaming JSON
@@ -855,7 +887,33 @@ export async function POST(req: NextRequest) {
       userInstruction: promptText,
       imagesCount: imageParts.length,
     });
-    const userContent: any = imageParts.length > 0 ? [{ type: 'text', text: prompt }, ...imageParts] : prompt;
+    // Validate image URLs before sending to API (for non-streaming path, handle both signed URLs and base64 data URLs)
+    const validImagePartsNonStream = [];
+    for (const imgPart of imageParts) {
+      try {
+        const url = imgPart.image_url.url;
+        if (url.startsWith('data:')) {
+          // Base64 data URLs are valid
+          validImagePartsNonStream.push(imgPart);
+        } else {
+          // Validate signed URLs
+          new URL(url);
+          validImagePartsNonStream.push(imgPart);
+        }
+      } catch {
+        console.warn('Invalid image URL:', imgPart.image_url.url);
+      }
+    }
+
+    if (imageParts.length > 0 && validImagePartsNonStream.length === 0) {
+      return NextResponse.json({
+        error: 'Invalid image URLs',
+        message: 'All provided image URLs are invalid. Please try uploading your images again.',
+        code: 'INVALID_IMAGE_URLS'
+      }, { status: 400 });
+    }
+
+    const userContent: any = validImagePartsNonStream.length > 0 ? [{ type: 'text', text: prompt }, ...validImagePartsNonStream] : prompt;
 
     logLlmInput('FLASHCARDS NON-STREAMING LLM INPUT', prompt);
     try {

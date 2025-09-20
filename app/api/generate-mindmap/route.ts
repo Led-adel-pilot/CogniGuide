@@ -252,7 +252,33 @@ export async function POST(req: NextRequest) {
       }
 
       const encoder = new TextEncoder();
-      const imageParts = images.map((url) => ({ type: 'image_url', image_url: { url } }));
+
+      // Validate image URLs before sending to API (handle both signed URLs and base64 data URLs)
+      const validImages = [];
+      for (const url of images) {
+        try {
+          if (url.startsWith('data:')) {
+            // Base64 data URLs are valid
+            validImages.push(url);
+          } else {
+            // Validate signed URLs
+            new URL(url);
+            validImages.push(url);
+          }
+        } catch {
+          console.warn('Invalid image URL:', url);
+        }
+      }
+
+      if (images.length > 0 && validImages.length === 0) {
+        return NextResponse.json({
+          error: 'Invalid image URLs',
+          message: 'All provided image URLs are invalid. Please try uploading your images again.',
+          code: 'INVALID_IMAGE_URLS'
+        }, { status: 400 });
+      }
+
+      const imageParts = validImages.map((url) => ({ type: 'image_url', image_url: { url } }));
       const userContent: any = imageParts.length > 0 ? [{ type: 'text', text: finalPrompt }, ...imageParts] : finalPrompt;
 
       // Reserve credit information for potential refunds
@@ -347,15 +373,21 @@ export async function POST(req: NextRequest) {
       }
       let anyTokenSent = false;
 
-      // Extract file paths from images for cleanup
+      // Extract file paths from images for cleanup (only for signed URLs, not base64 data URLs)
       const filesToCleanup: string[] = [];
       if (images.length > 0) {
         images.forEach(url => {
-          if (typeof url === 'string' && url.includes('supabase') && url.includes('/uploads/')) {
+          if (typeof url === 'string' && url.includes('supabase') && url.includes('/uploads/') && !url.startsWith('data:')) {
             try {
               const urlObj = new URL(url);
-              const path = urlObj.pathname.split('/storage/v1/object/public/uploads/')[1];
-              if (path) filesToCleanup.push(path);
+              // Handle both signed URLs (/sign/) and public URLs (/public/)
+              let path = urlObj.pathname.split('/storage/v1/object/sign/uploads/')[1] ||
+                        urlObj.pathname.split('/storage/v1/object/public/uploads/')[1];
+              if (path) {
+                // Remove query parameters from signed URLs
+                path = path.split('?')[0];
+                filesToCleanup.push(path);
+              }
             } catch {}
           }
         });

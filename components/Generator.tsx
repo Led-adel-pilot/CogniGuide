@@ -129,7 +129,7 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
   // Helper function to generate a file set key from multiple files
   const getFileSetKey = useCallback(async (files: File[]): Promise<string> => {
     const fileKeys = await Promise.all(files.map(f => getFileKey(f)));
-    return fileKeys.sort().join('||');
+    return fileKeys.sort().join('__'); // Use double underscore instead of pipes
   }, [getFileKey]);
 
   async function uploadOneWithRetry(file: File, initialSignedUrl: string, getFreshSigned: () => Promise<string>, onProgress?: (progress: number) => void) {
@@ -281,6 +281,12 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
       return; // Don't update files state
     }
 
+    // Log image files for debugging
+    const imageFiles = selectedFiles.filter(f => f.type.startsWith('image/'));
+    if (imageFiles.length > 0) {
+      debugLog(`Processing ${imageFiles.length} image files:`, imageFiles.map(f => `${f.name} (${f.type})`));
+    }
+
     setFiles(selectedFiles);
     // Generate a key for the current file set
     const fileSetKey = await getFileSetKey(selectedFiles);
@@ -331,6 +337,18 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
         // Fallback: legacy small-upload path if JSON/storage fails
         const totalBytes = selectedFiles.reduce((sum, f) => sum + (f.size || 0), 0);
         const reason = (e && (e as any).message) || (e && (e as any).error) || (typeof e === 'string' ? e : '') || 'Unknown error';
+
+        // Check if it's an image-related error and provide more specific guidance
+        const hasImages = selectedFiles.some(f => f.type.startsWith('image/'));
+        if (hasImages && (reason.toLowerCase().includes('image') || reason.toLowerCase().includes('upload') || reason.toLowerCase().includes('storage'))) {
+          setError(`Image upload failed: ${reason}. Please try uploading your images again or use a different image format.`);
+          setPreParsed(null);
+          setAllowedNameSizes(undefined);
+          setIsPreParsing(false);
+          setUploadProgress(undefined);
+          return;
+        }
+
         if (totalBytes > 4 * 1024 * 1024) {
           setError(`Storage pre-parse failed: ${reason}. Large files cannot be sent directly; please retry later or check storage configuration.`);
           setPreParsed(null);
@@ -349,7 +367,18 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
           headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : undefined,
         });
         if (!res.ok) {
-          try { const jj = await res.json(); setError(jj?.error || 'Failed to prepare files.'); } catch {}
+          try {
+            const jj = await res.json();
+            const errorMsg = jj?.error || 'Failed to prepare files.';
+            // Provide more specific error message for image-related failures
+            if (hasImages && (errorMsg.toLowerCase().includes('image') || errorMsg.toLowerCase().includes('format'))) {
+              setError(`Image processing failed: ${errorMsg} Please ensure your images are in supported formats (PNG, JPG, JPEG, GIF, WEBP).`);
+            } else {
+              setError(errorMsg);
+            }
+          } catch {
+            setError('Failed to prepare files.');
+          }
           setPreParsed(null);
           setAllowedNameSizes(undefined);
           setIsPreParsing(false);
@@ -462,6 +491,15 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
         }
         if (effectivePreParsed) {
           const payload = { text: effectivePreParsed.text || '', images: effectivePreParsed.images || [], prompt: prompt.trim() || '', rawCharCount: effectivePreParsed.rawCharCount };
+
+          // Debug logging for image processing
+          debugLog('Flashcard payload:', {
+            hasText: !!effectivePreParsed.text,
+            imageCount: effectivePreParsed.images?.length || 0,
+            hasImages: (effectivePreParsed.images?.length || 0) > 0,
+            firstImagePreview: effectivePreParsed.images?.[0]?.startsWith('data:') ? effectivePreParsed.images[0].substring(0, 100) + '...' : (effectivePreParsed.images?.[0] || '')
+          });
+
           const headers: Record<string, string> = { 'Content-Type': 'application/json' };
           if (accessToken) {
             headers['Authorization'] = `Bearer ${accessToken}`;
@@ -664,6 +702,15 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
       }
       if (effectivePreParsed) {
         const payload = { text: effectivePreParsed.text || '', images: effectivePreParsed.images || [], prompt: prompt.trim() || '', rawCharCount: effectivePreParsed.rawCharCount };
+
+        // Debug logging for image processing
+        debugLog('Mindmap payload:', {
+          hasText: !!effectivePreParsed.text,
+          imageCount: effectivePreParsed.images?.length || 0,
+          hasImages: (effectivePreParsed.images?.length || 0) > 0,
+          firstImagePreview: effectivePreParsed.images?.[0]?.startsWith('data:') ? effectivePreParsed.images[0].substring(0, 100) + '...' : (effectivePreParsed.images?.[0] || '')
+        });
+
         const headers: Record<string, string> = { 'Content-Type': 'application/json' };
         if (accessToken) {
             headers['Authorization'] = `Bearer ${accessToken}`;

@@ -413,17 +413,18 @@ For consistent branding across the application, use the `CogniGuide_logo.png` fi
 *   Flow: The client receives `{path, token}` per file and uses `supabase.storage.from(bucket).uploadToSignedUrl(path, token, file)` to upload
 *   **Critical Implementation Details**:
     - **File Key Sanitization**: Keys are strictly sanitized to `[A-Za-z0-9._-]` to prevent pipe characters ("|") from breaking signed uploads
+    - **File Set Key Separator**: Uses double underscore (`__`) instead of double pipe (`||`) to avoid conflicts with backend validation regex
     - **Path Format**: `users/{userId}/YYYY-MM-DD/{sanitizedKey}/{filename}` or `anon/{anonId}/YYYY-MM-DD/{sanitizedKey}/{filename}`
     - **Fallback Prevention**: Guards in client code prevent legacy multipart fallbacks when storage fails, avoiding 413 errors
 *   Notes:
     - Bucket: Create a private bucket named `uploads` in Supabase Storage
     - Security: Files remain private; the server (with Service Role) downloads them for preprocessing; the client never gets permanent public URLs
-    - Expiration: Preparse generates short-lived signed URLs for images if needed by the LLM
+    - **Image Processing**: Images are downloaded from Storage and converted to base64 data URLs for AI processing (Gemini API cannot access signed URLs)
     - **Troubleshooting**: If uploads fail, check that keys don't contain special characters that break URL generation
 
 #### Preparse JSON (Storage) Mode
 *   The preparse API now accepts a JSON payload: `{ bucket: 'uploads', objects: [{ path, name?, type?, size? }] }`
-*   For non-image files, the server downloads from Storage and extracts text; for images, it generates a 30‑minute signed URL and includes it in `images`
+*   For non-image files, the server downloads from Storage and extracts text; for images, it downloads from Storage, converts to base64 data URLs, and includes them in `images`
 *   Response shape is identical to multipart mode: `{ text, images, totalRawChars, maxChars, limitExceeded, includedFiles, excludedFiles, partialFile }`
 
 #### Storage Cleanup API (`app/api/storage/cleanup/route.ts`)
@@ -546,7 +547,9 @@ The sidebar history uses a sophisticated pagination system with infinite scroll.
 **Root Causes & Fixes**:
 1. **Pipe Characters in File Keys**: File keys containing "|" (pipe) characters break Supabase signed uploads
    - **Fix**: Keys are sanitized to `[A-Za-z0-9._-]` in `app/api/storage/get-signed-uploads/route.ts`
-   - **Before**: `name|size|type|hash` → **After**: `name_size_type_hash`
+2. **File Set Key Separator**: Using "||" (double pipe) as separator caused conflicts with backend validation regex
+   - **Fix**: Changed to "__" (double underscore) in `components/Generator.tsx` to avoid regex conflicts
+   - **Before**: `file1||file2||file3` → **After**: `file1__file2__file3`
 
 2. **Missing/Invalid Supabase Environment Variables**:
    - **Required**: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`
@@ -583,7 +586,7 @@ The sidebar history uses a sophisticated pagination system with infinite scroll.
 3. **File Path Extraction Issues**: URLs not properly parsed for cleanup
    - **Check**: Server logs for "Cleanup failed" with URL parsing errors
    - **Fix**: Verify Supabase URLs contain `/storage/v1/object/public/uploads/` pattern
-   - **Debug**: Check that signed URLs are from the correct bucket
+    - **Debug**: Check that image processing is working and base64 data URLs are being generated correctly
 
 **Prevention**:
 - Monitor Supabase Storage usage in dashboard
@@ -602,7 +605,26 @@ The sidebar history uses a sophisticated pagination system with infinite scroll.
 **Verification**:
 - Ensure private `uploads` bucket exists in Supabase Storage
 - Verify service role has read/write access to the bucket
-- Check that signed URLs are being generated correctly
+- Check that image processing is working and base64 data URLs are being generated correctly
+
+#### Image Processing Issues (Base64 Data URLs)
+**Symptoms**: Users see 400 Bad Request errors when trying to generate mind maps or flashcards from images.
+
+**Root Cause**: The Gemini AI API (via OpenAI interface) cannot access signed URLs from Supabase Storage, causing 400 Bad Request errors when trying to process images.
+
+**Solution Applied**:
+1. **Changed Image Processing Approach**: Modified `app/api/preparse/route.ts` to download images from Supabase Storage and convert them to base64 data URLs instead of using signed URLs
+2. **Updated Validation Logic**: Added URL validation in generation APIs to handle both signed URLs and base64 data URLs
+3. **Updated Cleanup Logic**: Modified cleanup to only process signed URLs (base64 data URLs don't need cleanup as they're embedded in requests)
+4. **Enhanced Error Handling**: Added better error messages for image processing failures
+
+**Files Modified**:
+- `app/api/preparse/route.ts` - Changed to base64 data URLs for images
+- `app/api/generate-mindmap/route.ts` - Updated validation and cleanup
+- `app/api/generate-flashcards/route.ts` - Updated validation and cleanup
+- `components/Generator.tsx` - Updated debug logging
+
+**Result**: Images are now downloaded and converted to base64 data URLs during preprocessing, which the Gemini API can directly access without needing external URL permissions.
 
 #### Mind Map Node Blurriness Issue
 **Symptoms**: Mind map nodes appear blurry until hovered over or parent collapsed/expanded.
