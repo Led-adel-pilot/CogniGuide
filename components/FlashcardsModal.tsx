@@ -489,9 +489,9 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
           <div className="text-center md:text-left text-sm font-medium truncate text-foreground">{studyInterleaved ? (current?.deckTitle || title) : (title || 'Flashcards')}</div>
           <div className="text-sm text-muted-foreground text-center hidden md:block">{hasCards ? (finished ? 'Completed' : studyDueOnly ? `${originalDueList.indexOf(index) + 1} / ${originalDueCount} due` : `${index + 1} / ${cards!.length}`) : ''}</div>
           <div className="justify-self-center md:justify-self-end">
-            {hasCards && !studyInterleaved && (
+            {hasCards && (
               <div className="inline-flex items-center gap-2 text-sm">
-                <span className="text-foreground font-medium">Exam date</span>
+                <span className="text-foreground font-medium">{studyInterleaved ? 'Source deck exam' : 'Exam date'}</span>
                 <div className="w-32">
                   <DatePicker
                     date={examDateInput}
