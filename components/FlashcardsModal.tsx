@@ -11,6 +11,7 @@ import type { Components } from 'react-markdown';
 import { ChevronLeft, ChevronRight, Eye, Loader2, X } from 'lucide-react';
 import posthog from 'posthog-js';
 import { DatePicker } from '@/components/DatePicker';
+import { formatDate, formatTime } from '@/lib/utils';
 
 const getDeckIdentifier = (deckId?: string, title?: string | null, cards?: Flashcard[] | null): string | null => {
   if (deckId) return deckId;
@@ -660,8 +661,8 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
                     {showAnswer && current?.schedule?.due ? (
                       <span className="inline-flex items-center h-6 px-2.5 rounded-full bg-sky-50 dark:bg-sky-900/30 text-sky-700 dark:text-sky-300 border border-sky-200 dark:border-sky-800 flashcard-due-pill">
                         {hoveredGrade && predictedDueDatesByGrade[hoveredGrade]
-                          ? `Next due: ${predictedDueDatesByGrade[hoveredGrade].toLocaleDateString()} ${predictedDueDatesByGrade[hoveredGrade].toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`
-                          : `Was due: ${new Date(current.schedule.due).toLocaleDateString()} ${new Date(current.schedule.due).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`
+                          ? `Next due: ${formatDate(predictedDueDatesByGrade[hoveredGrade])} ${formatTime(predictedDueDatesByGrade[hoveredGrade], {hour: '2-digit', minute:'2-digit'})}`
+                          : `Was due: ${formatDate(new Date(current.schedule.due))} ${formatTime(new Date(current.schedule.due), {hour: '2-digit', minute:'2-digit'})}`
                         }
                       </span>
                     ) : null}

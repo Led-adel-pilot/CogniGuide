@@ -20,6 +20,7 @@ CogniGuide comprehensive AI-powered study assistant. It uses an LLM to convert t
 *   **Interleaved Study Mode:** Advanced spaced repetition feature that interleaves cards from multiple decks to maximize learning effectiveness. When you have due cards from different subjects, this mode presents them in a randomized order while ensuring no two consecutive cards are from the same deck, forcing beneficial context switching that improves long-term retention. Each card maintains its individual deck's exam date and scheduling preferences.
 *   **Auth & History:** Users must sign in (Email magic link or Google) to generate mind maps or flashcards. Signed-in users get a dashboard with a unified reverse-chronological history of both mind maps and flashcards. Items show lucide icons (map vs card). Mind maps are stored as Markmap markdown; flashcards are stored as a JSON array (and may omit markdown when generated directly from files/prompts).
 *   **Seamless Save on Sign-Up:** When a non-authenticated user generates a mind map and then signs up to save it, the mind map is automatically saved to their new account and appears in their history, ensuring no work is lost.
+*   **Localized Date Formatting:** All dates and times are automatically displayed in the user's preferred locale format (dd/mm/yy, mm/dd/yy, etc.) based on their browser's language settings. This ensures users see dates in their familiar format whether they prefer European (dd/mm), American (mm/dd), or other regional date conventions.
 
 ## Technology Stack
 *   **Framework:** Next.js (React) for building the web application.
@@ -63,6 +64,7 @@ CogniGuide comprehensive AI-powered study assistant. It uses an LLM to convert t
 *   **Authentication & DB:** Supabase is used for authentication (email magic link and Google OAuth) and to persist user mind map history and flashcard data (only markdown is stored for mind maps, full flashcard data with scheduling state).
 *   **Image Generation:** `html-to-image` is used in `components/MindMapModal.tsx` to convert the rendered mind map (a DOM element) into SVG or PNG images for export.
  *   **PDF Generation:** Users can export to PDF from `components/MindMapModal.tsx`. The export functionality generates a PNG image of the mind map, cropped to its contents, and embeds it into a PDF document using `jsPDF`. This creates a rasterized, non-interactive PDF of the mind map.
+*   **Localized Date Formatting:** The application automatically detects and uses the user's browser locale for all date and time displays throughout the interface. This ensures users see dates in their preferred format (dd/mm/yy, mm/dd/yy, etc.) rather than being forced into a single regional format. The implementation uses `navigator.language` to detect the user's locale and applies it consistently across date pickers, flashcard due dates, history timestamps, and calendar components.
 
 ## PostHog Analytics Integration
 

@@ -16,6 +16,7 @@ import CogniGuideLogo from '../../CogniGuide_logo.png';
 import Image from 'next/image';
 import posthog from 'posthog-js';
 import ThemeToggle from '@/components/ThemeToggle';
+import { formatDate, formatTime } from '@/lib/utils';
 
 type SessionUser = {
   id: string;
@@ -952,7 +953,7 @@ export default function DashboardClient() {
                           })()}
                         </div>
                       )}
-                      <div className="text-xs text-muted-foreground">{new Date(item.created_at).toLocaleDateString()} {new Date(item.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
+                      <div className="text-xs text-muted-foreground">{formatDate(new Date(item.created_at))} {formatTime(new Date(item.created_at), { hour: '2-digit', minute: '2-digit' })}</div>
                     </div>
                   </button>
                   <div className={`absolute top-1/2 -translate-y-1/2 right-2 ${openMenuId === itemKey ? 'visible' : 'invisible group-hover:visible'}`} onClick={(e) => e.stopPropagation()}>

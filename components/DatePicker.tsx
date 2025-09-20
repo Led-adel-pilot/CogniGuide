@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { CalendarIcon, ClockIcon } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn, formatDate, formatTime } from "@/lib/utils";
 
 interface DatePickerProps {
   date?: Date;
@@ -76,11 +76,11 @@ export function DatePicker({
   };
 
   const formatDateTime = (date: Date) => {
-    const dateStr = date.toLocaleDateString();
+    const dateStr = formatDate(date);
     if (!showTimeOnButton) {
       return dateStr;
     }
-    const timeStr = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    const timeStr = formatTime(date, { hour: '2-digit', minute: '2-digit' });
     return `${dateStr} ${timeStr}`;
   };
 
