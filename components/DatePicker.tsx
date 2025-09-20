@@ -9,6 +9,28 @@ import { Label } from "@/components/ui/label";
 import { CalendarIcon, ClockIcon } from "lucide-react";
 import { cn, formatDate, formatTime } from "@/lib/utils";
 
+// Hook to detect mobile screen size
+function useIsMobile() {
+  const [isMobile, setIsMobile] = React.useState(false);
+
+  React.useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768); // md breakpoint
+    };
+
+    // Check initially
+    checkMobile();
+
+    // Add event listener
+    window.addEventListener('resize', checkMobile);
+
+    // Cleanup
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  return isMobile;
+}
+
 interface DatePickerProps {
   date?: Date;
   onDateChange?: (date: Date | undefined) => void;
@@ -27,6 +49,7 @@ export function DatePicker({
   const [isOpen, setIsOpen] = React.useState(false);
   const [timeValue, setTimeValue] = React.useState<string>("08:00:00");
   const [isTimeInputFocused, setIsTimeInputFocused] = React.useState(false);
+  const isMobile = useIsMobile();
 
   // Initialize time value from existing date
   React.useEffect(() => {
@@ -99,7 +122,13 @@ export function DatePicker({
           {date ? formatDateTime(date) : placeholder}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-auto p-0 z-[120]" align="start" side="bottom" avoidCollisions={false}>
+      <PopoverContent
+        className="w-auto p-0 z-[120]"
+        align={isMobile ? "center" : "start"}
+        side={isMobile ? "bottom" : "bottom"}
+        sideOffset={isMobile ? 8 : 4}
+        avoidCollisions={true}
+      >
         <div className="rounded-md border">
           <Calendar
             mode="single"
