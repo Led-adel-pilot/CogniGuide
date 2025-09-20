@@ -114,10 +114,6 @@ export default function MindMapModal({ markdown, onClose }: MindMapModalProps) {
       .trim() // Remove leading/trailing spaces
       .substring(0, 100); // Limit length to prevent overly long filenames
     const container = containerRef.current;
-    const svg = container.querySelector('#mindmap-svg') as SVGElement | null;
-
-    // Store originals in case we temporarily change global backgrounds (we won't touch the live container anymore)
-    const originalFontFamily = container.style.fontFamily;
 
     try {
         // Wait for fonts to be fully loaded to avoid fallback fonts in snapshots
@@ -129,162 +125,152 @@ export default function MindMapModal({ markdown, onClose }: MindMapModalProps) {
 
         // Inline the computed font on the container so the cloned node uses the same (Next/font) family
         const computedFontFamily = getComputedFontFamily();
+
+        // Create a clone of the container for export
+        const clonedContainer = container.cloneNode(true) as HTMLElement;
+
+        // Position the clone off-screen for export
+        clonedContainer.style.position = 'absolute';
+        clonedContainer.style.left = '-9999px';
+        clonedContainer.style.top = '0';
+        clonedContainer.style.zIndex = '-1000';
         if (computedFontFamily) {
-          container.style.fontFamily = computedFontFamily;
+          clonedContainer.style.fontFamily = computedFontFamily;
         }
 
-        // We now clone and capture off-screen to avoid disturbing the live view (no pan jump)
+        document.body.appendChild(clonedContainer);
 
-        const options = {
-            width: container.scrollWidth,
-            height: container.scrollHeight,
-            style: ({
-              ...(computedFontFamily ? { fontFamily: computedFontFamily } : {})
-            } as any),
-        };
-
-        if (format === 'svg') {
-            const svgEl = container.querySelector('#mindmap-svg') as SVGElement | null;
-            if (!svgEl) {
-                alert('Mind map SVG element not found.');
-                return;
-            }
-            const originalTransform = svgEl.style.transform;
-            svgEl.style.transform = 'none';
-            try {
-                await new Promise(resolve => setTimeout(resolve, 100));
-                const dataUrl = await toSvg(container, {
-                    width: container.scrollWidth,
-                    height: container.scrollHeight,
-                    filter: () => true
+        try {
+            if (format === 'svg') {
+                const svgEl = clonedContainer.querySelector('#mindmap-svg') as SVGElement | null;
+                if (!svgEl) {
+                    alert('Mind map SVG element not found.');
+                    return;
+                }
+                const originalTransform = svgEl.style.transform;
+                svgEl.style.transform = 'none';
+                try {
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    const dataUrl = await toSvg(clonedContainer, {
+                        width: clonedContainer.scrollWidth,
+                        height: clonedContainer.scrollHeight,
+                        filter: () => true
+                    });
+                    const link = document.createElement('a');
+                    link.download = `${sanitizedTitle}.svg`;
+                    link.href = dataUrl;
+                    link.click();
+                } finally {
+                    svgEl.style.transform = originalTransform;
+                }
+            } else if (format === 'png' || format === 'pdf') {
+                // Use a detached wrapper and crop to the exact content bounds to prevent tinted edges
+                // 1) Measure content bounds from cloned DOM
+                const nodes = Array.from(clonedContainer.querySelectorAll('.mindmap-node')) as HTMLElement[];
+                let minLeft = Infinity, minTop = Infinity, maxRight = -Infinity, maxBottom = -Infinity;
+                nodes.forEach((el) => {
+                  const left = el.offsetLeft;
+                  const top = el.offsetTop;
+                  const right = left + el.offsetWidth;
+                  const bottom = top + el.offsetHeight;
+                  if (left < minLeft) minLeft = left;
+                  if (top < minTop) minTop = top;
+                  if (right > maxRight) maxRight = right;
+                  if (bottom > maxBottom) maxBottom = bottom;
                 });
-                const link = document.createElement('a');
-                link.download = `${sanitizedTitle}.svg`;
-                link.href = dataUrl;
-                link.click();
-            } finally {
-                svgEl.style.transform = originalTransform;
-            }
-        } else if (format === 'png' || format === 'pdf') {
-            // Use a detached wrapper and crop to the exact content bounds to prevent tinted edges
-            // 1) Measure content bounds from live DOM (nodes are absolutely positioned inside the container)
-            const nodes = Array.from(container.querySelectorAll('.mindmap-node')) as HTMLElement[];
-            let minLeft = Infinity, minTop = Infinity, maxRight = -Infinity, maxBottom = -Infinity;
-            nodes.forEach((el) => {
-              const left = el.offsetLeft;
-              const top = el.offsetTop;
-              const right = left + el.offsetWidth;
-              const bottom = top + el.offsetHeight;
-              if (left < minLeft) minLeft = left;
-              if (top < minTop) minTop = top;
-              if (right > maxRight) maxRight = right;
-              if (bottom > maxBottom) maxBottom = bottom;
-            });
-            if (!Number.isFinite(minLeft) || !Number.isFinite(minTop)) {
-              // Fallback to full container if measurement fails
-              minLeft = 0; minTop = 0; maxRight = container.scrollWidth; maxBottom = container.scrollHeight;
-            }
-            // Add margin to prevent nodes from being right at the edge
-            const margin = 25;
-            const cropWidth = Math.max(1, Math.ceil(maxRight - minLeft) + margin * 2);
-            const cropHeight = Math.max(1, Math.ceil(maxBottom - minTop) + margin * 2);
-
-            // Determine theme background from viewport/body (light or dark)
-            let themeBackground = 'white';
-            try {
-              const viewportEl = viewportRef.current;
-              if (viewportEl) {
-                const vpBg = window.getComputedStyle(viewportEl).backgroundColor;
-                if (vpBg && vpBg !== 'rgba(0, 0, 0, 0)' && vpBg !== 'transparent') {
-                  themeBackground = vpBg;
+                if (!Number.isFinite(minLeft) || !Number.isFinite(minTop)) {
+                  // Fallback to full container if measurement fails
+                  minLeft = 0; minTop = 0; maxRight = clonedContainer.scrollWidth; maxBottom = clonedContainer.scrollHeight;
                 }
-              }
-              if (themeBackground === 'white' && typeof document !== 'undefined' && document.body) {
-                const bodyBg = window.getComputedStyle(document.body).backgroundColor;
-                if (bodyBg && bodyBg !== 'rgba(0, 0, 0, 0)' && bodyBg !== 'transparent') {
-                  themeBackground = bodyBg;
+                // Add margin to prevent nodes from being right at the edge
+                const margin = 25;
+                const cropWidth = Math.max(1, Math.ceil(maxRight - minLeft) + margin * 2);
+                const cropHeight = Math.max(1, Math.ceil(maxBottom - minTop) + margin * 2);
+
+                // Determine theme background from viewport/body (light or dark)
+                let themeBackground = 'white';
+                try {
+                  const viewportEl = viewportRef.current;
+                  if (viewportEl) {
+                    const vpBg = window.getComputedStyle(viewportEl).backgroundColor;
+                    if (vpBg && vpBg !== 'rgba(0, 0, 0, 0)' && vpBg !== 'transparent') {
+                      themeBackground = vpBg;
+                    }
+                  }
+                  if (themeBackground === 'white' && typeof document !== 'undefined' && document.body) {
+                    const bodyBg = window.getComputedStyle(document.body).backgroundColor;
+                    if (bodyBg && bodyBg !== 'rgba(0, 0, 0, 0)' && bodyBg !== 'transparent') {
+                      themeBackground = bodyBg;
+                    }
+                  }
+                } catch {}
+
+                // Prepare cloned container for clean capture
+                const svg = clonedContainer.querySelector('#mindmap-svg') as SVGElement | null;
+
+                // Clear backgrounds and reset positioning on clone
+                clonedContainer.style.background = '';
+                clonedContainer.style.backgroundColor = '';
+                clonedContainer.style.transform = 'none';
+                clonedContainer.style.position = 'absolute';
+                clonedContainer.style.left = '0';
+                clonedContainer.style.top = '0';
+                if (svg) svg.style.zIndex = '0';
+
+                // Remove node drop-shadows for clean edges
+                try {
+                  const nodes = Array.from(clonedContainer.querySelectorAll('.mindmap-node')) as HTMLElement[];
+                  nodes.forEach(n => { n.style.boxShadow = 'none'; n.style.backgroundClip = 'padding-box'; });
+                  const paths = Array.from(clonedContainer.querySelectorAll('path')) as SVGPathElement[];
+                  paths.forEach(p => {
+                    p.style.fill = 'none';
+                    const strokeColor = window.getComputedStyle(p).stroke;
+                    p.style.stroke = strokeColor || 'var(--connector-color)';
+                  });
+                } catch {}
+
+                try {
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    const dataUrl = await toPng(clonedContainer, {
+                        quality: 1.0,
+                        backgroundColor: themeBackground,
+                        cacheBust: true,
+                        filter: () => true
+                    });
+                    if (format === 'png') {
+                        const link = document.createElement('a');
+                        link.download = `${sanitizedTitle}.png`;
+                        link.href = dataUrl;
+                        link.click();
+                    } else {
+                        const pxToMm = 0.264583;
+                        const imgWidthMm = cropWidth * pxToMm;
+                        const imgHeightMm = cropHeight * pxToMm;
+                        const orientation = imgWidthMm > imgHeightMm ? 'landscape' : 'portrait';
+                        const pdf = new jsPDF({ orientation, unit: 'mm', format: 'a4' });
+                        const pageWidth = pdf.internal.pageSize.getWidth();
+                        const pageHeight = pdf.internal.pageSize.getHeight();
+                        // No margins - fill entire page (may distort aspect ratio)
+                        const scaleX = pageWidth / imgWidthMm;
+                        const scaleY = pageHeight / imgHeightMm;
+                        const renderW = imgWidthMm * scaleX;
+                        const renderH = imgHeightMm * scaleY;
+                        const x = 0;
+                        const y = 0;
+                        pdf.addImage(dataUrl, 'PNG', x, y, renderW, renderH);
+                        pdf.save(`${sanitizedTitle}.pdf`);
+                    }
+                } catch (error) {
+                    console.error('Export failed:', error);
                 }
-              }
-            } catch {}
-
-            // Temporarily modify container for clean capture
-            const originalContainerStyles = {
-              background: container.style.background,
-              backgroundColor: container.style.backgroundColor,
-              transform: container.style.transform,
-              position: container.style.position,
-              left: container.style.left,
-              top: container.style.top
-            };
-
-            const originalSvgZIndex = svg ? svg.style.zIndex : '';
-
-            // Clear backgrounds and reset positioning
-            container.style.background = '';
-            container.style.backgroundColor = '';
-            container.style.transform = 'none';
-            container.style.position = 'absolute';
-            container.style.left = '0';
-            container.style.top = '0';
-            if (svg) svg.style.zIndex = '0';
-
-            // Remove node drop-shadows for clean edges
-            try {
-              const nodes = Array.from(container.querySelectorAll('.mindmap-node')) as HTMLElement[];
-              nodes.forEach(n => { n.style.boxShadow = 'none'; n.style.backgroundClip = 'padding-box'; });
-              const paths = Array.from(container.querySelectorAll('path')) as SVGPathElement[];
-              paths.forEach(p => {
-                p.style.fill = 'none';
-                const strokeColor = window.getComputedStyle(p).stroke;
-                p.style.stroke = strokeColor || 'var(--connector-color)';
-              });
-            } catch {}
-
-            try {
-              await new Promise(resolve => setTimeout(resolve, 100));
-              const dataUrl = await toPng(container, {
-                quality: 1.0,
-                style: options.style || {},
-                backgroundColor: themeBackground,
-                cacheBust: true,
-                filter: () => true
-              });
-              if (format === 'png') {
-                const link = document.createElement('a');
-                link.download = `${sanitizedTitle}.png`;
-                link.href = dataUrl;
-                link.click();
-              } else {
-                const pxToMm = 0.264583;
-                const imgWidthMm = cropWidth * pxToMm;
-                const imgHeightMm = cropHeight * pxToMm;
-                const orientation = imgWidthMm > imgHeightMm ? 'landscape' : 'portrait';
-                const pdf = new jsPDF({ orientation, unit: 'mm', format: 'a4' });
-                const pageWidth = pdf.internal.pageSize.getWidth();
-                const pageHeight = pdf.internal.pageSize.getHeight();
-                // No margins - fill entire page (may distort aspect ratio)
-                const scaleX = pageWidth / imgWidthMm;
-                const scaleY = pageHeight / imgHeightMm;
-                const renderW = imgWidthMm * scaleX;
-                const renderH = imgHeightMm * scaleY;
-                const x = 0;
-                const y = 0;
-                pdf.addImage(dataUrl, 'PNG', x, y, renderW, renderH);
-                pdf.save(`${sanitizedTitle}.pdf`);
-              }
-            } finally {
-              // Restore original container styles
-              Object.assign(container.style, originalContainerStyles);
-              if (svg) svg.style.zIndex = originalSvgZIndex;
-              // Note: node box-shadows will be restored when the component re-renders
             }
+        } finally {
+            // Clean up the cloned container
+            document.body.removeChild(clonedContainer);
         }
     } catch (error) {
         console.error('Download failed:', error);
         alert('Failed to download mind map. Please try again.');
-    } finally {
-        // Restore any inline font override applied earlier
-        container.style.fontFamily = originalFontFamily;
     }
   };
 
