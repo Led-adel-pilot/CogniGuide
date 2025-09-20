@@ -887,7 +887,22 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
                 <DatePicker
                   date={examDateInput}
                   onDateChange={(date) => {
-                    setExamDateInput(date);
+                    if (date && date >= new Date()) {
+                      setExamDateInput(date);
+                      handleSetDeckExamDate(date);
+                      markExamDatePopupAsShown(deckIdentifier);
+                      setShowExamDatePopup(false);
+                      setShowAnswer(true);
+                      setAnswerShownTime(Date.now());
+                      posthog.capture('exam_date_set', {
+                        deckId: deckId,
+                        exam_datetime: date.toISOString(),
+                      });
+                    } else if (!date) {
+                      // Handle clearing the date
+                      setExamDateInput(undefined);
+                      handleSetDeckExamDate(undefined);
+                    }
                   }}
                   placeholder="Select date (optional)"
                 />
@@ -895,25 +910,6 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
 
             </div>
             <div className="flex flex-col gap-3 w-full max-w-md">
-              <button
-                onClick={() => {
-                  if (examDateInput) {
-                    handleSetDeckExamDate(examDateInput);
-                    markExamDatePopupAsShown(deckIdentifier);
-                    setShowExamDatePopup(false);
-                    setShowAnswer(true);
-                    setAnswerShownTime(Date.now());
-                    posthog.capture('exam_date_set', {
-                      deckId: deckId,
-                      exam_datetime: examDateInput.toISOString(),
-                    });
-                  }
-                }}
-                disabled={!examDateInput || examDateInput < new Date()}
-                className="w-full h-10 px-6 text-sm font-medium bg-primary text-primary-foreground rounded-full hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors whitespace-nowrap"
-              >
-                Set Exam Date
-              </button>
               <button
                 onClick={() => {
                   markExamDatePopupAsShown(deckIdentifier);
