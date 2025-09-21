@@ -7,12 +7,16 @@ const supabaseAdmin = supabaseUrl && supabaseServiceKey
   ? createClient(supabaseUrl, supabaseServiceKey)
   : null;
 
-export async function GET(_req: NextRequest, { params }: { params: { shareId: string } }) {
+export async function GET(
+  _req: NextRequest,
+  context: { params?: Promise<{ shareId?: string }> }
+) {
   if (!supabaseAdmin) {
     return NextResponse.json({ ok: false, error: 'Supabase is not configured.' }, { status: 500 });
   }
 
-  const shareId = params.shareId;
+  const resolvedParams = context.params ? await context.params : undefined;
+  const shareId = resolvedParams?.shareId;
   if (!shareId) {
     return NextResponse.json({ ok: false, error: 'Missing share ID.' }, { status: 400 });
   }
