@@ -7,7 +7,7 @@ import { supabase, MindmapRecord, FlashcardsRecord } from '@/lib/supabaseClient'
 import Generator from '@/components/Generator';
 import MindMapModal from '@/components/MindMapModal';
 import FlashcardsModal, { Flashcard as FlashcardType } from '@/components/FlashcardsModal';
-import { BrainCircuit, LogOut, Loader2, Map as MapIcon, Coins, Zap, Sparkles, CalendarClock, Menu, X, ChevronRight, MoreHorizontal, Edit, Trash2 } from 'lucide-react';
+import { BrainCircuit, LogOut, Loader2, Map as MapIcon, Coins, Zap, Sparkles, CalendarClock, Menu, X, ChevronRight, MoreHorizontal, Edit, Trash2, Share2 } from 'lucide-react';
 import FlashcardIcon from '@/components/FlashcardIcon';
 import { loadDeckSchedule, saveDeckSchedule, loadDeckScheduleAsync, saveDeckScheduleAsync, loadAllDeckSchedulesAsync, upsertDeckSchedulesBulkAsync, type StoredDeckSchedule } from '@/lib/sr-store';
 import { createInitialSchedule } from '@/lib/spaced-repetition';
@@ -101,6 +101,11 @@ export default function DashboardClient() {
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
   const [menuPosition, setMenuPosition] = useState<{ x: number; y: number } | null>(null);
   const [renamingItem, setRenamingItem] = useState<{ id: string; type: 'mindmap' | 'flashcards'; title: string } | null>(null);
+  const [shareItem, setShareItem] = useState<{ id: string; type: 'mindmap' | 'flashcards'; title: string | null } | null>(null);
+  const [shareStatus, setShareStatus] = useState<'idle' | 'loading' | 'success'>('idle');
+  const [shareLink, setShareLink] = useState<string | null>(null);
+  const [shareError, setShareError] = useState<string | null>(null);
+  const [shareCopied, setShareCopied] = useState(false);
 
   // Refs mirroring pagination state for async safety
   const historyBufferRef = useRef(historyBuffer);
@@ -113,6 +118,19 @@ export default function DashboardClient() {
   useEffect(() => { historyBufferRef.current = historyBuffer; }, [historyBuffer]);
   useEffect(() => { hasMoreMmRef.current = hasMoreMm; }, [hasMoreMm]);
   useEffect(() => { hasMoreFcRef.current = hasMoreFc; }, [hasMoreFc]);
+  useEffect(() => {
+    if (!shareItem) {
+      setShareLink(null);
+      setShareError(null);
+      setShareStatus('idle');
+      setShareCopied(false);
+    }
+  }, [shareItem]);
+  useEffect(() => {
+    if (!shareCopied) return;
+    const timeout = setTimeout(() => setShareCopied(false), 2000);
+    return () => clearTimeout(timeout);
+  }, [shareCopied]);
 
   const handleClosePricingModal = () => {
     setIsPricingModalOpen(false);
@@ -751,6 +769,63 @@ export default function DashboardClient() {
     setMenuPosition(null);
   };
 
+  const closeShareDialog = () => {
+    setShareItem(null);
+  };
+
+  const handleGenerateShareLink = async () => {
+    if (!shareItem) return;
+    setShareStatus('loading');
+    setShareError(null);
+    try {
+      const { data: sessionData } = await supabase.auth.getSession();
+      const token = sessionData.session?.access_token;
+      if (!token) {
+        throw new Error('We could not verify your session. Please sign in again.');
+      }
+      const response = await fetch('/api/share', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({
+          type: shareItem.type,
+          id: shareItem.id,
+        }),
+      });
+
+      const data = await response.json();
+      if (!response.ok || !data?.ok) {
+        throw new Error(data?.error || 'Unable to create a share link.');
+      }
+
+      const origin = typeof window !== 'undefined' ? window.location.origin : '';
+      const shareUrl = `${origin}/share/${data.shareId}`;
+      setShareLink(shareUrl);
+      setShareStatus('success');
+      posthog.capture('share_link_created', {
+        item_type: shareItem.type,
+        item_id: shareItem.id,
+      });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Unable to create a share link.';
+      setShareError(message);
+      setShareStatus('idle');
+    }
+  };
+
+  const handleCopyShareLink = async () => {
+    if (!shareLink) return;
+    try {
+      await navigator.clipboard.writeText(shareLink);
+      setShareCopied(true);
+    } catch (error) {
+      console.error('Failed to copy share link:', error);
+      setShareError('Failed to copy the link. Please copy it manually.');
+    }
+  };
+
   const handleRenameItem = async (itemId: string, itemType: 'mindmap' | 'flashcards', newTitle: string) => {
     if (!user) return;
 
@@ -1014,6 +1089,24 @@ export default function DashboardClient() {
           >
             <button
               onClick={() => {
+                if (!openMenuId) return;
+                const [type, id] = openMenuId.split(':');
+                const currentItem = combinedHistory.find((item) => item.id === id);
+                setShareItem({
+                  id,
+                  type: type as 'mindmap' | 'flashcards',
+                  title: currentItem?.title ?? null,
+                });
+                setOpenMenuId(null);
+                setMenuPosition(null);
+              }}
+              className="w-full text-left px-3 py-1.5 text-sm rounded-md hover:bg-muted flex items-center gap-2"
+            >
+              <Share2 className="h-4 w-4" />
+              Share
+            </button>
+            <button
+              onClick={() => {
                 const [type, id] = openMenuId.split(':');
                 // Find the current title from the combinedHistory
                 const currentItem = combinedHistory.find(item => item.id === id);
@@ -1070,6 +1163,74 @@ export default function DashboardClient() {
           </div>
         </div>
       </main>
+
+      {shareItem && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 dark:bg-black/60 px-4"
+          onClick={closeShareDialog}
+        >
+          <div
+            className="w-full max-w-sm rounded-2xl border bg-background p-5 shadow-xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <h2 className="text-lg font-semibold">
+                  Share {shareItem.type === 'mindmap' ? 'mind map' : 'flashcards'}
+                </h2>
+                <p className="text-sm text-muted-foreground">
+                  Create a public link that anyone can use to view this {shareItem.type === 'mindmap' ? 'mind map' : 'deck'}.
+                </p>
+              </div>
+              <button
+                onClick={closeShareDialog}
+                className="rounded-full p-1 text-muted-foreground hover:bg-muted"
+                aria-label="Close share dialog"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+
+            {shareError && (
+              <div className="mt-4 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-600 dark:border-red-900/40 dark:bg-red-950/40">
+                {shareError}
+              </div>
+            )}
+
+            {!shareLink && (
+              <button
+                onClick={handleGenerateShareLink}
+                disabled={shareStatus === 'loading'}
+                className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-full bg-gradient-primary px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-gradient-primary-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/50 disabled:cursor-not-allowed disabled:opacity-70"
+              >
+                {shareStatus === 'loading' && <Loader2 className="h-4 w-4 animate-spin" />}
+                Create Link
+              </button>
+            )}
+
+            {shareLink && (
+              <div className="mt-5 space-y-3">
+                <div className="text-xs text-muted-foreground">
+                  Anyone with this link can view the shared {shareItem.type === 'mindmap' ? 'mind map' : 'flashcards'}.
+                </div>
+                <div className="flex items-center gap-2">
+                  <input
+                    readOnly
+                    value={shareLink}
+                    className="flex-1 truncate rounded-lg border bg-muted/40 px-3 py-2 text-sm"
+                  />
+                  <button
+                    onClick={handleCopyShareLink}
+                    className="inline-flex items-center justify-center whitespace-nowrap rounded-full border px-4 py-2 text-sm font-medium hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/50"
+                  >
+                    {shareCopied ? 'Copied!' : 'Copy'}
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       <MindMapModal markdown={markdown} onClose={() => setMarkdown(null)} />
       <FlashcardsModal
