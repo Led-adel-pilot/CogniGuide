@@ -134,6 +134,35 @@ export default function MindMapModal({ markdown, onClose }: MindMapModalProps) {
         .join('\n');
     };
 
+const normalizeMindmapNodes = (root: HTMLElement) => {
+  const nodes = Array.from(root.querySelectorAll('.mindmap-node')) as HTMLElement[];
+  nodes.forEach((node) => {
+    const computed = window.getComputedStyle(node);
+    const background = computed.backgroundColor;
+    const fallbackBackground = computed.getPropertyValue('--node-bg-color');
+    if (background && background !== 'rgba(0, 0, 0, 0)' && background !== 'transparent') {
+      node.style.backgroundColor = background;
+    } else if (fallbackBackground) {
+      node.style.backgroundColor = fallbackBackground.trim();
+    }
+    const textColor = computed.color;
+    const fallbackText = computed.getPropertyValue('--text-color');
+    if (textColor) {
+      node.style.color = textColor;
+    } else if (fallbackText) {
+      node.style.color = fallbackText.trim();
+    }
+    const borderColor = computed.borderColor || computed.getPropertyValue('--node-border-color');
+    if (borderColor) {
+      node.style.borderColor = borderColor;
+    }
+    const boxShadow = computed.boxShadow || computed.getPropertyValue('--node-shadow');
+    if (boxShadow) {
+      node.style.boxShadow = boxShadow;
+    }
+  });
+};
+
     const inlineComputedStyles = (root: Element) => {
       const properties = [
         'position',
@@ -193,21 +222,6 @@ export default function MindMapModal({ markdown, onClose }: MindMapModalProps) {
         'stroke-linejoin',
         'fill',
       ];
-      const cssVariables = [
-        '--node-bg-color',
-        '--node-border-color',
-        '--node-shadow',
-        '--hover-border-color',
-        '--root-text-color',
-        '--root-border-color',
-        '--indicator-border-color',
-        '--collapsed-indicator-color',
-        '--text-color',
-        '--connector-color',
-        '--root-bg-color',
-        '--color-background',
-        '--color-foreground',
-      ];
       const elements: Element[] = [root, ...Array.from(root.querySelectorAll('*'))];
       elements.forEach((el) => {
         const computed = window.getComputedStyle(el);
@@ -219,26 +233,14 @@ export default function MindMapModal({ markdown, onClose }: MindMapModalProps) {
             }
           });
         }
-        cssVariables.forEach((varName) => {
-          const varValue = computed.getPropertyValue(varName);
-          if (varValue) {
-            (el as HTMLElement).style.setProperty(varName, varValue.trim());
-          }
-        });
         if (el instanceof HTMLElement) {
           const bg = computed.getPropertyValue('background-color');
           if (bg && bg !== 'rgba(0, 0, 0, 0)' && bg !== 'transparent') {
             el.style.backgroundColor = bg;
-          } else {
-            const varBg = computed.getPropertyValue('--node-bg-color');
-            if (varBg) el.style.backgroundColor = varBg.trim();
           }
           const color = computed.getPropertyValue('color');
           if (color) {
             el.style.color = color;
-          } else {
-            const varColor = computed.getPropertyValue('--text-color');
-            if (varColor) el.style.color = varColor.trim();
           }
         }
         if (el instanceof SVGElement) {
@@ -397,6 +399,8 @@ export default function MindMapModal({ markdown, onClose }: MindMapModalProps) {
                 } else {
                     try {
                         const pdfContainer = clonedContainer.cloneNode(true) as HTMLElement;
+                        pdfContainer.querySelectorAll('.mindmap-node').forEach(node => node.setAttribute('data-inline', 'true'));
+                        normalizeMindmapNodes(pdfContainer);
                         inlineComputedStyles(pdfContainer);
                         const offsetX = margin - minLeft;
                         const offsetY = margin - minTop;
