@@ -78,10 +78,14 @@ function FlashcardsList({ cards }: { cards: SharedFlashcard[] }) {
   );
 }
 
-export default async function SharePage({ params }: { params: Promise<{ shareId: string }> }) {
+type SharePageProps = {
+  params: Promise<{ shareId: string }>;
+};
+
+export default async function SharePage(props: SharePageProps) {
   let shareId: string | undefined;
   try {
-    const resolvedParams = await params;
+    const resolvedParams = await props.params;
     shareId = resolvedParams?.shareId;
   } catch (error) {
     console.error('Failed to resolve share params:', error);
