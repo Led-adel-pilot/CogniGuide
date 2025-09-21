@@ -109,7 +109,7 @@ export default function MindMapModal({ markdown, onClose }: MindMapModalProps) {
     const title = getTitle(markdown || '');
     // Better sanitization that preserves accented characters, case, and uses spaces
     const sanitizedTitle = title
-      .replace(/[^a-zA-Z0-9À-ÿ\s()]/g, '') // Keep letters (including accented), numbers, spaces, and parentheses
+      .replace(/[^a-zA-Z0-9\u00C0-\u017F\s()]/g, '') // Keep letters (including accented), numbers, spaces, and parentheses
       .replace(/\s+/g, ' ') // Normalize multiple spaces to single space
       .trim() // Remove leading/trailing spaces
       .substring(0, 100); // Limit length to prevent overly long filenames
@@ -186,12 +186,15 @@ export default function MindMapModal({ markdown, onClose }: MindMapModalProps) {
                 });
                 if (!Number.isFinite(minLeft) || !Number.isFinite(minTop)) {
                   // Fallback to full container if measurement fails
-                  minLeft = 0; minTop = 0; maxRight = clonedContainer.scrollWidth; maxBottom = clonedContainer.scrollHeight;
+                  minLeft = 0;
+                  minTop = 0;
+                  maxRight = clonedContainer.scrollWidth;
+                  maxBottom = clonedContainer.scrollHeight;
                 }
                 // Add margin to prevent nodes from being right at the edge
-                const margin = 25;
-                const cropWidth = Math.max(1, Math.ceil(maxRight - minLeft) + margin * 2);
-                const cropHeight = Math.max(1, Math.ceil(maxBottom - minTop) + margin * 2);
+                const marginPx = 25;
+                const exportWidth = Math.max(1, Math.ceil(maxRight - minLeft) + marginPx * 2);
+                const exportHeight = Math.max(1, Math.ceil(maxBottom - minTop) + marginPx * 2);
 
                 // Determine theme background from viewport/body (light or dark)
                 let themeBackground = 'white';
@@ -226,7 +229,11 @@ export default function MindMapModal({ markdown, onClose }: MindMapModalProps) {
                 // Remove node drop-shadows for clean edges
                 try {
                   const nodes = Array.from(clonedContainer.querySelectorAll('.mindmap-node')) as HTMLElement[];
-                  nodes.forEach(n => { n.style.boxShadow = 'none'; n.style.backgroundClip = 'padding-box'; });
+                  nodes.forEach(n => {
+                    n.style.boxShadow = 'none';
+                    n.style.backgroundClip = 'padding-box';
+                    n.style.transform = 'none';
+                  });
                   const paths = Array.from(clonedContainer.querySelectorAll('path')) as SVGPathElement[];
                   paths.forEach(p => {
                     p.style.fill = 'none';
@@ -250,20 +257,37 @@ export default function MindMapModal({ markdown, onClose }: MindMapModalProps) {
                         link.click();
                     } else {
                         const pxToMm = 0.264583;
-                        const imgWidthMm = cropWidth * pxToMm;
-                        const imgHeightMm = cropHeight * pxToMm;
-                        const orientation = imgWidthMm > imgHeightMm ? 'landscape' : 'portrait';
+                        let imgWidthPx = Math.max(exportWidth, 1);
+                        let imgHeightPx = Math.max(exportHeight, 1);
+                        try {
+                          const imageEl = await new Promise<HTMLImageElement>((resolve, reject) => {
+                            const img = new Image();
+                            img.onload = () => resolve(img);
+                            img.onerror = () => reject(new Error('Failed to measure exported image.'));
+                            img.src = dataUrl;
+                          });
+                          imgWidthPx = Math.max(imageEl.naturalWidth || imageEl.width || imgWidthPx, 1);
+                          imgHeightPx = Math.max(imageEl.naturalHeight || imageEl.height || imgHeightPx, 1);
+                        } catch {
+                          // Fall back to the measured export wrapper size if the image fails to load
+                        }
+                        const orientation = imgWidthPx >= imgHeightPx ? 'landscape' : 'portrait';
                         const pdf = new jsPDF({ orientation, unit: 'mm', format: 'a4' });
                         const pageWidth = pdf.internal.pageSize.getWidth();
                         const pageHeight = pdf.internal.pageSize.getHeight();
-                        // No margins - fill entire page (may distort aspect ratio)
-                        const scaleX = pageWidth / imgWidthMm;
-                        const scaleY = pageHeight / imgHeightMm;
-                        const renderW = imgWidthMm * scaleX;
-                        const renderH = imgHeightMm * scaleY;
-                        const x = 0;
-                        const y = 0;
-                        pdf.addImage(dataUrl, 'PNG', x, y, renderW, renderH);
+                        // Preserve aspect ratio and keep a small safety margin so the map never stretches
+                        const marginMm = Math.min(Math.max(marginPx * pxToMm, 0), Math.min(pageWidth, pageHeight) / 2);
+                        const imgWidthMm = imgWidthPx * pxToMm;
+                        const imgHeightMm = imgHeightPx * pxToMm;
+                        const availableWidth = Math.max(pageWidth - marginMm * 2, 1);
+                        const availableHeight = Math.max(pageHeight - marginMm * 2, 1);
+                        const scale = Math.min(availableWidth / imgWidthMm, availableHeight / imgHeightMm);
+                        const safeScale = Number.isFinite(scale) && scale > 0 ? scale : 1;
+                        const renderW = imgWidthMm * safeScale;
+                        const renderH = imgHeightMm * safeScale;
+                        const x = (pageWidth - renderW) / 2;
+                        const y = (pageHeight - renderH) / 2;
+                        pdf.addImage(dataUrl, 'PNG', x, y, renderW, renderH, undefined, 'FAST');
                         pdf.save(`${sanitizedTitle}.pdf`);
                     }
                 } catch (error) {
