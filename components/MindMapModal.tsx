@@ -134,34 +134,55 @@ export default function MindMapModal({ markdown, onClose }: MindMapModalProps) {
         .join('\n');
     };
 
-const normalizeMindmapNodes = (root: HTMLElement) => {
-  const nodes = Array.from(root.querySelectorAll('.mindmap-node')) as HTMLElement[];
-  nodes.forEach((node) => {
-    const computed = window.getComputedStyle(node);
-    const background = computed.backgroundColor;
-    const fallbackBackground = computed.getPropertyValue('--node-bg-color');
-    if (background && background !== 'rgba(0, 0, 0, 0)' && background !== 'transparent') {
-      node.style.backgroundColor = background;
-    } else if (fallbackBackground) {
-      node.style.backgroundColor = fallbackBackground.trim();
-    }
-    const textColor = computed.color;
-    const fallbackText = computed.getPropertyValue('--text-color');
-    if (textColor) {
-      node.style.color = textColor;
-    } else if (fallbackText) {
-      node.style.color = fallbackText.trim();
-    }
-    const borderColor = computed.borderColor || computed.getPropertyValue('--node-border-color');
-    if (borderColor) {
-      node.style.borderColor = borderColor;
-    }
-    const boxShadow = computed.boxShadow || computed.getPropertyValue('--node-shadow');
-    if (boxShadow) {
-      node.style.boxShadow = boxShadow;
-    }
-  });
-};
+    const normalizeMindmapNodes = (root: HTMLElement) => {
+      const rootStyles = window.getComputedStyle(document.documentElement);
+      const convertColor = (value: string | null) => {
+        if (!value) return '';
+        const trimmed = value.trim();
+        if (!trimmed) return '';
+        const probe = document.createElement('div');
+        probe.style.position = 'absolute';
+        probe.style.left = '-99999px';
+        probe.style.backgroundColor = trimmed;
+        document.body.appendChild(probe);
+        const resolved = window.getComputedStyle(probe).backgroundColor;
+        document.body.removeChild(probe);
+        return resolved;
+      };
+      const globalBackground = convertColor(rootStyles.getPropertyValue('--color-background'));
+      const globalBorder = convertColor(rootStyles.getPropertyValue('--color-border'));
+      const globalText = convertColor(rootStyles.getPropertyValue('--color-foreground'));
+
+      const nodes = Array.from(root.querySelectorAll('.mindmap-node')) as HTMLElement[];
+      nodes.forEach((node) => {
+        const computed = window.getComputedStyle(node);
+        let background = computed.backgroundColor;
+        if (!background || background === 'rgba(0, 0, 0, 0)' || background === 'transparent') {
+          background = convertColor(computed.getPropertyValue('--node-bg-color')) || globalBackground;
+        }
+        if (background) {
+          node.style.backgroundColor = background;
+        }
+        let textColor = computed.color;
+        if (!textColor || textColor === 'rgba(0, 0, 0, 0)' || textColor === 'transparent') {
+          textColor = convertColor(computed.getPropertyValue('--text-color')) || globalText;
+        }
+        if (textColor) {
+          node.style.color = textColor;
+        }
+        let borderColor = computed.borderColor;
+        if (!borderColor || borderColor === 'rgba(0, 0, 0, 0)' || borderColor === 'transparent') {
+          borderColor = convertColor(computed.getPropertyValue('--node-border-color')) || globalBorder;
+        }
+        if (borderColor) {
+          node.style.borderColor = borderColor;
+        }
+        const boxShadow = computed.boxShadow || computed.getPropertyValue('--node-shadow');
+        if (boxShadow) {
+          node.style.boxShadow = boxShadow;
+        }
+      });
+    };
 
     const inlineComputedStyles = (root: Element) => {
       const properties = [
