@@ -10,7 +10,6 @@ import { supabase } from '@/lib/supabaseClient';
 import { loadDeckSchedule, saveDeckSchedule, loadDeckScheduleAsync, saveDeckScheduleAsync } from '@/lib/sr-store';
 import posthog from 'posthog-js';
 import AuthModal from '@/components/AuthModal';
-import jsPDF from 'jspdf';
 
 interface MindMapModalProps {
   markdown: string | null;
@@ -114,6 +113,113 @@ export default function MindMapModal({ markdown, onClose }: MindMapModalProps) {
       .trim() // Remove leading/trailing spaces
       .substring(0, 100); // Limit length to prevent overly long filenames
     const container = containerRef.current;
+
+    const collectAttributes = (element: HTMLElement | null): Record<string, string> => {
+      const attrs: Record<string, string> = {};
+      if (!element) return attrs;
+      Array.from(element.attributes).forEach(attr => {
+        if (!attr || !attr.name) return;
+        if (attr.name.toLowerCase() === 'nonce') return;
+        const value = attr.value;
+        if (value) attrs[attr.name] = value;
+      });
+      return attrs;
+    };
+
+    const collectHeadMarkup = (): string => {
+      const head = document.head;
+      if (!head) return '';
+      return Array.from(head.querySelectorAll('style, link[rel="stylesheet"], link[rel="preload"][as="style"]'))
+        .map(node => node.outerHTML)
+        .join('\n');
+    };
+
+    const inlineComputedStyles = (root: Element) => {
+      const properties = [
+        'position',
+        'left',
+        'top',
+        'right',
+        'bottom',
+        'display',
+        'flex-direction',
+        'justify-content',
+        'align-items',
+        'gap',
+        'width',
+        'height',
+        'min-width',
+        'min-height',
+        'max-width',
+        'max-height',
+        'padding',
+        'padding-top',
+        'padding-right',
+        'padding-bottom',
+        'padding-left',
+        'margin',
+        'margin-top',
+        'margin-right',
+        'margin-bottom',
+        'margin-left',
+        'border',
+        'border-radius',
+        'border-color',
+        'border-width',
+        'border-style',
+        'box-shadow',
+        'background',
+        'background-color',
+        'color',
+        'font-family',
+        'font-size',
+        'font-weight',
+        'line-height',
+        'letter-spacing',
+        'text-transform',
+        'text-align',
+        'white-space',
+        'overflow',
+        'overflow-x',
+        'overflow-y',
+        'transform',
+        'transform-origin',
+        'opacity',
+        'z-index',
+        'stroke',
+        'stroke-width',
+        'stroke-dasharray',
+        'stroke-linecap',
+        'stroke-linejoin',
+        'fill',
+      ];
+      const elements: Element[] = [root, ...Array.from(root.querySelectorAll('*'))];
+      elements.forEach((el) => {
+        const computed = window.getComputedStyle(el);
+        if (el instanceof HTMLElement || el instanceof SVGElement) {
+          properties.forEach((prop) => {
+            const value = computed.getPropertyValue(prop);
+            if (value) {
+              el.style.setProperty(prop, value);
+            }
+          });
+        }
+        if (el instanceof SVGElement) {
+          ['fill', 'stroke', 'stroke-width', 'stroke-dasharray', 'stroke-linecap', 'stroke-linejoin'].forEach((attr) => {
+            const attrValue = computed.getPropertyValue(attr);
+            if (attrValue) {
+              el.setAttribute(attr, attrValue);
+            }
+          });
+          const transformValue = computed.getPropertyValue('transform');
+          if (transformValue && transformValue !== 'none') {
+            el.setAttribute('transform', transformValue);
+          } else {
+            el.removeAttribute('transform');
+          }
+        }
+      });
+    };
 
     try {
         // Wait for fonts to be fully loaded to avoid fallback fonts in snapshots
@@ -225,8 +331,8 @@ export default function MindMapModal({ markdown, onClose }: MindMapModalProps) {
 
                 // Remove node drop-shadows for clean edges
                 try {
-                  const nodes = Array.from(clonedContainer.querySelectorAll('.mindmap-node')) as HTMLElement[];
-                  nodes.forEach(n => { n.style.boxShadow = 'none'; n.style.backgroundClip = 'padding-box'; });
+                  const nodesForCleanup = Array.from(clonedContainer.querySelectorAll('.mindmap-node')) as HTMLElement[];
+                  nodesForCleanup.forEach(n => { n.style.boxShadow = 'none'; n.style.backgroundClip = 'padding-box'; });
                   const paths = Array.from(clonedContainer.querySelectorAll('path')) as SVGPathElement[];
                   paths.forEach(p => {
                     p.style.fill = 'none';
@@ -235,39 +341,94 @@ export default function MindMapModal({ markdown, onClose }: MindMapModalProps) {
                   });
                 } catch {}
 
-                try {
-                    await new Promise(resolve => setTimeout(resolve, 100));
-                    const dataUrl = await toPng(clonedContainer, {
-                        quality: 1.0,
-                        backgroundColor: themeBackground,
-                        cacheBust: true,
-                        filter: () => true
-                    });
-                    if (format === 'png') {
+                if (format === 'png') {
+                    try {
+                        await new Promise(resolve => setTimeout(resolve, 100));
+                        const dataUrl = await toPng(clonedContainer, {
+                            quality: 1.0,
+                            backgroundColor: themeBackground,
+                            cacheBust: true,
+                            filter: () => true
+                        });
                         const link = document.createElement('a');
                         link.download = `${sanitizedTitle}.png`;
                         link.href = dataUrl;
                         link.click();
-                    } else {
-                        const pxToMm = 0.264583;
-                        const imgWidthMm = cropWidth * pxToMm;
-                        const imgHeightMm = cropHeight * pxToMm;
-                        const orientation = imgWidthMm > imgHeightMm ? 'landscape' : 'portrait';
-                        const pdf = new jsPDF({ orientation, unit: 'mm', format: 'a4' });
-                        const pageWidth = pdf.internal.pageSize.getWidth();
-                        const pageHeight = pdf.internal.pageSize.getHeight();
-                        // No margins - fill entire page (may distort aspect ratio)
-                        const scaleX = pageWidth / imgWidthMm;
-                        const scaleY = pageHeight / imgHeightMm;
-                        const renderW = imgWidthMm * scaleX;
-                        const renderH = imgHeightMm * scaleY;
-                        const x = 0;
-                        const y = 0;
-                        pdf.addImage(dataUrl, 'PNG', x, y, renderW, renderH);
-                        pdf.save(`${sanitizedTitle}.pdf`);
+                    } catch (error) {
+                        console.error('Export failed:', error);
                     }
-                } catch (error) {
-                    console.error('Export failed:', error);
+                } else {
+                    try {
+                        const pdfContainer = clonedContainer.cloneNode(true) as HTMLElement;
+                        inlineComputedStyles(pdfContainer);
+                        const offsetX = margin - minLeft;
+                        const offsetY = margin - minTop;
+                        pdfContainer.style.position = 'absolute';
+                        pdfContainer.style.left = `${offsetX}px`;
+                        pdfContainer.style.top = `${offsetY}px`;
+                        pdfContainer.style.transform = 'none';
+                        pdfContainer.style.margin = '0';
+                        pdfContainer.style.padding = '0';
+                        pdfContainer.style.background = 'transparent';
+                        pdfContainer.style.zIndex = '0';
+                        pdfContainer.style.width = `${clonedContainer.scrollWidth}px`;
+
+                        Array.from(pdfContainer.querySelectorAll("*")).forEach((el) => {
+                          const element = el as HTMLElement;
+                          if (element.style && element.style.zIndex && Number(element.style.zIndex) < 0) {
+                            element.style.zIndex = '0';
+                          }
+                        });
+                        pdfContainer.style.height = `${clonedContainer.scrollHeight}px`;
+
+                        const wrapper = document.createElement('div');
+                        wrapper.id = 'mindmap-export-wrapper';
+                        wrapper.style.position = 'relative';
+                        wrapper.style.width = `${cropWidth}px`;
+                        wrapper.style.height = `${cropHeight}px`;
+                        wrapper.style.margin = '0';
+                        wrapper.style.padding = '0';
+                        wrapper.style.zIndex = '0';
+                        wrapper.style.background = themeBackground;
+                        wrapper.style.overflow = 'hidden';
+                        wrapper.appendChild(pdfContainer);
+
+                        const response = await fetch('/api/mindmap/pdf', {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({
+                            markup: wrapper.outerHTML,
+                            styles: collectHeadMarkup(),
+                            width: cropWidth,
+                            height: cropHeight,
+                            background: themeBackground,
+                            title: sanitizedTitle,
+                            metadata: { title: sanitizedTitle },
+                            htmlAttributes: collectAttributes(document.documentElement),
+                            bodyAttributes: collectAttributes(document.body),
+                            baseUrl: window.location.origin,
+                          }),
+                        });
+
+                        if (!response.ok) {
+                          const errorText = await response.text().catch(() => '');
+                          throw new Error(errorText || `PDF export failed with status ${response.status}`);
+                        }
+
+                        const blob = await response.blob();
+                        const url = URL.createObjectURL(blob);
+                        try {
+                          const link = document.createElement('a');
+                          link.href = url;
+                          link.download = `${sanitizedTitle}.pdf`;
+                          link.click();
+                        } finally {
+                          URL.revokeObjectURL(url);
+                        }
+                    } catch (error) {
+                        console.error('PDF export failed:', error);
+                        throw error;
+                    }
                 }
             }
         } finally {
@@ -276,7 +437,9 @@ export default function MindMapModal({ markdown, onClose }: MindMapModalProps) {
             document.documentElement.style.overflow = originalHtmlOverflow;
 
             // Clean up the cloned container
-            document.body.removeChild(clonedContainer);
+            if (document.body.contains(clonedContainer)) {
+              document.body.removeChild(clonedContainer);
+            }
         }
     } catch (error) {
         console.error('Download failed:', error);
