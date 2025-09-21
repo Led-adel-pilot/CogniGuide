@@ -78,8 +78,20 @@ function FlashcardsList({ cards }: { cards: SharedFlashcard[] }) {
   );
 }
 
-export default async function SharePage({ params }: { params: { shareId: string } }) {
-  const record = await getShareRecord(params.shareId);
+export default async function SharePage({ params }: { params: Promise<{ shareId: string }> }) {
+  let shareId: string | undefined;
+  try {
+    const resolvedParams = await params;
+    shareId = resolvedParams?.shareId;
+  } catch (error) {
+    console.error('Failed to resolve share params:', error);
+  }
+
+  if (!shareId) {
+    notFound();
+  }
+
+  const record = await getShareRecord(shareId);
   if (!record) {
     notFound();
   }
