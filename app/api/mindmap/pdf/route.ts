@@ -217,23 +217,6 @@ export async function POST(req: NextRequest) {
     await page.setContent(html, { waitUntil: ['domcontentloaded', 'networkidle0'] });
     await page.emulateMediaType('screen');
 
-    const debugNodes = await page.evaluate(() => {
-      return Array.from(document.querySelectorAll('.mindmap-node')).slice(0, 5).map((el) => {
-        const style = window.getComputedStyle(el);
-        return {
-          text: el.textContent,
-          bg: style.backgroundColor,
-          color: style.color,
-          opacity: style.opacity,
-          transform: style.transform,
-          top: style.top,
-          left: style.left,
-          display: style.display,
-        };
-      });
-    });
-    console.log('Mind map node sample:', debugNodes);
-
     const pdfBuffer = await page.pdf({
       printBackground: true,
       width: `${width}px`,

@@ -193,6 +193,21 @@ export default function MindMapModal({ markdown, onClose }: MindMapModalProps) {
         'stroke-linejoin',
         'fill',
       ];
+      const cssVariables = [
+        '--node-bg-color',
+        '--node-border-color',
+        '--node-shadow',
+        '--hover-border-color',
+        '--root-text-color',
+        '--root-border-color',
+        '--indicator-border-color',
+        '--collapsed-indicator-color',
+        '--text-color',
+        '--connector-color',
+        '--root-bg-color',
+        '--color-background',
+        '--color-foreground',
+      ];
       const elements: Element[] = [root, ...Array.from(root.querySelectorAll('*'))];
       elements.forEach((el) => {
         const computed = window.getComputedStyle(el);
@@ -203,6 +218,28 @@ export default function MindMapModal({ markdown, onClose }: MindMapModalProps) {
               el.style.setProperty(prop, value);
             }
           });
+        }
+        cssVariables.forEach((varName) => {
+          const varValue = computed.getPropertyValue(varName);
+          if (varValue) {
+            (el as HTMLElement).style.setProperty(varName, varValue.trim());
+          }
+        });
+        if (el instanceof HTMLElement) {
+          const bg = computed.getPropertyValue('background-color');
+          if (bg && bg !== 'rgba(0, 0, 0, 0)' && bg !== 'transparent') {
+            el.style.backgroundColor = bg;
+          } else {
+            const varBg = computed.getPropertyValue('--node-bg-color');
+            if (varBg) el.style.backgroundColor = varBg.trim();
+          }
+          const color = computed.getPropertyValue('color');
+          if (color) {
+            el.style.color = color;
+          } else {
+            const varColor = computed.getPropertyValue('--text-color');
+            if (varColor) el.style.color = varColor.trim();
+          }
         }
         if (el instanceof SVGElement) {
           ['fill', 'stroke', 'stroke-width', 'stroke-dasharray', 'stroke-linecap', 'stroke-linejoin'].forEach((attr) => {
