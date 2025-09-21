@@ -16,14 +16,14 @@ export default function ContactPage() {
             Have a question about CogniGuide or your subscription? Reach out and we’ll get back to you as soon as possible.
           </p>
 
-          <div className="rounded-[1.25rem] border bg-white p-6 shadow-sm mb-8">
+          <div className="rounded-[1.25rem] border bg-background p-6 shadow-sm mb-8">
             <h2 className="font-heading font-semibold mb-2">Customer Support</h2>
             <p className="text-sm text-muted-foreground">
               Email us at: <a className="underline" href="mailto:cogniguide.dev@gmail.com">cogniguide.dev@gmail.com</a>
             </p>
           </div>
 
-          <div className="rounded-[1.25rem] border bg-white p-6 shadow-sm">
+          <div className="rounded-[1.25rem] border bg-background p-6 shadow-sm">
             <h2 className="font-heading font-semibold mb-4">Send us a message</h2>
             <ContactForm />
           </div>
