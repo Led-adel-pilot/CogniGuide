@@ -9,14 +9,20 @@ const supabaseAdmin = supabaseUrl && supabaseServiceKey
 
 export async function GET(
   _req: NextRequest,
-  context: { params?: Promise<{ shareId?: string }> }
+  { params }: { params: Promise<{ shareId: string }> }
 ) {
   if (!supabaseAdmin) {
     return NextResponse.json({ ok: false, error: 'Supabase is not configured.' }, { status: 500 });
   }
 
-  const resolvedParams = context.params ? await context.params : undefined;
-  const shareId = resolvedParams?.shareId;
+  let shareId: string | undefined;
+  try {
+    const resolvedParams = await params;
+    shareId = resolvedParams?.shareId;
+  } catch (error) {
+    console.error('Failed to resolve share params:', error);
+  }
+
   if (!shareId) {
     return NextResponse.json({ ok: false, error: 'Missing share ID.' }, { status: 400 });
   }
