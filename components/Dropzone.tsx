@@ -131,7 +131,7 @@ export default function Dropzone({ onFileChange, disabled = false, onOpen, isPre
         method: 'drag-and-drop',
         file_count: newFiles.length,
         file_types: newFiles.map(f => f.type),
-        total_size_kb: newFiles.reduce((sum, f) => sum + f.size, 0) / 1024,
+        total_size_mb: newFiles.reduce((sum, f) => sum + f.size, 0) / (1024 * 1024),
       });
       setFiles(prevFiles => {
         const merged = [...prevFiles, ...newFiles];
@@ -155,7 +155,7 @@ export default function Dropzone({ onFileChange, disabled = false, onOpen, isPre
         method: 'file-selector',
         file_count: newFiles.length,
         file_types: newFiles.map(f => f.type),
-        total_size_kb: newFiles.reduce((sum, f) => sum + f.size, 0) / 1024,
+        total_size_mb: newFiles.reduce((sum, f) => sum + f.size, 0) / (1024 * 1024),
       });
       setFiles(prevFiles => {
         const merged = [...prevFiles, ...newFiles];
@@ -180,7 +180,7 @@ export default function Dropzone({ onFileChange, disabled = false, onOpen, isPre
     posthog.capture('file_removed', {
       file_name: fileToRemove.name,
       file_type: fileToRemove.type,
-      file_size_kb: fileToRemove.size / 1024,
+      file_size_mb: fileToRemove.size / (1024 * 1024),
     });
     setFiles(prevFiles => prevFiles.filter(file => file !== fileToRemove));
     // Notify parent component to reset upload states
@@ -224,7 +224,7 @@ export default function Dropzone({ onFileChange, disabled = false, onOpen, isPre
                 <div key={index} className="relative flex-shrink-0 flex flex-col items-center justify-center text-center p-4 border bg-background rounded-[1.25rem]">
                   <File className="w-10 h-10 text-primary mb-2" />
                   <p className="text-sm font-semibold text-foreground truncate w-28" title={file.name}>{file.name}</p>
-                  <p className="text-xs text-muted-foreground">({(file.size / 1024).toFixed(2)} KB)</p>
+                  <p className="text-xs text-muted-foreground">({(file.size < 102400 ? (file.size / 1024).toFixed(2) + ' KB' : (file.size / (1024 * 1024)).toFixed(2) + ' MB')})</p>
                   <button
                     onClick={(e) => {
                       e.preventDefault();
