@@ -161,8 +161,8 @@ async function launchBrowser(viewportWidth: number, viewportHeight: number): Pro
   const usingBundledChromium = normalizedPath.includes('/tmp/chromium') || normalizedPath.includes('/appdata/local/temp/chromium');
   const isBrave = normalizedPath.includes('brave-browser');
 
-  const headlessForBundled = (chromium as unknown as { headless?: boolean | 'shell' | 'new' }).headless ?? 'shell';
-  const headlessMode: boolean | 'shell' | 'new' = usingBundledChromium ? headlessForBundled : isBrave ? true : 'new';
+  const headlessForBundled = (chromium as unknown as { headless?: boolean | 'shell' }).headless ?? 'shell';
+  const headlessMode: boolean | 'shell' = usingBundledChromium ? headlessForBundled : true;
 
   const baseArgs = usingBundledChromium
     ? [...chromium.args]
