@@ -1,5 +1,7 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
+import Image from 'next/image';
+import CogniGuideLogo from '@/CogniGuide_logo.png';
 
 export const metadata: Metadata = {
   title: 'How to Study for Exams: 7 Techniques to Ace Your Next Test',
@@ -15,14 +17,15 @@ export default function HowToStudyForExamsPage() {
     <div className="bg-background text-foreground">
       <header className="border-b border-border bg-background">
         <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-6 sm:px-6">
-          <Link href="/" className="text-lg font-semibold tracking-tight">
-            CogniGuide
+          <Link href="/" className="flex items-center gap-2 text-lg font-semibold tracking-tight">
+            <Image src={CogniGuideLogo} alt="CogniGuide Logo" width={32} height={32} className="h-8 w-8" />
+            <span>CogniGuide</span>
           </Link>
           <Link
             href="/"
-            className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+            className="inline-flex items-center justify-center rounded-full bg-primary px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-primary/90"
           >
-            Back to resources
+            Sign up
           </Link>
         </div>
       </header>
@@ -239,3 +242,7 @@ export default function HowToStudyForExamsPage() {
     </div>
   );
 }
+
+
+
+
