@@ -153,13 +153,34 @@ export default function DashboardClient() {
   }, []);
 
   const copyShareLink = async (link: string) => {
+    let success = false;
     try {
       if (typeof navigator !== 'undefined' && navigator.clipboard?.writeText) {
         await navigator.clipboard.writeText(link);
-      } else if (shareLinkInputRef.current && typeof document !== 'undefined') {
-        shareLinkInputRef.current.select();
-        document.execCommand('copy');
+        success = true;
+      } else {
+        // Fallback method using a temporary textarea
+        const textArea = document.createElement('textarea');
+        textArea.value = link;
+        textArea.style.position = 'fixed';
+        textArea.style.left = '-999999px';
+        textArea.style.top = '-999999px';
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        try {
+          success = document.execCommand('copy');
+        } catch {
+          success = false;
+        } finally {
+          document.body.removeChild(textArea);
+        }
       }
+    } catch {
+      success = false;
+    }
+
+    if (success) {
       if (shareCopiedTimeoutRef.current) {
         clearTimeout(shareCopiedTimeoutRef.current);
       }
@@ -168,7 +189,7 @@ export default function DashboardClient() {
         setShareCopied(false);
         shareCopiedTimeoutRef.current = null;
       }, 2000);
-    } catch {
+    } else {
       if (shareCopiedTimeoutRef.current) {
         clearTimeout(shareCopiedTimeoutRef.current);
         shareCopiedTimeoutRef.current = null;
