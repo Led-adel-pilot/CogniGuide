@@ -50,6 +50,7 @@ type Props = {
   isGenerating?: boolean;
   error?: string | null;
   onClose: () => void;
+  onReviewDueCards?: (indices: number[]) => void;
   deckId?: string; // id from DB record when opened from history
   initialIndex?: number;
   studyDueOnly?: boolean;
@@ -59,13 +60,15 @@ type Props = {
   isEmbedded?: boolean;
 };
 
-export default function FlashcardsModal({ open, title, cards, isGenerating = false, error, onClose, deckId, initialIndex, studyDueOnly = false, studyInterleaved = false, interleavedDecks, dueIndices, isEmbedded = false }: Props) {
+export default function FlashcardsModal({ open, title, cards, isGenerating = false, error, onClose, onReviewDueCards, deckId, initialIndex, studyDueOnly = false, studyInterleaved = false, interleavedDecks, dueIndices, isEmbedded = false }: Props) {
   const [index, setIndex] = React.useState(0);
   const [showAnswer, setShowAnswer] = React.useState(false);
   const [scheduledCards, setScheduledCards] = React.useState<CardWithSchedule[] | null>(null);
   const [deckExamDate, setDeckExamDate] = React.useState<string>('');
   const [examDateInput, setExamDateInput] = React.useState<Date | undefined>(undefined);
   const [dueList, setDueList] = React.useState<number[]>([]);
+  const [dueNowIndices, setDueNowIndices] = React.useState<number[]>([]);
+  const [immediateReviewIndices, setImmediateReviewIndices] = React.useState<number[]>([]);
   const [predictedDueByGrade, setPredictedDueByGrade] = React.useState<Record<number, string>>({});
   const [predictedDueDatesByGrade, setPredictedDueDatesByGrade] = React.useState<Record<number, Date>>({});
   const [hoveredGrade, setHoveredGrade] = React.useState<number | null>(null);
@@ -131,6 +134,8 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
       setShowExamDatePopup(false);
       setCardsViewedCount(0);
       setAnswerShownTime(null);
+      setDueNowIndices([]);
+      setImmediateReviewIndices([]);
     }
   }, [open]);
 
@@ -159,6 +164,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
   }, []);
 
   React.useEffect(() => {
+    setImmediateReviewIndices([]);
     if (!cards || cards.length === 0) { setScheduledCards(null); return; }
     // Try load stored schedule by deckId; fallback to fresh
     if (deckId && !studyInterleaved) {
@@ -275,6 +281,27 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
     }
   }, [studyInterleaved, current]);
 
+  React.useEffect(() => {
+    if (!finished || !scheduledCards || scheduledCards.length === 0 || studyInterleaved) {
+      setDueNowIndices([]);
+      return;
+    }
+
+    const now = Date.now();
+    const newlyDue = scheduledCards.reduce<number[]>((acc, card, idx) => {
+      const dueValue = card.schedule?.due;
+      if (!dueValue) return acc;
+      const dueTime = new Date(dueValue).getTime();
+      if (!Number.isNaN(dueTime) && dueTime <= now) {
+        acc.push(idx);
+      }
+      return acc;
+    }, []);
+
+    const combined = [...new Set([...newlyDue, ...immediateReviewIndices])].sort((a, b) => a - b);
+    setDueNowIndices(combined);
+  }, [finished, scheduledCards, studyInterleaved, immediateReviewIndices]);
+
   function formatTimeUntil(dueDate: Date, now: Date = new Date()): string {
     const ms = Math.max(0, dueDate.getTime() - now.getTime());
     const minute = 60_000;
@@ -339,6 +366,8 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
       return;
     }
 
+    const cardIndex = index;
+
     if (studyInterleaved && current?.deckId && typeof current?.cardIndex === 'number') {
       // Interleaved: update the source deck's schedule
       const sourceDeckId = current.deckId;
@@ -370,16 +399,18 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
       });
 
     } else {
+      let updatedSchedule: FsrsScheduleState | null = null;
       setScheduledCards((prev) => {
         if (!prev) return prev;
         const next = [...prev];
-        const item = { ...next[index] };
+        const item = { ...next[cardIndex] };
         const base = item.schedule ?? createInitialSchedule();
         // Ensure deck-level examDate is applied
         const withDeckExam = { ...base, examDate: deckExamDate || base.examDate } as FsrsScheduleState;
         const newSchedule = nextSchedule(withDeckExam, g, new Date());
         item.schedule = newSchedule;
-        next[index] = item;
+        next[cardIndex] = item;
+        updatedSchedule = newSchedule;
 
         if (deckId && newSchedule.examDate !== deckExamDate) {
           setDeckExamDate(newSchedule.examDate || '');
@@ -387,7 +418,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
 
         posthog.capture('flashcard_graded', {
           deckId: deckId,
-          card_index: index,
+          card_index: cardIndex,
           grade: g,
           study_due_only: studyDueOnly,
           study_interleaved: studyInterleaved,
@@ -396,6 +427,18 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
 
         return next;
       });
+
+      if (updatedSchedule) {
+        const dueTime = new Date(updatedSchedule.due).getTime();
+        const shouldReviewImmediately = !Number.isNaN(dueTime) && dueTime <= Date.now();
+        setImmediateReviewIndices((prev) => {
+          const filtered = prev.filter((i) => i !== cardIndex);
+          if (shouldReviewImmediately) {
+            return [...filtered, cardIndex].sort((a, b) => a - b);
+          }
+          return filtered;
+        });
+      }
     }
     setShowAnswer(false);
     setHoveredGrade(null);
@@ -468,12 +511,20 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
 
   if (!open && !isEmbedded) return null;
 
-  const ModalContent = () => (
-    <div className={`relative w-full h-full rounded-[1.5rem] flex flex-col overflow-hidden ${
-      isEmbedded
-        ? '!bg-transparent !border-0 !ring-0 !shadow-none'
-        : 'bg-background border border-border ring-1 ring-black/5 shadow-2xl'
-    }`}>
+  const ModalContent = () => {
+    const dueAgainCount = dueNowIndices.length;
+    const hasImmediateDue = dueAgainCount > 0;
+    const dueAgainText = dueAgainCount === 1 ? '1 card is already due for review' : `${dueAgainCount} cards are already due for review`;
+    const completionMessage = hasImmediateDue
+      ? `You finished this deck, but ${dueAgainText}. Let’s review them now while they’re fresh.`
+      : 'You have finished this deck for now. For best results with spaced repetition, be sure to come back for future review sessions.';
+
+    return (
+      <div className={`relative w-full h-full rounded-[1.5rem] flex flex-col overflow-hidden ${
+        isEmbedded
+          ? '!bg-transparent !border-0 !ring-0 !shadow-none'
+          : 'bg-background border border-border ring-1 ring-black/5 shadow-2xl'
+      }`}>
       {!isEmbedded && (
         <div className="absolute top-2 right-2 z-30">
           <button
@@ -550,23 +601,35 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
                       Congratulations!
                     </div>
                     <div className="text-foreground text-sm sm:text-base leading-6 max-w-md">
-                      You have finished this deck for now. For best results with spaced repetition, be sure to come back for future review sessions.
+                      {completionMessage}
                     </div>
-                                          <button
+                      <button
                         onClick={() => {
-                          setFinished(false);
-                          setIndex(0);
-                          setShowAnswer(false);
-                          setHoveredGrade(null);
-                          setPredictedDueByGrade({});
-                          setPredictedDueDatesByGrade({});
-                          setCardsViewedCount(0);
-                          setShowSignupPopup(false);
-                          setAnswerShownTime(null);
+                          if (dueNowIndices.length > 0) {
+                            const nextDueList = [...dueNowIndices];
+                            if (nextDueList.length > 0) {
+                              setDueList(nextDueList);
+                              setOriginalDueList(nextDueList);
+                              setOriginalDueCount(nextDueList.length);
+                              setIndex(nextDueList[0]);
+                            }
+                            setFinished(false);
+                            setShowAnswer(false);
+                            setHoveredGrade(null);
+                            setPredictedDueByGrade({});
+                            setPredictedDueDatesByGrade({});
+                            setImmediateReviewIndices([]);
+                            setCardsViewedCount(0);
+                            setShowSignupPopup(false);
+                            setAnswerShownTime(null);
+                            onReviewDueCards?.(nextDueList);
+                          } else {
+                            handleClose();
+                          }
                         }}
                         className="mt-6 inline-flex items-center h-10 px-6 rounded-full text-white bg-gradient-primary shadow-sm hover:bg-gradient-primary-hover transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/50 whitespace-nowrap"
                       >
-                        Start Over
+                        {dueNowIndices.length > 0 ? 'Review due cards' : 'Close'}
                       </button>
                   </div>
                 </div>
@@ -814,6 +877,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
       </div>
     </div>
   );
+  };
 
   if (isEmbedded) {
     return <ModalContent />;

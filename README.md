@@ -19,8 +19,123 @@ CogniGuide comprehensive AI-powered study assistant. It uses an LLM to convert t
 *   **Persistent Study Progress:** The flashcard study interface automatically remembers the user's last viewed card position, even after closing the modal, refreshing the page, or reopening the browser. This works for both saved decks (using deck ID) and unsaved decks (using a unique identifier based on deck content). Progress is stored locally and persists across sessions.
 *   **Interleaved Study Mode:** Advanced spaced repetition feature that interleaves cards from multiple decks to maximize learning effectiveness. When you have due cards from different subjects, this mode presents them in a randomized order while ensuring no two consecutive cards are from the same deck, forcing beneficial context switching that improves long-term retention. Each card maintains its individual deck's exam date and scheduling preferences.
 *   **Auth & History:** Users must sign in (Email magic link or Google) to generate mind maps or flashcards. Signed-in users get a dashboard with a unified reverse-chronological history of both mind maps and flashcards. Items show lucide icons (map vs card). Mind maps are stored as Markmap markdown; flashcards are stored as a JSON array (and may omit markdown when generated directly from files/prompts).
+*   **Public Link Sharing:** Users can create shareable public links for their mind maps and flashcard decks from the dashboard history. These links allow anyone with the URL to view the content without signing in. The sharing system includes intelligent content deduplication, automatic import for signed-in users, and secure token-based access control.
 *   **Seamless Save on Sign-Up:** When a non-authenticated user generates a mind map and then signs up to save it, the mind map is automatically saved to their new account and appears in their history, ensuring no work is lost.
 *   **Localized Date Formatting:** All dates and times are automatically displayed in the user's preferred locale format (dd/mm/yy, mm/dd/yy, etc.) based on their browser's language settings. This ensures users see dates in their familiar format whether they prefer European (dd/mm), American (mm/dd), or other regional date conventions.
+
+## Public Link Sharing System
+
+CogniGuide includes a comprehensive public link sharing system that allows users to share their mind maps and flashcard decks with anyone via secure, token-based URLs. This feature enhances collaboration and content sharing while maintaining security and user control.
+
+### Key Features
+
+*   **Secure Token-Based Access:** Uses cryptographically signed tokens to control access to shared content
+*   **Content Deduplication:** Automatically detects and prevents duplicate imports when users access shared content they already own
+*   **Automatic Import:** Signed-in users can seamlessly import shared content with a single click
+*   **No Authentication Required:** Anyone with a share link can view the content without signing in
+*   **Owner Verification:** Only content owners can create share links for their items
+*   **Share Link Caching:** Frontend caches generated share links to improve performance
+
+### How It Works
+
+#### 1. Creating Share Links
+- Users access the sharing feature through the "Share" option in the history item dropdown menu on the dashboard
+- The system verifies the user owns the item before allowing share link creation
+- A secure token is generated using HMAC-SHA256 signature with the user's content ID and type
+- The token is embedded in a public URL: `/share/{type}/{token}` (e.g., `/share/mindmap/abc123.def456`)
+
+#### 2. Token Generation & Security
+- **Token Format:** `{payload}.{signature}` where payload contains the content type and ID
+- **Signing Algorithm:** HMAC-SHA256 using a secret key (SHARE_LINK_SECRET or SUPABASE_SERVICE_ROLE_KEY)
+- **Base64 URL Encoding:** Tokens use URL-safe base64 encoding for compatibility
+- **Timing-Safe Verification:** Server-side verification prevents timing attacks
+- **Token Validation:** Tokens include type checking and ownership verification
+
+#### 3. Accessing Shared Content
+- When someone visits a share link, the system validates the token and retrieves the original content
+- Content is displayed using the same viewer components (MindMapModal/FlashcardsModal) as the original
+- For authenticated users, an "Import" button allows them to save the shared content to their own account
+
+#### 4. Smart Import Logic
+- **Deduplication Check:** Before importing, the system checks if the user already has identical content
+- **Content Matching:** Compares content by markdown (for mind maps) or cards array (for flashcards)
+- **Automatic Import:** If content doesn't exist, it's automatically imported to the user's account
+- **User Feedback:** Clear messaging indicates whether content was imported or already owned
+
+### Technical Implementation
+
+#### API Endpoints
+
+**Share Link Creation** (`POST /api/share-link`)
+- Accepts: `{ itemId: string, itemType: 'mindmap' | 'flashcards' }`
+- Authentication: Required (Bearer token)
+- Process: Verifies ownership → generates token → returns share URL
+- Response: `{ ok: true, token: string, url: string }`
+
+**Share Link Import** (`POST /api/share-link/import`)
+- Accepts: `{ token: string }`
+- Authentication: Required (Bearer token)
+- Process: Validates token → checks for existing content → imports if needed
+- Response: `{ ok: true, recordId: string, alreadyOwned: boolean }`
+
+#### Token Management (`lib/share-links.ts`)
+- `createShareToken(type, id)`: Generates signed tokens for sharing
+- `verifyShareToken(token)`: Validates and decodes share tokens
+- Security: Uses timing-safe comparison for signature verification
+- Error Handling: Comprehensive validation with detailed error messages
+
+#### Frontend Integration (`components/ShareViewer.tsx`)
+- Handles display of shared content for both mind maps and flashcards
+- Automatically attempts to import content when user is authenticated
+- Manages authentication state changes during the import process
+- Provides seamless viewing experience identical to owned content
+
+#### Dashboard Integration (`app/dashboard/DashboardClient.tsx`)
+- Share buttons in history item dropdown menus
+- Modal for displaying and copying share links
+- Link caching to avoid redundant API calls
+- Copy-to-clipboard functionality with user feedback
+- Error handling for failed share operations
+
+### Security Features
+
+*   **Ownership Verification:** Only content owners can create share links
+*   **Token Expiration:** Tokens are cryptographically signed but don't include explicit expiration (relying on content ownership for revocation)
+*   **Content Isolation:** Shared content is served without exposing the original owner's account information
+*   **Secure Defaults:** All sharing operations require explicit user action
+*   **Audit Trail:** Share operations are tracked via PostHog analytics
+
+### User Experience
+
+#### For Content Creators:
+1. Click the "⋮" menu on any history item
+2. Select "Share" to open the share modal
+3. Click "Create Link" to generate a shareable URL
+4. Copy the link and share it with others
+5. The link can be used immediately and remains functional until the content is deleted
+
+#### For Content Consumers:
+1. Click a shared link to view the content
+2. If signed in, click "Import" to save to your account
+3. If not signed in, view the content directly
+4. Imported content appears in your dashboard history
+
+### Integration with Existing Features
+
+- **Spaced Repetition:** Imported flashcards maintain their scheduling state and can be studied immediately
+- **History Management:** Imported items appear in the unified history with proper timestamps
+- **Export Functions:** All export options (SVG, PNG, PDF) work with shared content
+- **Search & Organization:** Shared content can be renamed and managed like owned content
+
+### Analytics & Monitoring
+
+The sharing system includes comprehensive analytics tracking:
+- Share link creation events
+- Successful imports
+- Failed sharing attempts
+- Content view counts (via share page visits)
+
+This data helps improve the sharing experience and understand content usage patterns.
 
 ## Technology Stack
 *   **Framework:** Next.js (React) for building the web application.
