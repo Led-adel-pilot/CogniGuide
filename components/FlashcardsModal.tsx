@@ -399,7 +399,6 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
       });
 
     } else {
-      let updatedSchedule: FsrsScheduleState | null = null;
       setScheduledCards((prev) => {
         if (!prev) return prev;
         const next = [...prev];
@@ -408,9 +407,13 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
         // Ensure deck-level examDate is applied
         const withDeckExam = { ...base, examDate: deckExamDate || base.examDate } as FsrsScheduleState;
         const newSchedule = nextSchedule(withDeckExam, g, new Date());
+
+        // Check if card should be reviewed immediately
+        const dueTime = new Date(newSchedule.due).getTime();
+        const shouldReviewImmediately = !Number.isNaN(dueTime) && dueTime <= Date.now();
+
         item.schedule = newSchedule;
         next[cardIndex] = item;
-        updatedSchedule = newSchedule;
 
         if (deckId && newSchedule.examDate !== deckExamDate) {
           setDeckExamDate(newSchedule.examDate || '');
@@ -425,20 +428,17 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
           next_due_date: newSchedule.due,
         });
 
-        return next;
-      });
-
-      if (updatedSchedule) {
-        const dueTime = new Date(updatedSchedule.due).getTime();
-        const shouldReviewImmediately = !Number.isNaN(dueTime) && dueTime <= Date.now();
-        setImmediateReviewIndices((prev) => {
-          const filtered = prev.filter((i) => i !== cardIndex);
+        // Handle immediate review logic
+        setImmediateReviewIndices((prevIndices) => {
+          const filtered = prevIndices.filter((i) => i !== cardIndex);
           if (shouldReviewImmediately) {
             return [...filtered, cardIndex].sort((a, b) => a - b);
           }
           return filtered;
         });
-      }
+
+        return next;
+      });
     }
     setShowAnswer(false);
     setHoveredGrade(null);
