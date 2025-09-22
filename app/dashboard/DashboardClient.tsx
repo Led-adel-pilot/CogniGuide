@@ -1165,6 +1165,15 @@ export default function DashboardClient() {
         isGenerating={false}
         error={flashcardsError}
         onClose={() => { setFlashcardsOpen(false); setFlashcardsCards(null); setFlashcardsError(null); setStudyDueOnly(false); setStudyInterleaved(false); setDueIndices(undefined); setInitialDueIndex(undefined); }}
+        onReviewDueCards={(indices) => {
+          if (!indices || indices.length === 0) {
+            return;
+          }
+          setStudyDueOnly(true);
+          setStudyInterleaved(false);
+          setDueIndices(indices);
+          setInitialDueIndex(indices[0]);
+        }}
         deckId={activeDeckId || (flashcardsCards as any)?.__deckId}
         studyDueOnly={studyDueOnly}
         studyInterleaved={studyInterleaved}
