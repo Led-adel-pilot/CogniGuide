@@ -7,7 +7,7 @@ import { supabase, MindmapRecord, FlashcardsRecord } from '@/lib/supabaseClient'
 import Generator from '@/components/Generator';
 import MindMapModal from '@/components/MindMapModal';
 import FlashcardsModal, { Flashcard as FlashcardType } from '@/components/FlashcardsModal';
-import { BrainCircuit, LogOut, Loader2, Map as MapIcon, Coins, Zap, Sparkles, CalendarClock, Menu, X, ChevronRight, MoreHorizontal, Edit, Trash2, Share2 } from 'lucide-react';
+import { BrainCircuit, LogOut, Loader2, Map as MapIcon, Coins, Zap, Sparkles, CalendarClock, Menu, X, ChevronRight, MoreHorizontal, Edit, Trash2, Share2, Link2, Copy, Check } from 'lucide-react';
 import FlashcardIcon from '@/components/FlashcardIcon';
 import { loadDeckSchedule, saveDeckSchedule, loadDeckScheduleAsync, saveDeckScheduleAsync, loadAllDeckSchedulesAsync, upsertDeckSchedulesBulkAsync, type StoredDeckSchedule } from '@/lib/sr-store';
 import { createInitialSchedule } from '@/lib/spaced-repetition';
@@ -107,6 +107,7 @@ export default function DashboardClient() {
   const [shareLoading, setShareLoading] = useState(false);
   const [shareCopied, setShareCopied] = useState(false);
   const shareLinkInputRef = useRef<HTMLInputElement | null>(null);
+  const shareCopiedTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const shareLinksCacheRef = useRef<Map<string, string>>(new Map());
 
   // Refs mirroring pagination state for async safety
@@ -126,14 +127,55 @@ export default function DashboardClient() {
       const cached = shareLinksCacheRef.current.get(key) || null;
       setShareLink(cached);
       setShareError(null);
+      if (shareCopiedTimeoutRef.current) {
+        clearTimeout(shareCopiedTimeoutRef.current);
+        shareCopiedTimeoutRef.current = null;
+      }
       setShareCopied(false);
     } else {
       setShareLink(null);
       setShareError(null);
       setShareLoading(false);
+      if (shareCopiedTimeoutRef.current) {
+        clearTimeout(shareCopiedTimeoutRef.current);
+        shareCopiedTimeoutRef.current = null;
+      }
       setShareCopied(false);
     }
   }, [shareItem]);
+
+  useEffect(() => {
+    return () => {
+      if (shareCopiedTimeoutRef.current) {
+        clearTimeout(shareCopiedTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  const copyShareLink = async (link: string) => {
+    try {
+      if (typeof navigator !== 'undefined' && navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(link);
+      } else if (shareLinkInputRef.current && typeof document !== 'undefined') {
+        shareLinkInputRef.current.select();
+        document.execCommand('copy');
+      }
+      if (shareCopiedTimeoutRef.current) {
+        clearTimeout(shareCopiedTimeoutRef.current);
+      }
+      setShareCopied(true);
+      shareCopiedTimeoutRef.current = setTimeout(() => {
+        setShareCopied(false);
+        shareCopiedTimeoutRef.current = null;
+      }, 2000);
+    } catch {
+      if (shareCopiedTimeoutRef.current) {
+        clearTimeout(shareCopiedTimeoutRef.current);
+        shareCopiedTimeoutRef.current = null;
+      }
+      setShareCopied(false);
+    }
+  };
 
   const handleCreateShareLink = async () => {
     if (!shareItem) return;
@@ -163,6 +205,7 @@ export default function DashboardClient() {
       const key = `${shareItem.type}:${shareItem.id}`;
       shareLinksCacheRef.current.set(key, link);
       setShareLink(link);
+      await copyShareLink(link);
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Failed to create share link.';
       setShareError(message);
@@ -173,17 +216,15 @@ export default function DashboardClient() {
 
   const handleCopyShareLink = async () => {
     if (!shareLink) return;
-    try {
-      if (typeof navigator !== 'undefined' && navigator.clipboard?.writeText) {
-        await navigator.clipboard.writeText(shareLink);
-      } else if (shareLinkInputRef.current && typeof document !== 'undefined') {
-        shareLinkInputRef.current.select();
-        document.execCommand('copy');
-      }
-      setShareCopied(true);
-      setTimeout(() => setShareCopied(false), 2000);
-    } catch {
-      setShareCopied(false);
+    await copyShareLink(shareLink);
+  };
+
+  const handleShareButtonClick = () => {
+    if (shareLoading) return;
+    if (shareLink) {
+      void handleCopyShareLink();
+    } else {
+      void handleCreateShareLink();
     }
   };
 
@@ -1401,49 +1442,55 @@ export default function DashboardClient() {
 
       {shareItem && (
         <div className="fixed inset-0 bg-black/40 dark:bg-black/60 z-50 flex items-center justify-center p-4" onClick={() => setShareItem(null)}>
-          <div className="bg-background rounded-[1.5rem] p-6 w-full max-w-md border" onClick={(e) => e.stopPropagation()}>
-            <div className="flex items-start justify-between gap-4 mb-4">
-              <div>
-                <h2 className="text-lg font-bold">Share {shareItem.type === 'mindmap' ? 'Mind Map' : 'Flashcards'}</h2>
-                <p className="text-sm text-muted-foreground">Create a public link so anyone can view this {shareItem.type === 'mindmap' ? 'mind map' : 'deck'}.</p>
-              </div>
-              <button onClick={() => setShareItem(null)} className="inline-flex items-center justify-center w-8 h-8 rounded-full border border-border hover:bg-muted/60">
-                <X className="h-4 w-4" />
-              </button>
+          <div className="relative bg-background rounded-[1.5rem] p-6 w-full max-w-md border" onClick={(e) => e.stopPropagation()}>
+            <button onClick={() => setShareItem(null)} className="absolute top-4 right-4 inline-flex items-center justify-center w-8 h-8 rounded-full border border-border hover:bg-muted/60">
+              <X className="h-4 w-4" />
+            </button>
+            <div className="mb-1">
+              <h2 className="text-lg font-bold">Share public link to {shareItem.type === 'mindmap' ? 'Mind Map' : 'Flashcards'}</h2>
             </div>
+            <p className="text-xs text-muted-foreground mb-4">Anyone with the link can view this {shareItem.type === 'mindmap' ? 'mind map' : 'flashcard deck'}.</p>
             {shareError && (
               <div className="mb-3 text-sm text-red-600">{shareError}</div>
             )}
-            {shareLink ? (
-              <div className="space-y-3">
-                <div>
-                  <div className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Share link</div>
-                  <div className="mt-1 flex items-center gap-2">
-                    <input
-                      ref={shareLinkInputRef}
-                      value={shareLink}
-                      readOnly
-                      className="flex-1 px-3 py-2 rounded-lg border bg-muted/40 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
-                    />
-                    <button
-                      onClick={handleCopyShareLink}
-                      className="px-3 py-2 rounded-lg border bg-primary text-primary-foreground hover:bg-primary/90 text-sm"
-                    >
-                      {shareCopied ? 'Copied!' : 'Copy'}
-                    </button>
-                  </div>
-                </div>
-                <p className="text-xs text-muted-foreground">Anyone with the link can view this {shareItem.type === 'mindmap' ? 'mind map' : 'flashcard deck'} without signing in.</p>
+            <div className="space-y-3">
+              <div className="flex rounded-full border border-border/40 bg-background shadow-inner focus-within:outline-none focus-within:ring-2 focus-within:ring-primary/40">
+                <input
+                  ref={shareLinkInputRef}
+                  value={shareLink ?? ''}
+                  readOnly
+                  placeholder="https://cogniguide.app/share/…"
+                  className="flex-1 bg-transparent px-4 py-3 text-sm font-medium text-foreground border-none outline-none focus:ring-0"
+                />
+                <button
+                  type="button"
+                  onClick={handleShareButtonClick}
+                  disabled={shareLoading}
+                  className="inline-flex items-center justify-center gap-2 rounded-full bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground transition hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50 mr-1 my-1"
+                >
+                  {shareLoading ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : shareLink ? (
+                    shareCopied ? (
+                      <Check className="h-4 w-4" />
+                    ) : (
+                      <Copy className="h-4 w-4" />
+                    )
+                  ) : (
+                    <Link2 className="h-4 w-4" />
+                  )}
+                  <span>
+                    {shareLoading
+                      ? 'Creating…'
+                      : shareLink
+                        ? shareCopied
+                          ? 'Copied!'
+                          : 'Copy link'
+                        : 'Create link'}
+                  </span>
+                </button>
               </div>
-            ) : (
-              <button
-                onClick={handleCreateShareLink}
-                disabled={shareLoading}
-                className="inline-flex items-center justify-center w-full h-11 rounded-full border bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {shareLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Create Link'}
-              </button>
-            )}
+            </div>
           </div>
         </div>
       )}
