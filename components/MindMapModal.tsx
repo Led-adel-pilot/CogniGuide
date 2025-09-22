@@ -382,11 +382,15 @@ export default function MindMapModal({ markdown, onClose }: MindMapModalProps) {
 
                 try {
                     await new Promise(resolve => setTimeout(resolve, 100));
+                    const pdfPixelRatio = format === 'pdf'
+                      ? Math.min(Math.max((window.devicePixelRatio || 1) * 1.5, 1), 1.2)
+                      : undefined;
                     const dataUrl = await toPng(clonedContainer, {
                         quality: 1.0,
                         backgroundColor: themeBackgroundCss,
                         cacheBust: true,
-                        filter: () => true
+                        filter: () => true,
+                        ...(pdfPixelRatio ? { pixelRatio: pdfPixelRatio } : {})
                     });
                     if (format === 'png') {
                         const link = document.createElement('a');
@@ -431,6 +435,17 @@ export default function MindMapModal({ markdown, onClose }: MindMapModalProps) {
                         const x = (pageWidth - renderW) / 2;
                         const y = (pageHeight - renderH) / 2;
                         pdf.addImage(dataUrl, 'PNG', x, y, renderW, renderH, undefined, 'FAST');
+                        // Add CogniGuide watermark with clickable link in the PDF export
+                        const watermarkText = 'Made with CogniGuide';
+                        const watermarkFontSize = 8;
+                        const watermarkMarginMm = 6;
+                        pdf.setTextColor(150, 150, 150);
+                        pdf.setFontSize(watermarkFontSize);
+                        const watermarkWidth = pdf.getTextWidth(watermarkText);
+                        const watermarkX = Math.max(watermarkMarginMm, pageWidth - watermarkMarginMm - watermarkWidth);
+                        const watermarkY = pageHeight - watermarkMarginMm;
+                        pdf.textWithLink(watermarkText, watermarkX, watermarkY, { url: 'https://cogniguide.app' });
+                        pdf.setTextColor(0, 0, 0);
                         pdf.save(`${sanitizedTitle}.pdf`);
                     }
                 } catch (error) {
@@ -1116,4 +1131,6 @@ export default function MindMapModal({ markdown, onClose }: MindMapModalProps) {
     </>
   );
 }
+
+
 
