@@ -380,6 +380,43 @@ export default function MindMapModal({ markdown, onClose }: MindMapModalProps) {
                   });
                 } catch {}
 
+                if (format === 'png') {
+                  const watermark = document.createElement('div');
+                  watermark.textContent = 'CogniGuide';
+                  const shorterSide = Math.max(Math.min(exportWidth, exportHeight), 1);
+                  const fontSizePx = Math.round(
+                    Math.max(Math.min(shorterSide * 0.04, 28), 22)
+                  );
+                  const offsetPx = Math.round(Math.max(marginPx * 0.6, 18));
+                  const [bgR, bgG, bgB] = themeBackgroundRgb;
+                  const relativeLuminance =
+                    (0.2126 * bgR + 0.7152 * bgG + 0.0722 * bgB) / 255;
+                  const textColor =
+                    relativeLuminance < 0.5
+                      ? 'rgba(255, 255, 255, 0.7)'
+                      : 'rgba(17, 17, 17, 0.7)';
+                  const shadowColor =
+                    relativeLuminance < 0.5
+                      ? 'rgba(0, 0, 0, 0.3)'
+                      : 'rgba(255, 255, 255, 0.4)';
+                  watermark.style.position = 'absolute';
+                  watermark.style.bottom = `${offsetPx}px`;
+                  watermark.style.right = `${offsetPx}px`;
+                  watermark.style.fontFamily = "'Poppins', 'Helvetica Neue', Arial, sans-serif";
+                  watermark.style.fontWeight = '700';
+                  watermark.style.fontSize = `${fontSizePx}px`;
+                  watermark.style.color = textColor;
+                  watermark.style.opacity = '0.7';
+                  watermark.style.letterSpacing = '-0.01em';
+                  watermark.style.whiteSpace = 'nowrap';
+                  watermark.style.pointerEvents = 'none';
+                  watermark.style.userSelect = 'none';
+                  watermark.style.lineHeight = '1';
+                  watermark.style.textShadow = `0 1px 3px ${shadowColor}`;
+                  watermark.style.zIndex = '5';
+                  clonedContainer.appendChild(watermark);
+                }
+
                 try {
                     await new Promise(resolve => setTimeout(resolve, 100));
                     const pdfPixelRatio = format === 'pdf'
