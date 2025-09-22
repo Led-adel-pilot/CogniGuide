@@ -39,6 +39,159 @@ export default function MindMapModal({ markdown, onClose }: MindMapModalProps) {
     }
   };
 
+  const isMeaningfulColor = (value?: string | null): value is string => {
+    if (!value) return false;
+    const trimmed = value.trim();
+    if (!trimmed) return false;
+    const lower = trimmed.toLowerCase();
+    return lower !== 'transparent' && lower !== 'rgba(0, 0, 0, 0)';
+  };
+
+  const normalizeCssColorValue = (value?: string | null): string | null => {
+    if (!isMeaningfulColor(value)) return null;
+    const trimmed = value.trim();
+    if (typeof window === 'undefined') return trimmed;
+    let probe: HTMLDivElement | null = null;
+    let appended = false;
+    try {
+      probe = document.createElement('div');
+      probe.style.backgroundColor = trimmed;
+      if (!probe.style.backgroundColor) {
+        probe.style.backgroundColor = '';
+        probe.style.color = trimmed;
+      }
+      if (document.body) {
+        probe.style.position = 'absolute';
+        probe.style.left = '-9999px';
+        probe.style.top = '0';
+        probe.style.width = '0';
+        probe.style.height = '0';
+        document.body.appendChild(probe);
+        appended = true;
+        const styles = window.getComputedStyle(probe);
+        const computedBackground = styles.backgroundColor;
+        const computedColor = styles.color;
+        if (isMeaningfulColor(computedBackground)) {
+          return computedBackground.trim();
+        }
+        if (isMeaningfulColor(computedColor)) {
+          return computedColor.trim();
+        }
+      }
+      const inlineBackground = probe.style.backgroundColor;
+      if (isMeaningfulColor(inlineBackground)) {
+        return inlineBackground.trim();
+      }
+      const inlineColor = probe.style.color;
+      if (isMeaningfulColor(inlineColor)) {
+        return inlineColor.trim();
+      }
+    } catch {
+      return trimmed;
+    } finally {
+      if (probe && appended && document.body?.contains(probe)) {
+        document.body.removeChild(probe);
+      }
+    }
+    return trimmed;
+  };
+
+  const clampRgbComponent = (value: number) => Math.min(255, Math.max(0, Math.round(value)));
+
+  const parseNormalizedColorToRgb = (color: string): [number, number, number] | null => {
+    const trimmed = color.trim();
+    if (!trimmed) return null;
+    if (trimmed.startsWith('#')) {
+      let hex = trimmed.slice(1);
+      if (hex.length === 3 || hex.length === 4) {
+        hex = hex
+          .slice(0, 3)
+          .split('')
+          .map(ch => ch + ch)
+          .join('');
+      } else if (hex.length === 8) {
+        hex = hex.slice(0, 6);
+      }
+      if (hex.length !== 6) return null;
+      const num = Number.parseInt(hex, 16);
+      if (Number.isNaN(num)) return null;
+      return [
+        clampRgbComponent((num >> 16) & 0xff),
+        clampRgbComponent((num >> 8) & 0xff),
+        clampRgbComponent(num & 0xff)
+      ];
+    }
+    const rgbMatch = trimmed.match(/^rgba?\(\s*([0-9.]+%?)(?:\s*,\s*|\s+)([0-9.]+%?)(?:\s*,\s*|\s+)([0-9.]+%?)(?:\s*(?:\/|,)\s*[0-9.]+%?)?\s*\)$/i);
+    if (rgbMatch) {
+      const components = rgbMatch.slice(1, 4).map(part => {
+        const numeric = Number.parseFloat(part);
+        if (Number.isNaN(numeric)) return 0;
+        if (part.trim().endsWith('%')) {
+          return clampRgbComponent((numeric / 100) * 255);
+        }
+        return clampRgbComponent(numeric);
+      }) as [number, number, number];
+      return components;
+    }
+    return null;
+  };
+
+  const isDarkModeActive = (): boolean => {
+    if (typeof document === 'undefined') return false;
+    const html = document.documentElement;
+    const dataTheme = html.getAttribute('data-theme')?.toLowerCase();
+    if (dataTheme === 'dark') return true;
+    if (dataTheme === 'light') return false;
+    const combinedClassList = `${html.className} ${document.body?.className ?? ''}`.toLowerCase();
+    if (combinedClassList.includes('dark')) return true;
+    if (combinedClassList.includes('light')) return false;
+    if (typeof window !== 'undefined' && typeof window.matchMedia === 'function') {
+      try {
+        return window.matchMedia('(prefers-color-scheme: dark)').matches;
+      } catch {
+        return false;
+      }
+    }
+    return false;
+  };
+
+  const getThemeBackgroundColor = (): { css: string; rgb: [number, number, number] } => {
+    const candidates: (string | null | undefined)[] = [];
+    if (viewportRef.current) {
+      candidates.push(viewportRef.current.style.backgroundColor);
+      try {
+        candidates.push(window.getComputedStyle(viewportRef.current).backgroundColor);
+      } catch {}
+    }
+    if (containerRef.current) {
+      candidates.push(containerRef.current.style.backgroundColor);
+      try {
+        candidates.push(window.getComputedStyle(containerRef.current).backgroundColor);
+      } catch {}
+    }
+    if (typeof document !== 'undefined') {
+      try {
+        candidates.push(document.body?.style.backgroundColor);
+        candidates.push(document.body ? window.getComputedStyle(document.body).backgroundColor : null);
+      } catch {}
+      try {
+        candidates.push(document.documentElement?.style.backgroundColor);
+        candidates.push(document.documentElement ? window.getComputedStyle(document.documentElement).backgroundColor : null);
+        candidates.push(document.documentElement ? window.getComputedStyle(document.documentElement).getPropertyValue('--color-background') : null);
+      } catch {}
+    }
+    for (const candidate of candidates) {
+      const normalized = normalizeCssColorValue(candidate);
+      if (!normalized) continue;
+      const rgb = parseNormalizedColorToRgb(normalized);
+      if (rgb) {
+        return { css: `rgb(${rgb[0]}, ${rgb[1]}, ${rgb[2]})`, rgb };
+      }
+    }
+    const fallbackRgb: [number, number, number] = isDarkModeActive() ? [17, 23, 34] : [255, 255, 255];
+    return { css: `rgb(${fallbackRgb[0]}, ${fallbackRgb[1]}, ${fallbackRgb[2]})`, rgb: fallbackRgb };
+  };
+
   // Lightweight SHA-256 hex for stable local cache keys per markdown
   const computeSHA256Hex = async (input: string): Promise<string> => {
     const encoder = new TextEncoder();
@@ -196,30 +349,15 @@ export default function MindMapModal({ markdown, onClose }: MindMapModalProps) {
                 const exportWidth = Math.max(1, Math.ceil(maxRight - minLeft) + marginPx * 2);
                 const exportHeight = Math.max(1, Math.ceil(maxBottom - minTop) + marginPx * 2);
 
-                // Determine theme background from viewport/body (light or dark)
-                let themeBackground = 'white';
-                try {
-                  const viewportEl = viewportRef.current;
-                  if (viewportEl) {
-                    const vpBg = window.getComputedStyle(viewportEl).backgroundColor;
-                    if (vpBg && vpBg !== 'rgba(0, 0, 0, 0)' && vpBg !== 'transparent') {
-                      themeBackground = vpBg;
-                    }
-                  }
-                  if (themeBackground === 'white' && typeof document !== 'undefined' && document.body) {
-                    const bodyBg = window.getComputedStyle(document.body).backgroundColor;
-                    if (bodyBg && bodyBg !== 'rgba(0, 0, 0, 0)' && bodyBg !== 'transparent') {
-                      themeBackground = bodyBg;
-                    }
-                  }
-                } catch {}
+                // Determine the effective theme background once so exports stay consistent
+                const { css: themeBackgroundCss, rgb: themeBackgroundRgb } = getThemeBackgroundColor();
 
                 // Prepare cloned container for clean capture
                 const svg = clonedContainer.querySelector('#mindmap-svg') as SVGElement | null;
 
                 // Clear backgrounds and reset positioning on clone
-                clonedContainer.style.background = '';
-                clonedContainer.style.backgroundColor = '';
+                clonedContainer.style.background = themeBackgroundCss;
+                clonedContainer.style.backgroundColor = themeBackgroundCss;
                 clonedContainer.style.transform = 'none';
                 clonedContainer.style.position = 'absolute';
                 clonedContainer.style.left = '0';
@@ -246,7 +384,7 @@ export default function MindMapModal({ markdown, onClose }: MindMapModalProps) {
                     await new Promise(resolve => setTimeout(resolve, 100));
                     const dataUrl = await toPng(clonedContainer, {
                         quality: 1.0,
-                        backgroundColor: themeBackground,
+                        backgroundColor: themeBackgroundCss,
                         cacheBust: true,
                         filter: () => true
                     });
@@ -275,6 +413,11 @@ export default function MindMapModal({ markdown, onClose }: MindMapModalProps) {
                         const pdf = new jsPDF({ orientation, unit: 'mm', format: 'a4' });
                         const pageWidth = pdf.internal.pageSize.getWidth();
                         const pageHeight = pdf.internal.pageSize.getHeight();
+                        const backgroundRgb = themeBackgroundRgb;
+                        if (backgroundRgb) {
+                          pdf.setFillColor(backgroundRgb[0], backgroundRgb[1], backgroundRgb[2]);
+                          pdf.rect(0, 0, pageWidth, pageHeight, 'F');
+                        }
                         // Preserve aspect ratio and keep a small safety margin so the map never stretches
                         const marginMm = Math.min(Math.max(marginPx * pxToMm, 0), Math.min(pageWidth, pageHeight) / 2);
                         const imgWidthMm = imgWidthPx * pxToMm;
