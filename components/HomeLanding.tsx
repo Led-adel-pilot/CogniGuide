@@ -89,19 +89,30 @@ export default function HomeLanding() {
         </header>
 
         <main className="flex-1">
-          <section className="relative pt-12 pb-16 md:pt-16 md:pb-20 overflow-hidden">
-            <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[40rem] h-[40rem] bg-primary/10 rounded-full blur-3xl -z-10"></div>
+          <section className="relative pt-4 pb-16 md:pt-9 md:pb-20 overflow-hidden">
+            <div className="absolute inset-0 bg-grid-pattern opacity-5 pointer-events-none"></div>
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[40rem] h-[40rem] bg-primary/10 rounded-full blur-3xl -z-10 pointer-events-none"></div>
             <div className="container">
               <div className="flex flex-col lg:flex-row gap-12 lg:gap-16 items-start">
                 <div className="w-full lg:w-[28rem] xl:w-[32rem]">
                   <div className="text-center lg:text-left">
-                    <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold font-heading tracking-tighter md:leading-tight mb-6">
+                    <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold font-heading tracking-tighter md:leading-tight mb-4">
                       Learn Faster. Remember More. Ace Your Exams.
                     </h1>
-                    <p className="text-xl text-muted-foreground leading-relaxed">
+                    <p className="mt-6 text-xl text-muted-foreground leading-relaxed max-w-2xl mx-auto lg:mx-0">
                       Upload your PDFs, slides, or documents. Our AI creates clear mind maps and smart, spaced-repetition flashcards to help you learn 2x faster and ace your next test.
                     </p>
+                    <div className="mt-6 flex justify-center lg:justify-start">
+                      <div className="inline-flex flex-col items-center gap-1 sm:items-center">
+                        <button
+                          onClick={() => setShowAuth(true)}
+                          className="inline-flex items-center justify-center rounded-full bg-primary px-10 py-3.5 text-lg font-semibold text-primary-foreground shadow-xl shadow-primary/30 transition-transform hover:-translate-y-0.5 hover:shadow-primary/40"
+                        >
+                          Start for free
+                        </button>
+                        <p className="text-sm text-muted-foreground">No credit card required</p>
+                      </div>
+                    </div>
                   </div>
                 </div>
 
