@@ -1,13 +1,20 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Sun, Moon, Monitor } from 'lucide-react';
+import { Sun, Moon, Monitor, ChevronDown } from 'lucide-react';
 
 type Theme = 'light' | 'dark' | 'system';
+
+const themeOptions = [
+  { value: 'light' as Theme, label: 'Light', icon: Sun },
+  { value: 'dark' as Theme, label: 'Dark', icon: Moon },
+  { value: 'system' as Theme, label: 'System', icon: Monitor },
+];
 
 export default function ThemeToggle() {
   const [theme, setTheme] = useState<Theme>('system');
   const [mounted, setMounted] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -22,6 +29,7 @@ export default function ThemeToggle() {
 
   const updateTheme = (newTheme: Theme) => {
     setTheme(newTheme);
+    setIsOpen(false);
     try {
       localStorage.setItem('cogniguide_theme', newTheme);
 
@@ -53,45 +61,68 @@ export default function ThemeToggle() {
     return () => mediaQuery.removeEventListener('change', handleChange);
   }, [theme, mounted]);
 
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = () => {
+      setIsOpen(false);
+    };
+
+    if (isOpen) {
+      document.addEventListener('click', handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+    };
+  }, [isOpen]);
+
   if (!mounted) return null;
 
+  const currentThemeOption = themeOptions.find(option => option.value === theme);
+  const CurrentIcon = currentThemeOption?.icon || Monitor;
+
   return (
-    <div className="space-y-3">
+    <div className="flex items-center justify-between">
       <div className="text-sm font-medium">Theme</div>
-      <div className="flex gap-2">
+      <div className="relative">
         <button
-          onClick={() => updateTheme('light')}
-          className={`flex-1 flex items-center justify-center gap-2 p-2 rounded-xl border transition-colors ${
-            theme === 'light'
-              ? 'bg-primary text-primary-foreground border-primary'
-              : 'bg-background hover:bg-muted/50 border-border'
-          }`}
+          onClick={(e) => {
+            e.stopPropagation();
+            setIsOpen(!isOpen);
+          }}
+          className="flex items-center justify-between gap-2 p-2 rounded-xl bg-background hover:bg-muted/50 transition-colors min-w-[120px]"
         >
-          <Sun className="h-4 w-4" />
-          <span className="text-sm">Light</span>
+          <div className="flex items-center gap-2">
+            <CurrentIcon className="h-4 w-4 text-primary" />
+            <span className="text-sm font-medium">{currentThemeOption?.label || 'System'}</span>
+          </div>
+          <ChevronDown className={`h-4 w-4 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
         </button>
-        <button
-          onClick={() => updateTheme('dark')}
-          className={`flex-1 flex items-center justify-center gap-2 p-2 rounded-xl border transition-colors ${
-            theme === 'dark'
-              ? 'bg-primary text-primary-foreground border-primary'
-              : 'bg-background hover:bg-muted/50 border-border'
-          }`}
-        >
-          <Moon className="h-4 w-4" />
-          <span className="text-sm">Dark</span>
-        </button>
-        <button
-          onClick={() => updateTheme('system')}
-          className={`flex-1 flex items-center justify-center gap-2 p-2 rounded-xl border transition-colors ${
-            theme === 'system'
-              ? 'bg-primary text-primary-foreground border-primary'
-              : 'bg-background hover:bg-muted/50 border-border'
-          }`}
-        >
-          <Monitor className="h-4 w-4" />
-          <span className="text-sm">System</span>
-        </button>
+
+        {isOpen && (
+          <div className="absolute top-full right-0 mt-1 bg-background border rounded-xl shadow-lg z-10 overflow-hidden min-w-[120px]">
+            {themeOptions.map((option) => {
+              const Icon = option.icon;
+              const isSelected = theme === option.value;
+              return (
+                <button
+                  key={option.value}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    updateTheme(option.value);
+                  }}
+                  className={`w-full flex items-center gap-2 px-3 py-2 text-left text-sm transition-colors ${
+                    isSelected
+                      ? 'bg-muted/60'
+                      : 'hover:bg-muted/50 text-foreground'
+                  }`}
+                >
+                  <Icon className="h-4 w-4" />
+                  <span>{option.label}</span>
+                </button>
+              );
+            })}
+          </div>
+        )}
       </div>
     </div>
   );
