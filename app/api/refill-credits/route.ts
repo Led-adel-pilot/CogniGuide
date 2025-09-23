@@ -9,8 +9,7 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey);
 export async function POST(req: NextRequest) {
   try {
     // Secure the endpoint
-    const authToken = (req.headers.get('authorization') || '').replace('Bearer ', '');
-    if (authToken !== process.env.CRON_SECRET) {
+    if (!req.headers.get('x-vercel-cron')) {
       return new NextResponse('Unauthorized', { status: 401 });
     }
 
@@ -60,4 +59,8 @@ export async function POST(req: NextRequest) {
     const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred.';
     return NextResponse.json({ success: false, error: 'Failed to refill credits.', details: errorMessage }, { status: 500 });
   }
+}
+
+export function GET() {
+  return new NextResponse('Method Not Allowed', { status: 405 });
 }

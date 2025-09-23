@@ -197,6 +197,7 @@ function isSameUtcMonth(a: Date, b: Date): boolean {
 
 **Automated Monthly Refill:**
 - **Cron-Triggered**: External cron job calls this endpoint
+- **Invocation Security**: Vercel-managed cron jobs cannot attach custom headers, so the route only checks for the built-in `x-vercel-cron` header—keep the URL private or move the job if stronger auth is required
 - **Active Subscription Check**: Only refills users with active subscriptions
 - **Monthly Allocation**:
   - Student Plan: 300 credits

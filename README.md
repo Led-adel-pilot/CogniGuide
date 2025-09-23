@@ -537,7 +537,8 @@ For consistent branding across the application, use the `CogniGuide_logo.png` fi
 #### Refill Credits API (`app/api/refill-credits/route.ts`)
 *   **Purpose:** Cron job endpoint for monthly credit refills for paid subscribers
 *   **Method:** POST
-*   **Authentication:** Cron secret token required
+*   **Authentication:** Intended for Vercel's managed Cron; validates that the automatic `x-vercel-cron` header is present (custom secrets are not supported by the scheduler)
+*   **Security Trade-off:** Because the scheduler cannot send custom headers, anyone who discovers the route could spoof the request—keep the endpoint path private or move the refill logic elsewhere if you need stronger guarantees
 *   **Functionality:**
     - Queries all active subscriptions
     - Checks if monthly refill is due (based on last_refilled_at)
@@ -896,9 +897,10 @@ NEXT_PUBLIC_PADDLE_PRICE_ID_PRO_YEAR=pri_xxx
 PADDLE_WEBHOOK_SECRET=your_paddle_webhook_secret
 SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
 NEXT_PUBLIC_POSTHOG_KEY=your_posthog_project_api_key
-CRON_SECRET=your_cron_job_secret_for_credit_refills
 NEXT_PUBLIC_BASE_URL=your_production_domain # Optional: defaults to deployment URL
 ```
+
+> **Vercel Cron note:** Managed cron jobs declared in `vercel.json` cannot attach custom headers. The `/api/refill-credits` endpoint therefore only checks for Vercel's implicit `x-vercel-cron` header, which is a weak guarantee. Anyone who knows the URL could still hit it manually, so monitor usage or relocate the refill logic if you require stronger authentication.
 
 ### Paddle Billing integration
 
