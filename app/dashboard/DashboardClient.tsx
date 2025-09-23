@@ -1,13 +1,13 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { supabase, MindmapRecord, FlashcardsRecord } from '@/lib/supabaseClient';
 import Generator from '@/components/Generator';
 import MindMapModal from '@/components/MindMapModal';
 import FlashcardsModal, { Flashcard as FlashcardType } from '@/components/FlashcardsModal';
-import { BrainCircuit, LogOut, Loader2, Map as MapIcon, Coins, Zap, Sparkles, CalendarClock, Menu, X, ChevronRight, MoreHorizontal, Edit, Trash2, Share2, Link2, Copy, Check } from 'lucide-react';
+import { BrainCircuit, LogOut, Loader2, Map as MapIcon, Coins, Zap, Sparkles, CalendarClock, Menu, X, ChevronRight, MoreHorizontal, Edit, Trash2, Share2, Link2, Copy, Check, Gift, TrendingUp, Mail, FileText } from 'lucide-react';
 import FlashcardIcon from '@/components/FlashcardIcon';
 import { loadDeckSchedule, saveDeckSchedule, loadDeckScheduleAsync, saveDeckScheduleAsync, loadAllDeckSchedulesAsync, upsertDeckSchedulesBulkAsync, type StoredDeckSchedule } from '@/lib/sr-store';
 import { createInitialSchedule } from '@/lib/spaced-repetition';
@@ -22,6 +22,8 @@ type SessionUser = {
   id: string;
   email?: string;
 };
+
+const REFERRAL_REWARD_FALLBACK = 30;
 
 // Extract the first emoji from a title, if any
 function extractFirstEmoji(text?: string | null): string | null {
@@ -106,8 +108,23 @@ export default function DashboardClient() {
   const [shareError, setShareError] = useState<string | null>(null);
   const [shareLoading, setShareLoading] = useState(false);
   const [shareCopied, setShareCopied] = useState(false);
+  const [isReferralOpen, setIsReferralOpen] = useState(false);
+  const [referralLink, setReferralLink] = useState<string | null>(null);
+  const [referralCode, setReferralCode] = useState<string | null>(null);
+  const [referralStats, setReferralStats] = useState<{
+    redemptionsThisMonth: number;
+    monthlyLimit: number;
+    pendingCapReached?: boolean;
+  } | null>(null);
+  const [referralLoading, setReferralLoading] = useState(false);
+  const [referralError, setReferralError] = useState<string | null>(null);
+  const [referralCopied, setReferralCopied] = useState(false);
+  const [referralRewardNotice, setReferralRewardNotice] = useState<{ amount: number } | null>(null);
+  const referralRewardSeenRef = useRef<Set<string>>(new Set());
   const shareLinkInputRef = useRef<HTMLInputElement | null>(null);
   const shareCopiedTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const referralCopyTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const referralRewardTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const shareLinksCacheRef = useRef<Map<string, string>>(new Map());
 
   // Refs mirroring pagination state for async safety
@@ -149,36 +166,118 @@ export default function DashboardClient() {
       if (shareCopiedTimeoutRef.current) {
         clearTimeout(shareCopiedTimeoutRef.current);
       }
+      if (referralCopyTimeoutRef.current) {
+        clearTimeout(referralCopyTimeoutRef.current);
+      }
+      if (referralRewardTimeoutRef.current) {
+        clearTimeout(referralRewardTimeoutRef.current);
+      }
     };
   }, []);
 
-  const copyShareLink = async (link: string) => {
-    let success = false;
+  const fetchReferralDetails = useCallback(async () => {
+    setReferralLoading(true);
+    setReferralError(null);
+    try {
+      const { data: sessionData } = await supabase.auth.getSession();
+      const accessToken = sessionData?.session?.access_token;
+      if (!accessToken) {
+        throw new Error('You must be signed in to use referrals.');
+      }
+      const response = await fetch('/api/referrals/link', {
+        method: 'GET',
+        headers: { Authorization: `Bearer ${accessToken}` },
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok || !result?.ok || typeof result.link !== 'string') {
+        throw new Error(result?.error || 'Unable to fetch referral link.');
+      }
+
+      setReferralLink(result.link);
+      setReferralCode(typeof result.code === 'string' ? result.code : null);
+      const stats = result.stats;
+      if (stats && typeof stats === 'object') {
+        const monthlyLimit = Number((stats as any).monthlyLimit ?? 3);
+        const redemptions = Number((stats as any).redemptionsThisMonth ?? 0);
+        const capReached = Boolean((stats as any).pendingCapReached ?? false);
+        setReferralStats({
+          redemptionsThisMonth: Number.isFinite(redemptions) ? redemptions : 0,
+          monthlyLimit: Number.isFinite(monthlyLimit) && monthlyLimit > 0 ? monthlyLimit : 3,
+          pendingCapReached: capReached,
+        });
+      } else {
+        setReferralStats(null);
+      }
+      try {
+        posthog.capture('referral_link_loaded', {
+          status: 'success',
+          monthlyRedemptions: stats?.redemptionsThisMonth ?? 0,
+        });
+      } catch {}
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Unable to fetch referral link.';
+      setReferralLink(null);
+      setReferralCode(null);
+      setReferralStats(null);
+      setReferralError(message);
+      try {
+        posthog.capture('referral_link_loaded', { status: 'error', message });
+      } catch {}
+    } finally {
+      setReferralLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!isReferralOpen) {
+      if (referralCopyTimeoutRef.current) {
+        clearTimeout(referralCopyTimeoutRef.current);
+        referralCopyTimeoutRef.current = null;
+      }
+      setReferralCopied(false);
+      return;
+    }
+
+    setReferralCopied(false);
+    if (referralCopyTimeoutRef.current) {
+      clearTimeout(referralCopyTimeoutRef.current);
+      referralCopyTimeoutRef.current = null;
+    }
+    try {
+      posthog.capture('referral_modal_opened');
+    } catch {}
+    void fetchReferralDetails();
+  }, [isReferralOpen, fetchReferralDetails]);
+
+  const copyTextToClipboard = async (value: string): Promise<boolean> => {
     try {
       if (typeof navigator !== 'undefined' && navigator.clipboard?.writeText) {
-        await navigator.clipboard.writeText(link);
-        success = true;
-      } else {
-        // Fallback method using a temporary textarea
-        const textArea = document.createElement('textarea');
-        textArea.value = link;
-        textArea.style.position = 'fixed';
-        textArea.style.left = '-999999px';
-        textArea.style.top = '-999999px';
-        document.body.appendChild(textArea);
-        textArea.focus();
-        textArea.select();
-        try {
-          success = document.execCommand('copy');
-        } catch {
-          success = false;
-        } finally {
-          document.body.removeChild(textArea);
-        }
+        await navigator.clipboard.writeText(value);
+        return true;
+      }
+      if (typeof document === 'undefined') return false;
+      const textArea = document.createElement('textarea');
+      textArea.value = value;
+      textArea.style.position = 'fixed';
+      textArea.style.left = '-999999px';
+      textArea.style.top = '-999999px';
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+      try {
+        return document.execCommand('copy');
+      } catch {
+        return false;
+      } finally {
+        document.body.removeChild(textArea);
       }
     } catch {
-      success = false;
+      return false;
     }
+  };
+
+  const copyShareLink = async (link: string) => {
+    const success = await copyTextToClipboard(link);
 
     if (success) {
       if (shareCopiedTimeoutRef.current) {
@@ -197,6 +296,168 @@ export default function DashboardClient() {
       setShareCopied(false);
     }
   };
+
+  const handleCopyReferralLink = async () => {
+    if (!referralLink) return;
+    if (referralCopyTimeoutRef.current) {
+      clearTimeout(referralCopyTimeoutRef.current);
+      referralCopyTimeoutRef.current = null;
+    }
+    const success = await copyTextToClipboard(referralLink);
+    if (success) {
+      setReferralCopied(true);
+      setReferralError(null);
+      referralCopyTimeoutRef.current = setTimeout(() => {
+        setReferralCopied(false);
+        referralCopyTimeoutRef.current = null;
+      }, 2000);
+      try {
+        posthog.capture('referral_link_copied');
+      } catch {}
+    } else {
+      setReferralCopied(false);
+      setReferralError('Unable to copy link automatically. Please copy it manually.');
+    }
+  };
+
+  const showReferralRewardNotice = useCallback((amount: number, redemptionId?: string) => {
+    const key = redemptionId ? `referral:${redemptionId}` : `manual:${amount}`;
+    if (referralRewardSeenRef.current.has(key)) {
+      return;
+    }
+    referralRewardSeenRef.current.add(key);
+    if (redemptionId && user?.id) {
+      try {
+        if (typeof window !== 'undefined') {
+          localStorage.setItem(`cogniguide_referral_last_seen_${user.id}`, redemptionId);
+        }
+      } catch {}
+    }
+    if (referralRewardTimeoutRef.current) {
+      clearTimeout(referralRewardTimeoutRef.current);
+      referralRewardTimeoutRef.current = null;
+    }
+    setReferralRewardNotice({ amount });
+    referralRewardTimeoutRef.current = setTimeout(() => {
+      setReferralRewardNotice(null);
+      referralRewardTimeoutRef.current = null;
+    }, 8000);
+  }, [user]);
+
+  const dismissReferralRewardNotice = useCallback(() => {
+    if (referralRewardTimeoutRef.current) {
+      clearTimeout(referralRewardTimeoutRef.current);
+      referralRewardTimeoutRef.current = null;
+    }
+    setReferralRewardNotice(null);
+  }, []);
+
+  useEffect(() => {
+    if (!user) {
+      return;
+    }
+    if (typeof window === 'undefined') {
+      return;
+    }
+    try {
+      const storedId = localStorage.getItem(`cogniguide_referral_last_seen_${user.id}`);
+      if (storedId) {
+        referralRewardSeenRef.current.add(`referral:${storedId}`);
+      }
+    } catch {}
+  }, [user]);
+
+  useEffect(() => {
+    if (!user) {
+      return;
+    }
+    let cancelled = false;
+    const loadLatestRedemption = async () => {
+      const { data, error } = await supabase
+        .from('referral_redemptions')
+        .select('id, reward_credits')
+        .eq('referrer_id', user.id)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      if (cancelled || error || !data) {
+        return;
+      }
+      const redemptionId = typeof data.id === 'string' && data.id ? data.id : undefined;
+      if (!redemptionId) {
+        return;
+      }
+      const key = `referral:${redemptionId}`;
+      if (referralRewardSeenRef.current.has(key)) {
+        return;
+      }
+      let storedId: string | null = null;
+      if (typeof window !== 'undefined') {
+        try {
+          storedId = localStorage.getItem(`cogniguide_referral_last_seen_${user.id}`);
+        } catch {}
+      }
+      if (storedId === redemptionId) {
+        referralRewardSeenRef.current.add(key);
+        return;
+      }
+      const parsedReward = Number((data as any).reward_credits);
+      const rewardAmount = Number.isFinite(parsedReward) && parsedReward > 0 ? parsedReward : REFERRAL_REWARD_FALLBACK;
+      showReferralRewardNotice(rewardAmount, redemptionId);
+    };
+    void loadLatestRedemption();
+    return () => {
+      cancelled = true;
+    };
+  }, [user, showReferralRewardNotice]);
+
+  const redeemPendingReferral = useCallback(async () => {
+    if (typeof window === 'undefined') return;
+    let storedCode: string | null = null;
+    try {
+      storedCode = localStorage.getItem('cogniguide_pending_referral');
+      if (!storedCode) {
+        return;
+      }
+      localStorage.removeItem('cogniguide_pending_referral');
+    } catch {
+      return;
+    }
+
+    const trimmed = storedCode.trim();
+    if (!trimmed) return;
+
+    try {
+      const { data: sessionData } = await supabase.auth.getSession();
+      const accessToken = sessionData?.session?.access_token;
+      if (!accessToken) return;
+      const response = await fetch('/api/referrals/redeem', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({ code: trimmed }),
+      });
+      const result = await response.json().catch(() => ({}));
+      if (response.ok && result?.ok) {
+        try {
+          posthog.capture('referral_code_redeemed', { status: 'success' });
+        } catch {}
+      } else {
+        const errorMessage = result?.error || 'Referral redemption failed.';
+        console.warn('Referral redemption failed:', errorMessage);
+        try {
+          posthog.capture('referral_code_redeemed', { status: 'failed', error: errorMessage });
+        } catch {}
+      }
+    } catch (error) {
+      console.error('Error redeeming referral code:', error);
+      try {
+        posthog.capture('referral_code_redeemed', { status: 'error' });
+      } catch {}
+    }
+  }, []);
 
   const handleCreateShareLink = async () => {
     if (!shareItem) return;
@@ -342,6 +603,8 @@ export default function DashboardClient() {
         return;
       }
 
+      await redeemPendingReferral();
+
       // Check for and save a pending mind map from a pre-auth session
       try {
         const pendingMarkdown = localStorage.getItem('cogniguide:pending_mindmap');
@@ -483,43 +746,66 @@ export default function DashboardClient() {
         window.removeEventListener('cogniguide:credits-updated', handleCreditsUpdated as EventListener);
       }
     };
-  }, [router, searchParams]);
+  }, [router, searchParams, redeemPendingReferral]);
 
   useEffect(() => {
-    if (user) {
-      const channel = supabase
-        .channel(`user_credits_change_${user.id}`)
-        .on(
-          'postgres_changes',
-          {
-            event: '*',
-            schema: 'public',
-            table: 'user_credits',
-            filter: `user_id=eq.${user.id}`,
-          },
-          (payload) => {
-            if (payload.new && typeof (payload.new as any).credits === 'number') {
-              const val = Number((payload.new as any).credits ?? 0);
-              const finalCredits = Number.isFinite(val) ? val : 0;
-              setCredits(finalCredits);
-              // Update cache when credits change
-              try {
-                if (typeof window !== 'undefined') {
-                  localStorage.setItem(`cogniguide_credits_${user.id}`, finalCredits.toString());
-                  localStorage.setItem(`cogniguide_credits_time_${user.id}`, Date.now().toString());
-                }
-              } catch {}
-            }
-          }
-        )
-        .subscribe();
-    return () => {
-        supabase.removeChannel(channel);
-        window.removeEventListener('cogniguide:generation-complete', () => {});
-        window.removeEventListener('cogniguide:credits-updated', () => {});
-      };
+    if (!user) {
+      return;
     }
-  }, [user]);
+
+    const creditsChannel = supabase
+      .channel(`user_credits_change_${user.id}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'user_credits',
+          filter: `user_id=eq.${user.id}`,
+        },
+        (payload) => {
+          if (payload.new && typeof (payload.new as any).credits === 'number') {
+            const val = Number((payload.new as any).credits ?? 0);
+            const finalCredits = Number.isFinite(val) ? val : 0;
+            setCredits(finalCredits);
+            try {
+              if (typeof window !== 'undefined') {
+                localStorage.setItem(`cogniguide_credits_${user.id}`, finalCredits.toString());
+                localStorage.setItem(`cogniguide_credits_time_${user.id}`, Date.now().toString());
+              }
+            } catch {}
+          }
+        }
+      )
+      .subscribe();
+
+    const referralsChannel = supabase
+      .channel(`referral_rewards_${user.id}`)
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'referral_redemptions',
+          filter: `referrer_id=eq.${user.id}`,
+        },
+        (payload) => {
+          const newRow = (payload.new ?? {}) as { id?: string; reward_credits?: number };
+          const parsedReward = Number(newRow.reward_credits);
+          const rewardAmount = Number.isFinite(parsedReward) && parsedReward > 0 ? parsedReward : REFERRAL_REWARD_FALLBACK;
+          const redemptionId = typeof newRow.id === 'string' && newRow.id ? newRow.id : undefined;
+          showReferralRewardNotice(rewardAmount, redemptionId);
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(creditsChannel);
+      supabase.removeChannel(referralsChannel);
+      window.removeEventListener('cogniguide:generation-complete', () => {});
+      window.removeEventListener('cogniguide:credits-updated', () => {});
+    };
+  }, [user, showReferralRewardNotice]);
 
   useEffect(() => {
     const handleOutsideClick = () => {
@@ -722,6 +1008,12 @@ export default function DashboardClient() {
     if (fm) return fm.trim();
     return 'mindmap';
   };
+
+  const referralLimit = referralStats?.monthlyLimit ?? 3;
+  const referralUsed = referralStats?.redemptionsThisMonth ?? 0;
+  const referralCapReached = referralStats?.pendingCapReached ?? (referralLimit > 0 ? referralUsed >= referralLimit : false);
+  const referralProgress = referralLimit > 0 ? Math.min((referralUsed / referralLimit) * 100, 100) : 0;
+  const referralRemaining = referralLimit > 0 ? Math.max(referralLimit - referralUsed, 0) : 0;
 
   const prefetchSpacedData = async (fcRecords: FlashcardsRecord[]) => {
     if (prefetchingRef.current) return;
@@ -1419,22 +1711,41 @@ export default function DashboardClient() {
                   <li>
                     <button
                       type="button"
-                      onClick={() => setIsPricingModalOpen(true)}
-                      className="w-full text-left p-3 rounded-[1.25rem] border bg-background hover:bg-muted/50"
+                      onClick={() => {
+                        setLegalOpen(false);
+                        setIsSettingsOpen(false);
+                        setIsReferralOpen(true);
+                      }}
+                      className="w-full text-left p-3 rounded-[1.25rem] border bg-background hover:bg-muted/50 flex items-center gap-3"
                     >
-                      Pricing
+                      <Gift className="h-4 w-4 text-primary" />
+                      <span>Refer friends (earn credits)</span>
                     </button>
                   </li>
                   <li>
-                    <Link href="/contact" className="block w-full p-3 rounded-[1.25rem] border bg-background hover:bg-muted/50">Contact</Link>
+                    <button
+                      type="button"
+                      onClick={() => setIsPricingModalOpen(true)}
+                      className="w-full text-left p-3 rounded-[1.25rem] border bg-background hover:bg-muted/50 flex items-center gap-3"
+                    >
+                      <TrendingUp className="h-4 w-4 text-primary" />
+                      <span>Upgrade Plan</span>
+                    </button>
+                  </li>
+                  <li>
+                    <Link href="/contact" className="block w-full p-3 rounded-[1.25rem] border bg-background hover:bg-muted/50 flex items-center gap-3">
+                      <Mail className="h-4 w-4 text-primary" />
+                      <span>Contact</span>
+                    </Link>
                   </li>
                   <li className="relative">
                     <button
                       onClick={() => setLegalOpen(!legalOpen)}
-                      className="w-full text-left p-3 rounded-[1.25rem] border bg-background hover:bg-muted/50 flex items-center justify-between"
+                      className="w-full text-left p-3 rounded-[1.25rem] border bg-background hover:bg-muted/50 flex items-center gap-3"
                     >
+                      <FileText className="h-4 w-4 text-primary" />
                       <span>Legal</span>
-                      <ChevronRight className={`h-4 w-4 transition-transform ${legalOpen ? 'rotate-90' : ''}`} />
+                      <ChevronRight className={`h-4 w-4 transition-transform ml-auto ${legalOpen ? 'rotate-90' : ''}`} />
                     </button>
                     {legalOpen && (
                       <div className="absolute left-full top-0 ml-2 z-10 bg-background border rounded-[1.25rem] p-2 shadow-lg min-w-[140px]">
@@ -1457,6 +1768,123 @@ export default function DashboardClient() {
             </button>
 
             <div className="text-xs text-muted-foreground text-center mt-4">© {new Date().getFullYear()} CogniGuide</div>
+          </div>
+        </div>
+      )}
+
+      {isReferralOpen && (
+        <div
+          className="fixed inset-0 bg-black/40 dark:bg-black/60 z-50 flex items-center justify-center p-4"
+          onClick={() => setIsReferralOpen(false)}
+        >
+          <div
+            className="relative bg-background rounded-[1.5rem] p-6 w-full max-w-lg border"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              onClick={() => setIsReferralOpen(false)}
+              className="absolute top-4 right-4 inline-flex items-center justify-center w-8 h-8 rounded-full border border-border hover:bg-muted/60"
+            >
+              <X className="h-4 w-4" />
+            </button>
+            <div className="flex items-center gap-2 mb-2">
+              <Sparkles className="h-5 w-5 text-primary" />
+              <h2 className="text-lg font-bold">Refer friends & earn credits</h2>
+            </div>
+            <p className="text-xs text-muted-foreground mb-4">
+              Share your link and earn <span className="font-semibold text-foreground">30 credits</span> for each friend who signs in using it
+              (up to {referralLimit} rewards per calendar month).
+            </p>
+            {referralError && (
+              <div className="mb-3 rounded-lg border border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/20 px-3 py-2 text-xs text-red-600 dark:text-red-300">
+                {referralError}
+              </div>
+            )}
+            {referralLoading ? (
+              <div className="flex items-center justify-center py-10">
+                <Loader2 className="h-5 w-5 animate-spin" />
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <div className="flex rounded-full border border-border/40 bg-background shadow-inner focus-within:outline-none focus-within:ring-2 focus-within:ring-primary/40">
+                  <input
+                    value={referralLink ?? ''}
+                    readOnly
+                    placeholder="https://cogniguide.app/?ref=yourcode"
+                    className="flex-1 bg-transparent px-4 py-3 text-sm font-medium text-foreground border-none outline-none focus:ring-0"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleCopyReferralLink}
+                    disabled={referralLoading || !referralLink}
+                    className="inline-flex items-center justify-center gap-2 rounded-full bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground transition hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50 mr-1 my-1"
+                  >
+                    {referralLoading ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : referralLink ? (
+                      referralCopied ? (
+                        <Check className="h-4 w-4" />
+                      ) : (
+                        <Copy className="h-4 w-4" />
+                      )
+                    ) : (
+                      <Copy className="h-4 w-4" />
+                    )}
+                    <span>
+                      {referralCopied ? 'Copied!' : referralLoading ? 'Loading…' : 'Copy link'}
+                    </span>
+                  </button>
+                </div>
+                <div className="rounded-[1.25rem] border bg-muted/30 p-4 space-y-3">
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-muted-foreground">Monthly rewards</span>
+                    <span className="font-semibold">{referralUsed} / {referralLimit}</span>
+                  </div>
+                  <div className="h-2 w-full bg-muted rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-primary transition-all"
+                      style={{ width: `${referralProgress}%` }}
+                    />
+                  </div>
+                  {referralCapReached ? (
+                    <p className="text-xs text-muted-foreground">
+                      You&apos;ve reached this month&apos;s cap. Invite more friends next month for additional credits.
+                    </p>
+                  ) : (
+                    <p className="text-xs text-muted-foreground">
+                      Invite {referralRemaining} more friend{referralRemaining === 1 ? '' : 's'} to maximize this month&apos;s rewards.
+                    </p>
+                  )}
+                  {referralCode && (
+                    <p className="text-xs text-muted-foreground">
+                      Referral code: <span className="font-mono font-medium text-foreground">{referralCode}</span>
+                    </p>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {referralRewardNotice && (
+        <div className="fixed bottom-6 right-6 z-[60]">
+          <div className="pointer-events-auto flex w-80 items-start gap-3 rounded-2xl border border-border/60 bg-background/95 p-4 shadow-xl backdrop-blur">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary">
+              <Gift className="h-5 w-5" />
+            </div>
+            <div className="flex-1 text-sm text-foreground">
+              <p className="text-base font-semibold">Referral bonus applied</p>
+              <p className="mt-1 text-sm text-muted-foreground">You just earned {referralRewardNotice.amount} bonus credits. Enjoy exploring CogniGuide!</p>
+            </div>
+            <button
+              type="button"
+              onClick={dismissReferralRewardNotice}
+              className="ml-2 inline-flex h-8 w-8 items-center justify-center rounded-full border border-transparent text-muted-foreground transition hover:bg-muted/80 hover:text-foreground"
+              aria-label="Dismiss referral bonus notice"
+            >
+              <X className="h-4 w-4" />
+            </button>
           </div>
         </div>
       )}

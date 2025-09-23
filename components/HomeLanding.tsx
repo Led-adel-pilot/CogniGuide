@@ -23,6 +23,18 @@ export default function HomeLanding() {
   const router = useRouter();
 
   useEffect(() => {
+    try {
+      if (typeof window !== 'undefined') {
+        const params = new URLSearchParams(window.location.search);
+        const rawCode = params.get('ref');
+        if (rawCode && /^[A-Za-z0-9_-]{6,}$/u.test(rawCode)) {
+          localStorage.setItem('cogniguide_pending_referral', rawCode);
+        }
+      }
+    } catch {}
+  }, []);
+
+  useEffect(() => {
     const syncAuthCookie = (signedIn: boolean) => {
       try {
         if (typeof document !== 'undefined') {
