@@ -54,6 +54,7 @@ function removeFirstEmoji(text?: string | null): string {
 export default function DashboardClient() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const upgradeQueryParam = searchParams.get('upgrade');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [user, setUser] = useState<SessionUser | null>(null);
   const [loading, setLoading] = useState(true);
@@ -121,11 +122,13 @@ export default function DashboardClient() {
   const [referralCopied, setReferralCopied] = useState(false);
   const [referralRewardNotice, setReferralRewardNotice] = useState<{ amount: number } | null>(null);
   const referralRewardSeenRef = useRef<Set<string>>(new Set());
+  const userIdRef = useRef<string | null>(null);
   const shareLinkInputRef = useRef<HTMLInputElement | null>(null);
   const shareCopiedTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const referralCopyTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const referralRewardTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const shareLinksCacheRef = useRef<Map<string, string>>(new Map());
+  const lastUpgradeTriggerRef = useRef<string | null>(null);
 
   // Refs mirroring pagination state for async safety
   const historyBufferRef = useRef(historyBuffer);
@@ -320,16 +323,21 @@ export default function DashboardClient() {
     }
   };
 
-  const showReferralRewardNotice = useCallback((amount: number, redemptionId?: string) => {
+  useEffect(() => {
+    userIdRef.current = user?.id ?? null;
+  }, [user]);
+
+  const showReferralRewardNotice = useCallback((amount: number, redemptionId?: string, userIdOverride?: string) => {
     const key = redemptionId ? `referral:${redemptionId}` : `manual:${amount}`;
     if (referralRewardSeenRef.current.has(key)) {
       return;
     }
     referralRewardSeenRef.current.add(key);
-    if (redemptionId && user?.id) {
+    const targetUserId = userIdOverride ?? userIdRef.current;
+    if (redemptionId && targetUserId) {
       try {
         if (typeof window !== 'undefined') {
-          localStorage.setItem(`cogniguide_referral_last_seen_${user.id}`, redemptionId);
+          localStorage.setItem(`cogniguide_referral_last_seen_${targetUserId}`, redemptionId);
         }
       } catch {}
     }
@@ -342,7 +350,7 @@ export default function DashboardClient() {
       setReferralRewardNotice(null);
       referralRewardTimeoutRef.current = null;
     }, 8000);
-  }, [user]);
+  }, []);
 
   const dismissReferralRewardNotice = useCallback(() => {
     if (referralRewardTimeoutRef.current) {
@@ -403,7 +411,7 @@ export default function DashboardClient() {
       }
       const parsedReward = Number((data as any).reward_credits);
       const rewardAmount = Number.isFinite(parsedReward) && parsedReward > 0 ? parsedReward : REFERRAL_REWARD_FALLBACK;
-      showReferralRewardNotice(rewardAmount, redemptionId);
+      showReferralRewardNotice(rewardAmount, redemptionId, user?.id);
     };
     void loadLatestRedemption();
     return () => {
@@ -430,6 +438,7 @@ export default function DashboardClient() {
     try {
       const { data: sessionData } = await supabase.auth.getSession();
       const accessToken = sessionData?.session?.access_token;
+      const currentUserId = sessionData?.session?.user?.id || null;
       if (!accessToken) return;
       const response = await fetch('/api/referrals/redeem', {
         method: 'POST',
@@ -441,23 +450,38 @@ export default function DashboardClient() {
       });
       const result = await response.json().catch(() => ({}));
       if (response.ok && result?.ok) {
+        const rawReward = Number((result as any)?.redeemerReward ?? (result as any)?.reward ?? REFERRAL_REWARD_FALLBACK);
+        const rewardAmount = Number.isFinite(rawReward) && rawReward > 0 ? rawReward : REFERRAL_REWARD_FALLBACK;
+        showReferralRewardNotice(rewardAmount, undefined, currentUserId || undefined);
+        if (typeof (result as any)?.redeemerCredits === 'number') {
+          const creditsValue = Number((result as any).redeemerCredits);
+          if (Number.isFinite(creditsValue)) {
+            setCredits(creditsValue);
+            try {
+              if (typeof window !== 'undefined' && currentUserId) {
+                localStorage.setItem(`cogniguide_credits_${currentUserId}`, creditsValue.toString());
+                localStorage.setItem(`cogniguide_credits_time_${currentUserId}`, Date.now().toString());
+              }
+            } catch {}
+          }
+        }
         try {
-          posthog.capture('referral_code_redeemed', { status: 'success' });
+          posthog.capture('referral_code_redeemed', { status: 'success', actor: 'redeemer', reward: rewardAmount });
         } catch {}
       } else {
         const errorMessage = result?.error || 'Referral redemption failed.';
         console.warn('Referral redemption failed:', errorMessage);
         try {
-          posthog.capture('referral_code_redeemed', { status: 'failed', error: errorMessage });
+          posthog.capture('referral_code_redeemed', { status: 'failed', error: errorMessage, actor: 'redeemer' });
         } catch {}
       }
     } catch (error) {
       console.error('Error redeeming referral code:', error);
       try {
-        posthog.capture('referral_code_redeemed', { status: 'error' });
+        posthog.capture('referral_code_redeemed', { status: 'error', actor: 'redeemer' });
       } catch {}
     }
-  }, []);
+  }, [showReferralRewardNotice]);
 
   const handleCreateShareLink = async () => {
     if (!shareItem) return;
@@ -707,20 +731,6 @@ export default function DashboardClient() {
       window.addEventListener('cogniguide:generation-complete', handleGenerationComplete);
       window.addEventListener('cogniguide:credits-updated', handleCreditsUpdated as EventListener);
 
-      try {
-        const hasUpgradeQuery = Boolean(searchParams.get('upgrade'));
-        const hasLocalFlag = typeof window !== 'undefined' && (
-          localStorage.getItem('cogniguide_open_upgrade') === 'true' ||
-          localStorage.getItem('cogniguide_upgrade_flow') === 'true'
-        );
-        if (hasUpgradeQuery || hasLocalFlag) {
-          setIsPricingModalOpen(true);
-          if (hasLocalFlag) {
-            localStorage.removeItem('cogniguide_open_upgrade');
-            localStorage.removeItem('cogniguide_upgrade_flow');
-          }
-        }
-      } catch {}
     };
 
     init();
@@ -746,7 +756,49 @@ export default function DashboardClient() {
         window.removeEventListener('cogniguide:credits-updated', handleCreditsUpdated as EventListener);
       }
     };
-  }, [router, searchParams, redeemPendingReferral]);
+  }, [router, redeemPendingReferral]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') {
+      return;
+    }
+
+    let hasLocalFlag = false;
+    try {
+      hasLocalFlag =
+        localStorage.getItem('cogniguide_open_upgrade') === 'true' ||
+        localStorage.getItem('cogniguide_upgrade_flow') === 'true';
+    } catch {
+      hasLocalFlag = false;
+    }
+
+    const hasUpgradeQuery = Boolean(upgradeQueryParam);
+    const key = hasUpgradeQuery ? `query:${upgradeQueryParam}` : hasLocalFlag ? 'local' : null;
+
+    if (!key) {
+      lastUpgradeTriggerRef.current = null;
+      return;
+    }
+
+    if (lastUpgradeTriggerRef.current === key) {
+      if (hasLocalFlag) {
+        try {
+          localStorage.removeItem('cogniguide_open_upgrade');
+          localStorage.removeItem('cogniguide_upgrade_flow');
+        } catch {}
+      }
+      return;
+    }
+
+    lastUpgradeTriggerRef.current = key;
+    setIsPricingModalOpen(true);
+    if (hasLocalFlag) {
+      try {
+        localStorage.removeItem('cogniguide_open_upgrade');
+        localStorage.removeItem('cogniguide_upgrade_flow');
+      } catch {}
+    }
+  }, [upgradeQueryParam]);
 
   useEffect(() => {
     if (!user) {
@@ -794,7 +846,7 @@ export default function DashboardClient() {
           const parsedReward = Number(newRow.reward_credits);
           const rewardAmount = Number.isFinite(parsedReward) && parsedReward > 0 ? parsedReward : REFERRAL_REWARD_FALLBACK;
           const redemptionId = typeof newRow.id === 'string' && newRow.id ? newRow.id : undefined;
-          showReferralRewardNotice(rewardAmount, redemptionId);
+          showReferralRewardNotice(rewardAmount, redemptionId, user.id);
         }
       )
       .subscribe();
@@ -1792,8 +1844,8 @@ export default function DashboardClient() {
               <h2 className="text-lg font-bold">Refer friends & earn credits</h2>
             </div>
             <p className="text-xs text-muted-foreground mb-4">
-              Share your link and earn <span className="font-semibold text-foreground">30 credits</span> for each friend who signs in using it
-              (up to {referralLimit} rewards per calendar month).
+              Share your link so you and your friend each earn <span className="font-semibold text-foreground">30 credits</span> when they sign in using it
+              (up to {referralLimit} rewards per calendar month for you).
             </p>
             {referralError && (
               <div className="mb-3 rounded-lg border border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/20 px-3 py-2 text-xs text-red-600 dark:text-red-300">
@@ -1875,7 +1927,7 @@ export default function DashboardClient() {
             </div>
             <div className="flex-1 text-sm text-foreground">
               <p className="text-base font-semibold">Referral bonus applied</p>
-              <p className="mt-1 text-sm text-muted-foreground">You just earned {referralRewardNotice.amount} bonus credits. Enjoy exploring CogniGuide!</p>
+              <p className="mt-1 text-sm text-muted-foreground">You and your friend each earned {referralRewardNotice.amount} bonus credits. Enjoy exploring CogniGuide!</p>
             </div>
             <button
               type="button"

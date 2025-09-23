@@ -73,7 +73,24 @@ async function ensureInitialOrMonthlyFreeCredits(userId: string): Promise<{ cred
   const currentCredits = Number((data as any).credits ?? 0);
   const now = new Date(nowIso);
 
-  if (!last || !isSameUtcMonth(last, now)) {
+  if (!last) {
+    const baselineCredits = Number.isFinite(currentCredits) && currentCredits >= FREE_PLAN_CREDITS
+      ? currentCredits
+      : (Number.isFinite(currentCredits) ? currentCredits : 0) + FREE_PLAN_CREDITS;
+
+    await supabaseAdmin
+      .from('user_credits')
+      .update({
+        credits: baselineCredits,
+        last_refilled_at: nowIso,
+        updated_at: nowIso,
+      })
+      .eq('user_id', userId);
+
+    return { credits: baselineCredits };
+  }
+
+  if (!isSameUtcMonth(last, now)) {
     // Update credits and return new amount
     await supabaseAdmin
       .from('user_credits')

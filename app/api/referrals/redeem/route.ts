@@ -114,25 +114,49 @@ export async function POST(req: NextRequest) {
       throw redemptionError;
     }
 
-    const { data: creditsResult, error: creditError } = await supabaseAdmin.rpc('increment_user_credits', {
+    const { data: referrerCreditsResult, error: referrerCreditError } = await supabaseAdmin.rpc('increment_user_credits', {
       p_user_id: referrerId,
       p_amount: REFERRAL_REWARD_CREDITS,
     });
 
-    if (creditError) {
-      console.error('Failed to increment referral credits, rolling back redemption:', creditError);
+    if (referrerCreditError) {
+      console.error('Failed to increment referral credits, rolling back redemption:', referrerCreditError);
       await supabaseAdmin.from('referral_redemptions').delete().eq('id', redemption?.id);
       return NextResponse.json({ ok: false, error: 'Unable to complete referral credit grant.' }, { status: 500 });
     }
 
+    const { data: redeemerCreditsResult, error: redeemerCreditError } = await supabaseAdmin.rpc('increment_user_credits', {
+      p_user_id: userId,
+      p_amount: REFERRAL_REWARD_CREDITS,
+    });
+
+    if (redeemerCreditError) {
+      console.error('Failed to increment redeemer credits, rolling back referral redemption:', redeemerCreditError);
+      await supabaseAdmin.from('referral_redemptions').delete().eq('id', redemption?.id);
+      try {
+        await supabaseAdmin.rpc('increment_user_credits', { p_user_id: referrerId, p_amount: -REFERRAL_REWARD_CREDITS });
+      } catch (rollbackError) {
+        console.error('Failed to roll back referrer credits after redeemer credit failure:', rollbackError);
+      }
+      return NextResponse.json({ ok: false, error: 'Unable to complete referral credit grant.' }, { status: 500 });
+    }
+
     const updatedUsage = usage + 1;
-    const newCredits = typeof creditsResult === 'number' ? creditsResult : Number(creditsResult ?? 0);
+    const referrerCreditsValue = typeof referrerCreditsResult === 'number'
+      ? referrerCreditsResult
+      : Number(referrerCreditsResult ?? 0);
+    const redeemerCreditsValue = typeof redeemerCreditsResult === 'number'
+      ? redeemerCreditsResult
+      : Number(redeemerCreditsResult ?? 0);
 
     return NextResponse.json({
       ok: true,
       reward: REFERRAL_REWARD_CREDITS,
       referrerId,
-      referrerCredits: Number.isFinite(newCredits) ? newCredits : undefined,
+      referrerCredits: Number.isFinite(referrerCreditsValue) ? referrerCreditsValue : undefined,
+      redeemerId: userId,
+      redeemerReward: REFERRAL_REWARD_CREDITS,
+      redeemerCredits: Number.isFinite(redeemerCreditsValue) ? redeemerCreditsValue : undefined,
       stats: {
         redemptionsThisMonth: updatedUsage,
         monthlyLimit: REFERRAL_MONTHLY_LIMIT,

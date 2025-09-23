@@ -12,7 +12,7 @@ CogniGuide comprehensive AI-powered study assistant. It uses an LLM to convert t
 *   **Realtime Streaming Rendering:** The backend can stream model output token-by-token and the frontend progressively renders the Markmap markdown as tokens arrive so the mind map begins appearing immediately instead of waiting for the full generation to finish.
 *   **Smart File Caching & Pre-processing:** Advanced caching system prevents redundant file processing when users add/remove files. Files are automatically pre-processed immediately upon upload to extract text and images, eliminating the wait time when clicking Generate. Uses content-based hashing to ensure consistent caching across different environments (localhost/production) and browsers. Only changed file combinations trigger re-processing, significantly improving performance for multi-file uploads. Uploads are offloaded to Supabase Storage to bypass Vercel's ~4.5 MB body limit; client-side validation now allows up to 50 MB per file. **Real-time Upload Progress:** Users see live progress percentages (e.g., "Uploading (57%)") during file uploads, providing clear feedback on upload status and improving user experience.
 *   **Credit Loading Optimization:** Instant credit balance display with intelligent caching system. Credits load immediately on dashboard refresh using localStorage cache (5-minute expiration) with background refresh for accuracy. Eliminates the brief "0.0" flash that occurred during sequential API calls.
-*   **Referral Program:** Invite friends directly from the dashboard settings panel to earn 30 bonus credits for each successful referral (limited to three rewards per calendar month).
+*   **Referral Program:** Invite friends directly from the dashboard settings panel so you and every successful referral both receive 30 bonus credits (limited to three rewards per calendar month for the inviter).
 *   **Multiple Export Options:** Users can download the generated mind maps in various formats including SVG, PNG, and PDF.
 *   **Flashcards Generation (Two ways):**
     - From Mind Map: After a mind map is generated, users can generate study flashcards from the Markmap markdown and switch between the mind map view and a flashcards study mode.
@@ -147,7 +147,8 @@ CogniGuide includes a built-in referral system that rewards existing users with 
 1. Each authenticated user receives a persistent referral code (and link) that can be copied from the dashboard settings panel.
 2. When the invite link is shared, the landing page captures the `?ref=` query parameter and stores it locally until the visitor signs up.
 3. After the new user completes sign-in, the dashboard automatically redeems the stored referral code.
-4. The referrer instantly receives **30 bonus credits** for the successful signup. Rewards are limited to **three redemptions per calendar month** to prevent abuse.
+4. Both the referrer and the new user instantly receive **30 bonus credits** for the successful signup. Rewards are limited to **three redemptions per calendar month** for the referrer to prevent abuse.
+5. The redeemer sees a confirmation popup on their first dashboard visit so they immediately know the bonus credits were applied.
 
 ### Backend Schema
 
@@ -161,7 +162,7 @@ Run Supabase migrations after pulling these changes so the new tables and functi
 
 - **GET /api/referrals/link**: Authenticated endpoint that ensures a user has a referral code, returns the invite URL, and reports current-month redemption totals.
 - **POST /api/referrals/link**: Alias of the GET endpoint for clients that prefer POST.
-- **POST /api/referrals/redeem**: Accepts `{ code: string }` and rewards the referrer if the code is valid, not self-redeemed, and under the monthly cap. Returns updated monthly statistics and the referrer’s latest credit balance.
+- **POST /api/referrals/redeem**: Accepts `{ code: string }` and rewards both the referrer and the redeemer with 30 bonus credits when the code is valid, not self-redeemed, and under the monthly cap. Returns updated monthly statistics and the referrer’s latest credit balance, along with the redeemer’s new credit total.
 
 All referral endpoints authenticate via the Supabase service role key and return structured JSON with helpful error messages for UI handling.
 
