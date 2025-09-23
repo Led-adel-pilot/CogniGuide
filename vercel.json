@@ -2,7 +2,10 @@
   "crons": [
     {
       "path": "/api/refill-credits",
-      "schedule": "0 0 * * *"
+      "schedule": "0 0 * * *",
+      "headers": {
+        "Authorization": "Bearer <your-secret>"
+      }
     },
     {
       "path": "/api/storage/scheduled-cleanup",
