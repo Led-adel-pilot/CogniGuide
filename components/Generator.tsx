@@ -44,10 +44,14 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
   const [flashcardsDeckId, setFlashcardsDeckId] = useState<string | undefined>(undefined);
   const [authChecked, setAuthChecked] = useState(false);
   const [freeGenerationsLeft, setFreeGenerationsLeft] = useState<number>(NON_AUTH_FREE_LIMIT);
+  const [allowNonAuthGenerations, setAllowNonAuthGenerations] = useState<boolean>(true);
+  const [experimentVariant, setExperimentVariant] = useState<'control' | 'not-allow' | null>(null);
+  const [experimentReady, setExperimentReady] = useState(false);
   const [allowedNameSizes, setAllowedNameSizes] = useState<{ name: string; size: number }[] | undefined>(undefined);
   const [previewLoading, setPreviewLoading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState<number | undefined>(undefined);
   const router = useRouter();
+  const variantTrackedRef = useRef<string | null>(null);
 
   useEffect(() => {
     const init = async () => {
@@ -55,14 +59,6 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
       const authed = Boolean(data.user);
       setIsAuthed(authed);
       setUserId(data.user ? data.user.id : null);
-
-      // Load free generations count for unauthenticated users
-      if (!authed && typeof window !== 'undefined') {
-        const stored = localStorage.getItem('cogniguide_free_generations');
-        const used = stored ? parseInt(stored, 10) : 0;
-        setFreeGenerationsLeft(Math.max(0, NON_AUTH_FREE_LIMIT - used));
-      }
-
       setAuthChecked(true);
     };
     init();
@@ -80,6 +76,78 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
     });
     return () => { sub.subscription.unsubscribe(); };
   }, [router, redirectOnAuth]);
+
+  useEffect(() => {
+    const updateVariant = () => {
+      const rawVariant = posthog.getFeatureFlag('allow-non-auth-generation');
+      console.log('rawVariant', rawVariant);
+      if (rawVariant === null) return;
+
+      let variantName: 'control' | 'not-allow' = 'control';
+
+      // Check for 'not-allow' variant conditions
+      if (
+        rawVariant === false ||
+        rawVariant === 'false' ||
+        rawVariant === '0' ||
+        rawVariant === 'not-allow' ||
+        rawVariant === 'not_allow'
+      ) {
+        variantName = 'not-allow';
+      } else if (
+        rawVariant === true ||
+        rawVariant === 'true' ||
+        rawVariant === '1' ||
+        rawVariant === 'control'
+      ) {
+        variantName = 'control';
+      } else if (typeof rawVariant === 'string') {
+        const normalized = rawVariant.toLowerCase();
+        if (normalized === 'not-allow' || normalized === 'not_allow') {
+          variantName = 'not-allow';
+        } else if (normalized === 'control') {
+          variantName = 'control';
+        } else {
+          // Default to control for unrecognized string values
+          variantName = 'control';
+        }
+      }
+
+      setAllowNonAuthGenerations(variantName === 'control');
+      setExperimentVariant(variantName);
+      setExperimentReady(true);
+    };
+
+    const unsub = posthog.onFeatureFlags?.(updateVariant);
+    updateVariant();
+
+    return () => {
+      if (typeof unsub === 'function') unsub();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!experimentReady || !experimentVariant) return;
+    if (variantTrackedRef.current === experimentVariant) return;
+    posthog.capture('allow_non_auth_generation_variant', {
+      variant: experimentVariant,
+    });
+    variantTrackedRef.current = experimentVariant;
+  }, [experimentReady, experimentVariant]);
+
+  useEffect(() => {
+    if (!authChecked) return;
+    if (isAuthed) return;
+    if (!experimentReady && allowNonAuthGenerations === false) return;
+    if (allowNonAuthGenerations === false) {
+      setFreeGenerationsLeft(0);
+      return;
+    }
+    if (typeof window === 'undefined') return;
+    const stored = localStorage.getItem('cogniguide_free_generations');
+    const used = stored ? parseInt(stored, 10) : 0;
+    setFreeGenerationsLeft(Math.max(0, NON_AUTH_FREE_LIMIT - used));
+  }, [allowNonAuthGenerations, authChecked, experimentReady, isAuthed]);
 
   // Effect to handle preview animation for non-auth users
   useEffect(() => {
@@ -435,11 +503,25 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
     }
   }, [getFileSetKey, debugLog, MAX_FILE_BYTES, isAuthed, uploadAndPreparse]);
 
+  const requireAuthErrorMessage = 'Please sign up to generate with CogniGuide.';
+
   const handleSubmit = async () => {
+    const experimentBlocksNonAuth = authChecked && !isAuthed && experimentReady && allowNonAuthGenerations === false;
+    if (experimentBlocksNonAuth) {
+      setError(requireAuthErrorMessage);
+      setShowAuth(true);
+      posthog.capture('non_auth_generation_blocked', {
+        variant: experimentVariant ?? 'not-allow',
+        mode,
+      });
+      return;
+    }
+
     posthog.capture('generation_submitted', {
       mode: mode,
       file_count: files.length,
       has_prompt: !!prompt.trim(),
+      non_auth_generations_allowed: allowNonAuthGenerations !== false,
     });
     if (mode === 'flashcards') {
       // Require at least one file for file-based flashcards generation
@@ -449,7 +531,7 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
       }
 
       // Check free generations for unauthenticated users
-      if (!isAuthed && freeGenerationsLeft <= 0) {
+      if (!isAuthed && allowNonAuthGenerations !== false && freeGenerationsLeft <= 0) {
         setError(`You've used all ${NON_AUTH_FREE_LIMIT} no-signup generations. Please sign up to continue generating`);
         return;
       }
@@ -562,7 +644,7 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
           } catch {}
         }
         // Increment free generation counter for unauthenticated users
-        if (!isAuthed && typeof window !== 'undefined') {
+        if (!isAuthed && allowNonAuthGenerations !== false && typeof window !== 'undefined') {
           const stored = localStorage.getItem('cogniguide_free_generations');
           const used = stored ? parseInt(stored, 10) : 0;
           const newUsed = used + 1;
@@ -663,7 +745,7 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
     }
 
     // Check free generations for unauthenticated users
-    if (!isAuthed && freeGenerationsLeft <= 0) {
+    if (!isAuthed && allowNonAuthGenerations !== false && freeGenerationsLeft <= 0) {
       setError(`You've used all ${NON_AUTH_FREE_LIMIT} no-signup generations. Please sign up to continue generating!`);
       return;
     }
@@ -813,7 +895,7 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
       if (!md) throw new Error('Empty result from AI.');
 
       // Increment free generation counter for unauthenticated users
-      if (!isAuthed && typeof window !== 'undefined') {
+      if (!isAuthed && allowNonAuthGenerations !== false && typeof window !== 'undefined') {
         const stored = localStorage.getItem('cogniguide_free_generations');
         const used = stored ? parseInt(stored, 10) : 0;
         const newUsed = used + 1;
@@ -912,7 +994,7 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
                 size={compact ? 'compact' : 'default'}
                 onOpen={() => {
                   if (!authChecked) return false;
-                  if (!isAuthed && freeGenerationsLeft <= 0) {
+                  if (!isAuthed && allowNonAuthGenerations !== false && freeGenerationsLeft <= 0) {
                     setShowAuth(true);
                     return false; // block file dialog if no free generations left
                   }
@@ -942,7 +1024,7 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
                 previewLoading={previewLoading}
                 onInteract={() => {
                   if (!authChecked) return;
-                  if (!isAuthed && freeGenerationsLeft <= 0) setShowAuth(true);
+                  if (!isAuthed && allowNonAuthGenerations !== false && freeGenerationsLeft <= 0) setShowAuth(true);
                 }}
               />                  
               {error && (
@@ -999,7 +1081,7 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
                 </div>
               )}
 
-              {!isAuthed && freeGenerationsLeft > 0 && freeGenerationsLeft < NON_AUTH_FREE_LIMIT && (
+              {!isAuthed && allowNonAuthGenerations !== false && freeGenerationsLeft > 0 && freeGenerationsLeft < NON_AUTH_FREE_LIMIT && (
                 <div className="mt-4 text-center p-3 bg-muted border border-border text-foreground rounded-[1.25rem]">
                   <p className="text-sm font-medium">
                     {freeGenerationsLeft} no-signup {freeGenerationsLeft === 1 ? 'generation' : 'generations'} remaining.{' '}
@@ -1015,7 +1097,7 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
                 </div>
               )}
 
-              {!isAuthed && freeGenerationsLeft === NON_AUTH_FREE_LIMIT && (files.length > 0 || prompt.trim()) && (
+              {!isAuthed && allowNonAuthGenerations !== false && freeGenerationsLeft === NON_AUTH_FREE_LIMIT && (files.length > 0 || prompt.trim()) && (
                 <div className="mt-4 text-center p-3 bg-muted border border-border text-foreground rounded-[1.25rem]">
                   <p className="text-sm font-medium">
                     You have {NON_AUTH_FREE_LIMIT} no-signup generations!{' '}
