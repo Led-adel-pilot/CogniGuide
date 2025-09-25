@@ -21,6 +21,7 @@ import { formatDate, formatTime } from '@/lib/utils';
 type SessionUser = {
   id: string;
   email?: string;
+  referralLastSeenId?: string | null;
 };
 
 const REFERRAL_REWARD_FALLBACK = 30;
@@ -123,6 +124,7 @@ export default function DashboardClient() {
   const [referralRewardNotice, setReferralRewardNotice] = useState<{ amount: number } | null>(null);
   const referralRewardSeenRef = useRef<Set<string>>(new Set());
   const userIdRef = useRef<string | null>(null);
+  const referralLastSeenIdRef = useRef<string | null>(null);
   const shareLinkInputRef = useRef<HTMLInputElement | null>(null);
   const shareCopiedTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const referralCopyTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -325,7 +327,32 @@ export default function DashboardClient() {
 
   useEffect(() => {
     userIdRef.current = user?.id ?? null;
+    referralLastSeenIdRef.current = user?.referralLastSeenId ?? null;
   }, [user]);
+
+  const persistReferralRedemptionSeen = useCallback(
+    async (redemptionId: string, userId: string) => {
+      if (!redemptionId || !userId) {
+        return;
+      }
+      if (referralLastSeenIdRef.current === redemptionId) {
+        return;
+      }
+      try {
+        const { error } = await supabase.auth.updateUser({
+          data: { referral_last_seen_id: redemptionId },
+        });
+        if (error) {
+          throw error;
+        }
+        referralLastSeenIdRef.current = redemptionId;
+        setUser((prev) => (prev && prev.id === userId ? { ...prev, referralLastSeenId: redemptionId } : prev));
+      } catch (error) {
+        console.error('Failed to persist referral acknowledgement:', error);
+      }
+    },
+    [setUser]
+  );
 
   const showReferralRewardNotice = useCallback((amount: number, redemptionId?: string, userIdOverride?: string) => {
     const key = redemptionId ? `referral:${redemptionId}` : `manual:${amount}`;
@@ -340,6 +367,7 @@ export default function DashboardClient() {
           localStorage.setItem(`cogniguide_referral_last_seen_${targetUserId}`, redemptionId);
         }
       } catch {}
+      void persistReferralRedemptionSeen(redemptionId, targetUserId);
     }
     if (referralRewardTimeoutRef.current) {
       clearTimeout(referralRewardTimeoutRef.current);
@@ -350,7 +378,7 @@ export default function DashboardClient() {
       setReferralRewardNotice(null);
       referralRewardTimeoutRef.current = null;
     }, 8000);
-  }, []);
+  }, [persistReferralRedemptionSeen]);
 
   const dismissReferralRewardNotice = useCallback(() => {
     if (referralRewardTimeoutRef.current) {
@@ -363,6 +391,9 @@ export default function DashboardClient() {
   useEffect(() => {
     if (!user) {
       return;
+    }
+    if (user.referralLastSeenId) {
+      referralRewardSeenRef.current.add(`referral:${user.referralLastSeenId}`);
     }
     if (typeof window === 'undefined') {
       return;
@@ -405,7 +436,8 @@ export default function DashboardClient() {
           storedId = localStorage.getItem(`cogniguide_referral_last_seen_${user.id}`);
         } catch {}
       }
-      if (storedId === redemptionId) {
+      const seenId = storedId || user.referralLastSeenId || referralLastSeenIdRef.current;
+      if (seenId === redemptionId) {
         referralRewardSeenRef.current.add(key);
         return;
       }
@@ -619,7 +651,16 @@ export default function DashboardClient() {
 
     const init = async () => {
       const { data } = await supabase.auth.getUser();
-      const authed = data.user ? { id: data.user.id, email: data.user.email || undefined } : null;
+      const metadata = (data.user?.user_metadata ?? {}) as Record<string, unknown>;
+      const lastSeenFromMetadata =
+        typeof metadata['referral_last_seen_id'] === 'string' ? (metadata['referral_last_seen_id'] as string) : null;
+      const authed = data.user
+        ? {
+            id: data.user.id,
+            email: data.user.email || undefined,
+            referralLastSeenId: lastSeenFromMetadata,
+          }
+        : null;
       setUser(authed);
       setLoading(false);
       if (!authed) {
