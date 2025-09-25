@@ -14,11 +14,8 @@ export default function PricingModal({ isOpen, onClose, onPurchaseComplete }: Pr
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/40 dark:bg-black/60 z-50 flex items-center justify-center" onClick={onClose}>
-      <div
-        className="bg-background border rounded-[2rem] w-full max-w-5xl max-h-[90vh] overflow-y-auto p-4 sm:p-6"
-        onClick={(e) => e.stopPropagation()}
-      >
+    <div className="fixed inset-0 bg-background z-50">
+      <div className="w-full h-full overflow-y-auto p-4 sm:p-6">
         <div className="flex justify-end">
           <button onClick={onClose} className="p-2 rounded-full hover:bg-muted/50">
             <X className="h-6 w-6" />
