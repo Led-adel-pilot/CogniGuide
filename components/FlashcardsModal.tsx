@@ -86,6 +86,42 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
 
   const hasCards = Boolean(cards && cards.length > 0);
 
+  const questionRef = React.useRef<HTMLDivElement | null>(null);
+  const answerRef = React.useRef<HTMLDivElement | null>(null);
+
+  const renderMath = React.useCallback(() => {
+    if (typeof window === 'undefined') return;
+    const renderMathInElement = (window as any)?.renderMathInElement;
+    if (typeof renderMathInElement !== 'function') return;
+
+    const options = {
+      delimiters: [
+        { left: '$$', right: '$$', display: true },
+        { left: '$', right: '$', display: false },
+        { left: '\\(', right: '\\)', display: false },
+        { left: '\\[', right: '\\]', display: true },
+      ],
+      throwOnError: false,
+    };
+
+    if (questionRef.current) {
+      renderMathInElement(questionRef.current, options);
+    }
+    if (answerRef.current) {
+      renderMathInElement(answerRef.current, options);
+    }
+  }, []);
+
+  React.useEffect(() => {
+    if (!open) return;
+    const id = window.requestAnimationFrame(renderMath);
+    const timeout = window.setTimeout(() => renderMath(), 0);
+    return () => {
+      window.cancelAnimationFrame(id);
+      window.clearTimeout(timeout);
+    };
+  }, [open, index, showAnswer, cards, renderMath]);
+
   const deckIdentifier = React.useMemo(() => getDeckIdentifier(deckId, title, cards), [deckId, title, cards]);
 
   React.useEffect(() => {
@@ -721,7 +757,12 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
             <div className="w-full">
               <div className="relative mx-auto rounded-[1.35rem] p-[1.5px] bg-gradient-to-br from-indigo-200 via-sky-200 to-emerald-200">
                 <div className="bg-background border border-border rounded-[1.25rem] shadow p-5 sm:p-6 min-h-[180px] sm:min-h-[200px]">
-                  <div className="text-foreground text-xl sm:text-2xl font-semibold leading-7 sm:leading-8 break-words">{cards![index]?.question}</div>
+                  <div
+                    ref={questionRef}
+                    className="text-foreground text-xl sm:text-2xl font-semibold leading-7 sm:leading-8 break-words"
+                  >
+                    {cards![index]?.question}
+                  </div>
                   <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
                     {showAnswer && current?.schedule?.due ? (
                       <span className="inline-flex items-center h-6 px-2.5 rounded-full bg-sky-50 dark:bg-sky-900/30 text-sky-700 dark:text-sky-300 border border-sky-200 dark:border-sky-800 flashcard-due-pill">
@@ -735,7 +776,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
                   {showAnswer && (
                     <div className="mt-4 text-foreground">
                       <div className="h-px bg-border mb-4" />
-                      <div className="max-h-[45vh] overflow-y-auto text-sm text-foreground">
+                      <div ref={answerRef} className="max-h-[45vh] overflow-y-auto text-sm text-foreground">
                         <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
                           {cards![index]?.answer || ''}
                         </ReactMarkdown>
