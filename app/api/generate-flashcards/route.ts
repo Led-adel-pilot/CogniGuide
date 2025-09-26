@@ -241,7 +241,7 @@ async function generateJsonFromModel(userContent: any): Promise<{ title: string 
   let completion;
   try {
     completion = await openai.chat.completions.create({
-      model: 'gemini-flash-lite-latest',
+      model: 'gemini-2.5-flash-lite',
       // @ts-ignore
       reasoning_effort: 'none',
       messages: [{ role: 'user', content: userContent }],
@@ -305,7 +305,7 @@ export async function POST(req: NextRequest) {
       let stream;
       try {
         stream = await openai.chat.completions.create({
-          model: 'gemini-flash-lite-latest',
+          model: 'gemini-2.5-flash-lite',
           // @ts-ignore
           reasoning_effort: 'none', // Reduce thinking time for faster responses
           messages: [{ role: 'user', content: promptContent }],
