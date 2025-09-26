@@ -70,7 +70,7 @@ export default function AuthModal({ open }: AuthModalProps) {
         <h2 className="text-xl font-bold mb-2">Create a free account</h2>
         <p className="text-sm text-muted-foreground mb-4">Sign up to continue generating and save your history.</p>
 
-        {message && <div className="mb-3 text-sm text-green-700 dark:text-green-400 bg-green-50 dark:bg-green-950/50 border border-green-200 dark:border-green-800 rounded p-2">{message}</div>}
+        {message && <div className="mb-3 text-sm text-green-100 bg-green-600 border border-green-700 dark:text-green-800 dark:bg-green-100 dark:border-green-200 rounded p-2">{message}</div>}
         {error && <div className="mb-3 text-sm text-red-700 dark:text-red-400 bg-red-50 dark:bg-red-950/50 border border-red-200 dark:border-red-800 rounded p-2">{error}</div>}
 
         <div className="space-y-3">
@@ -88,7 +88,7 @@ export default function AuthModal({ open }: AuthModalProps) {
               className="flex-shrink-0 inline-flex items-center gap-2 px-5 py-2 bg-blue-600 text-white rounded-full disabled:opacity-60"
             >
               <Mail className="h-4 w-4" />
-              Get Login link
+              Send Link
             </button>
           </div>
 
