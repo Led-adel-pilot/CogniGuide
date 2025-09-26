@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { Poppins } from "next/font/google";
 import Link from "next/link";
+import Script from "next/script";
 
 export const metadata: Metadata = {
   title: "CogniGuide",
@@ -38,6 +39,10 @@ export default function RootLayout({
         <link rel="manifest" href="/manifest.json" />
         <link rel="icon" href="/favicon.ico" sizes="any" type="image/x-icon" />
         <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
+        <link
+          rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css"
+        />
         <script
           dangerouslySetInnerHTML={{
             __html: `
@@ -55,6 +60,14 @@ export default function RootLayout({
               } catch (e) {}
             `,
           }}
+        />
+        <Script
+          src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"
+          strategy="beforeInteractive"
+        />
+        <Script
+          src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+          strategy="beforeInteractive"
         />
       </head>
       <body className={`${poppins.className} flex min-h-screen flex-col bg-background text-foreground`}>

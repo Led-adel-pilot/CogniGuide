@@ -102,6 +102,9 @@ const D_THEME_COLOR_PALETTE = [
 
 // Dynamically select palette based on dark mode media query
 const isDarkMode = () => {
+    if (typeof document === 'undefined' || typeof window === 'undefined') {
+        return false;
+    }
     // 1. Check for theme override from the app's theme toggle
     const appTheme = document.documentElement.dataset.theme;
     if (appTheme === 'dark') return true;
@@ -318,7 +321,8 @@ function renderMarkdownToHTML(text: string): string {
         .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/__(.*?)__/g, '<strong>$1</strong>')
         .replace(/\*(.*?)\*/g, '<em>$1</em>').replace(/_(.*?)_/g, '<em>$1</em>')
         .replace(/~~(.*?)~~/g, '<del>$1</del>').replace(/==(.*?)\==/g, '<mark>$1</mark>')
-        .replace(/`([^`]+)`/g, '<code>$1</code>');
+        .replace(/`([^`]+)`/g, '<code>$1</code>')
+        .replace(/\n/g, '<br>');
 }
 
 function parseFrontmatter(markdown: string): { frontmatter: Record<string, string>, content: string } {
@@ -356,7 +360,58 @@ function applyColorVariations(node: MindMapNode) {
     node.children.forEach(applyColorVariations);
 }
 
-function parseMarkmap(markdown: string): MindMapNode {
+interface MarkdownToken {
+    type: 'heading' | 'list';
+    level: number;
+    indent: number;
+    text: string;
+    isFolded: boolean;
+}
+
+function tokenizeMarkdown(lines: string[], getIndent: (line: string) => number): MarkdownToken[] {
+    const tokens: MarkdownToken[] = [];
+    for (const originalLine of lines) {
+        if (originalLine.trim() === '') continue;
+        let processedLine = originalLine;
+        let isFolded = false;
+        if (processedLine.includes('<!-- markmap: fold -->')) {
+            isFolded = true;
+            processedLine = processedLine.replace('<!-- markmap: fold -->', '');
+        }
+        const headingMatch = processedLine.match(/^(#+)\s(.*)/);
+        if (headingMatch) {
+            tokens.push({
+                type: 'heading',
+                level: headingMatch[1].length,
+                indent: 0,
+                text: headingMatch[2].trim(),
+                isFolded
+            });
+            continue;
+        }
+        const listItemMatch = processedLine.match(/^(\s*)(\*|-|\d+\.)\s(.*)/);
+        if (listItemMatch) {
+            const indent = getIndent(listItemMatch[1]);
+            tokens.push({
+                type: 'list',
+                level: 0,
+                indent,
+                text: listItemMatch[3].trim(),
+                isFolded
+            });
+            continue;
+        }
+        if (tokens.length === 0 || !/^\s+/.test(originalLine)) continue;
+        const lastToken = tokens[tokens.length - 1];
+        const continuation = processedLine.trim();
+        if (!continuation) continue;
+        lastToken.text = `${lastToken.text}\n${continuation}`;
+        lastToken.isFolded = lastToken.isFolded || isFolded;
+    }
+    return tokens;
+}
+
+export function parseMarkmap(markdown: string): MindMapNode {
     const { frontmatter, content } = parseFrontmatter(markdown);
     let lines = content.split('\n');
     const getIndent = (line: string) => (line.match(/^\s*/) as RegExpMatchArray)[0].length;
@@ -368,6 +423,7 @@ function parseMarkmap(markdown: string): MindMapNode {
         rootText = lines[h1Index].trim().substring(2);
         lines.splice(h1Index, 1);
     }
+    const tokens = tokenizeMarkdown(lines, getIndent);
     const rootThemeColor = isDarkMode() ? 'hsla(213, 82%, 85%, 1.00)' : 'hsla(208, 82%, 39%, 1.00)';
     const rootTextColor = isDarkMode() ? 'hsla(213, 82%, 95%, 1.00)' : 'hsla(208, 82%, 29%, 1.00)';
     const root: MindMapNode = {
@@ -377,37 +433,29 @@ function parseMarkmap(markdown: string): MindMapNode {
     };
     const parentStack = [root];
     let lastHeadingLevel = 0;
-    for (const line of lines) {
-        if (line.trim() === '') continue;
-        let isFolded = false;
-        let processedLine = line;
-        if (line.includes('<!-- markmap: fold -->')) {
-            isFolded = true;
-            processedLine = line.replace('<!-- markmap: fold -->', '');
+    for (const token of tokens) {
+        let text = token.text;
+        const hasFoldMarker = text.includes('<!-- markmap: fold -->') || token.isFolded;
+        if (hasFoldMarker) {
+            text = text.replace('<!-- markmap: fold -->', '');
         }
-        const headingMatch = processedLine.match(/^(#+)\s(.*)/);
-        const listItemMatch = processedLine.match(/^(\s*)(\*|-|\d+\.)\s(.*)/);
-        let text, level;
-        if (headingMatch) {
-            level = headingMatch[1].length;
-            text = headingMatch[2].trim();
-            // Make level 2, 3 and 4 headings bold
+        let level;
+        if (token.type === 'heading') {
+            level = token.level;
+            text = text.trim();
             if (level >= 2 && level <= 4) {
                 text = `**${text}**`;
             }
             lastHeadingLevel = level;
-        } else if (listItemMatch) {
-            text = listItemMatch[3].trim();
-            // Treat leading ##/###/#### in list items as bold markers and strip them from display
+        } else {
+            text = text.trim();
             const pseudoHeading = text.match(/^#{2,4}\s+(.*)$/);
             if (pseudoHeading) {
                 text = `**${pseudoHeading[1].trim()}**`;
             }
-            const indent = getIndent(listItemMatch[1]);
-            level = lastHeadingLevel + 1 + Math.floor(indent / 2);
-        } else {
-            continue;
+            level = lastHeadingLevel + 1 + Math.floor(token.indent / 2);
         }
+        text = text.trim();
         while (parentStack[parentStack.length - 1].level >= level) {
             parentStack.pop();
         }
@@ -428,7 +476,7 @@ function parseMarkmap(markdown: string): MindMapNode {
             id: `node-${nodeCounter++}`, text: text, html: renderMarkdownToHTML(text),
             children: [],
             // Only collapse if explicitly folded in markdown
-            isCollapsed: isFolded,
+            isCollapsed: hasFoldMarker,
             level: level,
             parent: parent,
             themeColor: nodeThemeColor,
