@@ -21,8 +21,79 @@ import { formatDate, formatTime } from '@/lib/utils';
 type SessionUser = {
   id: string;
   email?: string;
+  fullName?: string | null;
+  avatarUrl?: string | null;
   referralLastSeenId?: string | null;
 };
+
+function getMetadataString(metadata: Record<string, unknown>, key: string): string | null {
+  const value = metadata[key];
+  return typeof value === 'string' && value.trim().length > 0 ? value.trim() : null;
+}
+
+function deriveFullNameFromMetadata(metadata: Record<string, unknown>): string | null {
+  const directName =
+    getMetadataString(metadata, 'full_name') ||
+    getMetadataString(metadata, 'name') ||
+    getMetadataString(metadata, 'preferred_username') ||
+    getMetadataString(metadata, 'user_name');
+
+  if (directName) return directName;
+
+  const givenName = getMetadataString(metadata, 'given_name');
+  const familyName = getMetadataString(metadata, 'family_name');
+  const combined = [givenName, familyName].filter(Boolean).join(' ').trim();
+
+  return combined.length > 0 ? combined : null;
+}
+
+function deriveAvatarUrlFromMetadata(metadata: Record<string, unknown>): string | null {
+  return getMetadataString(metadata, 'avatar_url') || getMetadataString(metadata, 'picture');
+}
+
+function formatNameFromEmail(email?: string): string | null {
+  if (!email) return null;
+  const [local] = email.split('@');
+  if (!local) return null;
+  const words = local
+    .split(/[._-]+/g)
+    .map((part) => part.trim())
+    .filter((part) => part.length > 0);
+
+  if (!words.length) return local;
+
+  return words
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
+}
+
+function getDisplayName(user: SessionUser | null): string {
+  if (!user) return 'User';
+  const fromMetadata = user.fullName?.trim();
+  if (fromMetadata) return fromMetadata;
+  const fromEmail = formatNameFromEmail(user.email);
+  if (fromEmail) return fromEmail;
+  return 'User';
+}
+
+function getInitials(name: string): string {
+  const words = name
+    .split(/\s+/g)
+    .map((part) => part.trim())
+    .filter(Boolean);
+
+  if (!words.length) {
+    return name.slice(0, 2).toUpperCase();
+  }
+
+  const initials = words
+    .map((word) => word.charAt(0))
+    .join('')
+    .slice(0, 2)
+    .toUpperCase();
+
+  return initials || name.slice(0, 2).toUpperCase();
+}
 
 const REFERRAL_REWARD_FALLBACK = 30;
 
@@ -131,6 +202,10 @@ export default function DashboardClient() {
   const referralRewardTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const shareLinksCacheRef = useRef<Map<string, string>>(new Map());
   const lastUpgradeTriggerRef = useRef<string | null>(null);
+
+  const displayName = getDisplayName(user);
+  const displayInitials = getInitials(displayName);
+  const avatarUrl = user?.avatarUrl ?? null;
 
   // Refs mirroring pagination state for async safety
   const historyBufferRef = useRef(historyBuffer);
@@ -652,12 +727,16 @@ export default function DashboardClient() {
     const init = async () => {
       const { data } = await supabase.auth.getUser();
       const metadata = (data.user?.user_metadata ?? {}) as Record<string, unknown>;
+      const fullName = deriveFullNameFromMetadata(metadata);
+      const avatarUrl = deriveAvatarUrlFromMetadata(metadata);
       const lastSeenFromMetadata =
         typeof metadata['referral_last_seen_id'] === 'string' ? (metadata['referral_last_seen_id'] as string) : null;
       const authed = data.user
         ? {
             id: data.user.id,
             email: data.user.email || undefined,
+            fullName,
+            avatarUrl,
             referralLastSeenId: lastSeenFromMetadata,
           }
         : null;
@@ -1511,8 +1590,22 @@ export default function DashboardClient() {
             onClick={() => setIsSettingsOpen(true)}
             className="w-full text-left pl-2 pr-2 py-3 rounded-xl border hover:bg-muted/50 flex items-center gap-3 transition-colors"
           >
+            <div className="relative h-10 w-10 rounded-full overflow-hidden bg-muted flex items-center justify-center text-sm font-medium text-foreground/80">
+              {avatarUrl ? (
+                <Image
+                  src={avatarUrl}
+                  alt={`${displayName} avatar`}
+                  fill
+                  sizes="40px"
+                  className="object-cover"
+                  unoptimized
+                />
+              ) : (
+                <span>{displayInitials}</span>
+              )}
+            </div>
             <div className="min-w-0 flex-1">
-              <div className="font-medium line-clamp-1">{user?.email || 'User'}</div>
+              <div className="font-medium line-clamp-1">{displayName}</div>
               <div className="text-xs text-muted-foreground flex items-center gap-1">
                 <Coins className="h-3 w-3" />
                 <span>{(Math.floor(credits * 10) / 10).toFixed(1)} Credits Remaining</span>
