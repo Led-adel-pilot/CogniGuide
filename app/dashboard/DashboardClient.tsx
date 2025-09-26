@@ -1449,7 +1449,7 @@ export default function DashboardClient() {
                 // Ensure UI reflects latest due based on cached schedules even if no network
                 recomputeDueFromCache(flashcardsHistory);
               }}
-              className="w-full text-left pl-2 pr-2 py-3 rounded-xl border hover:bg-muted/50 flex items-center gap-3 transition-colors"
+              className="w-full text-left pl-2 pr-2 py-3 rounded-xl hover:bg-muted/50 flex items-center gap-3 transition-colors"
             >
               <CalendarClock className="h-5 w-5 text-primary" />
               <span className="font-medium">Spaced repetition</span>
@@ -1502,11 +1502,11 @@ export default function DashboardClient() {
                         setFlashcardsOpen(true);
                       }
                     }}
-                    className={`w-full text-left pl-2 py-3 rounded-xl border flex items-start gap-2 transition-all ${
-                      openMenuId === itemKey
-                        ? 'pr-8 bg-muted/50'
-                        : 'pr-2 group-hover:pr-8 hover:bg-muted/50'
-                    }`}
+        className={`w-full text-left pl-2 py-2 rounded-xl flex items-start gap-2 transition-all ${
+          openMenuId === itemKey
+            ? 'pr-8 bg-muted/50'
+            : 'pr-2 group-hover:pr-8 hover:bg-muted/50'
+        }`}
                   >
                     <div className="mt-0.5 text-gray-600">
                       {(() => {
@@ -1588,27 +1588,27 @@ export default function DashboardClient() {
         <div className="border-t pt-2 space-y-2 pl-0 pr-2">
           <button
             onClick={() => setIsSettingsOpen(true)}
-            className="w-full text-left pl-2 pr-2 py-3 rounded-xl border hover:bg-muted/50 flex items-center gap-3 transition-colors"
+            className="w-full text-left pl-2 pr-2 py-2 rounded-xl hover:bg-muted/50 flex items-center gap-3 transition-colors"
           >
-            <div className="relative h-10 w-10 rounded-full overflow-hidden bg-muted flex items-center justify-center text-sm font-medium text-foreground/80">
-              {avatarUrl ? (
-                <Image
-                  src={avatarUrl}
-                  alt={`${displayName} avatar`}
-                  fill
-                  sizes="40px"
-                  className="object-cover"
-                  unoptimized
-                />
-              ) : (
-                <span>{displayInitials}</span>
-              )}
-            </div>
+    <div className="relative h-7 w-7 rounded-full overflow-hidden bg-muted flex items-center justify-center text-sm font-medium text-foreground/80">
+      {avatarUrl ? (
+        <Image
+          src={avatarUrl}
+          alt={`${displayName} avatar`}
+          fill
+          sizes="28px"
+          className="object-cover"
+          unoptimized
+        />
+      ) : (
+        <span>{displayInitials}</span>
+      )}
+    </div>
             <div className="min-w-0 flex-1">
               <div className="font-medium line-clamp-1">{displayName}</div>
               <div className="text-xs text-muted-foreground flex items-center gap-1">
                 <Coins className="h-3 w-3" />
-                <span>{(Math.floor(credits * 10) / 10).toFixed(1)} Credits Remaining</span>
+                <span>{(Math.floor(credits * 10) / 10).toFixed(1)} Credits</span>
               </div>
             </div>
           </button>
