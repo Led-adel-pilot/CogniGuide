@@ -16,6 +16,12 @@
   --font-heading: "Poppins", "sans-serif";
 }
 
+/* Generator shadow tokens */
+:root {
+  --generator-shadow-default: 0 0 20px 2px rgba(0, 0, 0, 0.1);
+  --generator-shadow-compact: 0 0 16px 2px rgba(0, 0, 0, 0.08);
+}
+
 /* Dark mode overrides */
 [data-theme="dark"] {
   /* Lighter dark theme (midnight slate) */
@@ -40,32 +46,8 @@
     background-color: rgba(37, 99, 235, 0.5); /* slightly lighter dark blue on hover */
   }
 
-  /* Light mode shadows - exactly as before */
-  .shadow-generator-light {
-    box-shadow: 0 0 16px 2px rgba(0, 0, 0, 0.08);
-  }
-
-  .shadow-generator-dark {
-    box-shadow: 0 0 20px 2px rgba(0, 0, 0, 0.1);
-  }
-
-  /* Dark mode shadow overrides - light blueish shadows */
-  [data-theme="dark"] .shadow-generator-light {
-    box-shadow: 0 0 16px 2px rgba(147, 197, 253, 0.12) !important;
-  }
-
-  [data-theme="dark"] .shadow-generator-dark {
-    box-shadow: 0 0 20px 2px rgba(147, 197, 253, 0.15) !important;
-  }
-
-  /* Also target the specific container classes used in Generator */
-  [data-theme="dark"] .shadow-\[0_0_16px_2px_rgba\(0\,0\,0\,0\.08\)\] {
-    box-shadow: 0 0 16px 2px rgba(147, 197, 253, 0.12) !important;
-  }
-
-  [data-theme="dark"] .shadow-\[0_0_20px_2px_rgba\(0\,0\,0\,0\.1\)\] {
-    box-shadow: 0 0 20px 2px rgba(147, 197, 253, 0.15) !important;
-  }
+  --generator-shadow-default: 0 0 22px 2px rgba(148, 192, 255, 0.16);
+  --generator-shadow-compact: 0 0 18px 2px rgba(148, 192, 255, 0.14);
 
   /* Dark mode billing toggle overrides */
   .billing-toggle-bg {
@@ -86,6 +68,14 @@
 
   /* Spaced repetition due badge dark-mode override */
   .spaced-due-badge { @apply dark:border-blue-800 dark:bg-blue-900/30 dark:text-blue-300; }
+}
+
+.generator-card {
+  box-shadow: var(--generator-shadow-default);
+}
+
+.generator-card--compact {
+  box-shadow: var(--generator-shadow-compact);
 }
 
 @layer base {

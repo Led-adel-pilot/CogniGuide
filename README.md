@@ -25,6 +25,10 @@ CogniGuide comprehensive AI-powered study assistant. It uses an LLM to convert t
 *   **Seamless Save on Sign-Up:** When a non-authenticated user generates a mind map and then signs up to save it, the mind map is automatically saved to their new account and appears in their history, ensuring no work is lost.
 *   **Localized Date Formatting:** All dates and times are automatically displayed in the user's preferred locale format (dd/mm/yy, mm/dd/yy, etc.) based on their browser's language settings. This ensures users see dates in their familiar format whether they prefer European (dd/mm), American (mm/dd), or other regional date conventions.
 
+## Styling & Theming Notes
+
+- Generator surfaces use two CSS custom properties—`--generator-shadow-default` and `--generator-shadow-compact`—defined in `app/globals.css`. Light mode keeps the existing neutral gray shadows, while the dark theme overrides those variables with a softer, low-saturation blue glow so each theme has a distinct look without duplicating class rules.
+
 ## Public Link Sharing System
 
 CogniGuide includes a comprehensive public link sharing system that allows users to share their mind maps and flashcard decks with anyone via secure, token-based URLs. This feature enhances collaboration and content sharing while maintaining security and user control.

@@ -973,7 +973,7 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
               <p className="text-muted-foreground mt-2">Upload your PDFs, slides, or documents. Our AI creates clear mind maps and smart, spaced-repetition flashcards to help you learn faster.</p>
             </div>
           )}
-            <div className={compact ? 'relative w-full max-w-none mx-auto bg-background rounded-[2rem] shadow-[0_0_16px_2px_rgba(0,0,0,0.08)]' : 'relative w-full max-w-none mx-auto bg-background rounded-[2rem] shadow-[0_0_20px_2px_rgba(0,0,0,0.1)]'}>
+            <div className={compact ? 'relative w-full max-w-none mx-auto bg-background rounded-[2rem] generator-card generator-card--compact' : 'relative w-full max-w-none mx-auto bg-background rounded-[2rem] generator-card'}>
             <div className={compact ? 'absolute -top-3 -left-3 w-20 h-20 bg-primary/10 rounded-full blur-2xl -z-10' : 'absolute -top-4 -left-4 w-24 h-24 bg-primary/10 rounded-full blur-2xl -z-10'}></div>
             <div className={compact ? 'absolute -bottom-3 -right-3 w-28 h-28 bg-accent/10 rounded-full blur-3xl -z-10' : 'absolute -bottom-4 -right-4 w-32 h-32 bg-accent/10 rounded-full blur-3xl -z-10'}></div>
             <div className={compact ? 'p-4 sm:p-6 space-y-4' : 'p-4 sm:p-6 space-y-4'}>
