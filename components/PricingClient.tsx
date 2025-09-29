@@ -10,9 +10,16 @@ import { PAID_PLANS, FREE_PLAN_CREDITS, MODEL_CREDIT_MULTIPLIERS } from '@/lib/p
 
 type BillingCycle = 'month' | 'year';
 
+type PriceValue = string | null;
+
 type PricesState = {
-  student: { month: string; year: string };
-  pro: { month: string; year: string };
+  student: { month: PriceValue; year: PriceValue };
+  pro: { month: PriceValue; year: PriceValue };
+};
+
+const INITIAL_PRICES: PricesState = {
+  student: { month: null, year: null },
+  pro: { month: null, year: null },
 };
 
 const PADDLE_ENV = process.env.NEXT_PUBLIC_PADDLE_ENV || 'sandbox';
@@ -26,10 +33,8 @@ export default function PricingClient({ onPurchaseComplete }: PricingClientProps
   const [scriptReady, setScriptReady] = useState(false);
   const [paddleReady, setPaddleReady] = useState(false);
   const [billingCycle, setBillingCycle] = useState<BillingCycle>('month');
-  const [prices, setPrices] = useState<PricesState>({
-    student: { month: '$0.00', year: '$0.00' },
-    pro: { month: '$0.00', year: '$0.00' },
-  });
+  const [prices, setPrices] = useState<PricesState>(INITIAL_PRICES);
+  const [pricesLoading, setPricesLoading] = useState(false);
   const mountedRef = useRef(true);
   const hasInitializedRef = useRef(false);
   const [user, setUser] = useState<User | null>(null);
@@ -166,11 +171,15 @@ export default function PricingClient({ onPurchaseComplete }: PricingClientProps
           ],
         } as const;
         const result = await PaddleObj.PricePreview(request);
-        if (mountedRef.current) {
+        if (mountedRef.current && result?.data?.details?.lineItems) {
           setPrices(prev => {
-            const next = { ...prev };
+            const next: PricesState = {
+              student: { ...prev.student },
+              pro: { ...prev.pro },
+            };
             result.data.details.lineItems.forEach((item: any) => {
-              const priceText = item.formattedTotals?.subtotal || '';
+              const priceText = item.formattedTotals?.subtotal ?? null;
+              if (!priceText) return;
               if (item.price?.id === PAID_PLANS.student.priceIds[cycle]) {
                 next.student[cycle] = priceText;
               } else if (item.price?.id === PAID_PLANS.pro.priceIds[cycle]) {
@@ -189,13 +198,20 @@ export default function PricingClient({ onPurchaseComplete }: PricingClientProps
   );
 
   const updateBothCycles = useCallback(async () => {
+    if (!paddleReady || !isConfigured) return;
+    if (mountedRef.current) {
+      setPricesLoading(true);
+    }
     try {
-      await updatePrices('month');
-      await updatePrices('year');
+      await Promise.all([updatePrices('month'), updatePrices('year')]);
     } catch (e) {
       console.error('An unexpected error occurred while updating prices:', e);
+    } finally {
+      if (mountedRef.current) {
+        setPricesLoading(false);
+      }
     }
-  }, [updatePrices]);
+  }, [updatePrices, paddleReady, isConfigured]);
 
   // Derive current plan and cycle from the stored Paddle priceId
   const currentSubscription = useMemo(() => {
@@ -237,11 +253,47 @@ export default function PricingClient({ onPurchaseComplete }: PricingClientProps
     return `Choose ${capitalize(planKey)}`;
   }, [billingCycle, currentSubscription, isCurrentPlanSelected, user]);
 
-  const isButtonDisabled = useCallback((planKey: 'student' | 'pro') => {
-    if (!isConfigured || !paddleReady) return true;
-    if (isCurrentPlanSelected(planKey)) return true;
-    return false;
-  }, [isConfigured, paddleReady, isCurrentPlanSelected]);
+  const renderPrimaryPrice = (planKey: 'student' | 'pro') => {
+    const price = prices[planKey][billingCycle];
+    if (!price) {
+      return (
+        <span
+          className="inline-flex h-9 w-28 animate-pulse rounded bg-muted"
+          aria-label="Loading price"
+        />
+      );
+    }
+    return (
+      <>
+        <span>{price}</span>
+        <span className="text-base font-semibold text-muted-foreground">/ {billingCycle}</span>
+      </>
+    );
+  };
+
+  const renderSecondaryPrice = (planKey: 'student' | 'pro') => {
+    const alternateCycle: BillingCycle = billingCycle === 'month' ? 'year' : 'month';
+    const price = prices[planKey][alternateCycle];
+    if (!price) {
+      return <span className="inline-flex h-4 w-24 animate-pulse rounded bg-muted" aria-hidden="true" />;
+    }
+    return (
+      <span>
+        {price} / {alternateCycle}
+      </span>
+    );
+  };
+
+  const isButtonDisabled = useCallback(
+    (planKey: 'student' | 'pro') => {
+      if (!isConfigured || !paddleReady) return true;
+      if (pricesLoading) return true;
+      if (!prices[planKey][billingCycle]) return true;
+      if (isCurrentPlanSelected(planKey)) return true;
+      return false;
+    },
+    [billingCycle, isConfigured, paddleReady, prices, pricesLoading, isCurrentPlanSelected]
+  );
 
   const openCheckout = useCallback(
     (plan: 'student' | 'pro', currentUser: User) => {
@@ -375,12 +427,15 @@ export default function PricingClient({ onPurchaseComplete }: PricingClientProps
             <h3 className="text-xl font-bold font-heading mb-1">Student</h3>
             <p className="text-muted-foreground mb-6">Plenty of credits for regular study and exam prep.</p>
             <div className="mb-6">
-              <div className="text-3xl font-extrabold">
-                {billingCycle === 'month' ? prices.student.month : prices.student.year}{' '}
-                <span className="text-base font-semibold text-muted-foreground">/ {billingCycle}</span>
+              <div
+                className="text-3xl font-extrabold flex items-baseline gap-2"
+                aria-live="polite"
+                aria-busy={pricesLoading || !prices.student[billingCycle]}
+              >
+                {renderPrimaryPrice('student')}
               </div>
-              <div className="text-sm text-muted-foreground">
-                {billingCycle === 'month' ? prices.student.year : prices.student.month} / {billingCycle === 'month' ? 'year' : 'month'}
+              <div className="text-sm text-muted-foreground min-h-[1.25rem]">
+                {renderSecondaryPrice('student')}
               </div>
             </div>
             <ul className="space-y-2 text-sm mb-6">
@@ -405,12 +460,15 @@ export default function PricingClient({ onPurchaseComplete }: PricingClientProps
             <h3 className="text-xl font-bold font-heading mb-1">Pro</h3>
             <p className="text-muted-foreground mb-6">For power users with high-volume needs.</p>
             <div className="mb-6">
-              <div className="text-3xl font-extrabold">
-                {billingCycle === 'month' ? prices.pro.month : prices.pro.year}{' '}
-                <span className="text-base font-semibold text-muted-foreground">/ {billingCycle}</span>
+              <div
+                className="text-3xl font-extrabold flex items-baseline gap-2"
+                aria-live="polite"
+                aria-busy={pricesLoading || !prices.pro[billingCycle]}
+              >
+                {renderPrimaryPrice('pro')}
               </div>
-              <div className="text-sm text-muted-foreground">
-                {billingCycle === 'month' ? prices.pro.year : prices.pro.month} / {billingCycle === 'month' ? 'year' : 'month'}
+              <div className="text-sm text-muted-foreground min-h-[1.25rem]">
+                {renderSecondaryPrice('pro')}
               </div>
             </div>
             <ul className="space-y-2 text-sm mb-6">
