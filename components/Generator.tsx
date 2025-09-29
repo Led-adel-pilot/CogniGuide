@@ -9,10 +9,17 @@ import MindMapModal from '@/components/MindMapModal';
 import FlashcardsModal, { Flashcard as FlashcardType } from '@/components/FlashcardsModal';
 import AuthModal from '@/components/AuthModal';
 import { supabase } from '@/lib/supabaseClient';
-import { NON_AUTH_FREE_LIMIT } from '@/lib/plans';
+import { NON_AUTH_FREE_LIMIT, type ModelChoice } from '@/lib/plans';
 import { Sparkles } from 'lucide-react';
 
-export default function Generator({ redirectOnAuth = false, showTitle = true, compact = false }: { redirectOnAuth?: boolean, showTitle?: boolean, compact?: boolean }) {
+interface GeneratorProps {
+  redirectOnAuth?: boolean;
+  showTitle?: boolean;
+  compact?: boolean;
+  modelChoice?: ModelChoice;
+}
+
+export default function Generator({ redirectOnAuth = false, showTitle = true, compact = false, modelChoice = 'fast' }: GeneratorProps) {
   // Enforce a client-side per-file size cap to avoid server 413s (Vercel ~4.5MB)
   const MAX_FILE_BYTES = Math.floor(50 * 1024 * 1024); // 50MB per file when using Supabase Storage
   const [files, setFiles] = useState<File[]>([]);
@@ -522,6 +529,7 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
       file_count: files.length,
       has_prompt: !!prompt.trim(),
       non_auth_generations_allowed: allowNonAuthGenerations !== false,
+      model_choice: modelChoice,
     });
     if (mode === 'flashcards') {
       // Require at least one file for file-based flashcards generation
@@ -572,7 +580,7 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
           }
         }
         if (effectivePreParsed) {
-          const payload = { text: effectivePreParsed.text || '', images: effectivePreParsed.images || [], prompt: prompt.trim() || '', rawCharCount: effectivePreParsed.rawCharCount };
+          const payload = { text: effectivePreParsed.text || '', images: effectivePreParsed.images || [], prompt: prompt.trim() || '', rawCharCount: effectivePreParsed.rawCharCount, model: modelChoice };
 
           // Debug logging for image processing
           debugLog('Flashcard payload:', {
@@ -600,6 +608,7 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
           const formData = new FormData();
           files.forEach((file) => formData.append('files', file));
           if (prompt.trim()) formData.append('prompt', prompt.trim());
+          formData.append('model', modelChoice);
           const headers: Record<string, string> = {};
           if (accessToken) {
             headers['Authorization'] = `Bearer ${accessToken}`;
@@ -783,7 +792,7 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
         }
       }
       if (effectivePreParsed) {
-        const payload = { text: effectivePreParsed.text || '', images: effectivePreParsed.images || [], prompt: prompt.trim() || '', rawCharCount: effectivePreParsed.rawCharCount };
+        const payload = { text: effectivePreParsed.text || '', images: effectivePreParsed.images || [], prompt: prompt.trim() || '', rawCharCount: effectivePreParsed.rawCharCount, model: modelChoice };
 
         // Debug logging for image processing
         debugLog('Mindmap payload:', {
@@ -811,6 +820,7 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
         const formData = new FormData();
         if (files.length > 0) { files.forEach(file => { formData.append('files', file); }); }
         if (prompt.trim()) formData.append('prompt', prompt.trim());
+        formData.append('model', modelChoice);
         const headers: Record<string, string> = {};
         if (accessToken) {
             headers['Authorization'] = `Bearer ${accessToken}`;

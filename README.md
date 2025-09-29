@@ -180,7 +180,7 @@ Analytics events (`posthog.capture`) track when referral links are opened, loade
 ## Technology Stack
 *   **Framework:** Next.js (React) for building the web application.
 *   **Styling:** Tailwind CSS for utility-first styling.
-*   **AI Integration:** OpenAI API (configured to use Google's Gemini API) for generating mind map content from text and images. The `GEMINI_API_KEY` environment variable is used for authentication. The `gemini-2.5-flash-lite` model is specifically used for generating the Markmap Markdown and supports multimodal inputs.
+*   **AI Integration:** OpenAI API (configured to use Google's Gemini API) for generating mind map content from text and images. The `GEMINI_API_KEY` environment variable is used for authentication. Model names are configured through `GEMINI_MODEL_FAST` (defaulting to `gemini-2.5-flash-lite`) and `GEMINI_MODEL_SMART` (defaulting to `gemini-2.5-flash`). Free and non-authenticated users are limited to the fast model, while paid users can opt into smart mode, which consumes 2.2× the normal credits.
     *   **Streaming Support:** When available, the API uses streaming (token-by-token) to forward model output to the client as a `text/plain` stream. The frontend consumes partial markdown and progressively updates the renderer to reduce perceived latency.
 *   **Document Parsing:**
 *   `pdf-parse`: Used in `lib/document-parser.ts` via `getTextFromPdf` to extract text from PDF files.
@@ -505,7 +505,7 @@ For consistent branding across the application, use the `CogniGuide_logo.png` fi
 *   It receives `FormData` which can contain either a `File` object (for document uploads) or a `promptText` string.
 *   **Document/Image Processing:** It intelligently determines the file type and uses helper functions from `lib/document-parser.ts` (`getTextFromPdf`, `getTextFromDocx`, `getTextFromPptx`) to extract raw text content from uploaded documents. It also supports plain text and Markdown (`text/markdown`, `.md`) files directly by reading their contents as UTF-8. For images (`image/*`), it attaches them to the multimodal request so the model can perform OCR and diagram understanding; when only images are provided, the API instructs the model to build a mind map from image content alone.
 *   **Prompt Engineering:** The `constructPrompt` function is crucial for guiding the AI. It builds a detailed prompt that instructs the AI to generate a structured, hierarchical mind map in Markmap Markdown format, adhering to specific rules (root node, parent/child nodes, no extra text). It also incorporates any custom user instructions.
-*   **AI Interaction:** It initializes the OpenAI client (configured to use Google's Gemini API) and sends the `finalPrompt` to the `gemini-2.5-flash-lite` model.
+*   **AI Interaction:** It initializes the OpenAI client (configured to use Google's Gemini API) and resolves the requested model via `GEMINI_MODEL_FAST`/`GEMINI_MODEL_SMART`. Requests default to the fast model; smart mode is restricted to paid plans and incurs a 2.2× credit multiplier before deduction.
 *   **Response Handling:** It extracts the markdown content from the AI's response, logs it, and returns it as a JSON response to the client. Comprehensive error handling is implemented for unsupported file types, missing input, and AI generation failures.
 
 ### Utility Libraries (`lib/`)
@@ -516,6 +516,7 @@ For consistent branding across the application, use the `CogniGuide_logo.png` fi
     - JSON POST with `{ markdown: string, numCards?: number }` (existing behavior) to synthesize flashcards from Markmap markdown. Streaming supported when `?stream=1` and emits NDJSON lines.
     - `FormData` POST with one or more `files` and optional `prompt` to generate flashcards directly from uploaded content (PDF/DOCX/PPTX/TXT/MD and images). Documents are parsed with `lib/document-parser.ts`; images are attached for multimodal OCR/diagram understanding. Streaming supported via NDJSON.
 *   Returns `{ title?: string, cards: { question: string, answer: string }[] }`.
+*   Model selection mirrors the mind map endpoint: requests use the `GEMINI_MODEL_FAST` value by default, while smart mode (`GEMINI_MODEL_SMART`) is reserved for paid plans and consumes 2.2× credits before deduction.
 *   The prompt instructs the model to emit a strict JSON object; the handler defensively extracts a JSON object from the response.
 *   Saving: when a user is authenticated, the UI saves generated flashcards to Supabase with the original mind map markdown snapshot, derived title, and the JSON array of cards.
 *   Retrieval: when `MindMapModal` opens for a given markdown, it first looks in an in-memory cache; if not found, it checks `localStorage` using a SHA‑256 hash of the markdown for an instant hit; if still not found and the user is signed in, it queries Supabase (`flashcards`) by `user_id` and `title` only (newest `created_at`) to avoid sending the full markdown over the network. On success, it mirrors the deck into `localStorage` and updates it with the Supabase `id` after save.
@@ -887,6 +888,8 @@ Define these in `.env.local` (and on your hosting provider):
 
 ```
 GEMINI_API_KEY=your_google_generative_ai_api_key
+GEMINI_MODEL_FAST=gemini-2.5-flash-lite
+GEMINI_MODEL_SMART=gemini-2.5-flash
 NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
 NEXT_PUBLIC_PADDLE_CLIENT_TOKEN=your_paddle_client_side_token
@@ -913,6 +916,7 @@ NEXT_PUBLIC_BASE_URL=your_production_domain # Optional: defaults to deployment U
   - `PAID_PLANS` object defines all plan details (credits, price IDs)
   - `FREE_PLAN_CREDITS` constant for authenticated free tier users
   - `NON_AUTH_FREE_LIMIT` constant for non-authenticated users (generation limit)
+  - `MODEL_CREDIT_MULTIPLIERS`/`MODEL_REQUIRED_TIER` define fast vs. smart mode pricing and access, with a shared `ModelChoice` type for API handlers
   - Helper functions for plan lookup and credit calculation
 - Webhooks are handled at `app/api/paddle-webhook/route.ts` to manage subscriptions and credit accounting.
 
@@ -932,6 +936,7 @@ NEXT_PUBLIC_BASE_URL=your_production_domain # Optional: defaults to deployment U
     - For document uploads, the backend extracts text (PDF/DOCX/PPTX/TXT/MD) and counts characters from the extracted text plus any prompt provided.
     - For image‑only requests, a minimum of 0.5 credits is charged.
     - For prompt‑only requests (no file uploads), a minimum of 1 credit is charged; if the pasted prompt exceeds 3,800 characters, credits are calculated proportionally to the text length.
+    - Smart mode multiplies the computed credit usage by 2.2× before reservation/deduction; fast mode keeps the base calculation.
     - Deduction happens at the start of generation. If streaming fails before any data is sent, the reserved credits are refunded automatically.
     - Applies to both endpoints: `POST /api/generate-mindmap` and `POST /api/generate-flashcards` (JSON and multipart modes).
   - **Automated Credit Management**:

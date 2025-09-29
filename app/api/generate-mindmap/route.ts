@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
 import { getTextFromDocx, getTextFromPdf, getTextFromPptx, getTextFromPlainText, processMultipleFiles } from '@/lib/document-parser';
+import { MODEL_CREDIT_MULTIPLIERS, MODEL_REQUIRED_TIER, type ModelChoice } from '@/lib/plans';
 import { createClient } from '@supabase/supabase-js';
 
 const openai = new OpenAI({
@@ -116,6 +117,18 @@ async function getUserTier(userId: string | null): Promise<'non-auth' | 'free' |
   }
 }
 
+const MODEL_NAMES: Record<ModelChoice, string> = {
+  fast: process.env.GEMINI_MODEL_FAST || 'gemini-2.5-flash-lite',
+  smart: process.env.GEMINI_MODEL_SMART || 'gemini-2.5-flash',
+};
+
+function normalizeModelChoice(model?: unknown): ModelChoice | null {
+  if (typeof model !== 'string' || model.trim() === '') return 'fast';
+  const lowered = model.trim().toLowerCase();
+  if (lowered === 'fast' || lowered === 'smart') return lowered;
+  return null;
+}
+
 async function getCurrentCredits(userId: string): Promise<number | null> {
   if (!supabaseAdmin) return null;
   const { data } = await supabaseAdmin
@@ -185,14 +198,22 @@ export async function POST(req: NextRequest) {
   try {
     const contentType = req.headers.get('content-type') || '';
 
-    async function respondWithStream(opts: { text: string; prompt: string; images: string[]; userId: string | null; rawCharCount?: number }) {
-      const { text, prompt, images, userId, rawCharCount } = opts;
+    async function respondWithStream(opts: { text: string; prompt: string; images: string[]; userId: string | null; rawCharCount?: number; model?: string }) {
+      const { text, prompt, images, userId, rawCharCount, model } = opts;
       const multimodalPreamble = images.length > 0
         ? `In addition to any text provided below, you are also given ${images.length} image(s). Carefully read text inside the images (OCR) and analyze diagrams to extract key concepts and relationships. Integrate insights from both text and images into a single coherent mind map.`
         : '';
       const textToProcess = text || prompt;
       if (!textToProcess && images.length === 0) {
         return NextResponse.json({ error: 'No content provided. Please upload a file (document or image) or enter a text prompt.' }, { status: 400 });
+      }
+      const modelChoice = normalizeModelChoice(model);
+      if (!modelChoice) {
+        return NextResponse.json({
+          error: 'Invalid model selected',
+          message: 'The requested model is not supported. Please choose either the fast or smart mode.',
+          code: 'INVALID_MODEL_SELECTION'
+        }, { status: 400 });
       }
       const finalPrompt = constructPrompt(
         textToProcess || 'No text provided. Analyze the attached image(s) only and build the mind map from their content.',
@@ -208,8 +229,19 @@ export async function POST(req: NextRequest) {
       const isPromptOnly = (!text && images.length === 0 && !!(prompt && prompt.trim().length > 0));
       if (images.length > 0 && creditsNeeded < 0.5) creditsNeeded = 0.5;
       if (isPromptOnly && creditsNeeded < 1) creditsNeeded = 1;
+      const multiplier = MODEL_CREDIT_MULTIPLIERS[modelChoice] ?? 1;
+      creditsNeeded = Number((creditsNeeded * multiplier).toFixed(3));
 
       const userIdResolved = userId || await getUserIdFromAuthHeader(req);
+      const userTier = await getUserTier(userIdResolved);
+      const requiredTier = MODEL_REQUIRED_TIER[modelChoice];
+      if (requiredTier === 'paid' && userTier !== 'paid') {
+        return NextResponse.json({
+          error: 'Upgrade required for smart mode',
+          message: 'Smart mode is available on paid plans. Please upgrade to access the Gemini smart model.',
+          code: 'SMART_MODEL_REQUIRES_UPGRADE'
+        }, { status: 403 });
+      }
       if (userIdResolved) {
         try {
           await ensureFreeMonthlyCredits(userIdResolved);
@@ -289,12 +321,13 @@ export async function POST(req: NextRequest) {
       console.log('=== MINDMAP LLM INPUT ===');
       console.log('Character count:', finalPrompt.length);
       console.log('Text content preview:', finalPrompt.substring(0, 200) + (finalPrompt.length > 200 ? '...' : ''));
+      console.log('Model:', MODEL_NAMES[modelChoice]);
       console.log('=======================');
 
       let stream;
       try {
         stream = await openai.chat.completions.create({
-          model: 'gemini-2.5-flash-lite',
+          model: MODEL_NAMES[modelChoice],
           // @ts-ignore
           reasoning_effort: 'none', // Reduce thinking time for faster responses
           messages: [{ role: 'user', content: userContent }],
@@ -447,10 +480,10 @@ export async function POST(req: NextRequest) {
     }
 
     if (contentType.includes('application/json')) {
-      let body: { text?: string; images?: string[]; prompt?: string } | null = null;
+      let body: { text?: string; images?: string[]; prompt?: string; model?: string } | null = null;
 
       try {
-        body = await req.json() as { text?: string; images?: string[]; prompt?: string } | null;
+        body = await req.json() as { text?: string; images?: string[]; prompt?: string; model?: string } | null;
       } catch (jsonError) {
         return NextResponse.json({
           error: 'Invalid JSON',
@@ -470,6 +503,7 @@ export async function POST(req: NextRequest) {
       const text = (body.text || '').toString();
       const prompt = (body.prompt || '').toString();
       const images = Array.isArray(body.images) ? body.images.filter(img => typeof img === 'string') : [];
+      const rawCharCount = typeof (body as any)?.rawCharCount === 'number' ? (body as any).rawCharCount as number : undefined;
 
       // Validate input
       if (!text && !prompt && images.length === 0) {
@@ -481,7 +515,7 @@ export async function POST(req: NextRequest) {
       }
 
       const userId = await getUserIdFromAuthHeader(req);
-      return await respondWithStream({ text, prompt, images, userId });
+      return await respondWithStream({ text, prompt, images, userId, rawCharCount, model: body.model });
     }
 
     // Fallback: multipart (legacy)
@@ -498,6 +532,7 @@ export async function POST(req: NextRequest) {
 
     const files = formData.getAll('files') as File[];
     const promptText = (formData.get('prompt') as string | null) || '';
+    const requestedModel = (formData.get('model') as string | null) || undefined;
 
     // Validate files
     if (files.length === 0 && !promptText.trim()) {
@@ -553,7 +588,7 @@ export async function POST(req: NextRequest) {
 
     const combined = result.extractedParts.join('\n\n');
     const images = result.imageDataUrls;
-    return await respondWithStream({ text: combined, prompt: promptText, images, userId: userId, rawCharCount: result.totalRawChars });
+    return await respondWithStream({ text: combined, prompt: promptText, images, userId: userId, rawCharCount: result.totalRawChars, model: requestedModel });
 
   } catch (error) {
     console.error('Error in generate-mindmap API:', error);

@@ -7,16 +7,18 @@ import { supabase, MindmapRecord, FlashcardsRecord } from '@/lib/supabaseClient'
 import Generator from '@/components/Generator';
 import MindMapModal from '@/components/MindMapModal';
 import FlashcardsModal, { Flashcard as FlashcardType } from '@/components/FlashcardsModal';
-import { BrainCircuit, LogOut, Loader2, Map as MapIcon, Coins, Zap, Sparkles, CalendarClock, Menu, X, ChevronRight, MoreHorizontal, Edit, Trash2, Share2, Link2, Copy, Check, Gift, TrendingUp, Mail, FileText } from 'lucide-react';
+import { BrainCircuit, LogOut, Loader2, Map as MapIcon, Coins, Zap, Sparkles, CalendarClock, Menu, X, ChevronRight, MoreHorizontal, Edit, Trash2, Share2, Link2, Copy, Check, Gift, TrendingUp, Mail, FileText, Lock, ChevronDown } from 'lucide-react';
 import FlashcardIcon from '@/components/FlashcardIcon';
 import { loadDeckSchedule, saveDeckSchedule, loadDeckScheduleAsync, saveDeckScheduleAsync, loadAllDeckSchedulesAsync, upsertDeckSchedulesBulkAsync, type StoredDeckSchedule } from '@/lib/sr-store';
 import { createInitialSchedule } from '@/lib/spaced-repetition';
 import PricingModal from '@/components/PricingModal';
+import { type ModelChoice } from '@/lib/plans';
 import CogniGuideLogo from '../../CogniGuide_logo.png';
 import Image from 'next/image';
 import posthog from 'posthog-js';
 import ThemeToggle from '@/components/ThemeToggle';
-import { formatDate, formatTime } from '@/lib/utils';
+import { cn, formatDate, formatTime } from '@/lib/utils';
+import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
 
 type SessionUser = {
   id: string;
@@ -156,6 +158,43 @@ export default function DashboardClient() {
   const [flashcardsCards, setFlashcardsCards] = useState<FlashcardType[] | null>(null);
   const [flashcardsError, setFlashcardsError] = useState<string | null>(null);
   const [credits, setCredits] = useState<number>(0);
+  const [selectedModel, setSelectedModel] = useState<ModelChoice>('fast');
+  const [userTier, setUserTier] = useState<'free' | 'paid'>('free');
+  const [tierLoading, setTierLoading] = useState<boolean>(true);
+  const [isModeMenuOpen, setIsModeMenuOpen] = useState(false);
+  const [hoveredModel, setHoveredModel] = useState<ModelChoice | null>(null);
+  const isPaidUser = userTier === 'paid';
+  const modelDetails: Record<
+    ModelChoice,
+    {
+      label: string;
+      description: string;
+      lockedDescription?: string;
+    }
+  > = {
+    fast: {
+      label: 'Fast',
+      description: 'Great for rapid studying sessions and everyday brainstorming.',
+    },
+    smart: {
+      label: 'Smart',
+      description: 'Produces richer, more structured outputs but consumes more credits per generation.',
+      lockedDescription: 'Upgrade to unlock the Smart mode for deeper, more structured outputs. It consumes more credits per generation.',
+    },
+  };
+  const resolvedHoveredModel = hoveredModel ?? selectedModel;
+  const hoveredMessage =
+    !isPaidUser && resolvedHoveredModel === 'smart'
+      ? modelDetails.smart.lockedDescription ?? modelDetails.smart.description
+      : modelDetails[resolvedHoveredModel].description;
+
+  useEffect(() => {
+    if (isModeMenuOpen) {
+      setHoveredModel(selectedModel);
+    } else {
+      setHoveredModel(null);
+    }
+  }, [isModeMenuOpen, selectedModel]);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isPricingModalOpen, setIsPricingModalOpen] = useState(false);
   const [spacedOpen, setSpacedOpen] = useState(false);
@@ -206,7 +245,6 @@ export default function DashboardClient() {
   const displayName = getDisplayName(user);
   const displayInitials = getInitials(displayName);
   const avatarUrl = user?.avatarUrl ?? null;
-
   // Refs mirroring pagination state for async safety
   const historyBufferRef = useRef(historyBuffer);
   const hasMoreMmRef = useRef(hasMoreMm);
@@ -377,6 +415,41 @@ export default function DashboardClient() {
     }
   };
 
+  const refreshUserTier = useCallback(
+    async (userIdOverride?: string) => {
+      const targetUserId = userIdOverride ?? userIdRef.current;
+      if (!targetUserId) {
+        setUserTier('free');
+        setTierLoading(false);
+        return;
+      }
+
+      setTierLoading(true);
+      try {
+        const { data, error } = await supabase
+          .from('subscriptions')
+          .select('status')
+          .eq('user_id', targetUserId)
+          .order('updated_at', { ascending: false })
+          .limit(1);
+
+        if (error) {
+          throw error;
+        }
+
+        const status = Array.isArray(data) && data.length > 0 ? (data[0] as any).status : null;
+        const paidStatuses = new Set(['active', 'trialing', 'past_due']);
+        setUserTier(status && paidStatuses.has(status) ? 'paid' : 'free');
+      } catch (err) {
+        console.error('Failed to load subscription status:', err);
+        setUserTier('free');
+      } finally {
+        setTierLoading(false);
+      }
+    },
+    [supabase]
+  );
+
   const handleCopyReferralLink = async () => {
     if (!referralLink) return;
     if (referralCopyTimeoutRef.current) {
@@ -403,7 +476,21 @@ export default function DashboardClient() {
   useEffect(() => {
     userIdRef.current = user?.id ?? null;
     referralLastSeenIdRef.current = user?.referralLastSeenId ?? null;
-  }, [user]);
+
+    if (user?.id) {
+      void refreshUserTier(user.id);
+    } else {
+      setUserTier('free');
+      setTierLoading(false);
+      setSelectedModel('fast');
+    }
+  }, [user, refreshUserTier]);
+
+  useEffect(() => {
+    if (!isPaidUser && selectedModel === 'smart') {
+      setSelectedModel('fast');
+    }
+  }, [isPaidUser, selectedModel]);
 
   const persistReferralRedemptionSeen = useCallback(
     async (redemptionId: string, userId: string) => {
@@ -462,6 +549,31 @@ export default function DashboardClient() {
     }
     setReferralRewardNotice(null);
   }, []);
+
+  const handleSelectModel = useCallback(
+    (choice: ModelChoice) => {
+      const allowed = choice === 'fast' || isPaidUser;
+      try {
+        posthog.capture('generation_model_option_clicked', {
+          model: choice,
+          allowed,
+          location: 'dashboard',
+        });
+      } catch {}
+
+      if (!allowed) {
+        lastUpgradeTriggerRef.current = 'model-selector';
+        setIsPricingModalOpen(true);
+        setIsModeMenuOpen(false); // Close the popover when showing pricing modal
+        return;
+      }
+
+      setSelectedModel(choice);
+      setHoveredModel(choice);
+      setIsModeMenuOpen(false);
+    },
+    [isPaidUser]
+  );
 
   useEffect(() => {
     if (!user) {
@@ -1670,7 +1782,75 @@ export default function DashboardClient() {
       )}
 
       {/* Main content */}
-      <main className="flex-1 overflow-y-auto min-h-0">
+      <main className="flex-1 overflow-y-auto min-h-0 relative">
+        {/* Models selector positioned at top left edge with sidebar */}
+        <div className="absolute top-20 left-2 z-20 md:left-4 md:top-4">
+          <Popover open={isModeMenuOpen} onOpenChange={setIsModeMenuOpen}>
+            <PopoverTrigger asChild>
+              <button
+                type="button"
+                className="group inline-flex items-center gap-2 rounded-full bg-background px-3 py-2 text-sm font-medium text-foreground transition hover:bg-muted/70"
+                aria-haspopup="listbox"
+                aria-expanded={isModeMenuOpen}
+              >
+                <div className="flex items-center gap-1">
+                  <span className="text-lg font-semibold">{modelDetails[selectedModel].label}</span>
+                  <span className="text-sm text-muted-foreground">Mode</span>
+                </div>
+                {!tierLoading && !isPaidUser && selectedModel === 'smart' && (
+                  <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 text-[11px] font-semibold uppercase tracking-wide text-primary">
+                    <Lock className="h-3 w-3" /> Pro
+                  </span>
+                )}
+                <ChevronDown className="h-4 w-4 text-muted-foreground transition group-hover:translate-y-0.5" />
+              </button>
+            </PopoverTrigger>
+            <PopoverContent
+              align="start"
+              className="w-[260px] border-none bg-muted/50 p-2 shadow-xl backdrop-blur rounded-2xl"
+            >
+              <div className="flex flex-col gap-1" role="listbox" aria-label="Generation modes">
+                {(['fast', 'smart'] as ModelChoice[]).map((choice) => {
+                  const isActive = selectedModel === choice;
+                  const locked = choice === 'smart' && !isPaidUser;
+                  const optionLabel = locked ? 'Smart' : modelDetails[choice].label;
+                  const shortDescription = choice === 'fast' ? 'Quick generation' : 'Detailed outputs';
+                  return (
+                    <button
+                      key={choice}
+                      type="button"
+                      onClick={() => handleSelectModel(choice)}
+                      onMouseEnter={() => setHoveredModel(choice)}
+                      onFocus={() => setHoveredModel(choice)}
+                      role="option"
+                      aria-selected={isActive}
+                      className={cn(
+                        'group flex w-full items-start gap-3 rounded-xl px-3 py-2 text-left transition',
+                        isActive ? 'bg-primary/10 text-primary' : 'hover:bg-muted/70'
+                      )}
+                    >
+                      <div className="flex flex-1 items-center gap-2">
+                        <div className="flex flex-col">
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm font-semibold leading-none">{optionLabel}</span>
+                            {!tierLoading && locked ? (
+                              <span className="inline-flex items-center gap-1 text-[11px] font-semibold uppercase tracking-wide text-primary">
+                                <Lock className="h-3 w-3" /> Subscriber Access
+                              </span>
+                            ) : null}
+                          </div>
+                          <span className="text-xs text-muted-foreground mt-0.5">{shortDescription}</span>
+                        </div>
+                        {isActive && <Check className="ml-auto h-4 w-4" />}
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </PopoverContent>
+          </Popover>
+        </div>
+
         <header className="md:hidden flex items-center justify-between sticky top-0 bg-background/80 backdrop-blur-sm px-6 py-3 border-b z-10">
           <button onClick={() => setIsSidebarOpen(true)} className="p-2 -ml-2">
             <Menu className="h-6 w-6" />
@@ -1681,18 +1861,25 @@ export default function DashboardClient() {
           </div>
           <div className="w-6" /> {/* Spacer */}
         </header>
-        <div className="container mx-auto px-6 pb-6 mt-12">
+        <div className="container mx-auto px-6 pb-6 mt-16 md:mt-10">
           <div className="max-w-3xl mx-auto">
-            <div className="text-center mt-2 mb-8">
-              <button
-                onClick={() => setIsPricingModalOpen(true)}
-                className="upgrade-plan-btn"
-              >
-                <Sparkles className="h-4 w-4" />
-                <span>Upgrade your Plan</span>
-              </button>
+            <div className="relative flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-center mb-8 min-h-[3rem]">
+              {(() => {
+                const shouldShowButton = !tierLoading && !isPaidUser;
+                return shouldShowButton ? (
+                  <div className="flex justify-center w-full">
+                    <button
+                      onClick={() => setIsPricingModalOpen(true)}
+                      className="upgrade-plan-btn inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary text-primary-foreground hover:bg-primary/90 transition-colors mx-auto"
+                    >
+                      <Sparkles className="h-4 w-4" />
+                      <span>Upgrade your Plan</span>
+                    </button>
+                  </div>
+                ) : null;
+              })()}
             </div>
-            <Generator showTitle={false} />
+            <Generator showTitle={false} modelChoice={selectedModel} />
           </div>
         </div>
       </main>
@@ -1727,6 +1914,7 @@ export default function DashboardClient() {
         onPurchaseComplete={() => {
           if (user) {
             loadUserCredits(user.id);
+            void refreshUserTier(user.id);
           }
         }}
       />

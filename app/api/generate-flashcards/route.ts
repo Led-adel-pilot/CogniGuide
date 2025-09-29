@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
 import { getTextFromDocx, getTextFromPdf, getTextFromPptx, getTextFromPlainText, processMultipleFiles } from '@/lib/document-parser';
+import { MODEL_CREDIT_MULTIPLIERS, MODEL_REQUIRED_TIER, type ModelChoice } from '@/lib/plans';
 import { createClient } from '@supabase/supabase-js';
 
 const openai = new OpenAI({
@@ -228,20 +229,35 @@ function extractJsonObject(text: string): any {
   throw new Error('Model response was not valid JSON');
 }
 
+const MODEL_NAMES: Record<ModelChoice, string> = {
+  fast: process.env.GEMINI_MODEL_FAST || 'gemini-2.5-flash-lite',
+  smart: process.env.GEMINI_MODEL_SMART || 'gemini-2.5-flash',
+};
+
+function normalizeModelChoice(model?: unknown): ModelChoice | null {
+  if (typeof model !== 'string' || model.trim() === '') return 'fast';
+  const lowered = model.trim().toLowerCase();
+  if (lowered === 'fast' || lowered === 'smart') return lowered;
+  return null;
+}
+
 // Simple, consistent logging of model input
-function logLlmInput(kind: string, prompt: string) {
+function logLlmInput(kind: string, prompt: string, modelChoice?: ModelChoice) {
   console.log(`=== ${kind} ===`);
   console.log('Character count:', prompt.length);
   console.log('Text content preview:', prompt.substring(0, 200) + (prompt.length > 200 ? '...' : ''));
+  if (modelChoice) {
+    console.log('Model:', MODEL_NAMES[modelChoice]);
+  }
   console.log('==============================');
 }
 
 // Shared non-streaming completion + JSON parsing
-async function generateJsonFromModel(userContent: any): Promise<{ title: string | null; cards: Flashcard[] }> {
+async function generateJsonFromModel(userContent: any, modelChoice: ModelChoice): Promise<{ title: string | null; cards: Flashcard[] }> {
   let completion;
   try {
     completion = await openai.chat.completions.create({
-      model: 'gemini-2.5-flash-lite',
+      model: MODEL_NAMES[modelChoice],
       // @ts-ignore
       reasoning_effort: 'none',
       messages: [{ role: 'user', content: userContent }],
@@ -300,12 +316,12 @@ export async function POST(req: NextRequest) {
     const contentType = req.headers.get('content-type') || '';
 
     // Helper to stream NDJSON lines from a prompt, with optional credit refund on total failure
-    const streamNdjson = async (promptContent: any, refundInfo?: { userId: string; credits: number }, images?: string[]) => {
+    const streamNdjson = async (promptContent: any, modelChoice: ModelChoice, refundInfo?: { userId: string; credits: number }, images?: string[]) => {
       const encoder = new TextEncoder();
       let stream;
       try {
         stream = await openai.chat.completions.create({
-          model: 'gemini-2.5-flash-lite',
+          model: MODEL_NAMES[modelChoice],
           // @ts-ignore
           reasoning_effort: 'none', // Reduce thinking time for faster responses
           messages: [{ role: 'user', content: promptContent }],
@@ -534,8 +550,27 @@ export async function POST(req: NextRequest) {
         }, { status: 400 });
       }
 
+      const modelChoice = normalizeModelChoice((body as any)?.model);
+      if (!modelChoice) {
+        return NextResponse.json({
+          error: 'Invalid model selected',
+          message: 'The requested model is not supported. Please choose either the fast or smart mode.',
+          code: 'INVALID_MODEL_SELECTION'
+        }, { status: 400 });
+      }
+
       const ONE_CREDIT_CHARS = 3800;
       const userIdForCredits = await getUserIdFromAuthHeader(req);
+      const userTier = await getUserTier(userIdForCredits);
+      const requiredTier = MODEL_REQUIRED_TIER[modelChoice];
+      if (requiredTier === 'paid' && userTier !== 'paid') {
+        return NextResponse.json({
+          error: 'Upgrade required for smart mode',
+          message: 'Smart mode is available on paid plans. Please upgrade to access the Gemini smart model.',
+          code: 'SMART_MODEL_REQUIRES_UPGRADE'
+        }, { status: 403 });
+      }
+
       if (userIdForCredits) {
         try {
           await ensureFreeMonthlyCredits(userIdForCredits);
@@ -547,7 +582,8 @@ export async function POST(req: NextRequest) {
 
       if (hasMarkdown) {
         const totalRawChars = body.markdown!.length;
-        const creditsNeeded = totalRawChars > 0 ? (totalRawChars / ONE_CREDIT_CHARS) : 0;
+        const multiplier = MODEL_CREDIT_MULTIPLIERS[modelChoice] ?? 1;
+        const creditsNeeded = Number((((totalRawChars > 0 ? (totalRawChars / ONE_CREDIT_CHARS) : 0)) * multiplier).toFixed(3));
         if (userIdForCredits && creditsNeeded > 0) {
           const currentCredits = await getCurrentCredits(userIdForCredits);
           if (currentCredits === null) {
@@ -582,15 +618,15 @@ export async function POST(req: NextRequest) {
         if (shouldStream) {
           const streamingPrompt = buildFlashcardPrompt({ mode: 'stream', sourceType: 'markmap', sourceContent: body.markdown!, numCards: body.numCards });
 
-          logLlmInput('FLASHCARDS MARKDOWN STREAMING LLM INPUT', streamingPrompt);
+          logLlmInput('FLASHCARDS MARKDOWN STREAMING LLM INPUT', streamingPrompt, modelChoice);
 
-          return streamNdjson(streamingPrompt, (userIdForCredits && creditsNeeded > 0) ? { userId: userIdForCredits, credits: creditsNeeded } : undefined, undefined);
+          return streamNdjson(streamingPrompt, modelChoice, (userIdForCredits && creditsNeeded > 0) ? { userId: userIdForCredits, credits: creditsNeeded } : undefined, undefined);
         }
         const prompt = buildFlashcardPrompt({ mode: 'json', sourceType: 'markmap', sourceContent: body.markdown!, numCards: body.numCards });
 
-        logLlmInput('FLASHCARDS MARKDOWN NON-STREAMING LLM INPUT', prompt);
+        logLlmInput('FLASHCARDS MARKDOWN NON-STREAMING LLM INPUT', prompt, modelChoice);
         try {
-          const result = await generateJsonFromModel(prompt);
+          const result = await generateJsonFromModel(prompt, modelChoice);
           return NextResponse.json(result);
         } catch (e) {
           console.error('Flashcard generation error:', e);
@@ -636,6 +672,8 @@ export async function POST(req: NextRequest) {
       let creditsNeeded = creditsRaw > 0 ? (creditsRaw / ONE_CREDIT_CHARS) : 0;
       if (images.length > 0 && creditsNeeded < 0.5) creditsNeeded = 0.5;
       if (!text && images.length === 0 && promptText && creditsNeeded < 1) creditsNeeded = 1;
+      const multiplier = MODEL_CREDIT_MULTIPLIERS[modelChoice] ?? 1;
+      creditsNeeded = Number((creditsNeeded * multiplier).toFixed(3));
       if (userIdForCredits && creditsNeeded > 0) {
         const currentCredits = await getCurrentCredits(userIdForCredits);
         if (currentCredits === null) {
@@ -669,15 +707,15 @@ export async function POST(req: NextRequest) {
       }
       const streamingPrompt = buildFlashcardPrompt({ mode: shouldStream ? 'stream' : 'json', sourceType: 'text', sourceContent: text || 'No text provided. Analyze the attached image(s) only and build flashcards from their content.', userInstruction: promptText, imagesCount: images.length, numCards: body.numCards });
 
-      logLlmInput('FLASHCARDS PRE-PARSED LLM INPUT', streamingPrompt);
+      logLlmInput('FLASHCARDS PRE-PARSED LLM INPUT', streamingPrompt, modelChoice);
       const userContent: any = images.length > 0
         ? [{ type: 'text', text: streamingPrompt }, ...images.map((url) => ({ type: 'image_url', image_url: { url } }))]
         : streamingPrompt;
       if (shouldStream) {
-        return streamNdjson(userContent, (userIdForCredits && creditsNeeded > 0) ? { userId: userIdForCredits, credits: creditsNeeded } : undefined, images);
+        return streamNdjson(userContent, modelChoice, (userIdForCredits && creditsNeeded > 0) ? { userId: userIdForCredits, credits: creditsNeeded } : undefined, images);
       }
       try {
-        const result = await generateJsonFromModel(userContent);
+        const result = await generateJsonFromModel(userContent, modelChoice);
         return NextResponse.json(result);
       } catch (e) {
         console.error('Flashcard generation error:', e);
@@ -727,6 +765,15 @@ export async function POST(req: NextRequest) {
 
     const files = formData.getAll('files') as File[];
     const promptText = (formData.get('prompt') as string | null) || '';
+    const modelChoice = normalizeModelChoice((formData.get('model') as string | null) || undefined);
+
+    if (!modelChoice) {
+      return NextResponse.json({
+        error: 'Invalid model selected',
+        message: 'The requested model is not supported. Please choose either the fast or smart mode.',
+        code: 'INVALID_MODEL_SELECTION'
+      }, { status: 400 });
+    }
 
     if (!files || files.length === 0) {
       return NextResponse.json({
@@ -738,6 +785,14 @@ export async function POST(req: NextRequest) {
 
     const userId = await getUserIdFromAuthHeader(req);
     const userTier = await getUserTier(userId);
+    const requiredTier = MODEL_REQUIRED_TIER[modelChoice];
+    if (requiredTier === 'paid' && userTier !== 'paid') {
+      return NextResponse.json({
+        error: 'Upgrade required for smart mode',
+        message: 'Smart mode is available on paid plans. Please upgrade to access the Gemini smart model.',
+        code: 'SMART_MODEL_REQUIRES_UPGRADE'
+      }, { status: 403 });
+    }
 
     // Use the new cumulative file processing logic
     let result;
@@ -799,6 +854,8 @@ export async function POST(req: NextRequest) {
     const ONE_CREDIT_CHARS = 3800;
     let creditsNeeded = totalRawChars > 0 ? (totalRawChars / ONE_CREDIT_CHARS) : 0;
     if (imageParts.length > 0 && creditsNeeded < 0.5) creditsNeeded = 0.5;
+    const multiplier = MODEL_CREDIT_MULTIPLIERS[modelChoice] ?? 1;
+    creditsNeeded = Number((creditsNeeded * multiplier).toFixed(3));
     if (userId) {
       try {
         await ensureFreeMonthlyCredits(userId);
@@ -875,8 +932,8 @@ export async function POST(req: NextRequest) {
       }
 
       const userContent: any = validImageParts.length > 0 ? [{ type: 'text', text: prompt }, ...validImageParts] : prompt;
-      logLlmInput('FLASHCARDS STREAMING LLM INPUT', prompt);
-      return streamNdjson(userContent, (userId && creditsNeeded > 0) ? { userId, credits: creditsNeeded } : undefined, validImageParts.map(img => img.image_url.url));
+      logLlmInput('FLASHCARDS STREAMING LLM INPUT', prompt, modelChoice);
+      return streamNdjson(userContent, modelChoice, (userId && creditsNeeded > 0) ? { userId, credits: creditsNeeded } : undefined, validImageParts.map(img => img.image_url.url));
     }
 
     // Non-streaming JSON
@@ -915,9 +972,9 @@ export async function POST(req: NextRequest) {
 
     const userContent: any = validImagePartsNonStream.length > 0 ? [{ type: 'text', text: prompt }, ...validImagePartsNonStream] : prompt;
 
-    logLlmInput('FLASHCARDS NON-STREAMING LLM INPUT', prompt);
+    logLlmInput('FLASHCARDS NON-STREAMING LLM INPUT', prompt, modelChoice);
     try {
-      const result = await generateJsonFromModel(userContent);
+      const result = await generateJsonFromModel(userContent, modelChoice);
       return NextResponse.json(result);
     } catch (e) {
       console.error('Flashcard generation error:', e);

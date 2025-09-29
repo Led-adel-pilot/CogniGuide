@@ -22,6 +22,18 @@ export const NON_AUTH_FREE_LIMIT = 3;
 
 export type Plan = keyof typeof PAID_PLANS;
 
+export const MODEL_CREDIT_MULTIPLIERS = {
+  fast: 1,
+  smart: 2.2,
+} as const;
+
+export const MODEL_REQUIRED_TIER = {
+  fast: 'free',
+  smart: 'paid',
+} as const;
+
+export type ModelChoice = keyof typeof MODEL_CREDIT_MULTIPLIERS;
+
 export function getPlanByPriceId(priceId: string): Plan | null {
   for (const plan in PAID_PLANS) {
     const typedPlan = plan as Plan;
