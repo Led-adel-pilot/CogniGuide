@@ -73,10 +73,9 @@ export default function HomeLanding() {
             <div className="flex items-center gap-2">
               <Image src={CogniGuideLogo} alt="CogniGuide Logo" width={40} height={40} className="h-10 w-10 text-primary" />
               <h1 className="text-2xl font-bold font-heading tracking-tighter">CogniGuide</h1>
-              {/* <Link href="/pricing" className="text-sm text-muted-foreground hover:underline">Pricing</Link> */}
-              {/* Maybe reducing user signup conversion, to be researched */}
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-4">
+              <Link href="/pricing" className="text-sm text-muted-foreground hover:underline">Pricing</Link>
               {isAuthed ? (
                 <>
                   <button onClick={() => router.push('/dashboard')} className="px-4 py-2 text-sm rounded-full border hover:bg-muted/50">Dashboard</button>
