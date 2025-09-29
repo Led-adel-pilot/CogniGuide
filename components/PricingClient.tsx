@@ -6,7 +6,7 @@ import { Check } from 'lucide-react';
 import { supabase } from '@/lib/supabaseClient';
 import AuthModal from '@/components/AuthModal';
 import { User } from '@supabase/supabase-js';
-import { PAID_PLANS, FREE_PLAN_CREDITS } from '@/lib/plans';
+import { PAID_PLANS, FREE_PLAN_CREDITS, MODEL_CREDIT_MULTIPLIERS } from '@/lib/plans';
 
 type BillingCycle = 'month' | 'year';
 
@@ -352,6 +352,7 @@ export default function PricingClient({ onPurchaseComplete }: PricingClientProps
               <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> {FREE_PLAN_CREDITS} monthly credits</li>
               <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> Mind maps + flashcards</li>
               <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> Spaced repetition</li>
+              <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> Fast model generations</li>
             </ul>
             {user ? (
               <button disabled className="w-full cursor-not-allowed rounded-full border py-2 text-sm text-gray-600">Current plan</button>
@@ -386,6 +387,7 @@ export default function PricingClient({ onPurchaseComplete }: PricingClientProps
               <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> {PAID_PLANS.student.credits} monthly credits</li>
               <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> Mind maps + flashcards</li>
               <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> Spaced repetition</li>
+              <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> Smart model for best results</li>
             </ul>
             <button
               onClick={() => handleChoosePlan('student')}
@@ -415,6 +417,7 @@ export default function PricingClient({ onPurchaseComplete }: PricingClientProps
               <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> {PAID_PLANS.pro.credits} monthly credits</li>
               <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> Mind maps + flashcards</li>
               <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> Spaced repetition</li>
+              <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> Smart model for best results</li>
             </ul>
             <button
               onClick={() => handleChoosePlan('pro')}
@@ -435,7 +438,7 @@ export default function PricingClient({ onPurchaseComplete }: PricingClientProps
             A credit is a unit used to process your content with AI, longer text extracts from uploaded documents consume more credits. As a rule of thumb: 1 credit ≈ 10 slides, a 2-page PDF, or 2 images, and each generation consumes at least 1 credit.
           </p>
           <p className="text-sm text-muted-foreground mt-3">
-            With {PAID_PLANS.student.credits} credits per month, you can upload over {PAID_PLANS.student.credits * 2} pages of text!
+            With {PAID_PLANS.student.credits} credits per month, you can upload over {PAID_PLANS.student.credits * 2} pages of text! Paid users can also access Smart Mode, which provides higher quality generation for {MODEL_CREDIT_MULTIPLIERS.smart}x the credit cost.
           </p>
         </div>
 

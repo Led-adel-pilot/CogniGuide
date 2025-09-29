@@ -1,7 +1,7 @@
 export const PAID_PLANS = {
   student: {
     name: 'Student',
-    credits: 500,
+    credits: 1200,
     priceIds: {
       month: process.env.NEXT_PUBLIC_PADDLE_PRICE_ID_STUDENT_MONTH,
       year: process.env.NEXT_PUBLIC_PADDLE_PRICE_ID_STUDENT_YEAR,
@@ -9,7 +9,7 @@ export const PAID_PLANS = {
   },
   pro: {
     name: 'Pro',
-    credits: 700,
+    credits: 1800,
     priceIds: {
       month: process.env.NEXT_PUBLIC_PADDLE_PRICE_ID_PRO_MONTH,
       year: process.env.NEXT_PUBLIC_PADDLE_PRICE_ID_PRO_YEAR,
@@ -24,7 +24,7 @@ export type Plan = keyof typeof PAID_PLANS;
 
 export const MODEL_CREDIT_MULTIPLIERS = {
   fast: 1,
-  smart: 2.2,
+  smart: 5.2,
 } as const;
 
 export const MODEL_REQUIRED_TIER = {

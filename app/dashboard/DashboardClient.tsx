@@ -416,7 +416,7 @@ export default function DashboardClient() {
   };
 
   const refreshUserTier = useCallback(
-    async (userIdOverride?: string) => {
+    async (userIdOverride?: string, options?: { skipLoadingState?: boolean }) => {
       const targetUserId = userIdOverride ?? userIdRef.current;
       if (!targetUserId) {
         setUserTier('free');
@@ -424,7 +424,9 @@ export default function DashboardClient() {
         return;
       }
 
-      setTierLoading(true);
+      if (!options?.skipLoadingState) {
+        setTierLoading(true);
+      }
       try {
         const { data, error } = await supabase
           .from('subscriptions')
@@ -439,7 +441,13 @@ export default function DashboardClient() {
 
         const status = Array.isArray(data) && data.length > 0 ? (data[0] as any).status : null;
         const paidStatuses = new Set(['active', 'trialing', 'past_due']);
-        setUserTier(status && paidStatuses.has(status) ? 'paid' : 'free');
+        const nextTier: 'free' | 'paid' = status && paidStatuses.has(status) ? 'paid' : 'free';
+        setUserTier(nextTier);
+        try {
+          if (typeof window !== 'undefined') {
+            localStorage.setItem(`cogniguide_user_tier_${targetUserId}`, nextTier);
+          }
+        } catch {}
       } catch (err) {
         console.error('Failed to load subscription status:', err);
         setUserTier('free');
@@ -478,7 +486,24 @@ export default function DashboardClient() {
     referralLastSeenIdRef.current = user?.referralLastSeenId ?? null;
 
     if (user?.id) {
-      void refreshUserTier(user.id);
+      let cachedTier: 'free' | 'paid' | null = null;
+      try {
+        if (typeof window !== 'undefined') {
+          const stored = localStorage.getItem(`cogniguide_user_tier_${user.id}`);
+          if (stored === 'free' || stored === 'paid') {
+            cachedTier = stored;
+          }
+        }
+      } catch {}
+
+      if (cachedTier) {
+        setUserTier(cachedTier);
+        setTierLoading(false);
+        void refreshUserTier(user.id, { skipLoadingState: true });
+      } else {
+        setTierLoading(true);
+        void refreshUserTier(user.id);
+      }
     } else {
       setUserTier('free');
       setTierLoading(false);
