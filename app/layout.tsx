@@ -1,12 +1,102 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { Poppins } from "next/font/google";
-import Link from "next/link";
 import Script from "next/script";
+import { siteMetadata } from "@/lib/siteMetadata";
 
-export const metadata: Metadata = {
-  title: "CogniGuide",
-  description: "Your AI study guide: turn notes and documents into mind maps and flashcards, and prepare for exams.",
+const googleSiteVerification = process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION;
+
+const baseMetadata: Metadata = {
+  metadataBase: new URL(siteMetadata.url),
+  title: {
+    default: siteMetadata.title,
+    template: `%s | ${siteMetadata.shortName}`,
+  },
+  description: siteMetadata.description,
+  keywords: siteMetadata.keywords,
+  openGraph: {
+    title: siteMetadata.title,
+    description: siteMetadata.description,
+    url: siteMetadata.url,
+    siteName: siteMetadata.name,
+    images: [
+      {
+        url: siteMetadata.ogImage,
+        width: 1200,
+        height: 630,
+        alt: `${siteMetadata.name} – AI-Powered Study Assistant`,
+      },
+    ],
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: siteMetadata.title,
+    description: siteMetadata.description,
+    images: [siteMetadata.ogImage],
+  },
+  alternates: {
+    canonical: siteMetadata.url,
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+      "max-video-preview": -1,
+    },
+  },
+  verification: {
+    google: googleSiteVerification,
+  },
+};
+
+if (!googleSiteVerification) {
+  delete baseMetadata.verification;
+}
+
+export const metadata: Metadata = baseMetadata;
+
+const structuredData = {
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  name: siteMetadata.name,
+  alternateName: siteMetadata.shortName,
+  url: siteMetadata.url,
+  applicationCategory: "EducationalApplication",
+  operatingSystem: "Web",
+  description: siteMetadata.description,
+  offers: {
+    "@type": "Offer",
+    availability: "https://schema.org/InStock",
+    price: "0",
+    priceCurrency: "USD",
+  },
+  featureList: [
+    "AI-powered document and image understanding",
+    "Interactive mind map generation",
+    "Flashcards with spaced repetition scheduling",
+    "Public sharing with secure links",
+    "Realtime streaming rendering",
+  ],
+  author: {
+    "@type": "Organization",
+    name: siteMetadata.name,
+  },
+  publisher: {
+    "@type": "Organization",
+    name: siteMetadata.name,
+  },
+  sameAs: [
+    siteMetadata.url,
+    "https://twitter.com/CogniGuideApp",
+    "https://www.linkedin.com/company/cogniguide/",
+  ],
+  email: siteMetadata.contactEmail,
 };
 
 const poppins = Poppins({
@@ -42,6 +132,10 @@ export default function RootLayout({
         <link
           rel="stylesheet"
           href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css"
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
         />
         <script
           dangerouslySetInnerHTML={{

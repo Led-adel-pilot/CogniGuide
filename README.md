@@ -4,6 +4,12 @@
 CogniGuide is an app that uses an AI to convert uploaded documents and images into interactive mind maps, and generates flashcards with spaced-repetition scheduling from an uploaded study material, to help users learn, review, and retain information more effectively with research backed strategies.
 - Target audiences/regions are the ones with highest paid conversion potential.
 
+### SEO & Discoverability Strategy
+- **Centralized Metadata Source:** `lib/siteMetadata.ts` defines the canonical title, description, keyword cluster, and preview assets so every page can reuse an identical SEO baseline without drift.
+- **Global HTML Metadata:** `app/layout.tsx` composes the metadata object for Next.js, wiring canonical URLs, robots directives, Open Graph/Twitter cards, and optional Google Search Console verification.
+- **Structured Data:** SoftwareApplication JSON-LD is embedded in the root layout to help search engines understand CogniGuide’s product scope, pricing, and supported features.
+- **Homepage Alignment:** The landing page pulls metadata from the shared config to keep titles/descriptions synchronized with the global defaults while focusing copy on high-intent study workflows.
+
 ## Key Features
 *   **Versatile Document & Image Support:** Accepts various document formats including PDF, DOCX, PPTX, TXT, Markdown (.md), and images (PNG/JPG/WebP/GIF). Documents are parsed to text; images are passed to the multimodal model for OCR and diagram understanding.
 *   **Custom Prompts:** Users can provide specific instructions or prompts to guide the AI in tailoring the mind map to their needs.

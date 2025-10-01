@@ -1,36 +1,27 @@
 import { redirect } from 'next/navigation';
 import { Metadata } from 'next';
 import HomeLanding from '@/components/HomeLanding';
+import { siteMetadata } from '@/lib/siteMetadata';
+
+const pageTitle = 'AI Mind Maps & Flashcards for Effective Studying';
+const pageDescription =
+  'Turn class notes, textbooks, and lecture slides into interactive mind maps and adaptive flashcards with CogniGuide\'s AI study assistant.';
 
 export const metadata: Metadata = {
-  title:
-    'CogniGuide | AI-Powered Mind Maps & Flashcards for Effective Studying',
-  description:
-    'Transform your study materials into interactive mind maps and smart flashcards with CogniGuide. Our AI-powered tools help you learn, review, and retain information more effectively. Supports PDF, DOCX, PPTX, and images.',
-  keywords: [
-    'AI study assistant',
-    'mind map generator',
-    'flashcard generator',
-    'spaced repetition',
-    'study tools',
-    'learning assistant',
-    'PDF to mind map',
-    'document analysis',
-    'CogniGuide',
-  ],
+  title: pageTitle,
+  description: pageDescription,
+  keywords: Array.from(new Set([...siteMetadata.keywords, 'study productivity', 'exam preparation'])),
   openGraph: {
-    title:
-      'CogniGuide | AI-Powered Mind Maps & Flashcards for Effective Studying',
-    description:
-      'Transform your study materials into interactive mind maps and smart flashcards with CogniGuide. Our AI-powered tools help you learn, review, and retain information more effectively. Supports PDF, DOCX, PPTX, and images.',
-    url: 'https://www.cogniguide.app',
-    siteName: 'CogniGuide',
+    title: `${siteMetadata.name} | ${pageTitle}`,
+    description: pageDescription,
+    url: siteMetadata.url,
+    siteName: siteMetadata.name,
     images: [
       {
-        url: 'https://www.cogniguide.app/og-image.png', // It's recommended to create a specific Open Graph image
+        url: siteMetadata.ogImage,
         width: 1200,
         height: 630,
-        alt: 'CogniGuide - AI-Powered Study Assistant',
+        alt: `${siteMetadata.name} - AI-Powered Study Assistant`,
       },
     ],
     locale: 'en_US',
@@ -38,17 +29,12 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title:
-      'CogniGuide | AI-Powered Mind Maps & Flashcards for Effective Studying',
-    description:
-      'Transform your study materials into interactive mind maps and smart flashcards with CogniGuide. Our AI-powered tools help you learn, review, and retain information more effectively. Supports PDF, DOCX, PPTX, and images.',
-    images: ['https://www.cogniguide.app/og-image.png'], // It's recommended to create a specific Twitter card image
+    title: `${siteMetadata.name} | ${pageTitle}`,
+    description: pageDescription,
+    images: [siteMetadata.ogImage],
   },
   alternates: {
-    canonical: 'https://www.cogniguide.app',
-  },
-  other: {
-    'google-site-verification': 'your_google_site_verification_token', // Replace with your actual token
+    canonical: siteMetadata.url,
   },
 };
 
