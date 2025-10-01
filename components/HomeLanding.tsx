@@ -75,7 +75,12 @@ export default function HomeLanding() {
               <h1 className="text-2xl font-bold font-heading tracking-tighter">CogniGuide</h1>
             </div>
             <div className="flex items-center gap-4">
-              <Link href="/pricing" className="text-sm text-muted-foreground hover:underline">Pricing</Link>
+              <Link
+                href="/pricing"
+                className="hidden text-sm text-muted-foreground hover:underline sm:inline"
+              >
+                Pricing
+              </Link>
               {isAuthed ? (
                 <>
                   <button onClick={() => router.push('/dashboard')} className="px-4 py-2 text-sm rounded-full border hover:bg-muted/50">Dashboard</button>
@@ -165,8 +170,12 @@ export default function HomeLanding() {
           <div className="container py-3 flex flex-col md:flex-row justify-between items-center gap-2">
             <p className="text-xs text-muted-foreground/70">&copy; {new Date().getFullYear()} CogniGuide. All rights reserved.</p>
             <nav className="flex flex-wrap justify-center gap-2 sm:gap-4">
-              {/* <Link href="/pricing" className="text-sm text-muted-foreground hover:underline">Pricing</Link> */}
-              {/* Maybe reducing user signup conversion, to be researched */}
+              <Link
+                href="/pricing"
+                className="text-xs text-muted-foreground/70 hover:underline md:hidden"
+              >
+                Pricing
+              </Link>
               <Link href="/contact" className="text-xs text-muted-foreground/70 hover:underline">Contact</Link>
               <Link href="/legal/refund-policy" className="text-xs text-muted-foreground/70 hover:underline">Refund Policy</Link>
               <Link href="/legal/cancellation-policy" className="text-xs text-muted-foreground/70 hover:underline">Cancellation Policy</Link>
