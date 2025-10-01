@@ -1,7 +1,8 @@
 # Project Context: CogniGuide
 
 ## Overview https://www.cogniguide.app
-CogniGuide comprehensive AI-powered study assistant. It uses an LLM to convert text and images into interactive mind maps, generates study flashcards with spaced-repetition scheduling, supports multimodal inputs (documents and images), to help users learn, review, and retain information more effectively with research backed strategies.
+CogniGuide is an app that uses an AI to convert uploaded documents and images into interactive mind maps, and generates flashcards with spaced-repetition scheduling from an uploaded study material, to help users learn, review, and retain information more effectively with research backed strategies.
+- Target audiences/regions are the ones with highest paid conversion potential.
 
 ## Key Features
 *   **Versatile Document & Image Support:** Accepts various document formats including PDF, DOCX, PPTX, TXT, Markdown (.md), and images (PNG/JPG/WebP/GIF). Documents are parsed to text; images are passed to the multimodal model for OCR and diagram understanding.
