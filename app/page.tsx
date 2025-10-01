@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   title:
     'CogniGuide | AI-Powered Mind Maps & Flashcards for Effective Studying',
   description:
-    'Transform your study materials into interactive mind maps and smart flashcards with CogniGuide. Our AI-powered tools help you learn, review, and retain information more effectively. Supports PDF, DOCX, PPTX, and images.',
+    'Transform your study materials into interactive mind maps and SEO-friendly flashcards with CogniGuide. Our AI-powered study tools help you learn, review, and rank better on Google while retaining information more effectively. Supports PDF, DOCX, PPTX, and images.',
   keywords: [
     'AI study assistant',
     'mind map generator',
@@ -14,6 +14,8 @@ export const metadata: Metadata = {
     'spaced repetition',
     'study tools',
     'learning assistant',
+    'study seo',
+    'education seo tools',
     'PDF to mind map',
     'document analysis',
     'CogniGuide',
@@ -22,7 +24,7 @@ export const metadata: Metadata = {
     title:
       'CogniGuide | AI-Powered Mind Maps & Flashcards for Effective Studying',
     description:
-      'Transform your study materials into interactive mind maps and smart flashcards with CogniGuide. Our AI-powered tools help you learn, review, and retain information more effectively. Supports PDF, DOCX, PPTX, and images.',
+      'Transform your study materials into interactive mind maps and SEO-friendly flashcards with CogniGuide. Our AI-powered study tools help you learn, review, and rank better on Google while retaining information more effectively. Supports PDF, DOCX, PPTX, and images.',
     url: 'https://www.cogniguide.app',
     siteName: 'CogniGuide',
     images: [
@@ -41,7 +43,7 @@ export const metadata: Metadata = {
     title:
       'CogniGuide | AI-Powered Mind Maps & Flashcards for Effective Studying',
     description:
-      'Transform your study materials into interactive mind maps and smart flashcards with CogniGuide. Our AI-powered tools help you learn, review, and retain information more effectively. Supports PDF, DOCX, PPTX, and images.',
+      'Transform your study materials into interactive mind maps and SEO-friendly flashcards with CogniGuide. Our AI-powered study tools help you learn, review, and rank better on Google while retaining information more effectively. Supports PDF, DOCX, PPTX, and images.',
     images: ['https://www.cogniguide.app/og-image.png'], // It's recommended to create a specific Twitter card image
   },
   alternates: {
