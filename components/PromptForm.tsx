@@ -44,8 +44,8 @@ export default function PromptForm({
           : "e.g., 'Only make flashcards about the first and third chapters'";
       }
       return isMobile
-        ? "e.g., 'Flashcards for chapters 1 & 3'"
-        : "e.g., 'Only make flashcards about the first and third chapters'";
+        ? "e.g., 'Cards on the cardiac conduction system'"
+        : "e.g., 'Generate flashcards on the cardiac conduction system'";
     }
 
     if (hasFiles) {
@@ -54,8 +54,8 @@ export default function PromptForm({
         : "e.g., 'Focus on chapter summaries and key arguments'";
     }
     return isMobile
-      ? "e.g., 'Mindmap for time management'"
-      : "e.g., 'Create a mindmap for time management strategies'";
+      ? "e.g., 'Mindmap on the major classes of antibiotics'"
+      : "e.g., 'Create a mindmap on the major classes of antibiotics'";
   };
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {

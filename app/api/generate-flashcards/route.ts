@@ -519,10 +519,10 @@ export async function POST(req: NextRequest) {
 
     if (contentType.includes('application/json')) {
       // Enhanced JSON path: supports either { markdown } OR { text, images?, prompt?, numCards? }
-      let body: { markdown?: string; numCards?: number; text?: string; images?: string[]; prompt?: string } | null = null;
+      let body: { markdown?: string; numCards?: number; text?: string; images?: string[]; prompt?: string; rawCharCount?: number; model?: string } | null = null;
 
       try {
-        body = await req.json() as { markdown?: string; numCards?: number; text?: string; images?: string[]; prompt?: string } | null;
+        body = await req.json() as { markdown?: string; numCards?: number; text?: string; images?: string[]; prompt?: string; rawCharCount?: number; model?: string } | null;
       } catch (jsonError) {
         return NextResponse.json({
           error: 'Invalid JSON',
@@ -540,7 +540,7 @@ export async function POST(req: NextRequest) {
       }
 
       const hasMarkdown = typeof body.markdown === 'string' && body.markdown.trim().length > 0;
-      const hasTextPayload = (typeof body.text === 'string' && body.text.length > 0) || (Array.isArray(body.images) && body.images.length > 0) || (typeof body.prompt === 'string' && body.prompt.trim().length > 0);
+      const hasTextPayload = (typeof body.text === 'string' && body.text.trim().length > 0) || (Array.isArray(body.images) && body.images.length > 0) || (typeof body.prompt === 'string' && body.prompt.trim().length > 0);
 
       if (!hasMarkdown && !hasTextPayload) {
         return NextResponse.json({
@@ -663,10 +663,16 @@ export async function POST(req: NextRequest) {
       }
 
       // Text/images/prompt path (pre-parsed input)
-      const text = (body.text || '').toString();
-      const promptText = (body.prompt || '').toString();
+      let text = typeof body.text === 'string' ? body.text : '';
+      const textHasContent = text.trim().length > 0;
+      if (!textHasContent) text = '';
+      let promptText = typeof body.prompt === 'string' ? body.prompt.trim() : '';
       const images = Array.isArray(body.images) ? body.images as string[] : [];
       const rawCharCount = typeof (body as any)?.rawCharCount === 'number' ? (body as any).rawCharCount as number : undefined;
+      if (!text && images.length === 0 && promptText) {
+        text = promptText;
+        promptText = '';
+      }
       // If rawCharCount is provided (from preparse), bill ONLY on truncated file text; exclude prompt length
       const creditsRaw = rawCharCount !== undefined ? rawCharCount : ((text?.length || 0) + (promptText?.length || 0));
       let creditsNeeded = creditsRaw > 0 ? (creditsRaw / ONE_CREDIT_CHARS) : 0;

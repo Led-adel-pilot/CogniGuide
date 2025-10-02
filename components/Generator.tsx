@@ -524,17 +524,20 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
       return;
     }
 
+    const trimmedPrompt = prompt.trim();
+
     posthog.capture('generation_submitted', {
       mode: mode,
       file_count: files.length,
-      has_prompt: !!prompt.trim(),
+      has_prompt: !!trimmedPrompt,
       non_auth_generations_allowed: allowNonAuthGenerations !== false,
       model_choice: modelChoice,
     });
     if (mode === 'flashcards') {
-      // Require at least one file for file-based flashcards generation
-      if (files.length === 0) {
-        setError('Please upload at least one file to generate flashcards.');
+      const hasFiles = files.length > 0;
+      // Require either files or a prompt topic for flashcards generation
+      if (!hasFiles && !trimmedPrompt) {
+        setError('Please upload at least one file or enter a topic to generate flashcards.');
         return;
       }
 
@@ -556,40 +559,14 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
         const { data: sessionData } = await supabase.auth.getSession();
         const accessToken = sessionData?.session?.access_token;
         let res: Response;
-        // If we haven't pre-parsed yet, do it now (single upload)
-        let effectivePreParsed: { text: string; images: string[]; rawCharCount?: number } | null = preParsed;
-        if (!effectivePreParsed && files.length > 0) {
-          try {
-            setIsPreParsing(true);
-            setUploadProgress(0);
-            const j = await uploadAndPreparse(files, (progress) => {
-              setUploadProgress(progress);
-            });
-            const text = typeof j?.text === 'string' ? j.text : '';
-            const images = Array.isArray(j?.images) ? j.images as string[] : [];
-            const rawCharCount = typeof j?.totalRawChars === 'number' ? j.totalRawChars as number : undefined;
-            effectivePreParsed = { text, images, rawCharCount };
-            setPreParsed(effectivePreParsed);
-          } catch(e) {
-            const msg = (e instanceof Error) ? e.message : 'An unknown error occurred during pre-parse.';
-            setError(msg);
-          }
-          finally {
-            setIsPreParsing(false);
-            setUploadProgress(undefined);
-          }
-        }
-        if (effectivePreParsed) {
-          const payload = { text: effectivePreParsed.text || '', images: effectivePreParsed.images || [], prompt: prompt.trim() || '', rawCharCount: effectivePreParsed.rawCharCount, model: modelChoice };
-
-          // Debug logging for image processing
-          debugLog('Flashcard payload:', {
-            hasText: !!effectivePreParsed.text,
-            imageCount: effectivePreParsed.images?.length || 0,
-            hasImages: (effectivePreParsed.images?.length || 0) > 0,
-            firstImagePreview: effectivePreParsed.images?.[0]?.startsWith('data:') ? effectivePreParsed.images[0].substring(0, 100) + '...' : (effectivePreParsed.images?.[0] || '')
-          });
-
+        if (!hasFiles) {
+          const payload = {
+            text: trimmedPrompt,
+            images: [],
+            prompt: '',
+            rawCharCount: trimmedPrompt.length,
+            model: modelChoice,
+          };
           const headers: Record<string, string> = { 'Content-Type': 'application/json' };
           if (accessToken) {
             headers['Authorization'] = `Bearer ${accessToken}`;
@@ -597,27 +574,78 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
           res = await fetch('/api/generate-flashcards?stream=1', {
             method: 'POST',
             body: JSON.stringify(payload),
-            headers: headers,
+            headers,
           });
         } else {
-          // As a last resort, fall back to legacy multipart for very small sets
-          const totalBytes = files.reduce((sum, f) => sum + (f.size || 0), 0);
-          if (totalBytes > 4 * 1024 * 1024) {
-            throw new Error('Upload is too large for direct submit and storage pre-parse failed. Please retry or check storage configuration.');
+          // If we haven't pre-parsed yet, do it now (single upload)
+          let effectivePreParsed: { text: string; images: string[]; rawCharCount?: number } | null = preParsed;
+          if (!effectivePreParsed) {
+            try {
+              setIsPreParsing(true);
+              setUploadProgress(0);
+              const j = await uploadAndPreparse(files, (progress) => {
+                setUploadProgress(progress);
+              });
+              const text = typeof j?.text === 'string' ? j.text : '';
+              const images = Array.isArray(j?.images) ? j.images as string[] : [];
+              const rawCharCount = typeof j?.totalRawChars === 'number' ? j.totalRawChars as number : undefined;
+              effectivePreParsed = { text, images, rawCharCount };
+              setPreParsed(effectivePreParsed);
+            } catch(e) {
+              const msg = (e instanceof Error) ? e.message : 'An unknown error occurred during pre-parse.';
+              setError(msg);
+            }
+            finally {
+              setIsPreParsing(false);
+              setUploadProgress(undefined);
+            }
           }
-          const formData = new FormData();
-          files.forEach((file) => formData.append('files', file));
-          if (prompt.trim()) formData.append('prompt', prompt.trim());
-          formData.append('model', modelChoice);
-          const headers: Record<string, string> = {};
-          if (accessToken) {
-            headers['Authorization'] = `Bearer ${accessToken}`;
+          if (effectivePreParsed) {
+            const payload = {
+              text: effectivePreParsed.text || '',
+              images: effectivePreParsed.images || [],
+              prompt: trimmedPrompt || '',
+              rawCharCount: effectivePreParsed.rawCharCount,
+              model: modelChoice,
+            };
+
+            // Debug logging for image processing
+            debugLog('Flashcard payload:', {
+              hasText: !!effectivePreParsed.text,
+              imageCount: effectivePreParsed.images?.length || 0,
+              hasImages: (effectivePreParsed.images?.length || 0) > 0,
+              firstImagePreview: effectivePreParsed.images?.[0]?.startsWith('data:') ? effectivePreParsed.images[0].substring(0, 100) + '...' : (effectivePreParsed.images?.[0] || '')
+            });
+
+            const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+            if (accessToken) {
+              headers['Authorization'] = `Bearer ${accessToken}`;
+            }
+            res = await fetch('/api/generate-flashcards?stream=1', {
+              method: 'POST',
+              body: JSON.stringify(payload),
+              headers: headers,
+            });
+          } else {
+            // As a last resort, fall back to legacy multipart for very small sets
+            const totalBytes = files.reduce((sum, f) => sum + (f.size || 0), 0);
+            if (totalBytes > 4 * 1024 * 1024) {
+              throw new Error('Upload is too large for direct submit and storage pre-parse failed. Please retry or check storage configuration.');
+            }
+            const formData = new FormData();
+            files.forEach((file) => formData.append('files', file));
+            if (trimmedPrompt) formData.append('prompt', trimmedPrompt);
+            formData.append('model', modelChoice);
+            const headers: Record<string, string> = {};
+            if (accessToken) {
+              headers['Authorization'] = `Bearer ${accessToken}`;
+            }
+            res = await fetch('/api/generate-flashcards?stream=1', {
+              method: 'POST',
+              body: formData,
+              headers: headers,
+            });
           }
-          res = await fetch('/api/generate-flashcards?stream=1', {
-            method: 'POST',
-            body: formData,
-            headers: headers,
-          });
         }
         // Handle insufficient credits the same way as mind maps: show inline error and do not open modal
         if (res.status === 402) {
@@ -748,7 +776,7 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
       return;
     }
 
-    if (files.length === 0 && !prompt.trim()) {
+    if (files.length === 0 && !trimmedPrompt) {
       setError('Please upload at least one file or enter a text prompt to generate a mind map.');
       return;
     }
@@ -792,7 +820,7 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
         }
       }
       if (effectivePreParsed) {
-        const payload = { text: effectivePreParsed.text || '', images: effectivePreParsed.images || [], prompt: prompt.trim() || '', rawCharCount: effectivePreParsed.rawCharCount, model: modelChoice };
+        const payload = { text: effectivePreParsed.text || '', images: effectivePreParsed.images || [], prompt: trimmedPrompt || '', rawCharCount: effectivePreParsed.rawCharCount, model: modelChoice };
 
         // Debug logging for image processing
         debugLog('Mindmap payload:', {
@@ -819,7 +847,7 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
         }
         const formData = new FormData();
         if (files.length > 0) { files.forEach(file => { formData.append('files', file); }); }
-        if (prompt.trim()) formData.append('prompt', prompt.trim());
+        if (trimmedPrompt) formData.append('prompt', trimmedPrompt);
         formData.append('model', modelChoice);
         const headers: Record<string, string> = {};
         if (accessToken) {
@@ -970,7 +998,7 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
           {showTitle && (
             <div className={compact ? 'text-center mb-4' : 'text-center mb-6'}>
               <h2 className={compact ? 'text-2xl md:text-3xl font-bold font-heading tracking-tight' : 'text-3xl md:text-4xl font-bold font-heading tracking-tight'}>Turn Your Notes into Mind Maps &amp; Flashcards with AI.</h2>
-              <p className="text-muted-foreground mt-2">Upload your PDFs, slides, or documents. Our AI creates clear mind maps and smart, spaced-repetition flashcards to help you learn faster.</p>
+              <p className="text-muted-foreground mt-2">Upload your PDFs, slides, or documents—or simply describe a topic. Our AI creates clear mind maps and smart, spaced-repetition flashcards to help you learn faster.</p>
             </div>
           )}
             <div className={compact ? 'relative w-full max-w-none mx-auto bg-background rounded-[2rem] generator-card generator-card--compact' : 'relative w-full max-w-none mx-auto bg-background rounded-[2rem] generator-card'}>
