@@ -5,6 +5,7 @@ const SITE = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://www.cogniguide.app'
 
 const staticRoutes = [
   '/',
+  '/ai-mind-map-generator',
   '/pricing',
   '/contact',
   '/legal/terms',
