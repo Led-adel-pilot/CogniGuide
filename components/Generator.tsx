@@ -59,6 +59,21 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
   const [uploadProgress, setUploadProgress] = useState<number | undefined>(undefined);
   const router = useRouter();
   const variantTrackedRef = useRef<string | null>(null);
+  const limitExceededCacheRef = useRef<{
+    signature: string;
+    preParsed: { text: string; images: string[]; rawCharCount?: number } | null;
+    allowedNameSizes: { name: string; size: number }[] | undefined;
+    error: string | null;
+  } | null>(null);
+
+  const getNameSizeSignature = useCallback(
+    (items: { name: string; size: number }[]) =>
+      items
+        .map((item) => `${item.name}::${item.size}`)
+        .sort()
+        .join('|'),
+    []
+  );
 
   useEffect(() => {
     const init = async () => {
@@ -345,8 +360,22 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
       processedFileSetsCache.current.clear();
       setPreParsed(null);
       lastPreparseKeyRef.current = null;
+      limitExceededCacheRef.current = null;
       setAllowedNameSizes(undefined);
       return;
+    }
+
+    const incomingSignature = getNameSizeSignature(selectedFiles.map((file) => ({ name: file.name, size: file.size })));
+    const cachedLimitExceeded = limitExceededCacheRef.current;
+    if (cachedLimitExceeded) {
+      if (cachedLimitExceeded.signature === incomingSignature) {
+        setFiles(selectedFiles);
+        setPreParsed(cachedLimitExceeded.preParsed);
+        setAllowedNameSizes(cachedLimitExceeded.allowedNameSizes);
+        setError(cachedLimitExceeded.error);
+        return;
+      }
+      limitExceededCacheRef.current = null;
     }
 
     // Validate file sizes before accepting them (50MB when using Supabase Storage)
@@ -388,13 +417,22 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
       const includedFiles = Array.isArray(j?.includedFiles) ? j.includedFiles as { name: string; size: number }[] : [];
       const excludedFiles = Array.isArray(j?.excludedFiles) ? j.excludedFiles as { name: string; size: number }[] : [];
       const partialFile = j?.partialFile as { name: string; size: number; includedChars: number } | null;
+      const includedSignature = getNameSizeSignature(includedFiles);
       if (limitExceeded) {
+        const truncationError = (isAuthedFromApi || isAuthed)
+          ? 'Content exceeds the length limit for your current plan. the content has been truncated.'
+          : null;
         setAllowedNameSizes(includedFiles);
-        if (isAuthedFromApi || isAuthed) {
-          setError('Content exceeds the length limit for your current plan. the content has been truncated.');
-        }
+        setError(truncationError);
+        limitExceededCacheRef.current = {
+          signature: includedSignature,
+          preParsed: { text, images, rawCharCount },
+          allowedNameSizes: includedFiles,
+          error: truncationError,
+        };
       } else {
         setAllowedNameSizes(undefined);
+        limitExceededCacheRef.current = null;
       }
       return;
     }
@@ -493,13 +531,22 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
       const includedFiles = Array.isArray(j?.includedFiles) ? j.includedFiles as { name: string; size: number }[] : [];
       const excludedFiles = Array.isArray(j?.excludedFiles) ? j.excludedFiles as { name: string; size: number }[] : [];
       const partialFile = j?.partialFile as { name: string; size: number; includedChars: number } | null;
+      const includedSignature = getNameSizeSignature(includedFiles);
       if (limitExceeded) {
+        const truncationError = (isAuthedFromApi || isAuthed)
+          ? 'Content exceeds the length limit for your current plan. the content has been truncated.'
+          : null;
         setAllowedNameSizes(includedFiles);
-        if (isAuthedFromApi || isAuthed) {
-          setError('Content exceeds the length limit for your current plan. the content has been truncated.');
-        }
+        setError(truncationError);
+        limitExceededCacheRef.current = {
+          signature: includedSignature,
+          preParsed: { text, images, rawCharCount },
+          allowedNameSizes: includedFiles,
+          error: truncationError,
+        };
       } else {
         setAllowedNameSizes(undefined);
+        limitExceededCacheRef.current = null;
       }
     } catch(e) {
       if (e instanceof Error) setError(`Pre-parse failed: ${e.message}`);
@@ -508,7 +555,7 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
       setIsPreParsing(false);
       setUploadProgress(undefined);
     }
-  }, [getFileSetKey, debugLog, MAX_FILE_BYTES, isAuthed, uploadAndPreparse]);
+  }, [getFileSetKey, debugLog, MAX_FILE_BYTES, isAuthed, uploadAndPreparse, getNameSizeSignature]);
 
   const requireAuthErrorMessage = 'Please sign up to generate with CogniGuide.';
 
