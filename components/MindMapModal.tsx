@@ -401,7 +401,7 @@ export default function MindMapModal({ markdown, onClose }: MindMapModalProps) {
                       : 'rgba(255, 255, 255, 0.4)';
                   watermark.style.position = 'absolute';
                   watermark.style.bottom = `${offsetPx}px`;
-                  watermark.style.right = `${offsetPx}px`;
+                  watermark.style.left = `${offsetPx}px`;
                   watermark.style.fontFamily = "'Poppins', 'Helvetica Neue', Arial, sans-serif";
                   watermark.style.fontWeight = '700';
                   watermark.style.fontSize = `${fontSizePx}px`;
