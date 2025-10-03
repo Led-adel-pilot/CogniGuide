@@ -371,7 +371,6 @@ export async function POST(req: NextRequest) {
         throw new Error('Failed to communicate with AI service');
       }
 
-      let anyChunkSent = false;
       let anyCardSent = false;
       let buffer = '';
       let pendingLine: string | null = null;
@@ -399,14 +398,152 @@ export async function POST(req: NextRequest) {
         });
       }
 
+      const processBufferFactory = (controller: ReadableStreamDefaultController<Uint8Array>) => {
+        const emitJson = (raw: string): boolean => {
+          const trimmed = raw.trim();
+          if (!trimmed) return false;
+          try {
+            const obj = JSON.parse(trimmed);
+            controller.enqueue(encoder.encode(trimmed + '\n'));
+            if (obj && obj.type === 'card') {
+              if (!anyCardSent) {
+                console.log('First card received from model');
+              }
+              anyCardSent = true;
+            }
+            if (obj && obj.type === 'done') {
+              console.log('Stream completed successfully');
+            }
+            lastHeartbeat = Date.now();
+            return true;
+          } catch {
+            return false;
+          }
+        };
+
+        const extractBalancedJson = (text: string): { json: string; rest: string } | null => {
+          let start = -1;
+          let depth = 0;
+          let inString = false;
+          let escapeNext = false;
+          for (let idx = 0; idx < text.length; idx++) {
+            const char = text[idx];
+            if (start === -1) {
+              if (/\s/.test(char)) {
+                continue;
+              }
+              if (char === '{') {
+                start = idx;
+                depth = 1;
+                continue;
+              }
+              return null;
+            }
+
+            if (escapeNext) {
+              escapeNext = false;
+              continue;
+            }
+
+            if (char === '"') {
+              if (inString) {
+                inString = false;
+              } else {
+                inString = true;
+              }
+              continue;
+            }
+
+            if (inString) {
+              if (char === '\\') {
+                escapeNext = true;
+              }
+              continue;
+            }
+
+            if (char === '{') {
+              depth++;
+              continue;
+            }
+
+            if (char === '}') {
+              depth--;
+              if (depth === 0) {
+                const json = text.slice(start, idx + 1);
+                const rest = text.slice(idx + 1);
+                return { json, rest };
+              }
+            }
+          }
+          return null;
+        };
+
+        const processPending = (isFinal: boolean) => {
+          while (true) {
+            const combined = (pendingLine ?? '') + buffer;
+            if (!combined) {
+              return;
+            }
+
+            const balanced = extractBalancedJson(combined);
+            if (balanced) {
+              pendingLine = null;
+              buffer = balanced.rest;
+              if (!emitJson(balanced.json)) {
+                // If parsing somehow fails here, stash the raw text and wait for more tokens
+                pendingLine = balanced.json + buffer;
+                buffer = '';
+                return;
+              }
+              // Continue looping in case multiple objects were buffered without newlines
+              continue;
+            }
+
+            if (isFinal) {
+              const trimmed = combined.trim();
+              if (!trimmed) {
+                pendingLine = null;
+                buffer = '';
+                return;
+              }
+              if (!emitJson(trimmed)) {
+                console.error('Failed to parse final JSON chunk:', trimmed);
+                throw new Error('Invalid JSON in final chunk');
+              }
+              pendingLine = null;
+              buffer = '';
+            }
+            return;
+          }
+        };
+
+        const processBuffer = (isFinal = false) => {
+          let newlineIndex = buffer.indexOf('\n');
+          while (newlineIndex !== -1) {
+            const line = buffer.slice(0, newlineIndex);
+            buffer = buffer.slice(newlineIndex + 1);
+            newlineIndex = buffer.indexOf('\n');
+            const candidate = (pendingLine ?? '') + line;
+            pendingLine = null;
+            if (!emitJson(candidate)) {
+              pendingLine = candidate;
+            }
+          }
+
+          processPending(isFinal);
+        };
+
+        return processBuffer;
+      };
+
       const readable = new ReadableStream<Uint8Array>({
         async start(controller) {
+          const processBuffer = processBufferFactory(controller);
           try {
             // Emit an immediate meta line so the client can render instantly
             try {
               const earlyMeta = JSON.stringify({ type: 'meta', title: 'flashcards' }) + '\n';
               controller.enqueue(encoder.encode(earlyMeta));
-              anyChunkSent = true; // do not count as card
               console.log('Stream started, sent meta line');
             } catch {}
             for await (const chunk of stream as any) {
@@ -432,41 +569,13 @@ export async function POST(req: NextRequest) {
                 } catch {}
               }
 
-              let newlineIndex = buffer.indexOf('\n');
-              while (newlineIndex !== -1) {
-                let line = buffer.slice(0, newlineIndex).trim();
-                buffer = buffer.slice(newlineIndex + 1);
-                newlineIndex = buffer.indexOf('\n');
-                if (!line) continue;
-                if (pendingLine) {
-                  line = pendingLine + line;
-                  pendingLine = null;
-                }
-                try {
-                  const obj = JSON.parse(line);
-                  controller.enqueue(encoder.encode(line + '\n'));
-                  anyChunkSent = true;
-                  if (obj && obj.type === 'card') {
-                    anyCardSent = true;
-                    if (!anyCardSent) console.log('First card received from model');
-                  }
-                  if (obj && obj.type === 'done') {
-                    console.log('Stream completed successfully');
-                  }
-                  lastHeartbeat = Date.now(); // Reset heartbeat on successful message
-                } catch {
-                  pendingLine = line;
-                }
+              try {
+                processBuffer();
+              } catch (processingError) {
+                throw processingError;
               }
             }
-            if (pendingLine) {
-              try {
-                const obj = JSON.parse(pendingLine);
-                controller.enqueue(encoder.encode(pendingLine + '\n'));
-                anyChunkSent = true;
-                if (obj && obj.type === 'card') anyCardSent = true;
-              } catch {}
-            }
+            processBuffer(true);
             controller.close();
 
             // Cleanup files after successful streaming
