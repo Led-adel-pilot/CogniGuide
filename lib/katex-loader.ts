@@ -2,12 +2,19 @@ const KATEX_CSS = "https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css"
 const KATEX_JS = "https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js";
 const KATEX_AUTO_RENDER_JS = "https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js";
 
+type IdleRequestCallback = (deadline: { didTimeout: boolean; timeRemaining(): number }) => void;
+
+type IdleRequestScheduler = {
+  requestIdleCallback?: (callback: IdleRequestCallback, options?: { timeout?: number }) => number;
+};
+
 type KatexWindow = Window & {
   katex?: unknown;
   renderMathInElement?: unknown;
 };
 
 let katexLoadPromise: Promise<void> | null = null;
+let preloadScheduled = false;
 
 function loadStylesheet(href: string): Promise<void> {
   if (typeof document === "undefined") return Promise.resolve();
@@ -117,12 +124,33 @@ export async function ensureKatexAssets(): Promise<void> {
 }
 
 export function preloadKatexAssets(): void {
-  if (typeof document === "undefined") return;
-  if (document.querySelector(`link[rel="preload"][href="${KATEX_CSS}"]`)) return;
-  const link = document.createElement("link");
-  link.rel = "preload";
-  link.as = "style";
-  link.href = KATEX_CSS;
-  link.crossOrigin = "anonymous";
-  document.head.appendChild(link);
+  if (typeof window === "undefined") return;
+  if (preloadScheduled || katexLoadPromise) return;
+
+  const scheduleLoad = () => {
+    ensureKatexAssets().catch((error) => {
+      preloadScheduled = false;
+      if (process.env.NODE_ENV !== "production") {
+        console.error("Failed to preload KaTeX assets", error);
+      }
+    });
+  };
+
+  preloadScheduled = true;
+  const idleScheduler = window as Window & IdleRequestScheduler;
+
+  if (typeof idleScheduler.requestIdleCallback === "function") {
+    idleScheduler.requestIdleCallback(
+      () => {
+        preloadScheduled = false;
+        scheduleLoad();
+      },
+      { timeout: 2000 },
+    );
+  } else {
+    window.setTimeout(() => {
+      preloadScheduled = false;
+      scheduleLoad();
+    }, 500);
+  }
 }
