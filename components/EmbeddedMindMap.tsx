@@ -1,7 +1,8 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { initializeMindMap, cleanup } from '@/lib/markmap-renderer';
+import { ensureKatexAssets, preloadKatexAssets } from '@/lib/katex-loader';
 
 interface EmbeddedMindMapProps {
   markdown: string;
@@ -11,17 +12,41 @@ export default function EmbeddedMindMap({ markdown }: EmbeddedMindMapProps) {
   const viewportRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    if (viewportRef.current && containerRef.current && markdown) {
-      initializeMindMap(markdown, viewportRef.current, containerRef.current, {
-        disableInteractions: true
-      });
+  const initialize = useCallback(async () => {
+    if (!viewportRef.current || !containerRef.current || !markdown) return;
+
+    try {
+      await ensureKatexAssets();
+    } catch (error) {
+      console.error('Failed to load KaTeX assets for embedded mind map', error);
     }
 
+    if (!viewportRef.current || !containerRef.current) return;
+
+    initializeMindMap(markdown, viewportRef.current, containerRef.current, {
+      disableInteractions: true,
+    });
+  }, [markdown]);
+
+  useEffect(() => {
+    preloadKatexAssets();
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const run = async () => {
+      if (cancelled) return;
+      await initialize();
+    };
+
+    void run();
+
     return () => {
+      cancelled = true;
       cleanup();
     };
-  }, [markdown]);
+  }, [initialize]);
 
   return (
     <div ref={viewportRef} className="map-viewport h-full w-full !bg-transparent cursor-default">

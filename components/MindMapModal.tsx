@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { initializeMindMap, cleanup, getFullMindMapBounds, updateMindMap, recommendPrintScaleMultiplier, getPrintZoomBias, collapseToMainBranches } from '@/lib/markmap-renderer';
+import { ensureKatexAssets, preloadKatexAssets } from '@/lib/katex-loader';
 import { Download, X, FileImage, Loader2, Map as MapIcon } from 'lucide-react';
 import FlashcardIcon from '@/components/FlashcardIcon';
 import FlashcardsModal from '@/components/FlashcardsModal';
@@ -27,6 +28,10 @@ export default function MindMapModal({ markdown, onClose }: MindMapModalProps) {
   // NEW: ref and state to size the dropdown to the trigger width
   const triggerGroupRef = useRef<HTMLDivElement>(null);
   const [dropdownWidth, setDropdownWidth] = useState<number | undefined>(undefined);
+
+  useEffect(() => {
+    preloadKatexAssets();
+  }, []);
 
   // Will capture computed font-family to inline during export
   const getComputedFontFamily = () => {
@@ -734,16 +739,35 @@ export default function MindMapModal({ markdown, onClose }: MindMapModalProps) {
 
 
   useEffect(() => {
-    if (!viewportRef.current || !containerRef.current) return;
     if (!markdown) return;
-    if (!initializedRef.current && viewMode === 'map') {
-      initializeMindMap(markdown, viewportRef.current, containerRef.current);
-      initializedRef.current = true;
-      setHasGeneratedContent(true);
-    } else {
-      if (viewMode === 'map') updateMindMap(markdown);
-    }
-    return () => { /* no-op between updates */ };
+    if (!viewportRef.current || !containerRef.current) return;
+
+    let cancelled = false;
+
+    const run = async () => {
+      try {
+        await ensureKatexAssets();
+      } catch (error) {
+        console.error('Failed to load KaTeX assets for mind map modal', error);
+      }
+
+      if (cancelled) return;
+      if (!viewportRef.current || !containerRef.current) return;
+
+      if (!initializedRef.current && viewMode === 'map') {
+        initializeMindMap(markdown, viewportRef.current, containerRef.current);
+        initializedRef.current = true;
+        setHasGeneratedContent(true);
+      } else if (viewMode === 'map') {
+        updateMindMap(markdown);
+      }
+    };
+
+    void run();
+
+    return () => {
+      cancelled = true;
+    };
   }, [markdown, viewMode]);
 
   // Reset renderer when modal is closed (markdown becomes null)
@@ -888,14 +912,35 @@ export default function MindMapModal({ markdown, onClose }: MindMapModalProps) {
     if (viewMode === 'flashcards') {
       initializedRef.current = false;
       cleanup();
-    } else if (viewMode === 'map') {
-      if (markdown && viewportRef.current && containerRef.current && !initializedRef.current) {
-        initializeMindMap(markdown, viewportRef.current, containerRef.current);
-        initializedRef.current = true;
-      }
+      return;
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [viewMode]);
+
+    if (viewMode !== 'map') return;
+    if (!markdown) return;
+    if (!viewportRef.current || !containerRef.current || initializedRef.current) return;
+
+    let cancelled = false;
+
+    const run = async () => {
+      try {
+        await ensureKatexAssets();
+      } catch (error) {
+        console.error('Failed to load KaTeX assets when switching to map view', error);
+      }
+
+      if (cancelled) return;
+      if (!viewportRef.current || !containerRef.current || initializedRef.current) return;
+
+      initializeMindMap(markdown, viewportRef.current, containerRef.current);
+      initializedRef.current = true;
+    };
+
+    void run();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [viewMode, markdown]);
 
   // Reset flashcard state when switching to a different mind map markdown
   useEffect(() => {

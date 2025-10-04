@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { Poppins } from "next/font/google";
-import Script from "next/script";
 import { siteMetadata } from "@/lib/siteMetadata";
 
 const googleSiteVerification = process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION;
@@ -129,10 +128,6 @@ export default function RootLayout({
         <link rel="manifest" href="/manifest.json" />
         <link rel="icon" href="/favicon.ico" sizes="any" type="image/x-icon" />
         <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
-        <link
-          rel="stylesheet"
-          href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css"
-        />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
@@ -154,14 +149,6 @@ export default function RootLayout({
               } catch (e) {}
             `,
           }}
-        />
-        <Script
-          src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"
-          strategy="beforeInteractive"
-        />
-        <Script
-          src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
-          strategy="beforeInteractive"
         />
       </head>
       <body className={`${poppins.className} flex min-h-screen flex-col bg-background text-foreground`}>
