@@ -12,7 +12,7 @@ import { ChevronLeft, ChevronRight, Eye, Loader2, X } from 'lucide-react';
 import posthog from 'posthog-js';
 import { DatePicker } from '@/components/DatePicker';
 import { formatDate, formatTime } from '@/lib/utils';
-import { ensureKatexAssets, preloadKatexAssets } from '@/lib/katex-loader';
+import { ensureKatexAssets } from '@/lib/katex-loader';
 
 const getDeckIdentifier = (deckId?: string, title?: string | null, cards?: Flashcard[] | null): string | null => {
   if (deckId) return deckId;
@@ -118,10 +118,6 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
       .catch((error) => {
         console.error('Failed to load KaTeX assets for flashcards', error);
       });
-  }, []);
-
-  React.useEffect(() => {
-    preloadKatexAssets();
   }, []);
 
   React.useEffect(() => {

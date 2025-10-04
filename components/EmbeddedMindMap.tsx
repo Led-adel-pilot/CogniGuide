@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef } from 'react';
 import { initializeMindMap, cleanup } from '@/lib/markmap-renderer';
-import { ensureKatexAssets, preloadKatexAssets } from '@/lib/katex-loader';
+import { ensureKatexAssets } from '@/lib/katex-loader';
 
 interface EmbeddedMindMapProps {
   markdown: string;
@@ -27,10 +27,6 @@ export default function EmbeddedMindMap({ markdown }: EmbeddedMindMapProps) {
       disableInteractions: true,
     });
   }, [markdown]);
-
-  useEffect(() => {
-    preloadKatexAssets();
-  }, []);
 
   useEffect(() => {
     let cancelled = false;

@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { initializeMindMap, cleanup, getFullMindMapBounds, updateMindMap, recommendPrintScaleMultiplier, getPrintZoomBias, collapseToMainBranches } from '@/lib/markmap-renderer';
-import { ensureKatexAssets, preloadKatexAssets } from '@/lib/katex-loader';
+import { ensureKatexAssets } from '@/lib/katex-loader';
 import { Download, X, FileImage, Loader2, Map as MapIcon } from 'lucide-react';
 import FlashcardIcon from '@/components/FlashcardIcon';
 import FlashcardsModal from '@/components/FlashcardsModal';
@@ -28,10 +28,6 @@ export default function MindMapModal({ markdown, onClose }: MindMapModalProps) {
   // NEW: ref and state to size the dropdown to the trigger width
   const triggerGroupRef = useRef<HTMLDivElement>(null);
   const [dropdownWidth, setDropdownWidth] = useState<number | undefined>(undefined);
-
-  useEffect(() => {
-    preloadKatexAssets();
-  }, []);
 
   // Will capture computed font-family to inline during export
   const getComputedFontFamily = () => {
