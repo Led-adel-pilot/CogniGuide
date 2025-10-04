@@ -7,6 +7,7 @@ import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 import CogniGuideLogo from '../CogniGuide_logo.png';
 import { supabase } from '@/lib/supabaseClient';
+import Generator from '@/components/Generator';
 
 const AuthModal = dynamic(() => import('@/components/AuthModal'), { ssr: false });
 
@@ -20,11 +21,6 @@ const EmbeddedFlashcards = dynamic(() => import('@/components/EmbeddedFlashcards
   loading: () => <div className="w-full h-full animate-pulse bg-muted/40" aria-hidden="true" />,
 });
 
-const Generator = dynamic(() => import('@/components/Generator'), {
-  ssr: false,
-  loading: () => null,
-});
-
 const InteractiveMindMap = () => {
   const markdownData = "# Benefits of Reading from Mind Maps 🧠\n- **Enhanced Comprehension** 📖\n  - Visual layout clarifies relationships between concepts\n  - See the big picture and details simultaneously\n- **Improved Memory Retention** 💾\n  - Colors, branches, and keywords engage more of the brain\n  - Information is chunked into manageable parts\n- **Faster Learning** 🚀\n  - Quickly grasp complex topics\n  - Information is presented in a concise and organized manner\n- **Boosts Creativity** ✨\n  - Radiant structure encourages associative thinking\n  - Sparks new ideas and connections\n- **Effective Revision** ✅\n  - Condenses large amounts of information into a single page\n  - Easy to review and recall key points\n- **Engaging and Fun** 🎉\n  - More appealing than linear notes\n  - Makes studying a more active process";
 
@@ -34,7 +30,7 @@ const InteractiveMindMap = () => {
 export default function HomeLanding() {
   const [showAuth, setShowAuth] = useState(false);
   const [isAuthed, setIsAuthed] = useState(false);
-  const [shouldRenderGenerator, setShouldRenderGenerator] = useState(false);
+
   const [shouldRenderMindMap, setShouldRenderMindMap] = useState(false);
   const [shouldRenderFlashcards, setShouldRenderFlashcards] = useState(false);
   const router = useRouter();
@@ -83,109 +79,7 @@ export default function HomeLanding() {
     return () => { sub.subscription.unsubscribe(); };
   }, []);
 
-  useEffect(() => {
-    if (shouldRenderGenerator) return;
-    if (typeof window === 'undefined') return;
 
-    let cancelled = false;
-    let hasTriggered = false;
-
-    const win = window as typeof window & {
-      requestIdleCallback?: (callback: () => void, options?: { timeout?: number }) => number;
-      cancelIdleCallback?: (handle: number) => void;
-    };
-
-    let idleHandle: number | null = null;
-    let rafHandle: number | null = null;
-    let timeoutHandle: ReturnType<typeof window.setTimeout> | null = null;
-
-    const cancelIdleCallbacks = () => {
-      if (idleHandle !== null && win.cancelIdleCallback) {
-        win.cancelIdleCallback(idleHandle);
-      }
-      if (rafHandle !== null) {
-        window.cancelAnimationFrame(rafHandle);
-      }
-      if (timeoutHandle !== null) {
-        clearTimeout(timeoutHandle);
-      }
-      idleHandle = null;
-      rafHandle = null;
-      timeoutHandle = null;
-    };
-
-    const handleUserInput = () => {
-      void loadGenerator();
-    };
-
-    const removeUserInputListeners = () => {
-      window.removeEventListener('pointerdown', handleUserInput);
-      window.removeEventListener('keydown', handleUserInput);
-    };
-
-    async function loadGenerator() {
-      if (hasTriggered) return;
-      hasTriggered = true;
-      cancelIdleCallbacks();
-      removeUserInputListeners();
-
-      try {
-        await import('@/components/Generator');
-        if (!cancelled) {
-          setShouldRenderGenerator(true);
-        }
-      } catch (error) {
-        hasTriggered = false;
-        if (process.env.NODE_ENV !== 'production') {
-          console.error('Failed to load generator', error);
-        }
-
-        if (!cancelled) {
-          window.addEventListener('pointerdown', handleUserInput, { passive: true });
-          window.addEventListener('keydown', handleUserInput);
-
-          if (win.requestIdleCallback) {
-            idleHandle = win.requestIdleCallback(
-              () => {
-                void loadGenerator();
-              },
-              { timeout: 600 }
-            );
-          } else {
-            rafHandle = window.requestAnimationFrame(() => {
-              timeoutHandle = setTimeout(() => {
-                void loadGenerator();
-              }, 120);
-            });
-          }
-        }
-      }
-    }
-
-    window.addEventListener('pointerdown', handleUserInput, { passive: true });
-    window.addEventListener('keydown', handleUserInput);
-
-    if (win.requestIdleCallback) {
-      idleHandle = win.requestIdleCallback(
-        () => {
-          void loadGenerator();
-        },
-        { timeout: 600 }
-      );
-    } else {
-      rafHandle = window.requestAnimationFrame(() => {
-        timeoutHandle = setTimeout(() => {
-          void loadGenerator();
-        }, 120);
-      });
-    }
-
-    return () => {
-      cancelled = true;
-      removeUserInputListeners();
-      cancelIdleCallbacks();
-    };
-  }, [shouldRenderGenerator]);
 
   useEffect(() => {
     if (shouldRenderMindMap) return;
@@ -296,7 +190,7 @@ export default function HomeLanding() {
                 </div>
 
                 <div className="flex-1 w-full min-h-[28rem]">
-                  {shouldRenderGenerator ? <Generator redirectOnAuth showTitle={false} /> : null}
+                  <Generator redirectOnAuth showTitle={false} />
                 </div>
               </div>
             </div>
