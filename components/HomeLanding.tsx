@@ -1,15 +1,26 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
-import Generator from '@/components/Generator';
 import Link from 'next/link';
-import CogniGuideLogo from '../CogniGuide_logo.png';
+import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
+import CogniGuideLogo from '../CogniGuide_logo.png';
 import { supabase } from '@/lib/supabaseClient';
-import AuthModal from '@/components/AuthModal';
-import EmbeddedMindMap from '@/components/EmbeddedMindMap';
-import EmbeddedFlashcards from '@/components/EmbeddedFlashcards';
+
+import Generator from '@/components/Generator';
+
+const AuthModal = dynamic(() => import('@/components/AuthModal'), { ssr: false });
+
+const EmbeddedMindMap = dynamic(() => import('@/components/EmbeddedMindMap'), {
+  ssr: false,
+  loading: () => <div className="w-full h-full animate-pulse bg-muted/40" aria-hidden="true" />,
+});
+
+const EmbeddedFlashcards = dynamic(() => import('@/components/EmbeddedFlashcards'), {
+  ssr: false,
+  loading: () => <div className="w-full h-full animate-pulse bg-muted/40" aria-hidden="true" />,
+});
 
 const InteractiveMindMap = () => {
   const markdownData = "# Benefits of Reading from Mind Maps 🧠\n- **Enhanced Comprehension** 📖\n  - Visual layout clarifies relationships between concepts\n  - See the big picture and details simultaneously\n- **Improved Memory Retention** 💾\n  - Colors, branches, and keywords engage more of the brain\n  - Information is chunked into manageable parts\n- **Faster Learning** 🚀\n  - Quickly grasp complex topics\n  - Information is presented in a concise and organized manner\n- **Boosts Creativity** ✨\n  - Radiant structure encourages associative thinking\n  - Sparks new ideas and connections\n- **Effective Revision** ✅\n  - Condenses large amounts of information into a single page\n  - Easy to review and recall key points\n- **Engaging and Fun** 🎉\n  - More appealing than linear notes\n  - Makes studying a more active process";
@@ -20,7 +31,11 @@ const InteractiveMindMap = () => {
 export default function HomeLanding() {
   const [showAuth, setShowAuth] = useState(false);
   const [isAuthed, setIsAuthed] = useState(false);
+  const [shouldRenderMindMap, setShouldRenderMindMap] = useState(false);
+  const [shouldRenderFlashcards, setShouldRenderFlashcards] = useState(false);
   const router = useRouter();
+  const mindMapSectionRef = useRef<HTMLDivElement | null>(null);
+  const flashcardsSectionRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     try {
@@ -63,6 +78,52 @@ export default function HomeLanding() {
     });
     return () => { sub.subscription.unsubscribe(); };
   }, []);
+
+  useEffect(() => {
+    if (shouldRenderMindMap) return;
+
+    const node = mindMapSectionRef.current;
+    if (!node) return;
+
+    const observer = new IntersectionObserver(
+      (entries, obs) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            setShouldRenderMindMap(true);
+            obs.disconnect();
+            break;
+          }
+        }
+      },
+      { rootMargin: '200px 0px 200px 0px' }
+    );
+
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, [shouldRenderMindMap]);
+
+  useEffect(() => {
+    if (shouldRenderFlashcards) return;
+
+    const node = flashcardsSectionRef.current;
+    if (!node) return;
+
+    const observer = new IntersectionObserver(
+      (entries, obs) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            setShouldRenderFlashcards(true);
+            obs.disconnect();
+            break;
+          }
+        }
+      },
+      { rootMargin: '200px 0px 200px 0px' }
+    );
+
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, [shouldRenderFlashcards]);
 
   return (
     <>
@@ -133,7 +194,7 @@ export default function HomeLanding() {
             </div>
           </section>
 
-          <section className="pt-10 md:pt-12 pb-16 bg-muted/30 border-y">
+          <section className="pt-10 md:pt-12 pb-16 bg-muted/30 border-y" ref={mindMapSectionRef}>
             <div className="container">
               <div className="text-center mb-8">
                 <h2 className="text-3xl md:text-4xl font-bold font-heading tracking-tight">Visual Learning with Mind Maps</h2>
@@ -143,13 +204,13 @@ export default function HomeLanding() {
               </div>
               <div className="bg-background rounded-[2rem] border shadow-xl shadow-slate-200/50 dark:shadow-slate-700/50 overflow-hidden">
                 <div className="w-full h-[300px] md:h-[600px]">
-                  <InteractiveMindMap />
+                  {shouldRenderMindMap ? <InteractiveMindMap /> : <div className="w-full h-full animate-pulse bg-muted/40" aria-hidden="true" />}
                 </div>
               </div>
             </div>
           </section>
 
-          <section className="pt-16 md:pt-20 pb-16">
+          <section className="pt-16 md:pt-20 pb-16" ref={flashcardsSectionRef}>
             <div className="container">
               <div className="text-center mb-8">
                 <h2 className="text-3xl md:text-4xl font-bold font-heading tracking-tight">Active Recall with Spaced Repetition</h2>
@@ -159,7 +220,11 @@ export default function HomeLanding() {
               </div>
               <div className="bg-background rounded-[2rem] border shadow-xl shadow-slate-200/50 dark:shadow-slate-700/50 overflow-hidden">
                 <div className="w-full h-[68vh] md:h-[600px]">
-                  <EmbeddedFlashcards />
+                  {shouldRenderFlashcards ? (
+                    <EmbeddedFlashcards />
+                  ) : (
+                    <div className="w-full h-full animate-pulse bg-muted/40" aria-hidden="true" />
+                  )}
                 </div>
               </div>
               <div className="text-center mt-12">

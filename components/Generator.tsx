@@ -1,16 +1,25 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, type ComponentProps } from 'react';
 import { useRouter } from 'next/navigation';
+import dynamic from 'next/dynamic';
 import posthog from 'posthog-js';
 import Dropzone from '@/components/Dropzone';
 import PromptForm from '@/components/PromptForm';
-import MindMapModal from '@/components/MindMapModal';
-import FlashcardsModal, { Flashcard as FlashcardType } from '@/components/FlashcardsModal';
-import AuthModal from '@/components/AuthModal';
 import { supabase } from '@/lib/supabaseClient';
 import { NON_AUTH_FREE_LIMIT, type ModelChoice } from '@/lib/plans';
 import { Sparkles } from 'lucide-react';
+import type AuthModalComponent from '@/components/AuthModal';
+import type MindMapModalComponent from '@/components/MindMapModal';
+import type FlashcardsModalComponent, { Flashcard as FlashcardType } from '@/components/FlashcardsModal';
+
+type AuthModalProps = ComponentProps<typeof AuthModalComponent>;
+type MindMapModalProps = ComponentProps<typeof MindMapModalComponent>;
+type FlashcardsModalProps = ComponentProps<typeof FlashcardsModalComponent>;
+
+const AuthModal = dynamic<AuthModalProps>(() => import('@/components/AuthModal'), { ssr: false });
+const MindMapModal = dynamic<MindMapModalProps>(() => import('@/components/MindMapModal'), { ssr: false });
+const FlashcardsModal = dynamic<FlashcardsModalProps>(() => import('@/components/FlashcardsModal'), { ssr: false });
 
 interface GeneratorProps {
   redirectOnAuth?: boolean;
