@@ -5,14 +5,13 @@ import { supabase } from '@/lib/supabaseClient';
 import AuthModal from '@/components/AuthModal';
 import { nextSchedule, createInitialSchedule, type FsrsScheduleState, type Grade } from '@/lib/spaced-repetition';
 import { loadDeckSchedule, saveDeckSchedule, loadDeckScheduleAsync, saveDeckScheduleAsync } from '@/lib/sr-store';
-import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import type { Components } from 'react-markdown';
 import { ChevronLeft, ChevronRight, Eye, Loader2, X } from 'lucide-react';
 import posthog from 'posthog-js';
 import { DatePicker } from '@/components/DatePicker';
 import { formatDate, formatTime } from '@/lib/utils';
-import { ensureKatexAssets } from '@/lib/katex-loader';
+import KatexRenderer from './KatexRenderer';
 
 const getDeckIdentifier = (deckId?: string, title?: string | null, cards?: Flashcard[] | null): string | null => {
   if (deckId) return deckId;
@@ -86,49 +85,6 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
   const current = scheduledCards && scheduledCards[index] ? scheduledCards[index] : null;
 
   const hasCards = Boolean(cards && cards.length > 0);
-
-  const questionRef = React.useRef<HTMLDivElement | null>(null);
-  const answerRef = React.useRef<HTMLDivElement | null>(null);
-
-  const renderMath = React.useCallback(() => {
-    if (typeof window === 'undefined') return;
-
-    ensureKatexAssets()
-      .then(() => {
-        const renderMathInElement = (window as any)?.renderMathInElement;
-        if (typeof renderMathInElement !== 'function') return;
-
-        const options = {
-          delimiters: [
-            { left: '$$', right: '$$', display: true },
-            { left: '$', right: '$', display: false },
-            { left: '\\(', right: '\\)', display: false },
-            { left: '\\[', right: '\\]', display: true },
-          ],
-          throwOnError: false,
-        };
-
-        if (questionRef.current) {
-          renderMathInElement(questionRef.current, options);
-        }
-        if (answerRef.current) {
-          renderMathInElement(answerRef.current, options);
-        }
-      })
-      .catch((error) => {
-        console.error('Failed to load KaTeX assets for flashcards', error);
-      });
-  }, []);
-
-  React.useEffect(() => {
-    if (!open) return;
-    const id = window.requestAnimationFrame(renderMath);
-    const timeout = window.setTimeout(() => renderMath(), 0);
-    return () => {
-      window.cancelAnimationFrame(id);
-      window.clearTimeout(timeout);
-    };
-  }, [open, index, showAnswer, cards, renderMath]);
 
   const deckIdentifier = React.useMemo(() => getDeckIdentifier(deckId, title, cards), [deckId, title, cards]);
 
@@ -765,12 +721,10 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
             <div className="w-full">
               <div className="relative mx-auto rounded-[1.35rem] p-[1.5px] bg-gradient-to-br from-indigo-200 via-sky-200 to-emerald-200">
                 <div className="bg-background border border-border rounded-[1.25rem] shadow p-5 sm:p-6 min-h-[180px] sm:min-h-[200px]">
-                  <div
-                    ref={questionRef}
+                  <KatexRenderer
+                    content={cards![index]?.question}
                     className="text-foreground text-xl sm:text-2xl font-semibold leading-7 sm:leading-8 break-words"
-                  >
-                    {cards![index]?.question}
-                  </div>
+                  />
                   <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
                     {showAnswer && current?.schedule?.due ? (
                       <span className="inline-flex items-center h-6 px-2.5 rounded-full bg-sky-50 dark:bg-sky-900/30 text-sky-700 dark:text-sky-300 border border-sky-200 dark:border-sky-800 flashcard-due-pill">
@@ -784,12 +738,12 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
                   {showAnswer && (
                     <div className="mt-4 text-foreground">
                       <div className="h-px bg-border mb-4" />
-                      <div ref={answerRef} className="max-h-[45vh] overflow-y-auto text-sm text-foreground">
-                        <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
-                          {cards![index]?.answer || ''}
-                        </ReactMarkdown>
-                      </div>
-
+                      <KatexRenderer
+                        content={cards![index]?.answer || ''}
+                        useMarkdown={true}
+                        markdownComponents={markdownComponents}
+                        className="max-h-[45vh] overflow-y-auto text-sm text-foreground"
+                      />
                     </div>
                   )}
                 </div>
