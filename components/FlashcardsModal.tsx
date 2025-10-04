@@ -30,19 +30,24 @@ export type Flashcard = { question: string; answer: string };
 type CardWithSchedule = Flashcard & { schedule?: FsrsScheduleState; deckId?: string; cardIndex?: number; deckTitle?: string; };
 
 const markdownComponents: Components = {
-  ul({ node, ...props }) {
+  ul(props) {
     return <ul className="list-disc list-inside pl-4 my-2 space-y-1" {...props} />;
   },
-  ol({ node, ...props }) {
+  ol(props) {
     return <ol className="list-decimal list-inside pl-4 my-2 space-y-1" {...props} />;
   },
-  li({ node, ...props }) {
+  li(props) {
     return <li className="leading-6" {...props} />;
   },
-  p({ node, ...props }) {
+  p(props) {
     return <p className="my-2 leading-6" {...props} />;
   },
 };
+
+type AutoRenderDelimiter = { left: string; right: string; display: boolean };
+type AutoRenderOptions = { delimiters: AutoRenderDelimiter[]; throwOnError: boolean };
+type RenderMathInElement = (element: HTMLElement, options: AutoRenderOptions) => void;
+type KatexLikeWindow = Window & { renderMathInElement?: RenderMathInElement };
 
 type Props = {
   open: boolean;
@@ -79,7 +84,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
   const [showLossAversionPopup, setShowLossAversionPopup] = React.useState(false);
   const [showSignupPopup, setShowSignupPopup] = React.useState(false);
   const [showExamDatePopup, setShowExamDatePopup] = React.useState(false);
-  const [cardsViewedCount, setCardsViewedCount] = React.useState(0);
+  const [, setCardsViewedCount] = React.useState(0);
   const [answerShownTime, setAnswerShownTime] = React.useState<number | null>(null);
   const [originalDueCount, setOriginalDueCount] = React.useState(0);
   const [originalDueList, setOriginalDueList] = React.useState<number[]>([]);
@@ -87,18 +92,23 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
 
   const hasCards = Boolean(cards && cards.length > 0);
 
+  const questionContent = cards && cards[index] ? cards[index]!.question : '';
+  const answerContent = cards && cards[index] ? cards[index]!.answer : '';
+
   const questionRef = React.useRef<HTMLDivElement | null>(null);
   const answerRef = React.useRef<HTMLDivElement | null>(null);
 
-  const renderMath = React.useCallback(() => {
+  const renderMath = React.useCallback((isCancelled?: () => boolean) => {
     if (typeof window === 'undefined') return;
 
     ensureKatexAssets()
       .then(() => {
-        const renderMathInElement = (window as any)?.renderMathInElement;
+        if (isCancelled?.()) return;
+
+        const renderMathInElement = (window as KatexLikeWindow).renderMathInElement;
         if (typeof renderMathInElement !== 'function') return;
 
-        const options = {
+        const options: AutoRenderOptions = {
           delimiters: [
             { left: '$$', right: '$$', display: true },
             { left: '$', right: '$', display: false },
@@ -108,12 +118,17 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
           throwOnError: false,
         };
 
-        if (questionRef.current) {
-          renderMathInElement(questionRef.current, options);
-        }
-        if (answerRef.current) {
-          renderMathInElement(answerRef.current, options);
-        }
+        const applyRender = (element: HTMLElement | null) => {
+          if (!element) return;
+          element.querySelectorAll('[data-processed="true"]').forEach((node) => {
+            node.removeAttribute('data-processed');
+          });
+          renderMathInElement(element, options);
+        };
+
+        applyRender(questionRef.current);
+        if (isCancelled?.()) return;
+        applyRender(answerRef.current);
       })
       .catch((error) => {
         console.error('Failed to load KaTeX assets for flashcards', error);
@@ -122,13 +137,21 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
 
   React.useEffect(() => {
     if (!open) return;
-    const id = window.requestAnimationFrame(renderMath);
-    const timeout = window.setTimeout(() => renderMath(), 0);
+    let cancelled = false;
+
+    const run = () => {
+      if (cancelled) return;
+      renderMath(() => cancelled);
+    };
+
+    const id = window.requestAnimationFrame(run);
+    const timeout = window.setTimeout(run, 0);
     return () => {
+      cancelled = true;
       window.cancelAnimationFrame(id);
       window.clearTimeout(timeout);
     };
-  }, [open, index, showAnswer, cards, renderMath]);
+  });
 
   const deckIdentifier = React.useMemo(() => getDeckIdentifier(deckId, title, cards), [deckId, title, cards]);
 
@@ -682,7 +705,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
                   <div className="bg-background border border-border rounded-[1.25rem] shadow p-8 sm:p-10 min-h-[200px] sm:min-h-[250px] flex flex-col items-center justify-center text-center">
                     <h2 className="text-foreground text-2xl font-bold mb-4">Ready to study smarter?</h2>
                     <p className="text-muted-foreground mb-6 max-w-md">
-                      You've seen how effective flashcards can be. Create your own study set from your course materials in seconds.
+                      You&apos;ve seen how effective flashcards can be. Create your own study set from your course materials in seconds.
                     </p>
                     <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full max-w-md justify-center">
                       <button
@@ -723,7 +746,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
               ) : (
                 <div className="relative mx-auto rounded-[1.35rem] p-[1.5px] bg-gradient-to-br from-indigo-200 via-sky-200 to-emerald-200">
                   <div className="bg-background border border-border rounded-[1.25rem] shadow p-8 sm:p-10 min-h-[200px] sm:min-h-[250px] flex flex-col items-center justify-center text-center">
-                    <h2 className="text-foreground text-2xl font-bold mb-4">🎉 Great job! Don't lose your progress!</h2>
+                    <h2 className="text-foreground text-2xl font-bold mb-4">🎉 Great job! Don&apos;t lose your progress!</h2>
                     <p className="text-muted-foreground mb-6 max-w-md">
                       Sign up to save this flashcard deck and track your study progress with spaced repetition.
                     </p>
@@ -769,7 +792,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
                     ref={questionRef}
                     className="text-foreground text-xl sm:text-2xl font-semibold leading-7 sm:leading-8 break-words"
                   >
-                    {cards![index]?.question}
+                    {questionContent}
                   </div>
                   <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
                     {showAnswer && current?.schedule?.due ? (
@@ -786,7 +809,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
                       <div className="h-px bg-border mb-4" />
                       <div ref={answerRef} className="max-h-[45vh] overflow-y-auto text-sm text-foreground">
                         <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
-                          {cards![index]?.answer || ''}
+                          {answerContent || ''}
                         </ReactMarkdown>
                       </div>
 
@@ -941,7 +964,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
           {/* Black transparent background */}
           <div className="absolute inset-0 bg-black/40 dark:bg-black/60 z-0"></div>
           <div className="bg-background border p-8 rounded-2xl shadow-xl max-w-md w-full text-center relative z-10">
-            <h2 className="text-foreground text-2xl font-bold mb-4">Don't Lose Your Progress!</h2>
+            <h2 className="text-foreground text-2xl font-bold mb-4">Don&apos;t Lose Your Progress!</h2>
             <p className="text-muted-foreground mb-6">
               Sign up to save this deck and track your study progress with spaced repetition.
             </p>
@@ -1011,7 +1034,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
           <div className="bg-background border p-8 rounded-2xl shadow-xl max-w-md w-full text-center relative z-10">
             <h2 className="text-foreground text-2xl font-bold mb-4">📅 Set Your Exam Date</h2>
             <p className="text-muted-foreground text-sm mb-4">
-              The spaced repetition algorithm will adjust review intervals to ensure you're well-prepared by your exam date.
+              The spaced repetition algorithm will adjust review intervals to ensure you&apos;re well-prepared by your exam date.
             </p>
             <div className="mb-6">
               <div className="relative">
