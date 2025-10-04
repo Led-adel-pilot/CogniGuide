@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
+import type { ChatCompletionChunk } from 'openai/resources/chat/completions';
 import { getTextFromDocx, getTextFromPdf, getTextFromPptx, getTextFromPlainText, processMultipleFiles } from '@/lib/document-parser';
 import { MODEL_CREDIT_MULTIPLIERS, MODEL_REQUIRED_TIER, type ModelChoice } from '@/lib/plans';
 import { createClient } from '@supabase/supabase-js';
@@ -241,6 +242,34 @@ function normalizeModelChoice(model?: unknown): ModelChoice | null {
   return null;
 }
 
+type DeltaLike = ChatCompletionChunk.Choice['delta'] | { content?: unknown; reasoning?: unknown } | undefined;
+
+function extractDeltaText(delta: DeltaLike): string {
+  if (!delta) return '';
+  const rawContent = delta.content as unknown;
+  if (typeof rawContent === 'string') {
+    return rawContent;
+  }
+  if (rawContent == null) {
+    return '';
+  }
+  if (Array.isArray(rawContent)) {
+    return rawContent
+      .map((part) => {
+        if (typeof part === 'string') return part;
+        if (part && typeof part === 'object' && 'text' in part && typeof (part as { text?: unknown }).text === 'string') {
+          return (part as { text: string }).text;
+        }
+        return '';
+      })
+      .join('');
+  }
+  if (typeof rawContent === 'object' && 'text' in rawContent && typeof (rawContent as { text?: unknown }).text === 'string') {
+    return (rawContent as { text: string }).text;
+  }
+  return '';
+}
+
 // Simple, consistent logging of model input
 function logLlmInput(kind: string, prompt: string, modelChoice?: ModelChoice) {
   console.log(`=== ${kind} ===`);
@@ -318,7 +347,8 @@ export async function POST(req: NextRequest) {
     // Helper to stream NDJSON lines from a prompt, with optional credit refund on total failure
     const streamNdjson = async (promptContent: any, modelChoice: ModelChoice, refundInfo?: { userId: string; credits: number }, images?: string[]) => {
       const encoder = new TextEncoder();
-      let stream;
+      const streamStartedAt = Date.now();
+      let stream: AsyncIterable<ChatCompletionChunk>;
       try {
         stream = await openai.chat.completions.create({
           model: MODEL_NAMES[modelChoice],
@@ -327,6 +357,11 @@ export async function POST(req: NextRequest) {
           messages: [{ role: 'user', content: promptContent }],
           stream: true,
           stream_options: { include_usage: false }, // Reduce overhead
+        });
+        console.log('[Flashcards] Opened streaming completion', {
+          model: MODEL_NAMES[modelChoice],
+          hasImages: Array.isArray(images) && images.length > 0,
+          requestedMode: 'stream',
         });
       } catch (apiError) {
         console.error('OpenAI API error in streamNdjson:', apiError);
@@ -376,7 +411,13 @@ export async function POST(req: NextRequest) {
       let pendingLine: string | null = null;
       let lastHeartbeat = Date.now();
       const HEARTBEAT_INTERVAL = 30000; // 30 seconds
-      const STREAM_TIMEOUT = 4 * 60 * 1000; // 4 minutes total timeout for the entire stream
+      let totalChunks = 0;
+      let totalChars = 0;
+      let jsonObjectsEmitted = 0;
+      let metaObjects = 0;
+      let doneObjects = 0;
+      let parseRetries = 0;
+      let firstTokenAt: number | null = null;
 
       // Extract file paths from images for cleanup (only for signed URLs, not base64 data URLs)
       const filesToCleanup: string[] = [];
@@ -405,18 +446,32 @@ export async function POST(req: NextRequest) {
           try {
             const obj = JSON.parse(trimmed);
             controller.enqueue(encoder.encode(trimmed + '\n'));
+            jsonObjectsEmitted += 1;
             if (obj && obj.type === 'card') {
               if (!anyCardSent) {
                 console.log('First card received from model');
               }
               anyCardSent = true;
+              console.log('[Flashcards] Emitted card', {
+                questionPreview: typeof obj.question === 'string' ? obj.question.slice(0, 80) : undefined,
+                answerPreview: typeof obj.answer === 'string' ? obj.answer.slice(0, 80) : undefined,
+                cardsStreamed: jsonObjectsEmitted,
+              });
             }
             if (obj && obj.type === 'done') {
               console.log('Stream completed successfully');
+              doneObjects += 1;
+            }
+            if (obj && obj.type === 'meta') {
+              metaObjects += 1;
+              console.log('[Flashcards] Meta received', {
+                title: typeof obj.title === 'string' ? obj.title : undefined,
+              });
             }
             lastHeartbeat = Date.now();
             return true;
           } catch {
+            parseRetries += 1;
             return false;
           }
         };
@@ -507,7 +562,9 @@ export async function POST(req: NextRequest) {
                 return;
               }
               if (!emitJson(trimmed)) {
-                console.error('Failed to parse final JSON chunk:', trimmed);
+                console.error('[Flashcards] Failed to parse final JSON chunk', {
+                  snippet: trimmed.slice(0, 200),
+                });
                 throw new Error('Invalid JSON in final chunk');
               }
               pendingLine = null;
@@ -545,20 +602,28 @@ export async function POST(req: NextRequest) {
               const earlyMeta = JSON.stringify({ type: 'meta', title: 'flashcards' }) + '\n';
               controller.enqueue(encoder.encode(earlyMeta));
               console.log('Stream started, sent meta line');
+              metaObjects += 1;
             } catch {}
-            for await (const chunk of stream as any) {
-              const token: string = chunk?.choices?.[0]?.delta?.content || '';
-              if (!token) continue;
-
-              // Check for overall stream timeout
+            for await (const chunk of stream) {
               const now = Date.now();
-              if (now - lastHeartbeat > STREAM_TIMEOUT) {
-                console.warn('Stream timeout detected, ending stream');
-                controller.close();
-                break;
+              const delta = chunk?.choices?.[0]?.delta;
+              const token = extractDeltaText(delta);
+              totalChunks += 1;
+              const deltaReasoning = delta && typeof (delta as { reasoning?: unknown }).reasoning === 'string';
+              if (deltaReasoning) {
+                console.log('[Flashcards] Streaming reasoning token received');
               }
-
+              if (!token) {
+                continue;
+              }
+              if (!firstTokenAt) {
+                firstTokenAt = now;
+                console.log('[Flashcards] First token received', {
+                  delayMs: now - streamStartedAt,
+                });
+              }
               buffer += token;
+              totalChars += token.length;
 
               // Send heartbeat if it's been too long since last activity
               if (now - lastHeartbeat > HEARTBEAT_INTERVAL) {
@@ -572,11 +637,26 @@ export async function POST(req: NextRequest) {
               try {
                 processBuffer();
               } catch (processingError) {
+                console.error('[Flashcards] Error while processing buffer', {
+                  bufferedChars: buffer.length,
+                  pendingLength: pendingLine?.length ?? 0,
+                  parseAttempts: parseRetries,
+                });
                 throw processingError;
               }
             }
             processBuffer(true);
             controller.close();
+            console.log('[Flashcards] Stream finished', {
+              anyCardSent,
+              totalChunks,
+              totalChars,
+              jsonObjectsEmitted,
+              metaObjects,
+              doneObjects,
+              parseRetries,
+              durationMs: Date.now() - streamStartedAt,
+            });
 
             // Cleanup files after successful streaming
             if (filesToCleanup.length > 0 && anyCardSent) {
@@ -592,6 +672,16 @@ export async function POST(req: NextRequest) {
             }
           } catch (err) {
             console.error('Streaming error:', err);
+            console.error('[Flashcards] Streaming summary at error', {
+              anyCardSent,
+              totalChunks,
+              totalChars,
+              jsonObjectsEmitted,
+              metaObjects,
+              doneObjects,
+              parseRetries,
+              firstTokenDelayMs: firstTokenAt ? firstTokenAt - streamStartedAt : null,
+            });
 
             if (!anyCardSent) {
               // If no cards were sent, refund credits and return error response
