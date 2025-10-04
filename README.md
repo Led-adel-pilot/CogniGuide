@@ -2,7 +2,7 @@
 
 ## Overview https://www.cogniguide.app
 CogniGuide is an app that uses an AI to convert uploaded documents and images into interactive mind maps, and generates flashcards with spaced-repetition scheduling from an uploaded study material, to help users learn, review, and retain information more effectively with research backed strategies.
-- Target audiences/regions are the ones with highest paid conversion potential.
+- The target audiences/regions are the ones with highest paid conversion potential.
 
 ### SEO & Discoverability Strategy
 - **Centralized Metadata Source:** `lib/siteMetadata.ts` defines the canonical title, description, keyword cluster, and preview assets so every page can reuse an identical SEO baseline without drift.
