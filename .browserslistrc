@@ -1,9 +1,13 @@
 [production]
 supports es6-module
-last 2 chrome versions
-last 2 edge versions
-last 2 firefox versions
-last 2 safari versions
+last 3 chrome versions
+last 3 edge versions
+last 3 firefox versions
+last 3 safari versions
+not safari < 15.4
+not ios_saf < 15.4
+not opera < 79
+not samsung < 18
 
 [development]
 last 1 chrome version
