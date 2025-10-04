@@ -11,7 +11,8 @@ import { NON_AUTH_FREE_LIMIT, type ModelChoice } from '@/lib/plans';
 import { Sparkles } from 'lucide-react';
 import type AuthModalComponent from '@/components/AuthModal';
 import type MindMapModalComponent from '@/components/MindMapModal';
-import type FlashcardsModalComponent, { Flashcard as FlashcardType } from '@/components/FlashcardsModal';
+import type FlashcardsModalComponent from '@/components/FlashcardsModal';
+import type { Flashcard as FlashcardType } from '@/components/FlashcardsModal';
 
 type AuthModalProps = ComponentProps<typeof AuthModalComponent>;
 type MindMapModalProps = ComponentProps<typeof MindMapModalComponent>;
