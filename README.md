@@ -9,6 +9,7 @@ CogniGuide is an app that uses an AI to convert uploaded documents and images in
 - **Global HTML Metadata:** `app/layout.tsx` composes the metadata object for Next.js, wiring canonical URLs, robots directives, Open Graph/Twitter cards, and optional Google Search Console verification.
 - **Structured Data:** SoftwareApplication JSON-LD is embedded in the root layout to help search engines understand CogniGuide’s product scope, pricing, and supported features.
 - **Homepage Alignment:** The landing page pulls metadata from the shared config to keep titles/descriptions synchronized with the global defaults while focusing copy on high-intent study workflows.
+- **Deferred Hero Generator Hydration:** The homepage generator hydrates lazily after the initial paint or first interaction, shrinking the initial HTML payload so the very first document request responds faster and PageSpeed stops flagging slow server response/compression issues.
 
 ## Key Features
 *   **Versatile Document & Image Support:** Accepts various document formats including PDF, DOCX, PPTX, TXT, Markdown (.md), and images (PNG/JPG/WebP/GIF). Documents are parsed to text; images are passed to the multimodal model for OCR and diagram understanding.
