@@ -120,6 +120,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
 
         const applyRender = (element: HTMLElement | null) => {
           if (!element) return;
+          element.removeAttribute('data-processed');
           element.querySelectorAll('[data-processed="true"]').forEach((node) => {
             node.removeAttribute('data-processed');
           });
