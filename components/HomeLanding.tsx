@@ -97,7 +97,7 @@ export default function HomeLanding() {
 
     let idleHandle: number | null = null;
     let rafHandle: number | null = null;
-    let timeoutHandle: ReturnType<typeof setTimeout> | null = null;
+    let timeoutHandle: ReturnType<typeof window.setTimeout> | null = null;
 
     const cancelIdleCallbacks = () => {
       if (idleHandle !== null && win.cancelIdleCallback) {
@@ -107,7 +107,7 @@ export default function HomeLanding() {
         window.cancelAnimationFrame(rafHandle);
       }
       if (timeoutHandle !== null) {
-        window.clearTimeout(timeoutHandle);
+        clearTimeout(timeoutHandle);
       }
       idleHandle = null;
       rafHandle = null;
@@ -153,7 +153,7 @@ export default function HomeLanding() {
             );
           } else {
             rafHandle = window.requestAnimationFrame(() => {
-              timeoutHandle = window.setTimeout(() => {
+              timeoutHandle = setTimeout(() => {
                 void loadGenerator();
               }, 120);
             });
@@ -174,7 +174,7 @@ export default function HomeLanding() {
       );
     } else {
       rafHandle = window.requestAnimationFrame(() => {
-        timeoutHandle = window.setTimeout(() => {
+        timeoutHandle = setTimeout(() => {
           void loadGenerator();
         }, 120);
       });
