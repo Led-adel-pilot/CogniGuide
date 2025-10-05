@@ -30,16 +30,20 @@ export type Flashcard = { question: string; answer: string };
 type CardWithSchedule = Flashcard & { schedule?: FsrsScheduleState; deckId?: string; cardIndex?: number; deckTitle?: string; };
 
 const markdownComponents: Components = {
-  ul(props) {
+  ul({ node, ...props }) {
+    void node;
     return <ul className="list-disc list-inside pl-4 my-2 space-y-1" {...props} />;
   },
-  ol(props) {
+  ol({ node, ...props }) {
+    void node;
     return <ol className="list-decimal list-inside pl-4 my-2 space-y-1" {...props} />;
   },
-  li(props) {
+  li({ node, ...props }) {
+    void node;
     return <li className="leading-6" {...props} />;
   },
-  p(props) {
+  p({ node, ...props }) {
+    void node;
     return <p className="my-2 leading-6" {...props} />;
   },
 };
@@ -47,7 +51,38 @@ const markdownComponents: Components = {
 type AutoRenderDelimiter = { left: string; right: string; display: boolean };
 type AutoRenderOptions = { delimiters: AutoRenderDelimiter[]; throwOnError: boolean };
 type RenderMathInElement = (element: HTMLElement, options: AutoRenderOptions) => void;
-type KatexLikeWindow = Window & { renderMathInElement?: RenderMathInElement };
+type KatexRenderOptions = { throwOnError?: boolean; displayMode?: boolean };
+type KatexRenderer = { render?: (expression: string, element: HTMLElement, options?: KatexRenderOptions) => void };
+type KatexLikeWindow = Window & { renderMathInElement?: RenderMathInElement; katex?: KatexRenderer };
+
+const MATH_DELIMITER_PATTERN = /\$|\\\(|\\\[|\\begin\{/;
+const UNDELIMITED_MATH_HINT_PATTERN = /(?:[_^]|\\[a-zA-Z]+)/;
+const BLOCK_MATH_TAGS = new Set(['DIV', 'LI', 'P', 'TD', 'TH']);
+
+const tryRenderUndelimitedMath = (element: HTMLElement, katex: KatexRenderer) => {
+  if (!katex?.render) return;
+  if (element.querySelector('.katex')) return;
+  if (element.childNodes.length !== 1) return;
+
+  const [childNode] = Array.from(element.childNodes);
+  if (!childNode || childNode.nodeType !== Node.TEXT_NODE) return;
+
+  const text = childNode.textContent?.trim() ?? '';
+  if (!text) return;
+  if (MATH_DELIMITER_PATTERN.test(text)) return;
+  if (!UNDELIMITED_MATH_HINT_PATTERN.test(text)) return;
+
+  try {
+    katex.render(text, element, {
+      throwOnError: false,
+      displayMode: BLOCK_MATH_TAGS.has(element.tagName),
+    });
+  } catch (error) {
+    if (process.env.NODE_ENV !== 'production') {
+      console.error('Failed to render un-delimited KaTeX content in flashcards', error);
+    }
+  }
+};
 
 type Props = {
   open: boolean;
@@ -125,6 +160,16 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
             node.removeAttribute('data-processed');
           });
           renderMathInElement(element, options);
+          const katex = (window as KatexLikeWindow).katex;
+          if (katex?.render) {
+            const elementsToCheck: HTMLElement[] = [element];
+            element.querySelectorAll<HTMLElement>('p, li, div, span, td, th').forEach((node) => {
+              elementsToCheck.push(node);
+            });
+            elementsToCheck.forEach((node) => {
+              tryRenderUndelimitedMath(node, katex);
+            });
+          }
         };
 
         applyRender(questionRef.current);
