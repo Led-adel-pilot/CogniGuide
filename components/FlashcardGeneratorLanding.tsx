@@ -150,7 +150,7 @@ export default function FlashcardGeneratorLanding() {
           {/* Value Props */}
           <section className="pt-10 md:pt-12 pb-12 bg-muted/30 border-y">
             <div className="container">
-              <div className="text-center mb-8">
+              <div className="text-center mb-10">
                 <h2 className="text-3xl md:text-4xl font-bold font-heading tracking-tight">Why choose an AI flashcard maker?</h2>
                 <p className="text-muted-foreground mt-3 max-w-3xl mx-auto">
                   Stop spending hours making cards by hand. CogniGuide turns your study material into clean, effective flashcards and optimises your review plan automatically with spaced repetition.
@@ -182,26 +182,30 @@ export default function FlashcardGeneratorLanding() {
 
           {/* How it works */}
           <section className="pt-12 md:pt-16 pb-12">
-            <div className="container">
+            <div className="container px-4 sm:px-6 lg:px-8">
               <div className="text-center mb-10">
                 <h2 className="text-3xl md:text-4xl font-bold font-heading tracking-tight">How to create flashcards with AI</h2>
                 <p className="text-muted-foreground mt-3 max-w-3xl mx-auto">Three simple steps from upload to study.</p>
               </div>
-              <ol className="grid grid-cols-1 md:grid-cols-3 gap-6 list-decimal">
+              <ol className="grid grid-cols-1 md:grid-cols-3 gap-6 list-none">
                 {[{
                   title: 'Upload your material',
                   desc: 'Add PDFs, DOCX, PPTX, images, or paste notes. We’ll parse and prepare the content.'
                 }, {
                   title: 'Generate your deck',
-                  desc: 'Our AI creates clean question–answer cards and tags them by topic.'
+                  desc: 'Our AI creates clean question–answer cards. Saving you hours of manual work.'
                 }, {
                   title: 'Study with spaced repetition',
                   desc: 'Review on an FSRS schedule tuned to your exam date for deeper long‑term memory.'
                 }].map((s, i) => (
                   <li key={i} className="bg-background rounded-2xl border p-6 shadow-sm">
-                    <span className="inline-flex h-8 w-8 items-center justify-center rounded-full border mr-2 text-sm font-semibold">{i+1}</span>
-                    <h3 className="inline text-lg font-semibold">{s.title}</h3>
-                    <p className="mt-2 text-muted-foreground">{s.desc}</p>
+                    <div className="flex items-start gap-3">
+                      <span className="flex-shrink-0 flex h-8 w-8 items-center justify-center rounded-full border text-sm font-semibold bg-background text-foreground">{i+1}</span>
+                      <div className="flex-1">
+                        <h3 className="text-lg font-semibold mb-2">{s.title}</h3>
+                        <p className="text-muted-foreground">{s.desc}</p>
+                      </div>
+                    </div>
                   </li>
                 ))}
               </ol>
@@ -212,18 +216,18 @@ export default function FlashcardGeneratorLanding() {
           </section>
 
           {/* SEO text section targeting secondary variants */}
-          <section className="pt-6 md:pt-10 pb-14 bg-muted/20 border-t">
+          <section className="pt-8 md:pt-12 pb-16 bg-muted/20 border-t">
             <div className="container prose prose-slate dark:prose-invert max-w-none">
-              <h2 id="ai-flashcard-generator-keywords" className="text-2xl md:text-3xl font-bold font-heading tracking-tight">AI flashcard generator & maker: who is this for?</h2>
-              <p>
+              <h2 id="ai-flashcard-generator-keywords" className="text-2xl md:text-3xl font-bold font-heading tracking-tight mb-6">AI flashcard generator & maker: who is this for?</h2>
+              <p className="mb-6">
                 CogniGuide is an <strong>AI flashcard generator</strong> built for medical and nursing students, engineers, language learners, and busy professionals preparing for certifications. If you’ve been searching for an <em>AI flashcard maker</em> or a faster alternative to manual card creation, this page is for you.
               </p>
-              <ul>
+              <ul className="mb-6 space-y-2">
                 <li><strong>Students:</strong> Turn dense lecture slides into concise Q–A cards.</li>
                 <li><strong>Professionals:</strong> Prep for AWS, PMP, CFA and more—without hand‑typing every card.</li>
                 <li><strong>Language learners:</strong> Build vocab decks from readings and images with text.</li>
               </ul>
-              <p>
+              <p className="mb-0">
                 Prefer visual first? Try our <Link href="/ai-mind-map-generator" className="underline">AI mind map generator</Link> and then convert nodes into flashcards.
               </p>
             </div>
@@ -232,11 +236,11 @@ export default function FlashcardGeneratorLanding() {
           {/* FAQ */}
           <section className="pt-12 md:pt-16 pb-20">
             <div className="container">
-              <div className="text-center mb-8">
+              <div className="text-center mb-10">
                 <h2 className="text-3xl md:text-4xl font-bold font-heading tracking-tight">AI flashcard generator FAQs</h2>
                 <p className="text-muted-foreground mt-3 max-w-3xl mx-auto">Everything you need to know before your first deck.</p>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
                 {[{
                   q: 'What is an AI flashcard generator?',
                   a: 'It is a tool that creates question–answer study cards from your documents and notes using large language models, then schedules reviews with spaced repetition.'
@@ -256,7 +260,7 @@ export default function FlashcardGeneratorLanding() {
                   </div>
                 ))}
               </div>
-              <div className="text-center mt-10">
+              <div className="text-center">
                 <button onClick={() => setShowAuth(true)} className="inline-flex items-center justify-center rounded-full bg-primary px-8 py-3 text-base font-semibold text-primary-foreground hover:bg-primary/90">Generate my first deck</button>
               </div>
             </div>
