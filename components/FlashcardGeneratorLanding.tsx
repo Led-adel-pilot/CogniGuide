@@ -135,12 +135,14 @@ export default function FlashcardGeneratorLanding() {
                 </div>
 
                 <div className="flex-1 w-full min-h-[28rem]" ref={flashcardsSectionRef}>
-                  <div className="w-full h-[68vh] md:h-[28rem] lg:h-[32rem]">
-                    {shouldRenderFlashcards ? (
-                      <EmbeddedFlashcards />
-                    ) : (
-                      <div className="w-full h-full animate-pulse bg-muted/40" aria-hidden="true" />
-                    )}
+                  <div className="bg-background rounded-[2rem] border shadow-xl shadow-slate-200/50 dark:shadow-slate-700/50 overflow-hidden">
+                    <div className="w-full h-[65vh] md:h-[26rem] lg:h-[30rem]">
+                      {shouldRenderFlashcards ? (
+                        <EmbeddedFlashcards />
+                      ) : (
+                        <div className="w-full h-full animate-pulse bg-muted/40" aria-hidden="true" />
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
