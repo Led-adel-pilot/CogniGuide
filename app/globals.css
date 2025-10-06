@@ -239,6 +239,10 @@
     font-size: 1.2em !important;
 }
 
+.katex-display {
+    text-align: left !important;
+}
+
 @layer utilities {
   .bg-grid-pattern {
     background-image: linear-gradient(to right, var(--color-border) 1px, transparent 1px),
