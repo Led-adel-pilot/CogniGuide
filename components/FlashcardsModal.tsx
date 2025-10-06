@@ -836,7 +836,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
                 <div className="bg-background border border-border rounded-[1.25rem] shadow p-5 sm:p-6 min-h-[180px] sm:min-h-[200px]">
                   <div
                     ref={questionRef}
-                    className="text-foreground text-xl sm:text-2xl font-semibold leading-7 sm:leading-8 break-words"
+                    className="text-foreground text-xl sm:text-2xl font-semibold leading-7 sm:leading-8 break-words flashcard-katex-content"
                   >
                     {questionContent}
                   </div>
@@ -853,7 +853,10 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
                   {showAnswer && (
                     <div className="mt-4 text-foreground">
                       <div className="h-px bg-border mb-4" />
-                      <div ref={answerRef} className="max-h-[45vh] overflow-y-auto text-sm text-foreground">
+                      <div
+                        ref={answerRef}
+                        className="max-h-[45vh] overflow-y-auto text-sm text-foreground flashcard-katex-content"
+                      >
                         <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
                           {answerContent || ''}
                         </ReactMarkdown>
@@ -997,14 +1000,34 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
   );
   };
 
+  const katexAlignmentStyles = `
+    .flashcard-katex-content .katex-display {
+      text-align: left !important;
+      margin-left: 0 !important;
+      margin-right: 0 !important;
+    }
+
+    .flashcard-katex-content .katex-display > .katex {
+      text-align: left !important;
+    }
+  `;
+
   if (isEmbedded) {
-    return <ModalContent />;
+    return (
+      <>
+        <ModalContent />
+        <style jsx global>{katexAlignmentStyles}</style>
+      </>
+    );
   }
 
   return (
-    <div className="fixed inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center z-[100] p-4 font-sans">
-      <AuthModal open={showAuthModal} />
-      <ModalContent />
+    <>
+      <div className="fixed inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center z-[100] p-4 font-sans">
+        <AuthModal open={showAuthModal} />
+        <ModalContent />
+      </div>
+      <style jsx global>{katexAlignmentStyles}</style>
       {showLossAversionPopup && (
         <div className="absolute inset-0 flex items-center justify-center z-[110]">
           {/* Black transparent background */}
@@ -1128,6 +1151,6 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 }
