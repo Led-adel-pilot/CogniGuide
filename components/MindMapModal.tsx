@@ -6,6 +6,7 @@ import { ensureKatexAssets } from '@/lib/katex-loader';
 import { Download, X, FileImage, Loader2, Map as MapIcon } from 'lucide-react';
 import FlashcardIcon from '@/components/FlashcardIcon';
 import FlashcardsModal from '@/components/FlashcardsModal';
+import ShareTriggerButton from '@/components/ShareTriggerButton';
 import { toSvg, toPng } from 'html-to-image';
 import { supabase } from '@/lib/supabaseClient';
 import { loadDeckSchedule, saveDeckSchedule, loadDeckScheduleAsync, saveDeckScheduleAsync } from '@/lib/sr-store';
@@ -16,10 +17,12 @@ import jsPDF from 'jspdf';
 interface MindMapModalProps {
   markdown: string | null;
   onClose: () => void;
+  onShareMindMap?: () => void;
+  onShareFlashcards?: (deckId: string, title: string | null) => void;
 }
 
 
-export default function MindMapModal({ markdown, onClose }: MindMapModalProps) {
+export default function MindMapModal({ markdown, onClose, onShareMindMap, onShareFlashcards }: MindMapModalProps) {
   const viewportRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [isDropdownOpen, setDropdownOpen] = useState(false);
@@ -1016,9 +1019,9 @@ export default function MindMapModal({ markdown, onClose }: MindMapModalProps) {
       <div className="fixed inset-0 backdrop-blur-sm flex items-center justify-center z-[100] p-4 font-sans" style={{ backgroundColor: 'var(--color-background)' }}>
         <div className="relative w-full h-full rounded-[1.5rem] border border-border ring-1 ring-black/5 shadow-2xl shadow-[0_10px_25px_rgba(0,0,0,0.12),0_25px_70px_rgba(0,0,0,0.18)] flex flex-col overflow-hidden" style={{ backgroundColor: 'var(--color-background)' }}>
           <div className="absolute top-2 right-2 z-30 group inline-flex items-center gap-1.5">
-              {viewMode === 'map' ? (
-                <>
-                  <button
+            {viewMode === 'map' ? (
+              <>
+                <button
                     onClick={flashcards ? () => setViewMode('flashcards') : handleGenerateFlashcards}
                     className={`inline-flex items-center gap-1 px-4 py-1.5 rounded-full border border-border text-foreground hover:bg-muted/50 text-sm focus:outline-none min-w-[44px] transition-all duration-300 ease-in-out ${
                       isGeneratingFlashcards
@@ -1102,14 +1105,21 @@ export default function MindMapModal({ markdown, onClose }: MindMapModalProps) {
                 </>
               )}
 
-              <button
-                onClick={handleClose}
-                className="inline-flex items-center justify-center w-8 h-8 text-foreground rounded-full border border-border shadow-sm hover:bg-muted/50 focus:outline-none opacity-100 translate-x-0 transition-all duration-200 ease-in-out"
-                style={{ backgroundColor: 'var(--color-background)' }}
-                aria-label="Close"
-              >
-                <X className="h-4 w-4" />
-              </button>
+            {onShareMindMap && (
+              <ShareTriggerButton
+                onClick={onShareMindMap}
+                className="opacity-100 translate-x-0 transition-all duration-200 ease-in-out"
+              />
+            )}
+
+            <button
+              onClick={handleClose}
+              className="inline-flex items-center justify-center w-8 h-8 text-foreground rounded-full border border-border shadow-sm hover:bg-muted/50 focus:outline-none opacity-100 translate-x-0 transition-all duration-200 ease-in-out"
+              style={{ backgroundColor: 'var(--color-background)' }}
+              aria-label="Close"
+            >
+              <X className="h-4 w-4" />
+            </button>
           </div>
 
           {/* White overlay to fully cover mind map when in flashcards mode */}
@@ -1135,6 +1145,7 @@ export default function MindMapModal({ markdown, onClose }: MindMapModalProps) {
                 onClose={() => setViewMode('map')}
                 deckId={flashcardsSavedId || undefined}
                 initialIndex={flashcardIndex}
+                onShare={flashcardsSavedId && onShareFlashcards ? () => onShareFlashcards(flashcardsSavedId, getTitle(markdown) || null) : undefined}
               />
             )}
           </div>
