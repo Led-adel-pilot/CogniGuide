@@ -13,6 +13,7 @@ import posthog from 'posthog-js';
 import { DatePicker } from '@/components/DatePicker';
 import { formatDate, formatTime } from '@/lib/utils';
 import { ensureKatexAssets } from '@/lib/katex-loader';
+import ShareTriggerButton from '@/components/ShareTriggerButton';
 
 const getDeckIdentifier = (deckId?: string, title?: string | null, cards?: Flashcard[] | null): string | null => {
   if (deckId) return deckId;
@@ -99,9 +100,10 @@ type Props = {
   interleavedDecks?: Array<{ id: string; title: string | null; cards: Flashcard[] }>;
   dueIndices?: number[];
   isEmbedded?: boolean;
+  onShare?: () => void;
 };
 
-export default function FlashcardsModal({ open, title, cards, isGenerating = false, error, onClose, onReviewDueCards, deckId, initialIndex, studyDueOnly = false, studyInterleaved = false, interleavedDecks, dueIndices, isEmbedded = false }: Props) {
+export default function FlashcardsModal({ open, title, cards, isGenerating = false, error, onClose, onReviewDueCards, deckId, initialIndex, studyDueOnly = false, studyInterleaved = false, interleavedDecks, dueIndices, isEmbedded = false, onShare }: Props) {
   const [index, setIndex] = React.useState(0);
   const [showAnswer, setShowAnswer] = React.useState(false);
   const [scheduledCards, setScheduledCards] = React.useState<CardWithSchedule[] | null>(null);
@@ -639,7 +641,10 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
           : 'bg-background border border-border ring-1 ring-black/5 shadow-2xl'
       }`}>
       {!isEmbedded && (
-        <div className="absolute top-2 right-2 z-30">
+        <div className="absolute top-2 right-2 z-30 flex items-center gap-2">
+          {onShare && (
+            <ShareTriggerButton onClick={onShare} showText={true} />
+          )}
           <button
             onClick={handleClose}
             className="inline-flex items-center justify-center w-8 h-8 bg-background text-foreground rounded-full border border-border shadow-sm hover:bg-muted/50 dark:hover:bg-muted/80 focus:outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400/50"

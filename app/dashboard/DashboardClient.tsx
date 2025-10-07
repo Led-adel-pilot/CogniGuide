@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { supabase, MindmapRecord, FlashcardsRecord } from '@/lib/supabaseClient';
@@ -133,6 +134,8 @@ export default function DashboardClient() {
   const [user, setUser] = useState<SessionUser | null>(null);
   const [loading, setLoading] = useState(true);
   const [markdown, setMarkdown] = useState<string | null>(null);
+  const [activeMindMapId, setActiveMindMapId] = useState<string | null>(null);
+  const [activeMindMapTitle, setActiveMindMapTitle] = useState<string | null>(null);
   // Full flashcards list for spaced repetition prefetching
   const [flashcardsHistory, setFlashcardsHistory] = useState<FlashcardsRecord[]>([]);
   // Sidebar combined history (paginated)
@@ -220,6 +223,7 @@ export default function DashboardClient() {
   const [shareError, setShareError] = useState<string | null>(null);
   const [shareLoading, setShareLoading] = useState(false);
   const [shareCopied, setShareCopied] = useState(false);
+  const [isSharePortalReady, setIsSharePortalReady] = useState(false);
   const [isReferralOpen, setIsReferralOpen] = useState(false);
   const [referralLink, setReferralLink] = useState<string | null>(null);
   const [referralCode, setReferralCode] = useState<string | null>(null);
@@ -240,7 +244,34 @@ export default function DashboardClient() {
   const referralCopyTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const referralRewardTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const shareLinksCacheRef = useRef<Map<string, string>>(new Map());
+  const sharePortalContainerRef = useRef<HTMLElement | null>(null);
   const lastUpgradeTriggerRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (typeof document === 'undefined') return;
+
+    let container = document.getElementById('share-portal-root') as HTMLElement | null;
+    let createdContainer = false;
+
+    if (!container) {
+      container = document.createElement('div');
+      container.id = 'share-portal-root';
+      container.style.position = 'relative';
+      container.style.zIndex = '2147483647';
+      document.body.appendChild(container);
+      createdContainer = true;
+    }
+
+    sharePortalContainerRef.current = container;
+    setIsSharePortalReady(true);
+
+    return () => {
+      sharePortalContainerRef.current = null;
+      if (createdContainer && container?.parentNode) {
+        container.parentNode.removeChild(container);
+      }
+    };
+  }, []);
 
   const displayName = getDisplayName(user);
   const displayInitials = getInitials(displayName);
@@ -904,7 +935,14 @@ export default function DashboardClient() {
             .select()
             .single();
 
+          setActiveMindMapId(null);
+          setActiveMindMapTitle(null);
+
           if (!insertError && insertData) {
+            const insertedId = typeof insertData.id === 'string' ? insertData.id : null;
+            const insertedTitle = typeof insertData.title === 'string' ? insertData.title : null;
+            setActiveMindMapId(insertedId);
+            setActiveMindMapTitle(insertedTitle);
             // Open the newly saved mind map for a seamless UX
             setMarkdown(pendingMarkdown);
             // Reload sidebar history to show the new item
@@ -1506,10 +1544,16 @@ export default function DashboardClient() {
         setCombinedHistory((prev) =>
           prev.map((item) => (item.id === itemId ? { ...item, title: newTitle } : item))
         );
+        if (itemType === 'mindmap' && itemId === activeMindMapId) {
+          setActiveMindMapTitle(newTitle);
+        }
         if (itemType === 'flashcards') {
           setFlashcardsHistory((prev) =>
             prev.map((item) => (item.id === itemId ? { ...item, title: newTitle } : item))
           );
+          if (itemId === activeDeckId) {
+            setFlashcardsTitle(newTitle);
+          }
         }
     }
     setRenamingItem(null);
@@ -1627,6 +1671,8 @@ export default function DashboardClient() {
                         item_id: item.id,
                       });
                       if (item.type === 'mindmap') {
+                        setActiveMindMapId(item.id);
+                        setActiveMindMapTitle(item.title ?? null);
                         setMarkdown(item.markdown);
                       } else {
                         setFlashcardsTitle(item.title || 'flashcards');
@@ -1909,14 +1955,25 @@ export default function DashboardClient() {
         </div>
       </main>
 
-      <MindMapModal markdown={markdown} onClose={() => setMarkdown(null)} />
+      <MindMapModal
+        markdown={markdown}
+        onClose={() => {
+          setMarkdown(null);
+          setActiveMindMapId(null);
+          setActiveMindMapTitle(null);
+        }}
+        onShareMindMap={activeMindMapId ? () => setShareItem({ id: activeMindMapId, type: 'mindmap', title: activeMindMapTitle ?? null }) : undefined}
+        onShareFlashcards={(deckId, title) => {
+          setShareItem({ id: deckId, type: 'flashcards', title });
+        }}
+      />
       <FlashcardsModal
         open={flashcardsOpen}
         title={flashcardsTitle}
         cards={flashcardsCards}
         isGenerating={false}
         error={flashcardsError}
-        onClose={() => { setFlashcardsOpen(false); setFlashcardsCards(null); setFlashcardsError(null); setStudyDueOnly(false); setStudyInterleaved(false); setDueIndices(undefined); setInitialDueIndex(undefined); }}
+        onClose={() => { setFlashcardsOpen(false); setFlashcardsCards(null); setFlashcardsError(null); setStudyDueOnly(false); setStudyInterleaved(false); setDueIndices(undefined); setInitialDueIndex(undefined); setActiveDeckId(undefined); }}
         onReviewDueCards={(indices) => {
           if (!indices || indices.length === 0) {
             return;
@@ -1932,6 +1989,7 @@ export default function DashboardClient() {
         interleavedDecks={studyInterleaved ? dueQueue : undefined}
         dueIndices={dueIndices}
         initialIndex={initialDueIndex}
+        onShare={activeDeckId && activeDeckId !== 'interleaved-session' ? () => setShareItem({ id: activeDeckId, type: 'flashcards', title: flashcardsTitle ?? null }) : undefined}
       />
       <PricingModal
         isOpen={isPricingModalOpen}
@@ -2288,60 +2346,74 @@ export default function DashboardClient() {
         </div>
       )}
 
-      {shareItem && (
-        <div className="fixed inset-0 bg-black/40 dark:bg-black/60 z-50 flex items-center justify-center p-4" onClick={() => setShareItem(null)}>
-          <div className="relative bg-background rounded-[1.5rem] p-6 w-full max-w-md border" onClick={(e) => e.stopPropagation()}>
-            <button onClick={() => setShareItem(null)} className="absolute top-4 right-4 inline-flex items-center justify-center w-8 h-8 rounded-full border border-border hover:bg-muted/60">
-              <X className="h-4 w-4" />
-            </button>
-            <div className="mb-1">
-              <h2 className="text-lg font-bold">Share public link to {shareItem.type === 'mindmap' ? 'Mind Map' : 'Flashcards'}</h2>
-            </div>
-            <p className="text-xs text-muted-foreground mb-4">Anyone with the link can view this {shareItem.type === 'mindmap' ? 'mind map' : 'flashcard deck'}.</p>
-            {shareError && (
-              <div className="mb-3 text-sm text-red-600">{shareError}</div>
-            )}
-            <div className="space-y-3">
-              <div className="flex rounded-full border border-border/40 bg-background shadow-inner focus-within:outline-none focus-within:ring-2 focus-within:ring-primary/40">
-                <input
-                  ref={shareLinkInputRef}
-                  value={shareLink ?? ''}
-                  readOnly
-                  placeholder="https://cogniguide.app/share/…"
-                  className="flex-1 bg-transparent px-4 py-3 text-sm font-medium text-foreground border-none outline-none focus:ring-0"
-                />
+      {shareItem && isSharePortalReady && typeof document !== 'undefined' && sharePortalContainerRef.current
+        ? createPortal(
+            <div
+              className="fixed inset-0 bg-black/40 dark:bg-black/60 z-[2147483647] flex items-center justify-center p-4"
+              onClick={() => setShareItem(null)}
+            >
+              <div
+                className="relative bg-background rounded-[1.5rem] p-6 w-full max-w-md border"
+                onClick={(e) => e.stopPropagation()}
+              >
                 <button
-                  type="button"
-                  onClick={handleShareButtonClick}
-                  disabled={shareLoading}
-                  className="inline-flex items-center justify-center gap-2 rounded-full bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground transition hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50 mr-1 my-1"
+                  onClick={() => setShareItem(null)}
+                  className="absolute top-4 right-4 inline-flex items-center justify-center w-8 h-8 rounded-full border border-border hover:bg-muted/60"
                 >
-                  {shareLoading ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  ) : shareLink ? (
-                    shareCopied ? (
-                      <Check className="h-4 w-4" />
-                    ) : (
-                      <Copy className="h-4 w-4" />
-                    )
-                  ) : (
-                    <Link2 className="h-4 w-4" />
-                  )}
-                  <span>
-                    {shareLoading
-                      ? 'Creating…'
-                      : shareLink
-                        ? shareCopied
-                          ? 'Copied!'
-                          : 'Copy link'
-                        : 'Create link'}
-                  </span>
+                  <X className="h-4 w-4" />
                 </button>
+                <div className="mb-1">
+                  <h2 className="text-lg font-bold">
+                    Share public link to {shareItem.type === 'mindmap' ? 'Mind Map' : 'Flashcards'}
+                  </h2>
+                </div>
+                <p className="text-xs text-muted-foreground mb-4">
+                  Anyone with the link can view this {shareItem.type === 'mindmap' ? 'mind map' : 'flashcard deck'}.
+                </p>
+                {shareError && <div className="mb-3 text-sm text-red-600">{shareError}</div>}
+                <div className="space-y-3">
+                  <div className="flex rounded-full border border-border/40 bg-background shadow-inner focus-within:outline-none focus-within:ring-2 focus-within:ring-primary/40">
+                    <input
+                      ref={shareLinkInputRef}
+                      value={shareLink ?? ''}
+                      readOnly
+                      placeholder="https://cogniguide.app/share/…"
+                      className="flex-1 bg-transparent px-4 py-3 text-sm font-medium text-foreground border-none outline-none focus:ring-0"
+                    />
+                    <button
+                      type="button"
+                      onClick={handleShareButtonClick}
+                      disabled={shareLoading}
+                      className="inline-flex items-center justify-center gap-2 rounded-full bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground transition hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50 mr-1 my-1"
+                    >
+                      {shareLoading ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : shareLink ? (
+                        shareCopied ? (
+                          <Check className="h-4 w-4" />
+                        ) : (
+                          <Copy className="h-4 w-4" />
+                        )
+                      ) : (
+                        <Link2 className="h-4 w-4" />
+                      )}
+                      <span>
+                        {shareLoading
+                          ? 'Creating…'
+                          : shareLink
+                            ? shareCopied
+                              ? 'Copied!'
+                              : 'Copy link'
+                            : 'Create link'}
+                      </span>
+                    </button>
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
-        </div>
-      )}
+            </div>,
+            sharePortalContainerRef.current
+          )
+        : null}
     </div>
   );
 }
