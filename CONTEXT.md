@@ -91,3 +91,121 @@
 ## 10. Ancillary Assets
 - Global styles in `app/globals.css` (not detailed here) supply CSS variables for light/dark themes, typography, and Markmap visuals in conjunction with `lib/markmap-renderer`. The repository also includes marketing assets (`CogniGuide_logo.png`, icons) and documentation (APP_DOC.md, event tracking notes) that describe product strategy.
 
+
+## Supabase tables:
+
+```customers
+create table public.customers (
+  id uuid not null default gen_random_uuid (),
+  user_id uuid not null,
+  paddle_customer_id text not null,
+  created_at timestamp with time zone not null default now(),
+  constraint customers_pkey primary key (id),
+  constraint customers_paddle_customer_id_key unique (paddle_customer_id),
+  constraint customers_user_id_fkey foreign KEY (user_id) references auth.users (id) on delete CASCADE
+) TABLESPACE pg_default;
+```
+
+```flashcards
+create table public.flashcards (
+  id uuid not null default gen_random_uuid (),
+  user_id uuid not null,
+  title text null,
+  markdown text not null,
+  cards jsonb not null,
+  created_at timestamp with time zone not null default now(),
+  constraint flashcards_pkey primary key (id),
+  constraint flashcards_user_id_fkey foreign KEY (user_id) references auth.users (id) on delete CASCADE,
+  constraint flashcards_cards_is_array check ((jsonb_typeof(cards) = 'array'::text))
+) TABLESPACE pg_default;
+
+create index IF not exists flashcards_user_id_created_at_idx on public.flashcards using btree (user_id, created_at desc) TABLESPACE pg_default;
+```
+
+
+```flashcards_schedule
+create table public.flashcards_schedule (
+  user_id uuid not null,
+  deck_id uuid not null,
+  schedules jsonb not null default '[]'::jsonb,
+  updated_at timestamp with time zone not null default now(),
+  exam_date timestamp with time zone null,
+  constraint flashcards_schedule_pkey primary key (user_id, deck_id),
+  constraint flashcards_schedule_user_id_fkey foreign KEY (user_id) references auth.users (id) on delete CASCADE
+) TABLESPACE pg_default;
+```
+
+```mindmaps
+create table public.mindmaps (
+  id uuid not null default gen_random_uuid (),
+  user_id uuid not null,
+  title text null,
+  markdown text not null,
+  created_at timestamp with time zone not null default now(),
+  constraint mindmaps_pkey primary key (id),
+  constraint mindmaps_user_id_fkey foreign KEY (user_id) references auth.users (id) on delete CASCADE
+) TABLESPACE pg_default;
+
+create index IF not exists mindmaps_user_id_created_at_idx on public.mindmaps using btree (user_id, created_at desc) TABLESPACE pg_default;
+```
+
+
+```referral_codes
+create table public.referral_codes (
+  user_id uuid not null,
+  code text not null,
+  created_at timestamp with time zone not null default now(),
+  constraint referral_codes_pkey primary key (user_id),
+  constraint referral_codes_code_key unique (code),
+  constraint referral_codes_user_id_fkey foreign KEY (user_id) references auth.users (id) on delete CASCADE
+) TABLESPACE pg_default;
+```
+
+```referral_redemptions
+create table public.referral_redemptions (
+  id uuid not null default gen_random_uuid (),
+  referrer_id uuid not null,
+  referral_code text not null,
+  referred_user_id uuid not null,
+  reward_credits numeric(12, 6) not null default 30,
+  created_at timestamp with time zone not null default now(),
+  constraint referral_redemptions_pkey primary key (id),
+  constraint referral_redemptions_referred_user_id_key unique (referred_user_id),
+  constraint referral_redemptions_referral_code_fkey foreign KEY (referral_code) references referral_codes (code) on delete CASCADE,
+  constraint referral_redemptions_referred_user_id_fkey foreign KEY (referred_user_id) references auth.users (id) on delete CASCADE,
+  constraint referral_redemptions_referrer_id_fkey foreign KEY (referrer_id) references auth.users (id) on delete CASCADE,
+  constraint referral_redemptions_reward_positive check ((reward_credits > (0)::numeric))
+) TABLESPACE pg_default;
+
+create index IF not exists referral_redemptions_referrer_created_idx on public.referral_redemptions using btree (referrer_id, created_at) TABLESPACE pg_default;
+```
+
+```subscriptions
+create table public.subscriptions (
+  id uuid not null default gen_random_uuid (),
+  user_id uuid not null,
+  paddle_subscription_id text not null,
+  status text null,
+  plan text null,
+  created_at timestamp with time zone not null default now(),
+  updated_at timestamp with time zone not null default now(),
+  constraint subscriptions_pkey primary key (id),
+  constraint subscriptions_paddle_subscription_id_key unique (paddle_subscription_id),
+  constraint subscriptions_user_id_fkey foreign KEY (user_id) references auth.users (id) on delete CASCADE
+) TABLESPACE pg_default;
+```
+
+```user_credits
+create table public.user_credits (
+  id uuid not null default gen_random_uuid (),
+  user_id uuid not null,
+  credits numeric(12, 6) not null default 0,
+  last_refilled_at timestamp with time zone null,
+  updated_at timestamp with time zone not null default now(),
+  constraint user_credits_pkey primary key (id),
+  constraint user_credits_user_id_key unique (user_id),
+  constraint user_credits_user_id_fkey foreign KEY (user_id) references auth.users (id) on delete CASCADE,
+  constraint user_credits_nonnegative check ((credits >= (0)::numeric))
+) TABLESPACE pg_default;
+```
+
