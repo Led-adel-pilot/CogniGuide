@@ -660,7 +660,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
           !isEmbedded ? 'pt-14 sm:pt-4 md:pt-0' : 'pt-4 md:pt-0'
         }`}
       >
-        <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 items-center gap-2 sm:gap-3 px-4 sm:px-6 md:px-0">
+        <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 items-center gap-2 sm:gap-3 px-4 sm:px-6 md:px-0 mt-10">
           <div className="text-center md:text-left text-sm font-medium truncate text-foreground">{studyInterleaved ? (current?.deckTitle || title) : (title || 'Flashcards')}</div>
           <div className="text-sm text-muted-foreground text-center hidden md:block">{hasCards ? (finished ? 'Completed' : studyDueOnly ? `${originalDueList.indexOf(index) + 1} / ${originalDueCount} due` : `${index + 1} / ${cards!.length}`) : ''}</div>
           <div className="justify-self-center md:justify-self-end">
@@ -685,8 +685,8 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
           <div className="text-sm text-muted-foreground text-center md:hidden">{hasCards ? (finished ? 'Completed' : studyDueOnly ? `${originalDueList.indexOf(index) + 1} / ${originalDueCount} due` : `${index + 1} / ${cards!.length}`) : ''}</div>
         </div>
         {hasCards ? (
-          <div className="w-full max-w-5xl mx-auto mt-2 px-4 sm:px-6 md:px-0">
-            <div className="h-1.5 rounded-full bg-muted overflow-hidden">
+        <div className="w-full max-w-5xl mx-auto mt-6 px-4 sm:px-6 md:px-0">
+          <div className="h-1.5 rounded-full bg-muted overflow-hidden">
               <div
                 className="h-full bg-gradient-to-r from-indigo-500 via-sky-500 to-emerald-500"
                 style={{
@@ -1032,7 +1032,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
 
   return (
     <>
-      <div className="fixed inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center z-[100] p-4 font-sans">
+      <div className="fixed inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center z-[100] p-3 font-sans">
         <AuthModal open={showAuthModal} />
         <ModalContent />
       </div>
