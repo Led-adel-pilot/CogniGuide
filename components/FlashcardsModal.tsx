@@ -655,8 +655,12 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
         </div>
       )}
 
-      <div className="w-full h-full grid grid-rows-[auto,1fr,auto] bg-background">
-        <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 items-center gap-2 sm:gap-3">
+      <div
+        className={`w-full h-full grid grid-rows-[auto,1fr,auto] bg-background ${
+          !isEmbedded ? 'pt-14 sm:pt-4 md:pt-0' : 'pt-4 md:pt-0'
+        }`}
+      >
+        <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 items-center gap-2 sm:gap-3 px-4 sm:px-6 md:px-0">
           <div className="text-center md:text-left text-sm font-medium truncate text-foreground">{studyInterleaved ? (current?.deckTitle || title) : (title || 'Flashcards')}</div>
           <div className="text-sm text-muted-foreground text-center hidden md:block">{hasCards ? (finished ? 'Completed' : studyDueOnly ? `${originalDueList.indexOf(index) + 1} / ${originalDueCount} due` : `${index + 1} / ${cards!.length}`) : ''}</div>
           <div className="justify-self-center md:justify-self-end">
@@ -681,7 +685,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
           <div className="text-sm text-muted-foreground text-center md:hidden">{hasCards ? (finished ? 'Completed' : studyDueOnly ? `${originalDueList.indexOf(index) + 1} / ${originalDueCount} due` : `${index + 1} / ${cards!.length}`) : ''}</div>
         </div>
         {hasCards ? (
-          <div className="w-full max-w-5xl mx-auto mt-2">
+          <div className="w-full max-w-5xl mx-auto mt-2 px-4 sm:px-6 md:px-0">
             <div className="h-1.5 rounded-full bg-muted overflow-hidden">
               <div
                 className="h-full bg-gradient-to-r from-indigo-500 via-sky-500 to-emerald-500"
@@ -701,7 +705,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
           </div>
         ) : null}
 
-        <div className="w-full max-w-3xl mx-auto overflow-auto py-2 mt-0 sm:mt-0 sm:flex sm:items-center sm:justify-center">
+        <div className="w-full max-w-3xl mx-auto overflow-auto py-2 mt-0 sm:mt-0 sm:flex sm:items-center sm:justify-center px-4 sm:px-6 md:px-0">
           {error ? (
             <div className="w-full text-sm text-red-600">{error}</div>
           ) : !hasCards ? (
