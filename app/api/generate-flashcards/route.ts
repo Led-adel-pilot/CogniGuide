@@ -230,6 +230,22 @@ function extractJsonObject(text: string): any {
   throw new Error('Model response was not valid JSON');
 }
 
+function stripMarkdownCodeFences(text: string): string {
+  let result = text.trim();
+  const leadingFence = /^```(?:json)?\s*/i;
+  const trailingFence = /\s*```$/;
+
+  while (leadingFence.test(result)) {
+    result = result.replace(leadingFence, '').trimStart();
+  }
+
+  while (trailingFence.test(result)) {
+    result = result.replace(trailingFence, '').trimEnd();
+  }
+
+  return result;
+}
+
 const MODEL_NAMES: Record<ModelChoice, string> = {
   fast: process.env.GEMINI_MODEL_FAST || 'gemini-2.5-flash-lite',
   smart: process.env.GEMINI_MODEL_SMART || 'gemini-2.5-flash',
@@ -443,34 +459,53 @@ export async function POST(req: NextRequest) {
         const emitJson = (raw: string): boolean => {
           const trimmed = raw.trim();
           if (!trimmed) return false;
+
+          const sanitized = stripMarkdownCodeFences(trimmed);
+
+          const parseCandidate = (candidate: string): any | null => {
+            try {
+              return JSON.parse(candidate);
+            } catch {
+              return null;
+            }
+          };
+
+          const parsed = parseCandidate(trimmed) ?? (sanitized !== trimmed ? parseCandidate(sanitized) : null);
+
+          if (!parsed) {
+            parseRetries += 1;
+            return false;
+          }
+
           try {
-            const obj = JSON.parse(trimmed);
-            controller.enqueue(encoder.encode(trimmed + '\n'));
+            const line = JSON.stringify(parsed);
+            controller.enqueue(encoder.encode(line + '\n'));
             jsonObjectsEmitted += 1;
-            if (obj && obj.type === 'card') {
+            if (parsed && parsed.type === 'card') {
               if (!anyCardSent) {
                 console.log('First card received from model');
               }
               anyCardSent = true;
               console.log('[Flashcards] Emitted card', {
-                questionPreview: typeof obj.question === 'string' ? obj.question.slice(0, 80) : undefined,
-                answerPreview: typeof obj.answer === 'string' ? obj.answer.slice(0, 80) : undefined,
+                questionPreview: typeof parsed.question === 'string' ? parsed.question.slice(0, 80) : undefined,
+                answerPreview: typeof parsed.answer === 'string' ? parsed.answer.slice(0, 80) : undefined,
                 cardsStreamed: jsonObjectsEmitted,
               });
             }
-            if (obj && obj.type === 'done') {
+            if (parsed && parsed.type === 'done') {
               console.log('Stream completed successfully');
               doneObjects += 1;
             }
-            if (obj && obj.type === 'meta') {
+            if (parsed && parsed.type === 'meta') {
               metaObjects += 1;
               console.log('[Flashcards] Meta received', {
-                title: typeof obj.title === 'string' ? obj.title : undefined,
+                title: typeof parsed.title === 'string' ? parsed.title : undefined,
               });
             }
             lastHeartbeat = Date.now();
             return true;
-          } catch {
+          } catch (enqueueError) {
+            console.error('[Flashcards] Failed to enqueue JSON line', enqueueError);
             parseRetries += 1;
             return false;
           }
@@ -561,9 +596,49 @@ export async function POST(req: NextRequest) {
                 buffer = '';
                 return;
               }
-              if (!emitJson(trimmed)) {
+
+              const withoutFences = stripMarkdownCodeFences(trimmed);
+
+              if (withoutFences !== trimmed) {
+                let remaining = withoutFences;
+                let emittedAny = false;
+
+                while (true) {
+                  const balanced = extractBalancedJson(remaining);
+                  if (!balanced) {
+                    break;
+                  }
+
+                  remaining = balanced.rest;
+                  emittedAny = true;
+
+                  if (!emitJson(balanced.json)) {
+                    pendingLine = balanced.json + remaining;
+                    buffer = '';
+                    return;
+                  }
+
+                  if (!remaining.trim()) {
+                    pendingLine = null;
+                    buffer = '';
+                    return;
+                  }
+                }
+
+                if (emittedAny) {
+                  pendingLine = remaining.trim() ? remaining : null;
+                  buffer = '';
+                  if (!pendingLine) {
+                    return;
+                  }
+                }
+              }
+
+              const finalCandidate = withoutFences !== trimmed ? withoutFences : trimmed;
+
+              if (!emitJson(finalCandidate)) {
                 console.error('[Flashcards] Failed to parse final JSON chunk', {
-                  snippet: trimmed.slice(0, 200),
+                  snippet: finalCandidate.slice(0, 200),
                 });
                 throw new Error('Invalid JSON in final chunk');
               }
