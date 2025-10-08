@@ -1028,7 +1028,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
 
   return (
     <>
-      <div className="fixed inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center z-[100] p-2 font-sans">
+      <div className="fixed inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center z-[100] p-4 font-sans">
         <AuthModal open={showAuthModal} />
         <ModalContent />
       </div>
