@@ -655,7 +655,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
         </div>
       )}
 
-      <div className="w-full h-full grid grid-rows-[auto,1fr,auto] bg-background p-4 sm:p-6">
+      <div className="w-full h-full grid grid-rows-[auto,1fr,auto] bg-background">
         <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 items-center gap-2 sm:gap-3">
           <div className="text-center md:text-left text-sm font-medium truncate text-foreground">{studyInterleaved ? (current?.deckTitle || title) : (title || 'Flashcards')}</div>
           <div className="text-sm text-muted-foreground text-center hidden md:block">{hasCards ? (finished ? 'Completed' : studyDueOnly ? `${originalDueList.indexOf(index) + 1} / ${originalDueCount} due` : `${index + 1} / ${cards!.length}`) : ''}</div>
@@ -1028,7 +1028,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
 
   return (
     <>
-      <div className="fixed inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center z-[100] p-4 font-sans">
+      <div className="fixed inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center z-[100] p-2 font-sans">
         <AuthModal open={showAuthModal} />
         <ModalContent />
       </div>

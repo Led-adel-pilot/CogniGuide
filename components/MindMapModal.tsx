@@ -1016,7 +1016,7 @@ export default function MindMapModal({ markdown, onClose, onShareMindMap, onShar
   return (
     <>
       <AuthModal open={showAuthModal} />
-      <div className="fixed inset-0 backdrop-blur-sm flex items-center justify-center z-[100] p-4 font-sans" style={{ backgroundColor: 'var(--color-background)' }}>
+      <div className="fixed inset-0 backdrop-blur-sm flex items-center justify-center z-[100] p-1 font-sans" style={{ backgroundColor: 'var(--color-background)' }}>
         <div className="relative w-full h-full rounded-[1.5rem] border border-border ring-1 ring-black/5 shadow-2xl shadow-[0_10px_25px_rgba(0,0,0,0.12),0_25px_70px_rgba(0,0,0,0.18)] flex flex-col overflow-hidden" style={{ backgroundColor: 'var(--color-background)' }}>
           <div className="absolute top-2 right-2 z-30 group inline-flex items-center gap-1.5">
             {viewMode === 'map' ? (
@@ -1220,6 +1220,3 @@ export default function MindMapModal({ markdown, onClose, onShareMindMap, onShar
     </>
   );
 }
-
-
-
