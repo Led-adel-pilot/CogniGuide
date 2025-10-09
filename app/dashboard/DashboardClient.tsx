@@ -2372,19 +2372,19 @@ export default function DashboardClient() {
                 </p>
                 {shareError && <div className="mb-3 text-sm text-red-600">{shareError}</div>}
                 <div className="space-y-3">
-                  <div className="flex rounded-full border border-border/40 bg-background shadow-inner focus-within:outline-none focus-within:ring-2 focus-within:ring-primary/40">
+                  <div className="flex flex-col gap-2 rounded-3xl border border-border/40 bg-background p-2 shadow-inner focus-within:outline-none focus-within:ring-2 focus-within:ring-primary/40 sm:flex-row sm:items-center sm:gap-0 sm:rounded-full sm:p-0">
                     <input
                       ref={shareLinkInputRef}
                       value={shareLink ?? ''}
                       readOnly
                       placeholder="https://cogniguide.app/share/…"
-                      className="flex-1 bg-transparent px-4 py-3 text-sm font-medium text-foreground border-none outline-none focus:ring-0"
+                      className="flex-1 border-none bg-transparent px-4 py-3 text-sm font-medium text-foreground outline-none focus:ring-0"
                     />
                     <button
                       type="button"
                       onClick={handleShareButtonClick}
                       disabled={shareLoading}
-                      className="inline-flex items-center justify-center gap-2 rounded-full bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground transition hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50 mr-1 my-1"
+                      className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground transition hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto sm:rounded-full sm:mr-1 sm:my-1"
                     >
                       {shareLoading ? (
                         <Loader2 className="h-4 w-4 animate-spin" />
