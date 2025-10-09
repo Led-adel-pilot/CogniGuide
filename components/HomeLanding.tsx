@@ -139,12 +139,6 @@ export default function HomeLanding() {
             </div>
             <div className="flex items-center gap-4">
               <Link
-                href="/ai-mind-map-generator"
-                className="hidden text-sm text-primary font-medium hover:underline sm:inline"
-              >
-                Mind Map Generator
-              </Link>
-              <Link
                 href="/pricing"
                 className="hidden text-sm text-muted-foreground hover:underline sm:inline"
               >
@@ -244,16 +238,16 @@ export default function HomeLanding() {
             <p className="text-xs text-muted-foreground/70">&copy; {new Date().getFullYear()} CogniGuide. All rights reserved.</p>
             <nav className="flex flex-wrap justify-center gap-2 sm:gap-4">
               <Link
-                href="/ai-mind-map-generator"
-                className="text-xs text-muted-foreground/70 hover:underline md:hidden"
-              >
-                Mind Map Generator
-              </Link>
-              <Link
                 href="/pricing"
                 className="text-xs text-muted-foreground/70 hover:underline md:hidden"
               >
                 Pricing
+              </Link>
+              <Link
+                href="/ai-mind-map-generator"
+                className="text-xs text-muted-foreground/70 hover:underline"
+              >
+                Mind Map Generator
               </Link>
               <Link href="/contact" className="text-xs text-muted-foreground/70 hover:underline">Contact</Link>
               <Link href="/legal/refund-policy" className="text-xs text-muted-foreground/70 hover:underline">Refund Policy</Link>

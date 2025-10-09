@@ -97,7 +97,6 @@ export default function FlashcardGeneratorLanding() {
               <h1 className="text-2xl font-bold font-heading tracking-tighter">CogniGuide</h1>
             </div>
             <div className="flex items-center gap-4">
-              <Link href="/ai-mind-map-generator" className="hidden text-sm text-primary font-medium hover:underline sm:inline">Mind Map Generator</Link>
               <Link href="/pricing" className="hidden text-sm text-muted-foreground hover:underline sm:inline">Pricing</Link>
               {isAuthed ? (
                 <button onClick={() => router.push('/dashboard')} className="px-4 py-2 text-sm rounded-full border hover:bg-muted/50">Dashboard</button>
@@ -273,8 +272,19 @@ export default function FlashcardGeneratorLanding() {
           <div className="container py-3 flex flex-col md:flex-row justify-between items-center gap-2">
             <p className="text-xs text-muted-foreground/70">&copy; {new Date().getFullYear()} CogniGuide. All rights reserved.</p>
             <nav className="flex flex-wrap justify-center gap-2 sm:gap-4">
-              <Link href="/ai-mind-map-generator" className="text-xs text-muted-foreground/70 hover:underline md:hidden">Mind Map Generator</Link>
               <Link href="/pricing" className="text-xs text-muted-foreground/70 hover:underline md:hidden">Pricing</Link>
+              <Link
+                href="/ai-mind-map-generator"
+                className="text-xs text-muted-foreground/70 hover:underline"
+              >
+                Mind Map Generator
+              </Link>
+              <Link
+                href="/ai-flashcard-generator"
+                className="text-xs text-muted-foreground/70 hover:underline"
+              >
+                Flashcard Generator
+              </Link>
               <Link href="/contact" className="text-xs text-muted-foreground/70 hover:underline">Contact</Link>
               <Link href="/legal/refund-policy" className="text-xs text-muted-foreground/70 hover:underline">Refund Policy</Link>
               <Link href="/legal/cancellation-policy" className="text-xs text-muted-foreground/70 hover:underline">Cancellation Policy</Link>
