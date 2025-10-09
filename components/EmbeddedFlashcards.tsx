@@ -47,12 +47,16 @@ const sampleFlashcards: Flashcard[] = [
 
 export default function EmbeddedFlashcards() {
     return (
-        <FlashcardsModal
-            open={true}
-            isEmbedded={true}
-            cards={sampleFlashcards}
-            title="Sample Flashcards"
-            onClose={() => {}}
-        />
+        <div className="flex h-full w-full items-center justify-center px-4 py-4 sm:px-6 sm:py-6 md:px-8">
+            <div className="h-full w-full max-w-4xl">
+                <FlashcardsModal
+                    open={true}
+                    isEmbedded={true}
+                    cards={sampleFlashcards}
+                    title="Sample Flashcards"
+                    onClose={() => {}}
+                />
+            </div>
+        </div>
     );
 }
