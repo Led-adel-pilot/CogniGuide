@@ -656,7 +656,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
       )}
 
       <div
-        className={`w-full h-full grid grid-rows-[auto,1fr,auto] bg-background gap-y-6 pb-8 sm:pb-10 ${
+        className={`w-full h-full grid grid-rows-[auto,1fr,auto] bg-background gap-y-3 pb-4 sm:pb-6 ${
           !isEmbedded ? 'pt-14 sm:pt-4 md:pt-0' : 'pt-4 md:pt-0'
         }`}
       >
