@@ -1505,17 +1505,33 @@ export default function DashboardClient() {
       if (cancellingDeckId) return;
       setSpacedError(null);
       setCancellingDeckId(deckId);
-      const dueMap = (typeof window !== 'undefined' && (window as any).__cogniguide_due_map) || {};
-      const existingDueCount = Array.isArray(dueMap[deckId]) ? (dueMap[deckId] as number[]).length : 0;
-      const deckEntry = dueQueue.find((deck) => deck.id === deckId);
+
+      const dueMapFromWindow =
+        (typeof window !== 'undefined' && (window as any).__cogniguide_due_map
+          ? ((window as any).__cogniguide_due_map as Record<string, number[]>)
+          : {}) ?? {};
+      const existingDueCount = Array.isArray(dueMapFromWindow[deckId]) ? dueMapFromWindow[deckId].length : 0;
+      const deckIndex = dueQueue.findIndex((deck) => deck.id === deckId);
+      const deckEntry = deckIndex >= 0 ? dueQueue[deckIndex] : undefined;
+
+      setDueQueue((prev) => prev.filter((deck) => deck.id !== deckId));
+      if (typeof window !== 'undefined') {
+        const updatedMap = { ...dueMapFromWindow, [deckId]: [] };
+        (window as any).__cogniguide_due_map = updatedMap;
+      }
+      setTotalDueCount((prev) => Math.max(0, prev - existingDueCount));
+
       try {
-        const stored = (await loadDeckScheduleAsync(deckId)) ?? loadDeckSchedule(deckId);
+        let stored = loadDeckSchedule(deckId);
+        if (!stored) {
+          stored = await loadDeckScheduleAsync(deckId);
+        }
         const now = new Date();
         const desiredLength = deckEntry?.cards.length ?? stored?.schedules?.length ?? 0;
-        let schedules = Array.isArray(stored?.schedules) ? [...stored!.schedules] : [];
+        const schedules = Array.isArray(stored?.schedules) ? [...(stored?.schedules ?? [])] : [];
         if (desiredLength > 0) {
           if (schedules.length > desiredLength) {
-            schedules = schedules.slice(0, desiredLength);
+            schedules.length = desiredLength;
           } else if (schedules.length < desiredLength) {
             const deficit = desiredLength - schedules.length;
             for (let i = 0; i < deficit; i++) {
@@ -1529,12 +1545,6 @@ export default function DashboardClient() {
           isCancelled: true,
         };
         await saveDeckScheduleAsync(deckId, updated);
-        setDueQueue((prev) => prev.filter((deck) => deck.id !== deckId));
-        if (typeof window !== 'undefined') {
-          const updatedMap = { ...dueMap, [deckId]: [] };
-          (window as any).__cogniguide_due_map = updatedMap;
-        }
-        setTotalDueCount((prev) => Math.max(0, prev - existingDueCount));
         posthog.capture('spaced_repetition_deck_cancelled', {
           deck_id: deckId,
           due_card_count: existingDueCount,
@@ -1542,6 +1552,24 @@ export default function DashboardClient() {
       } catch (error) {
         console.error(`Failed to cancel spaced repetition deck ${deckId}:`, error);
         setSpacedError('Failed to cancel deck. Please try again.');
+        setDueQueue((prev) => {
+          if (!deckEntry) return prev;
+          const next = [...prev];
+          const insertAt = deckIndex >= 0 && deckIndex <= next.length ? deckIndex : next.length;
+          next.splice(insertAt, 0, deckEntry);
+          return next;
+        });
+        if (typeof window !== 'undefined') {
+          const currentMap = ((window as any).__cogniguide_due_map as Record<string, number[]>) || {};
+          const revertedMap = { ...currentMap };
+          if (Array.isArray(dueMapFromWindow[deckId])) {
+            revertedMap[deckId] = dueMapFromWindow[deckId];
+          } else {
+            delete revertedMap[deckId];
+          }
+          (window as any).__cogniguide_due_map = revertedMap;
+        }
+        setTotalDueCount((prev) => prev + existingDueCount);
       } finally {
         setCancellingDeckId(null);
       }
