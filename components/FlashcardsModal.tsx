@@ -647,11 +647,13 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
       : 'You have finished this deck for now. For best results with spaced repetition, be sure to come back for future review sessions.';
 
     return (
-      <div className={`relative w-full h-full rounded-[1.5rem] flex flex-col overflow-hidden ${
-        isEmbedded
-          ? '!bg-transparent !border-0 !ring-0 !shadow-none'
-          : 'bg-background border border-border ring-1 ring-black/5 shadow-2xl'
-      }`}>
+      <div
+        className={`relative w-full rounded-[1.5rem] flex flex-col ${
+          isEmbedded
+            ? 'h-auto overflow-visible !bg-transparent !border-0 !ring-0 !shadow-none'
+            : 'h-full overflow-hidden bg-background border border-border ring-1 ring-black/5 shadow-2xl'
+        }`}
+      >
       {!isEmbedded && (
         <div className="absolute top-2 right-2 z-30 flex items-center gap-2">
           {onShare && (
@@ -668,8 +670,8 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
       )}
 
       <div
-        className={`w-full h-full grid grid-rows-[auto,1fr,auto] bg-background gap-y-3 pb-4 sm:pb-6 ${
-          !isEmbedded ? 'pt-14 sm:pt-4 md:pt-0' : 'pt-4 md:pt-0'
+        className={`w-full grid grid-rows-[auto,1fr,auto] bg-background gap-y-3 pb-4 sm:pb-6 ${
+          !isEmbedded ? 'h-full pt-14 sm:pt-4 md:pt-0' : 'h-auto pt-4 md:pt-0'
         }`}
       >
         <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 items-center gap-2 sm:gap-3 px-4 sm:px-6 md:px-0 mt-10">
@@ -876,7 +878,11 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
                       <div className="h-px bg-border mb-4" />
                       <div
                         ref={answerRef}
-                        className="max-h-[45vh] overflow-y-auto text-sm text-foreground flashcard-katex-content"
+                        className={`${
+                          isEmbedded
+                            ? 'max-h-none overflow-visible'
+                            : 'max-h-[45vh] overflow-y-auto'
+                        } text-sm text-foreground flashcard-katex-content`}
                       >
                         <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
                           {answerContent || ''}
