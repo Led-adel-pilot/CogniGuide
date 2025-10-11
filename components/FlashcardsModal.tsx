@@ -656,7 +656,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
       )}
 
       <div
-        className={`w-full h-full grid grid-rows-[auto,1fr,auto] bg-background ${
+        className={`w-full h-full grid grid-rows-[auto,1fr,auto] bg-background gap-y-6 pb-8 sm:pb-10 ${
           !isEmbedded ? 'pt-14 sm:pt-4 md:pt-0' : 'pt-4 md:pt-0'
         }`}
       >
@@ -705,7 +705,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
           </div>
         ) : null}
 
-        <div className="w-full max-w-3xl mx-auto overflow-auto py-2 mt-0 sm:mt-0 sm:flex sm:items-center sm:justify-center px-4 sm:px-6 md:px-0">
+        <div className="w-full max-w-3xl mx-auto overflow-auto py-2 mt-0 sm:mt-0 sm:flex sm:items-start sm:justify-center px-4 sm:px-6 md:px-0">
           {error ? (
             <div className="w-full text-sm text-red-600">{error}</div>
           ) : !hasCards ? (
