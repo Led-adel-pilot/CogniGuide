@@ -284,7 +284,15 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
     // Try load stored schedule by deckId; fallback to fresh
     if (deckId && !studyInterleaved) {
       (async () => {
-        const stored = (await loadDeckScheduleAsync(deckId)) || loadDeckSchedule(deckId);
+        let stored = (await loadDeckScheduleAsync(deckId)) || loadDeckSchedule(deckId);
+        if (stored?.isCancelled) {
+          const revived = { ...stored, isCancelled: false };
+          saveDeckSchedule(deckId, revived);
+          saveDeckScheduleAsync(deckId, revived).catch((err) => {
+            console.error(`Failed to clear cancellation flag for deck ${deckId}:`, err);
+          });
+          stored = revived;
+        }
         if (stored && Array.isArray(stored.schedules) && stored.schedules.length === cards.length) {
           let finalExamDate = stored.examDate || '';
           if (finalExamDate) {
@@ -338,7 +346,11 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
 
   React.useEffect(() => {
     if (!deckId || !scheduledCards || studyInterleaved) return;
-    const payload = { examDate: deckExamDate || undefined, schedules: scheduledCards.map((c) => c.schedule) };
+    const payload = {
+      examDate: deckExamDate || undefined,
+      schedules: scheduledCards.map((c) => c.schedule),
+      isCancelled: false,
+    };
     // Save remotely when possible; always mirror to local as fallback
     saveDeckSchedule(deckId, payload);
     saveDeckScheduleAsync(deckId, payload).catch((err) => {
@@ -441,7 +453,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
       (async () => {
         const stored = await loadDeckScheduleAsync(sourceDeckId);
         const schedules = stored?.schedules || interleavedDecks?.find(d => d.id === sourceDeckId)?.cards.map(() => createInitialSchedule()) || [];
-        const newPayload = { examDate: dateTime?.toISOString(), schedules };
+        const newPayload = { examDate: dateTime?.toISOString(), schedules, isCancelled: false };
         await saveDeckScheduleAsync(sourceDeckId, newPayload);
         saveDeckSchedule(sourceDeckId, newPayload); // Also update local cache
       })();
@@ -500,7 +512,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
       // Update in local storage
       const newSchedules = [...(stored?.schedules || sourceDeck.cards.map(() => createInitialSchedule()))];
       newSchedules[sourceCardIndex] = newSchedule;
-      const payload = { examDate: newSchedule.examDate, schedules: newSchedules };
+      const payload = { examDate: newSchedule.examDate, schedules: newSchedules, isCancelled: false };
       saveDeckSchedule(sourceDeckId, payload);
       saveDeckScheduleAsync(sourceDeckId, payload);
 

@@ -3,6 +3,7 @@ import { supabase } from '@/lib/supabaseClient';
 export type StoredDeckSchedule = {
   examDate?: string; // ISO datetime string (YYYY-MM-DDTHH:mm:ss.sssZ) or date-only string (YYYY-MM-DD)
   schedules: Array<any>; // FsrsScheduleState[], but stored as plain JSON
+  isCancelled?: boolean;
 };
 
 const PREFIX = 'cogniguide_sr_schedule_';
@@ -78,7 +79,11 @@ export function getMemoryDeckSchedule(deckId: string): StoredDeckSchedule | null
 }
 
 export function setMemoryDeckSchedule(deckId: string, data: StoredDeckSchedule): void {
-  memorySchedules[deckId] = { examDate: data.examDate, schedules: data.schedules };
+  memorySchedules[deckId] = {
+    examDate: data.examDate,
+    schedules: data.schedules,
+    isCancelled: data.isCancelled ?? false,
+  };
 }
 
 export function loadDeckSchedule(deckId: string): StoredDeckSchedule | null {
@@ -93,7 +98,8 @@ export function loadDeckSchedule(deckId: string): StoredDeckSchedule | null {
     if (!parsed || typeof parsed !== 'object') return null;
     const schedules = Array.isArray(parsed.schedules) ? parsed.schedules : [];
     const examDate = typeof parsed.examDate === 'string' ? parsed.examDate : undefined;
-    const result = { schedules, examDate } as StoredDeckSchedule;
+    const isCancelled = typeof parsed.isCancelled === 'boolean' ? parsed.isCancelled : false;
+    const result = { schedules, examDate, isCancelled } as StoredDeckSchedule;
     setMemoryDeckSchedule(deckId, result);
     return result;
   } catch {
@@ -108,8 +114,9 @@ export function saveDeckSchedule(deckId: string, data: StoredDeckSchedule): void
     localStorage.setItem(PREFIX + deckId, JSON.stringify({
       examDate: normalizedExamDate,
       schedules: data.schedules,
+      isCancelled: data.isCancelled ?? false,
     }));
-    setMemoryDeckSchedule(deckId, { ...data, examDate: normalizedExamDate });
+    setMemoryDeckSchedule(deckId, { ...data, examDate: normalizedExamDate, isCancelled: data.isCancelled ?? false });
   } catch {}
 }
 
@@ -124,7 +131,7 @@ export async function loadDeckScheduleAsync(deckId: string): Promise<StoredDeckS
     if (!userId) return loadDeckSchedule(deckId);
     const { data, error } = await supabase
       .from('flashcards_schedule')
-      .select('schedules, exam_date')
+      .select('schedules, exam_date, is_cancelled')
       .eq('user_id', userId)
       .eq('deck_id', deckId)
       .single();
@@ -132,6 +139,7 @@ export async function loadDeckScheduleAsync(deckId: string): Promise<StoredDeckS
     const result = {
       schedules: Array.isArray((data as any).schedules) ? (data as any).schedules : [],
       examDate: (data as any).exam_date || undefined,
+      isCancelled: typeof (data as any).is_cancelled === 'boolean' ? (data as any).is_cancelled : false,
     } as StoredDeckSchedule;
     setMemoryDeckSchedule(deckId, result);
     // Mirror to localStorage for offline/fallback
@@ -146,26 +154,31 @@ export async function saveDeckScheduleAsync(deckId: string, data: StoredDeckSche
   try {
     const { data: userData } = await supabase.auth.getUser();
     const userId = userData.user?.id;
+    const normalizedExamDate = normalizeExamDate(data.examDate);
+    const normalizedData: StoredDeckSchedule = {
+      examDate: normalizedExamDate,
+      schedules: data.schedules || [],
+      isCancelled: data.isCancelled ?? false,
+    };
     if (!userId) {
-      saveDeckSchedule(deckId, data);
+      saveDeckSchedule(deckId, normalizedData);
       return;
     }
-    const normalizedExamDate = normalizeExamDate(data.examDate);
     const payload = {
       user_id: userId,
       deck_id: deckId,
       exam_date: normalizedExamDate || null,
       schedules: data.schedules || [],
+      is_cancelled: data.isCancelled ?? false,
       updated_at: new Date().toISOString(),
     };
     // upsert on (user_id, deck_id)
     await supabase.from('flashcards_schedule').upsert(payload, { onConflict: 'user_id,deck_id' });
     // Keep caches in sync
-    const normalizedData = { ...data, examDate: normalizedExamDate };
     setMemoryDeckSchedule(deckId, normalizedData);
     saveDeckSchedule(deckId, normalizedData);
   } catch {
-    saveDeckSchedule(deckId, data);
+    saveDeckSchedule(deckId, { ...data, examDate: normalizeExamDate(data.examDate), isCancelled: data.isCancelled ?? false });
   }
 }
 
@@ -177,7 +190,7 @@ export async function loadAllDeckSchedulesAsync(): Promise<Record<string, Stored
     if (!userId) return {};
     const { data, error } = await supabase
       .from('flashcards_schedule')
-      .select('deck_id, schedules, exam_date')
+      .select('deck_id, schedules, exam_date, is_cancelled')
       .eq('user_id', userId);
     if (error || !data) return {};
     const map: Record<string, StoredDeckSchedule> = {};
@@ -185,7 +198,8 @@ export async function loadAllDeckSchedulesAsync(): Promise<Record<string, Stored
       const deckId = String(row.deck_id);
       const schedules = Array.isArray(row.schedules) ? row.schedules : [];
       const examDate = row.exam_date || undefined;
-      const val = { schedules, examDate } as StoredDeckSchedule;
+      const isCancelled = typeof row.is_cancelled === 'boolean' ? row.is_cancelled : false;
+      const val = { schedules, examDate, isCancelled } as StoredDeckSchedule;
       map[deckId] = val;
       setMemoryDeckSchedule(deckId, val);
       saveDeckSchedule(deckId, val);
@@ -212,6 +226,7 @@ export async function upsertDeckSchedulesBulkAsync(items: Array<{ deckId: string
         deck_id: deckId,
         exam_date: normalizedExamDate || null,
         schedules: data.schedules || [],
+        is_cancelled: data.isCancelled ?? false,
         updated_at: new Date().toISOString(),
       };
     });
@@ -220,7 +235,11 @@ export async function upsertDeckSchedulesBulkAsync(items: Array<{ deckId: string
       rows.forEach((r, index) => {
         const originalData = items[index].data;
         const normalizedExamDate = normalizeExamDate(originalData.examDate);
-        const val = { examDate: normalizedExamDate || undefined, schedules: r.schedules } as StoredDeckSchedule;
+        const val = {
+          examDate: normalizedExamDate || undefined,
+          schedules: r.schedules,
+          isCancelled: originalData.isCancelled ?? false,
+        } as StoredDeckSchedule;
         setMemoryDeckSchedule(r.deck_id as string, val);
         saveDeckSchedule(r.deck_id as string, val);
       });

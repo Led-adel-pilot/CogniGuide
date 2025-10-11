@@ -213,6 +213,7 @@ export default function DashboardClient() {
   const [legalOpen, setLegalOpen] = useState(false);
   const prefetchingRef = useRef(false);
   const [totalDueCount, setTotalDueCount] = useState<number>(0);
+  const [cancellingDeckId, setCancellingDeckId] = useState<string | null>(null);
   const listRef = useRef<HTMLDivElement | null>(null);
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
@@ -1375,8 +1376,10 @@ export default function DashboardClient() {
       for (const f of fcRecords) {
         const deckId = f.id;
         const cardsArr = (f.cards as any[]) as FlashcardType[];
-        let schedules = (allSchedules[deckId]?.schedules || loadDeckSchedule(deckId)?.schedules || []) as any[];
-        const examDate = allSchedules[deckId]?.examDate || loadDeckSchedule(deckId)?.examDate || undefined;
+        const stored = allSchedules[deckId] ?? loadDeckSchedule(deckId);
+        const examDate = stored?.examDate;
+        const isCancelled = stored?.isCancelled ?? false;
+        let schedules = (stored?.schedules || []) as any[];
         if (schedules.length !== cardsArr.length) {
           if (schedules.length > cardsArr.length) {
             schedules = schedules.slice(0, cardsArr.length);
@@ -1384,14 +1387,14 @@ export default function DashboardClient() {
             const deficit = cardsArr.length - schedules.length;
             for (let i = 0; i < deficit; i++) schedules.push(createInitialSchedule(now));
           }
-          const normalized: StoredDeckSchedule = { examDate, schedules };
+          const normalized: StoredDeckSchedule = { examDate, schedules, isCancelled };
           bulkToSave.push({ deckId, data: normalized });
           // update local cache immediately
           saveDeckSchedule(deckId, normalized);
         }
         // Check if exam date has passed - if so, don't include cards in due queue
         let dIdx: number[] = [];
-        if (examDate) {
+        if (!isCancelled && examDate) {
           let examDateTime: Date;
           if (examDate.includes('T')) {
             // Full datetime string
@@ -1410,7 +1413,7 @@ export default function DashboardClient() {
               .map((x: any) => x.i);
           }
           // If more than 24 hours have passed since the exam, dIdx remains empty
-        } else {
+        } else if (!isCancelled) {
           // No exam date set - include due cards normally
           dIdx = schedules
             .map((s: any, i: number) => ({ i, due: s?.due ? new Date(s.due) : now }))
@@ -1419,7 +1422,7 @@ export default function DashboardClient() {
         }
         dueMap[deckId] = dIdx;
         totalDue += dIdx.length;
-        if (dIdx.length > 0) {
+        if (!isCancelled && dIdx.length > 0) {
           queue.push({ id: deckId, title: f.title, cards: cardsArr });
         }
       }
@@ -1445,7 +1448,8 @@ export default function DashboardClient() {
     for (const f of fcRecords) {
       const deckId = f.id;
       const cardsArr = (f.cards as any[]) as FlashcardType[];
-      let stored = loadDeckSchedule(deckId);
+      const stored = loadDeckSchedule(deckId);
+      const isCancelled = stored?.isCancelled ?? false;
       let schedules = (stored?.schedules || []) as any[];
       if (schedules.length !== cardsArr.length) {
         if (schedules.length > cardsArr.length) schedules = schedules.slice(0, cardsArr.length);
@@ -1453,13 +1457,13 @@ export default function DashboardClient() {
           const deficit = cardsArr.length - schedules.length;
           for (let i = 0; i < deficit; i++) schedules.push(createInitialSchedule(now));
         }
-        const normalized: StoredDeckSchedule = { examDate: stored?.examDate, schedules };
+        const normalized: StoredDeckSchedule = { examDate: stored?.examDate, schedules, isCancelled };
         saveDeckSchedule(deckId, normalized);
       }
       // Check if exam date has passed - if so, don't include cards in due queue
       let dIdx: number[] = [];
       const examDate = stored?.examDate;
-      if (examDate) {
+      if (!isCancelled && examDate) {
         let examDateTime: Date;
         if (examDate.includes('T')) {
           // Full datetime string
@@ -1478,7 +1482,7 @@ export default function DashboardClient() {
             .map((x: any) => x.i);
         }
         // If more than 24 hours have passed since the exam, dIdx remains empty
-      } else {
+      } else if (!isCancelled) {
         // No exam date set - include due cards normally
         dIdx = schedules
           .map((s: any, i: number) => ({ i, due: s?.due ? new Date(s.due) : now }))
@@ -1487,7 +1491,7 @@ export default function DashboardClient() {
       }
       dueMap[deckId] = dIdx;
       totalDue += dIdx.length;
-      if (dIdx.length > 0) queue.push({ id: deckId, title: f.title, cards: cardsArr });
+      if (!isCancelled && dIdx.length > 0) queue.push({ id: deckId, title: f.title, cards: cardsArr });
     }
     setDueQueue(queue);
     if (typeof window !== 'undefined') {
@@ -1495,6 +1499,55 @@ export default function DashboardClient() {
     }
     setTotalDueCount(totalDue);
   };
+
+  const handleCancelDueDeck = useCallback(
+    async (deckId: string) => {
+      if (cancellingDeckId) return;
+      setSpacedError(null);
+      setCancellingDeckId(deckId);
+      const dueMap = (typeof window !== 'undefined' && (window as any).__cogniguide_due_map) || {};
+      const existingDueCount = Array.isArray(dueMap[deckId]) ? (dueMap[deckId] as number[]).length : 0;
+      const deckEntry = dueQueue.find((deck) => deck.id === deckId);
+      try {
+        const stored = (await loadDeckScheduleAsync(deckId)) ?? loadDeckSchedule(deckId);
+        const now = new Date();
+        const desiredLength = deckEntry?.cards.length ?? stored?.schedules?.length ?? 0;
+        let schedules = Array.isArray(stored?.schedules) ? [...stored!.schedules] : [];
+        if (desiredLength > 0) {
+          if (schedules.length > desiredLength) {
+            schedules = schedules.slice(0, desiredLength);
+          } else if (schedules.length < desiredLength) {
+            const deficit = desiredLength - schedules.length;
+            for (let i = 0; i < deficit; i++) {
+              schedules.push(createInitialSchedule(now));
+            }
+          }
+        }
+        const updated: StoredDeckSchedule = {
+          examDate: stored?.examDate,
+          schedules,
+          isCancelled: true,
+        };
+        await saveDeckScheduleAsync(deckId, updated);
+        setDueQueue((prev) => prev.filter((deck) => deck.id !== deckId));
+        if (typeof window !== 'undefined') {
+          const updatedMap = { ...dueMap, [deckId]: [] };
+          (window as any).__cogniguide_due_map = updatedMap;
+        }
+        setTotalDueCount((prev) => Math.max(0, prev - existingDueCount));
+        posthog.capture('spaced_repetition_deck_cancelled', {
+          deck_id: deckId,
+          due_card_count: existingDueCount,
+        });
+      } catch (error) {
+        console.error(`Failed to cancel spaced repetition deck ${deckId}:`, error);
+        setSpacedError('Failed to cancel deck. Please try again.');
+      } finally {
+        setCancellingDeckId(null);
+      }
+    },
+    [cancellingDeckId, dueQueue],
+  );
 
   const handleDeleteItem = async (itemType: 'mindmap' | 'flashcards', itemId: string) => {
     if (!user) return;
@@ -2110,33 +2163,50 @@ export default function DashboardClient() {
               {!spacedLoading && dueQueue.map((f) => {
                 const dueMap = (typeof window !== 'undefined' && (window as any).__cogniguide_due_map) || {};
                 const count = Array.isArray(dueMap[f.id]) ? (dueMap[f.id] as number[]).length : 0;
+                const isCancelling = cancellingDeckId === f.id;
                 return (
-                  <div key={f.id} className="p-2 rounded-xl border flex items-center justify-between">
-                    <div>
+                  <div key={f.id} className="p-2 rounded-xl border flex items-center justify-between gap-3">
+                    <div className="min-w-0">
                       <div className="font-medium line-clamp-1">{f.title || 'flashcards'}</div>
                       <div className="text-xs text-muted-foreground">{count} due now</div>
                     </div>
-                    <button
-                      className="px-3 py-1.5 text-xs rounded-full border bg-primary text-primary-foreground hover:bg-primary/90"
-                      onClick={() => {
-                        const list = (dueMap[f.id] as number[]) || [];
-                        posthog.capture('spaced_repetition_deck_studied', {
-                          deck_id: f.id,
-                          due_card_count: list.length,
-                        });
-                        const arr = f.cards as any; (arr as any).__deckId = f.id; setActiveDeckId(f.id);
-                        setStudyDueOnly(true);
-                        setDueIndices(list);
-                        setInitialDueIndex(list[0] ?? 0);
-                        setSpacedOpen(false);
-                        setFlashcardsTitle(f.title || 'flashcards');
-                        setFlashcardsCards(arr);
-                        setFlashcardsError(null);
-                        setFlashcardsOpen(true);
-                      }}
-                    >
-                      Study
-                    </button>
+                    <div className="flex items-center gap-2">
+                      <button
+                        className={cn(
+                          'px-3 py-1.5 text-xs rounded-full border hover:bg-muted/50 transition-colors',
+                          isCancelling ? 'opacity-60 cursor-not-allowed' : '',
+                        )}
+                        onClick={() => handleCancelDueDeck(f.id)}
+                        disabled={isCancelling}
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        className={cn(
+                          'px-3 py-1.5 text-xs rounded-full border bg-primary text-primary-foreground hover:bg-primary/90',
+                          isCancelling ? 'opacity-60 cursor-not-allowed' : '',
+                        )}
+                        onClick={() => {
+                          const list = (dueMap[f.id] as number[]) || [];
+                          posthog.capture('spaced_repetition_deck_studied', {
+                            deck_id: f.id,
+                            due_card_count: list.length,
+                          });
+                          const arr = f.cards as any; (arr as any).__deckId = f.id; setActiveDeckId(f.id);
+                          setStudyDueOnly(true);
+                          setDueIndices(list);
+                          setInitialDueIndex(list[0] ?? 0);
+                          setSpacedOpen(false);
+                          setFlashcardsTitle(f.title || 'flashcards');
+                          setFlashcardsCards(arr);
+                          setFlashcardsError(null);
+                          setFlashcardsOpen(true);
+                        }}
+                        disabled={isCancelling}
+                      >
+                        Study
+                      </button>
+                    </div>
                   </div>
                 );
               })}

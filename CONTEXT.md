@@ -130,6 +130,7 @@ create table public.flashcards_schedule (
   schedules jsonb not null default '[]'::jsonb,
   updated_at timestamp with time zone not null default now(),
   exam_date timestamp with time zone null,
+  is_cancelled boolean not null default false,
   constraint flashcards_schedule_pkey primary key (user_id, deck_id),
   constraint flashcards_schedule_user_id_fkey foreign KEY (user_id) references auth.users (id) on delete CASCADE
 ) TABLESPACE pg_default;
