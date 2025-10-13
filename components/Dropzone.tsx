@@ -84,6 +84,10 @@ export default function Dropzone({ onFileChange, disabled = false, onOpen, isPre
   const [files, setFiles] = useState<File[]>([]);
   const inputRef = useRef<HTMLInputElement | null>(null);
   const [inputKey, setInputKey] = useState(0);
+  const [uploadingFileKeys, setUploadingFileKeys] = useState<Set<string>>(new Set());
+  const [currentBatchProgress, setCurrentBatchProgress] = useState(0);
+
+  const getFileKey = useCallback((file: File) => `${file.name}|${file.size}|${file.lastModified ?? ''}`, []);
 
   useEffect(() => {
     onFileChange(files);
@@ -134,18 +138,35 @@ export default function Dropzone({ onFileChange, disabled = false, onOpen, isPre
         total_size_mb: newFiles.reduce((sum, f) => sum + f.size, 0) / (1024 * 1024),
       });
       setFiles(prevFiles => {
+        const prevKeys = new Set(prevFiles.map(getFileKey));
         const merged = [...prevFiles, ...newFiles];
         const seen = new Set<string>();
+        const next: File[] = [];
+        const newKeys: string[] = [];
         // Deduplicate by name|size|lastModified
-        return merged.filter(f => {
-          const key = `${f.name}|${f.size}|${f.lastModified ?? ''}`;
-          if (seen.has(key)) return false;
+        merged.forEach((f) => {
+          const key = getFileKey(f);
+          if (seen.has(key)) return;
           seen.add(key);
-          return true;
+          next.push(f);
+          if (!prevKeys.has(key)) {
+            newKeys.push(key);
+          }
         });
+        if (newKeys.length > 0) {
+          if (!isPreParsing) {
+            setCurrentBatchProgress(0);
+          }
+          setUploadingFileKeys(prev => {
+            const nextSet = new Set(prev);
+            newKeys.forEach(k => nextSet.add(k));
+            return nextSet;
+          });
+        }
+        return next;
       });
     }
-  }, [disabled]);
+  }, [disabled, getFileKey, isPreParsing]);
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFiles = e.target.files;
@@ -158,14 +179,31 @@ export default function Dropzone({ onFileChange, disabled = false, onOpen, isPre
         total_size_mb: newFiles.reduce((sum, f) => sum + f.size, 0) / (1024 * 1024),
       });
       setFiles(prevFiles => {
+        const prevKeys = new Set(prevFiles.map(getFileKey));
         const merged = [...prevFiles, ...newFiles];
         const seen = new Set<string>();
-        return merged.filter(f => {
-          const key = `${f.name}|${f.size}|${f.lastModified ?? ''}`;
-          if (seen.has(key)) return false;
+        const next: File[] = [];
+        const newKeys: string[] = [];
+        merged.forEach((f) => {
+          const key = getFileKey(f);
+          if (seen.has(key)) return;
           seen.add(key);
-          return true;
+          next.push(f);
+          if (!prevKeys.has(key)) {
+            newKeys.push(key);
+          }
         });
+        if (newKeys.length > 0) {
+          if (!isPreParsing) {
+            setCurrentBatchProgress(0);
+          }
+          setUploadingFileKeys(prev => {
+            const nextSet = new Set(prev);
+            newKeys.forEach(k => nextSet.add(k));
+            return nextSet;
+          });
+        }
+        return next;
       });
     }
     // Reset the input value so selecting the same files again still fires onChange
@@ -183,9 +221,31 @@ export default function Dropzone({ onFileChange, disabled = false, onOpen, isPre
       file_size_mb: fileToRemove.size / (1024 * 1024),
     });
     setFiles(prevFiles => prevFiles.filter(file => file !== fileToRemove));
+    setUploadingFileKeys(prev => {
+      const next = new Set(prev);
+      next.delete(getFileKey(fileToRemove));
+      return next;
+    });
     // Notify parent component to reset upload states
     onFileRemove?.(fileToRemove);
   }
+
+  useEffect(() => {
+    if (isPreParsing) {
+      if (typeof uploadProgress === 'number') {
+        setCurrentBatchProgress(uploadProgress);
+      } else {
+        setCurrentBatchProgress(prev => (prev < 100 ? prev : 100));
+      }
+    }
+  }, [isPreParsing, uploadProgress]);
+
+  useEffect(() => {
+    if (!isPreParsing) {
+      setUploadingFileKeys(new Set());
+      setCurrentBatchProgress(0);
+    }
+  }, [isPreParsing]);
 
   const dropzoneClassName = useMemo(() => {
     const heightClass = size === 'compact' ? 'h-36 sm:h-40' : 'h-48';
@@ -220,34 +280,42 @@ export default function Dropzone({ onFileChange, disabled = false, onOpen, isPre
         {files.length > 0 ? (
           <div className="flex flex-col items-center justify-center w-full h-full p-4">
             <div className="flex flex-row items-center justify-center gap-4 w-full overflow-x-auto max-h-full">
-              {files.map((file, index) => (
-                <div key={index} className="relative flex-shrink-0 flex flex-col items-center justify-center text-center p-4 border bg-background rounded-[1.25rem]">
-                  <File className="w-10 h-10 text-primary mb-2" />
-                  <p className="text-sm font-semibold text-foreground truncate w-28" title={file.name}>{file.name}</p>
-                  <p className="text-xs text-muted-foreground">({(file.size < 102400 ? (file.size / 1024).toFixed(2) + ' KB' : (file.size / (1024 * 1024)).toFixed(2) + ' MB')})</p>
-                  <button
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      handleRemoveFile(file);
-                    }}
-                    className="absolute top-2 right-2 w-6 h-6 inline-flex items-center justify-center bg-white text-black border border-gray-300 rounded-full hover:bg-gray-50 focus:outline-none z-30"
-                    aria-label="Remove file"
-                  >
-                    <X className="w-4 h-4" />
-                  </button>
-                  {isPreParsing && (
-                    <div className="absolute inset-4 bg-background/90 backdrop-blur-md rounded-[1rem] flex flex-col items-center justify-center z-10 transition-all duration-200">
-                      <RadialProgressBar progress={uploadProgress ?? 0} />
-                      <p className="text-xs text-muted-foreground font-medium mt-3 text-center">
-                        {uploadProgress !== undefined && uploadProgress < 100 ? 'Uploading...' : 'Processing...'}
-                      </p>
-                    </div>
-                  )}
-                </div>
-              ))}
+              {files.map((file, index) => {
+                const fileKey = getFileKey(file);
+                const showProgress = isPreParsing && uploadingFileKeys.has(fileKey);
+                const displayProgress = Math.min(Math.max(currentBatchProgress, 0), 100);
+                const isUploading = typeof uploadProgress === 'number'
+                  ? uploadProgress < 100
+                  : displayProgress < 100;
+                return (
+                  <div key={index} className="relative flex-shrink-0 flex flex-col items-center justify-center text-center p-4 border bg-background rounded-[1.25rem]">
+                    <File className="w-10 h-10 text-primary mb-2" />
+                    <p className="text-sm font-semibold text-foreground truncate w-28" title={file.name}>{file.name}</p>
+                    <p className="text-xs text-muted-foreground">({(file.size < 102400 ? (file.size / 1024).toFixed(2) + ' KB' : (file.size / (1024 * 1024)).toFixed(2) + ' MB')})</p>
+                    <button
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        handleRemoveFile(file);
+                      }}
+                      className="absolute top-2 right-2 w-6 h-6 inline-flex items-center justify-center bg-white text-black border border-gray-300 rounded-full hover:bg-gray-50 focus:outline-none z-30"
+                      aria-label="Remove file"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                    {showProgress && (
+                      <div className="absolute inset-4 bg-background/90 backdrop-blur-md rounded-[1rem] flex flex-col items-center justify-center z-10 transition-all duration-200">
+                        <RadialProgressBar progress={displayProgress} />
+                        <p className="text-xs text-muted-foreground font-medium mt-3 text-center">
+                          {isUploading ? 'Uploading...' : 'Processing...'}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
             </div>
-             <p className="mt-4 text-xs text-muted-foreground">You can add more files.</p>
+            <p className="mt-4 text-xs text-muted-foreground">You can add more files.</p>
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center text-center">
