@@ -37,15 +37,26 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
   const [isPreParsing, setIsPreParsing] = useState(false);
   const lastPreparseKeyRef = useRef<string | null>(null);
   // Cache for file set processing results (keyed by file set combination)
-  const processedFileSetsCache = useRef<Map<string, { result: any; processedAt: number }>>(new Map());
+  const processedFileSetsCache = useRef<Map<string, { result: Record<string, unknown>; processedAt: number }>>(new Map());
 
   // Debug logging in development
   const isDevelopment = process.env.NODE_ENV === 'development';
-  const debugLog = useCallback((message: string, ...args: any[]) => {
+  const debugLog = useCallback((message: string, ...args: unknown[]) => {
     if (isDevelopment) {
       console.log(`[FileCache] ${message}`, ...args);
     }
   }, [isDevelopment]);
+  const extractErrorMessage = (value: unknown): string | undefined => {
+    if (!value) return undefined;
+    if (value instanceof Error) return value.message;
+    if (typeof value === 'string') return value;
+    if (typeof value === 'object') {
+      const record = value as Record<string, unknown>;
+      if (typeof record.message === 'string') return record.message;
+      if (typeof record.error === 'string') return record.error;
+    }
+    return undefined;
+  };
   const [prompt, setPrompt] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -70,6 +81,76 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
     allowedNameSizes: { name: string; size: number }[] | undefined;
     error: string | null;
   } | null>(null);
+
+  type UploadedFileMetadata = {
+    bucket: string;
+    path: string;
+    storageKey: string;
+    name: string;
+    size: number;
+    lastModified: number;
+    uploadedAt: number;
+  };
+
+  type FileIdentity = {
+    signature: string;
+    storageKey: string;
+    safeName: string;
+    lastModified: number;
+    contentHash: string;
+  };
+
+  const uploadedFilesRef = useRef<Map<string, UploadedFileMetadata>>(new Map());
+  const fileIdentityCacheRef = useRef<WeakMap<File, FileIdentity>>(new WeakMap());
+
+  const sanitizeForKey = useCallback((value: string) => value.replace(/[^A-Za-z0-9._-]/g, '_'), []);
+
+  const getFileIdentity = useCallback(async (file: File): Promise<FileIdentity> => {
+    const cached = fileIdentityCacheRef.current.get(file);
+    if (cached) {
+      return cached;
+    }
+
+    const safeName = sanitizeForKey(file.name || 'file').slice(0, 50) || 'file';
+    const lastModified = typeof file.lastModified === 'number' ? file.lastModified : 0;
+
+    let contentHash = '0';
+    let hashInt = 0;
+    try {
+      const slice = file.slice(0, 512);
+      const arrayBuffer = await slice.arrayBuffer();
+      const bytes = new Uint8Array(arrayBuffer);
+      let hash = 0;
+      for (let i = 0; i < bytes.length; i++) {
+        hash = (hash << 5) - hash + bytes[i];
+        hash |= 0; // Force 32-bit
+      }
+      hashInt = hash;
+      contentHash = Math.abs(hash).toString(36).slice(0, 8);
+    } catch (error) {
+      debugLog('Failed to compute file hash, falling back to size-based key', error);
+    }
+
+    const signature = `${file.name}::${file.size}::${lastModified}::${contentHash}`;
+    let storageKey = `${safeName}_${file.size}_${lastModified}_${contentHash}`;
+    storageKey = sanitizeForKey(storageKey);
+    if (!storageKey) {
+      const fallbackHash = Math.abs(hashInt || 0).toString(36);
+      storageKey = `${fallbackHash || 'file'}_${file.size}_${lastModified}`;
+    }
+    if (storageKey.length > 120) {
+      storageKey = storageKey.slice(storageKey.length - 120);
+    }
+
+    const identity: FileIdentity = { signature, storageKey, safeName, lastModified, contentHash };
+    fileIdentityCacheRef.current.set(file, identity);
+    return identity;
+  }, [debugLog, sanitizeForKey]);
+
+  const getFileSignature = useCallback(async (file: File) => {
+    const identity = await getFileIdentity(file);
+    return identity.signature;
+  }, [getFileIdentity]);
 
   const getNameSizeSignature = useCallback(
     (items: { name: string; size: number }[]) =>
@@ -114,46 +195,6 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
     }
   }, [isAuthed, authChecked, files.length, prompt, isLoading, isPreParsing]);
 
-  // Helper function to generate a unique key for a file
-  const getFileKey = useCallback(async (file: File): Promise<string> => {
-    // Create a truly unique key that avoids special characters and conflicts
-    // Include timestamp for uniqueness and content hash for deduplication
-    const timestamp = Date.now().toString(36);
-    const random = Math.random().toString(36).slice(2, 8);
-
-    try {
-      // Create content hash from first 512 bytes for deduplication
-      const slice = file.slice(0, 512);
-      const arrayBuffer = await slice.arrayBuffer();
-      const bytes = new Uint8Array(arrayBuffer);
-      let hash = 0;
-      for (let i = 0; i < bytes.length; i++) {
-        hash = ((hash << 5) - hash) + bytes[i];
-        hash = hash & hash; // Convert to 32-bit integer
-      }
-      const contentHash = Math.abs(hash).toString(36).slice(0, 8);
-
-      // Safe filename: sanitize name and limit length
-      const safeName = file.name.replace(/[^A-Za-z0-9._-]/g, '_').slice(0, 50);
-
-      // Final key: timestamp_random_contentHash_safeName
-      const finalKey = `${timestamp}_${random}_${contentHash}_${safeName}`;
-      debugLog(`Generated file key: ${finalKey}`);
-      return finalKey;
-    } catch (error) {
-      // Fallback: use timestamp + random + size + safe name
-      const safeName = file.name.replace(/[^A-Za-z0-9._-]/g, '_').slice(0, 50);
-      const fallbackKey = `${timestamp}_${random}_${file.size}_${safeName}`;
-      debugLog(`Hashing failed, using fallback key: ${fallbackKey}`);
-      return fallbackKey;
-    }
-  }, [debugLog]);
-
-  // Helper function to generate a file set key from multiple files
-  const getFileSetKey = useCallback(async (files: File[]): Promise<string> => {
-    const fileKeys = await Promise.all(files.map(f => getFileKey(f)));
-    return fileKeys.sort().join('__'); // Use double underscore instead of pipes
-  }, [getFileKey]);
 
   async function uploadOneWithRetry(file: File, initialSignedUrl: string, getFreshSigned: () => Promise<string>, onProgress?: (progress: number) => void) {
     const tryUpload = async (signedUrl: string) => {
@@ -207,82 +248,169 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
   }
 
   // Upload files to Supabase Storage using signed URLs, then call JSON preparse
-  const uploadAndPreparse = useCallback(async (selectedFiles: File[], onProgress?: (progress?: number) => void) => {
+  const uploadAndPreparse = useCallback(async (
+    selectedFiles: File[],
+    onProgress?: (progress?: number) => void
+  ): Promise<Record<string, unknown>> => {
     const { data: sessionData } = await supabase.auth.getSession();
     const accessToken = sessionData?.session?.access_token;
     const headers: Record<string, string> = { 'Content-Type': 'application/json' };
     if (accessToken) {
       headers['Authorization'] = `Bearer ${accessToken}`;
     }
-    // Generate stable keys per file for deterministic storage paths
-    const keys = await Promise.all(selectedFiles.map(f => getFileKey(f)));
-    const filesMeta = selectedFiles.map((f, i) => ({ name: f.name, size: f.size, type: f.type || 'application/octet-stream', key: keys[i] }));
-    const anonId = (typeof window !== 'undefined') ? (localStorage.getItem('cogniguide_anon_id') || (() => { const v = crypto.randomUUID(); localStorage.setItem('cogniguide_anon_id', v); return v; })()) : undefined;
-    // Request signed upload URLs
-    const signedRes = await fetch('/api/storage/get-signed-uploads', {
-      method: 'POST',
-      headers: headers,
-      body: JSON.stringify({ files: filesMeta, anonId }),
-    });
-    if (!signedRes.ok) {
-      const j = await signedRes.json().catch(() => null);
-      throw new Error(j?.error || 'Failed to prepare uploads');
-    }
-    const { bucket, items } = await signedRes.json();
-    // Upload each file via signed URL with progress tracking
-    for (let i = 0; i < selectedFiles.length; i++) {
-      const file = selectedFiles[i];
-      const first = items[i];
 
-      await uploadOneWithRetry(
-        file,
-        first.signedUrl,
-        async () => {
-          // re-fetch a fresh signed URL for this single file
-          const meta = { name: file.name, size: file.size, type: file.type || 'application/octet-stream', key: keys[i] };
-          const { data: sessionData } = await supabase.auth.getSession();
-          const accessToken = sessionData?.session?.access_token;
-          const headers: Record<string, string> = { 'Content-Type': 'application/json' };
-          if (accessToken) {
-            headers['Authorization'] = `Bearer ${accessToken}`;
-          }
-          const signedRes2 = await fetch('/api/storage/get-signed-uploads', {
-            method: 'POST',
-            headers: headers,
-            body: JSON.stringify({ files: [meta], anonId }),
-          });
-          if (!signedRes2.ok) throw new Error('Failed to refresh upload URL');
-          const fresh = await signedRes2.json();
-          return fresh.items[0].signedUrl;
-        },
-        onProgress ? (fileProgress) => {
-          // Calculate overall progress across all files
-          const baseProgress = (i / selectedFiles.length) * 100;
-          const currentFileProgress = fileProgress / selectedFiles.length;
-          const overallProgress = Math.round(baseProgress + currentFileProgress);
-          onProgress(overallProgress);
-        } : undefined
-      );
-    }
+    const fileIdentities = await Promise.all(selectedFiles.map(async (file) => ({ file, ...(await getFileIdentity(file)) })));
+    const filesNeedingUpload = fileIdentities.filter(({ signature }) => !uploadedFilesRef.current.has(signature));
+    const totalFiles = fileIdentities.length;
+    let completed = totalFiles - filesNeedingUpload.length;
 
-    // Signal that upload is complete and server processing is starting
     if (onProgress) {
-      onProgress(100); // Set progress to 100% to indicate upload complete, processing started
+      const initial = totalFiles === 0 ? 100 : Math.round((completed / totalFiles) * 100);
+      onProgress(initial);
     }
-    
-    // Build objects descriptor and call JSON preparse
-    const objects = items.map((it: any, i: number) => ({ path: it.path, name: selectedFiles[i].name, type: selectedFiles[i].type || 'application/octet-stream', size: selectedFiles[i].size }));
+
+    const anonId = (typeof window !== 'undefined')
+      ? (localStorage.getItem('cogniguide_anon_id') || (() => {
+        const v = crypto.randomUUID();
+        localStorage.setItem('cogniguide_anon_id', v);
+        return v;
+      })())
+      : undefined;
+
+    let effectiveBucket: string | null = null;
+
+    if (filesNeedingUpload.length > 0) {
+      const filesMeta = filesNeedingUpload.map(({ file, storageKey }) => ({
+        name: file.name,
+        size: file.size,
+        type: file.type || 'application/octet-stream',
+        key: storageKey,
+      }));
+
+      const signedRes = await fetch('/api/storage/get-signed-uploads', {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ files: filesMeta, anonId }),
+      });
+      if (!signedRes.ok) {
+        const j = await signedRes.json().catch(() => null);
+        throw new Error(j?.error || 'Failed to prepare uploads');
+      }
+      const signedPayload = await signedRes.json() as {
+        bucket: string;
+        items: Array<{ path: string; signedUrl: string }>;
+      };
+      const { bucket, items } = signedPayload;
+      effectiveBucket = bucket;
+
+      for (let i = 0; i < filesNeedingUpload.length; i++) {
+        const { file, signature, storageKey } = filesNeedingUpload[i];
+        const item = items?.[i];
+        if (!item?.signedUrl) {
+          throw new Error('Failed to retrieve upload URL.');
+        }
+
+        let currentPath = item.path;
+
+        await uploadOneWithRetry(
+          file,
+          item.signedUrl,
+          async () => {
+            const refreshRes = await fetch('/api/storage/get-signed-uploads', {
+              method: 'POST',
+              headers,
+              body: JSON.stringify({
+                files: [{
+                  name: file.name,
+                  size: file.size,
+                  type: file.type || 'application/octet-stream',
+                  key: storageKey,
+                }],
+                anonId,
+              }),
+            });
+            if (!refreshRes.ok) {
+              throw new Error('Failed to refresh upload URL');
+            }
+            const fresh = await refreshRes.json() as {
+              bucket?: string;
+              items?: Array<{ path: string; signedUrl: string }>;
+            };
+            const freshItem = fresh?.items?.[0];
+            if (!freshItem?.signedUrl) {
+              throw new Error('Failed to refresh upload URL');
+            }
+            currentPath = freshItem.path;
+            effectiveBucket = fresh?.bucket || bucket;
+            return freshItem.signedUrl;
+          },
+          onProgress
+            ? (fileProgress) => {
+              const aggregate = totalFiles === 0
+                ? 100
+                : Math.round(((completed + fileProgress / 100) / totalFiles) * 100);
+              onProgress(aggregate);
+            }
+            : undefined
+        );
+
+        const meta: UploadedFileMetadata = {
+          bucket,
+          path: currentPath,
+          storageKey,
+          name: file.name,
+          size: file.size,
+          lastModified: typeof file.lastModified === 'number' ? file.lastModified : 0,
+          uploadedAt: Date.now(),
+        };
+        uploadedFilesRef.current.set(signature, meta);
+        completed += 1;
+        if (onProgress) {
+          const aggregate = totalFiles === 0 ? 100 : Math.round((completed / totalFiles) * 100);
+          onProgress(aggregate);
+        }
+      }
+    }
+
+    if (!effectiveBucket && fileIdentities.length > 0) {
+      const firstMeta = uploadedFilesRef.current.get(fileIdentities[0].signature);
+      if (firstMeta) {
+        effectiveBucket = firstMeta.bucket;
+      }
+    }
+
+    if (!effectiveBucket) {
+      effectiveBucket = 'uploads';
+    }
+
+    if (onProgress && completed >= totalFiles) {
+      onProgress(100);
+    }
+
+    const objects = fileIdentities.map(({ file, signature }) => {
+      const meta = uploadedFilesRef.current.get(signature);
+      if (!meta) {
+        throw new Error(`Missing upload metadata for ${file.name}`);
+      }
+      return {
+        path: meta.path,
+        name: file.name,
+        type: file.type || 'application/octet-stream',
+        size: file.size,
+      };
+    });
+
     const preRes = await fetch('/api/preparse', {
       method: 'POST',
-      headers: headers,
-      body: JSON.stringify({ bucket, objects }),
+      headers,
+      body: JSON.stringify({ bucket: effectiveBucket, objects }),
     });
     if (!preRes.ok) {
       const j = await preRes.json().catch(() => null);
       throw new Error(j?.error || 'Failed to prepare files.');
     }
-    return await preRes.json();
-  }, [getFileKey]);
+    return await preRes.json() as Record<string, unknown>;
+  }, [getFileIdentity]);
 
   const handleFileChange = useCallback(async (selectedFiles: File[]) => {
     // Clear any previous errors when files change
@@ -294,6 +422,8 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
       setPreParsed(null);
       lastPreparseKeyRef.current = null;
       limitExceededCacheRef.current = null;
+      uploadedFilesRef.current.clear();
+      fileIdentityCacheRef.current = new WeakMap();
       setAllowedNameSizes(undefined);
       return;
     }
@@ -324,9 +454,21 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
       debugLog(`Processing ${imageFiles.length} image files:`, imageFiles.map(f => `${f.name} (${f.type})`));
     }
 
+    const identityList = await Promise.all(selectedFiles.map(async (file) => ({
+      file,
+      signature: await getFileSignature(file),
+    })));
+    const activeSignatures = new Set(identityList.map((entry) => entry.signature));
+    // Remove metadata for files that are no longer selected
+    for (const signature of Array.from(uploadedFilesRef.current.keys())) {
+      if (!activeSignatures.has(signature)) {
+        uploadedFilesRef.current.delete(signature);
+      }
+    }
+
     setFiles(selectedFiles);
     // Generate a key for the current file set
-    const fileSetKey = await getFileSetKey(selectedFiles);
+    const fileSetKey = identityList.map((entry) => entry.signature).sort().join('__');
     debugLog(`File set key: ${fileSetKey}`);
     lastPreparseKeyRef.current = fileSetKey;
 
@@ -348,8 +490,6 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
       // Handle cumulative pruning feedback from cached result
       const limitExceeded = Boolean(j?.limitExceeded);
       const includedFiles = Array.isArray(j?.includedFiles) ? j.includedFiles as { name: string; size: number }[] : [];
-      const excludedFiles = Array.isArray(j?.excludedFiles) ? j.excludedFiles as { name: string; size: number }[] : [];
-      const partialFile = j?.partialFile as { name: string; size: number; includedChars: number } | null;
       const includedSignature = getNameSizeSignature(includedFiles);
       if (limitExceeded) {
         const truncationError = (isAuthedFromApi || isAuthed)
@@ -374,7 +514,7 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
     try {
       setIsPreParsing(true);
       setUploadProgress(0);
-      let j: any;
+      let j: Record<string, unknown> = {};
       try {
         j = await uploadAndPreparse(selectedFiles, (progress) => {
           setUploadProgress(progress);
@@ -382,7 +522,7 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
       } catch (e) {
         // Fallback: legacy small-upload path if JSON/storage fails
         const totalBytes = selectedFiles.reduce((sum, f) => sum + (f.size || 0), 0);
-        const reason = (e && (e as any).message) || (e && (e as any).error) || (typeof e === 'string' ? e : '') || 'Unknown error';
+        const reason = extractErrorMessage(e) || 'Unknown error';
 
         // Check if it's an image-related error and provide more specific guidance
         const hasImages = selectedFiles.some(f => f.type.startsWith('image/'));
@@ -414,8 +554,8 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
         });
         if (!res.ok) {
           try {
-            const jj = await res.json();
-            const errorMsg = jj?.error || 'Failed to prepare files.';
+            const jj = await res.json() as Record<string, unknown>;
+            const errorMsg = typeof jj?.error === 'string' ? jj.error : 'Failed to prepare files.';
             // Provide more specific error message for image-related failures
             if (hasImages && (errorMsg.toLowerCase().includes('image') || errorMsg.toLowerCase().includes('format'))) {
               setError(`Image processing failed: ${errorMsg} Please ensure your images are in supported formats (PNG, JPG, JPEG, GIF, WEBP).`);
@@ -431,7 +571,7 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
           setUploadProgress(undefined);
           return;
         }
-        j = await res.json();
+        j = await res.json() as Record<string, unknown>;
       }
 
       // Cache the complete result for this file set
@@ -462,8 +602,6 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
       // Handle cumulative pruning feedback
       const limitExceeded = Boolean(j?.limitExceeded);
       const includedFiles = Array.isArray(j?.includedFiles) ? j.includedFiles as { name: string; size: number }[] : [];
-      const excludedFiles = Array.isArray(j?.excludedFiles) ? j.excludedFiles as { name: string; size: number }[] : [];
-      const partialFile = j?.partialFile as { name: string; size: number; includedChars: number } | null;
       const includedSignature = getNameSizeSignature(includedFiles);
       if (limitExceeded) {
         const truncationError = (isAuthedFromApi || isAuthed)
@@ -488,7 +626,7 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
       setIsPreParsing(false);
       setUploadProgress(undefined);
     }
-  }, [getFileSetKey, debugLog, MAX_FILE_BYTES, isAuthed, uploadAndPreparse, getNameSizeSignature]);
+  }, [getFileSignature, debugLog, MAX_FILE_BYTES, isAuthed, uploadAndPreparse, getNameSizeSignature]);
 
   const requireAuthErrorMessage = 'Please sign up to generate with CogniGuide.';
 
@@ -622,7 +760,10 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
         // Handle insufficient credits the same way as mind maps: show inline error and do not open modal
         if (res.status === 402) {
           let msg = 'Insufficient credits. Upload a smaller file or';
-          try { const j = await res.json(); msg = j?.error || msg; } catch {}
+          try {
+            const j = await res.json() as Record<string, unknown>;
+            if (typeof j?.error === 'string') msg = j.error;
+          } catch {}
           setError(msg);
           setIsLoading(false);
           return;
@@ -631,7 +772,10 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
           const contentType = res.headers.get('content-type') || '';
           if (contentType.includes('application/json')) {
             let errorMsg = 'Failed to generate flashcards.';
-            try { const j = await res.json(); errorMsg = j.error || errorMsg; } catch {}
+            try {
+              const j = await res.json() as Record<string, unknown>;
+              if (typeof j?.error === 'string') errorMsg = j.error;
+            } catch {}
             throw new Error(errorMsg);
           } else {
             let errorMsg = `Failed to generate flashcards. Server returned ${res.status} ${res.statusText}.`;
@@ -656,11 +800,12 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
         setFlashcardsOpen(true);
 
         if (!res.body) {
-          const data = await res.json().catch(() => null);
-          const cards = Array.isArray(data?.cards) ? data.cards as FlashcardType[] : [];
+          const data = await res.json().catch(() => null) as Record<string, unknown> | null;
+          const rawCards = Array.isArray(data?.['cards']) ? data?.['cards'] : [];
+          const cards = Array.isArray(rawCards) ? (rawCards as FlashcardType[]) : [];
           if (cards.length === 0) throw new Error('No cards generated');
           setFlashcardsCards(cards);
-          setFlashcardsTitle(typeof data?.title === 'string' ? data.title : null);
+          setFlashcardsTitle(typeof data?.['title'] === 'string' ? (data['title'] as string) : null);
           // Persist generated flashcards for authenticated users and set deck id for SR persistence
           if (isAuthed && userId) {
             try {
@@ -670,9 +815,13 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
                 .insert({ user_id: userId, title: titleToSave, markdown: '', cards })
                 .select('id')
                 .single();
-              if (!insErr && (ins as any)?.id) {
-                setFlashcardsDeckId((ins as any).id as string);
-                if (typeof window !== 'undefined') window.dispatchEvent(new CustomEvent('cogniguide:generation-complete'));
+              if (!insErr) {
+                const inserted = (ins ?? null) as Record<string, unknown> | null;
+                const insertedId = inserted && typeof inserted['id'] === 'string' ? inserted['id'] : null;
+                if (insertedId) {
+                  setFlashcardsDeckId(insertedId);
+                  if (typeof window !== 'undefined') window.dispatchEvent(new CustomEvent('cogniguide:generation-complete'));
+                }
               }
             } catch {}
           }
@@ -682,9 +831,7 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
           let buf = '';
           let streamedTitle: string | null = null;
           const accumulated: FlashcardType[] = [];
-          // eslint-disable-next-line no-constant-condition
           while (true) {
-            // eslint-disable-next-line no-await-in-loop
             const { value, done } = await reader.read();
             if (done) break;
             if (value) buf += decoder.decode(value, { stream: true });
@@ -721,9 +868,13 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
                 .insert({ user_id: userId, title: titleToSave, markdown: '', cards: accumulated })
                 .select('id')
                 .single();
-              if (!insErr && (ins as any)?.id) {
-                setFlashcardsDeckId((ins as any).id as string);
-                if (typeof window !== 'undefined') window.dispatchEvent(new CustomEvent('cogniguide:generation-complete'));
+              if (!insErr) {
+                const inserted = (ins ?? null) as Record<string, unknown> | null;
+                const insertedId = inserted && typeof inserted['id'] === 'string' ? inserted['id'] : null;
+                if (insertedId) {
+                  setFlashcardsDeckId(insertedId);
+                  if (typeof window !== 'undefined') window.dispatchEvent(new CustomEvent('cogniguide:generation-complete'));
+                }
               }
             } catch {}
           }
@@ -986,7 +1137,14 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
                   }
                   return true;
                 }}
-                onFileRemove={() => {
+                onFileRemove={async (file) => {
+                  try {
+                    const identity = await getFileIdentity(file);
+                    uploadedFilesRef.current.delete(identity.signature);
+                    fileIdentityCacheRef.current.delete(file);
+                  } catch (err) {
+                    debugLog('Failed to remove file identity on delete', err);
+                  }
                   // Reset upload states when a file is removed during upload
                   setIsPreParsing(false);
                   setUploadProgress(undefined);

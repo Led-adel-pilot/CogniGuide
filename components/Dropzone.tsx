@@ -76,7 +76,7 @@ interface DropzoneProps {
   // Visual size variant
   size?: 'default' | 'compact';
   // Callback when a file is removed (useful for resetting upload states)
-  onFileRemove?: () => void;
+  onFileRemove?: (file: File) => void;
 }
 
 export default function Dropzone({ onFileChange, disabled = false, onOpen, isPreParsing = false, uploadProgress, allowedNameSizes, size = 'default', onFileRemove }: DropzoneProps) {
@@ -138,7 +138,7 @@ export default function Dropzone({ onFileChange, disabled = false, onOpen, isPre
         const seen = new Set<string>();
         // Deduplicate by name|size|lastModified
         return merged.filter(f => {
-          const key = `${f.name}|${f.size}|${(f as any).lastModified ?? ''}`;
+          const key = `${f.name}|${f.size}|${f.lastModified ?? ''}`;
           if (seen.has(key)) return false;
           seen.add(key);
           return true;
@@ -161,7 +161,7 @@ export default function Dropzone({ onFileChange, disabled = false, onOpen, isPre
         const merged = [...prevFiles, ...newFiles];
         const seen = new Set<string>();
         return merged.filter(f => {
-          const key = `${f.name}|${f.size}|${(f as any).lastModified ?? ''}`;
+          const key = `${f.name}|${f.size}|${f.lastModified ?? ''}`;
           if (seen.has(key)) return false;
           seen.add(key);
           return true;
@@ -184,7 +184,7 @@ export default function Dropzone({ onFileChange, disabled = false, onOpen, isPre
     });
     setFiles(prevFiles => prevFiles.filter(file => file !== fileToRemove));
     // Notify parent component to reset upload states
-    onFileRemove?.();
+    onFileRemove?.(fileToRemove);
   }
 
   const dropzoneClassName = useMemo(() => {
