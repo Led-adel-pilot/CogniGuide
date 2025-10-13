@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { processMultipleFiles, MultiFileProcessResult } from '@/lib/document-parser';
+import { processMultipleFiles } from '@/lib/document-parser';
 import { createClient } from '@supabase/supabase-js';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
@@ -11,6 +11,13 @@ const supabaseAdmin = (supabaseUrl && supabaseServiceKey)
 // In-memory cache for user tiers (userId -> { tier, expiresAt })
 const userTierCache = new Map<string, { tier: 'free' | 'paid'; expiresAt: number }>();
 const TIER_CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+
+type StorageObjectDescriptor = {
+  path: string;
+  name?: string;
+  type?: string;
+  size?: number;
+};
 
 async function getUserIdFromAuthHeader(req: NextRequest): Promise<string | null> {
   try {
@@ -47,7 +54,10 @@ async function getUserTier(userId: string | null): Promise<'non-auth' | 'free' |
       .order('updated_at', { ascending: false })
       .limit(1);
 
-    const status = Array.isArray(data) && data.length > 0 ? (data[0] as any).status : null;
+    const latest = Array.isArray(data) && data.length > 0 ? data[0] : null;
+    const status = latest && typeof latest === 'object' && latest !== null && 'status' in latest
+      ? (latest as { status?: string }).status ?? null
+      : null;
     const tier = status === 'active' || status === 'trialing' ? 'paid' : 'free';
 
     // Cache the result
@@ -70,9 +80,25 @@ export async function POST(req: NextRequest) {
 
     // JSON path: { bucket, objects: [{ path, name?, type?, size? }] }
     if (contentType.includes('application/json')) {
-      const body = await req.json().catch(() => null) as any;
-      const bucket = typeof body?.bucket === 'string' ? body.bucket : 'uploads';
-      const objects = Array.isArray(body?.objects) ? body.objects as Array<{ path: string; name?: string; type?: string; size?: number }> : [];
+      const rawBody = await req.json().catch(() => null);
+      const body = rawBody && typeof rawBody === 'object' ? (rawBody as Record<string, unknown>) : {};
+      const bucket = typeof body.bucket === 'string' ? body.bucket : 'uploads';
+      const objectsInput = Array.isArray(body.objects) ? body.objects : [];
+      const objects: StorageObjectDescriptor[] = objectsInput
+        .map((entry) => (entry && typeof entry === 'object' ? entry as Record<string, unknown> : null))
+        .filter((entry): entry is Record<string, unknown> => Boolean(entry && typeof entry.path === 'string'))
+        .map((entry) => ({
+          path: String(entry.path),
+          name: typeof entry.name === 'string' ? entry.name : undefined,
+          type: typeof entry.type === 'string' ? entry.type : undefined,
+          size: typeof entry.size === 'number' ? entry.size : undefined,
+        }));
+      const existingRawCharsValue = body.existingRawChars;
+      const existingRawChars = typeof existingRawCharsValue === 'number'
+        ? Math.max(existingRawCharsValue, 0)
+        : typeof existingRawCharsValue === 'string'
+          ? Math.max(Number(existingRawCharsValue) || 0, 0)
+          : 0;
       if (!objects || objects.length === 0) {
         return NextResponse.json({ error: 'No objects provided' }, { status: 400 });
       }
@@ -80,7 +106,7 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: 'Storage not configured. The SUPABASE_SERVICE_ROLE_KEY is likely missing.' }, { status: 500 });
       }
 
-      const pseudoFiles: File[] = [] as any;
+      const pseudoFiles: File[] = [];
       const imageUrls: string[] = [];
 
       for (const obj of objects) {
@@ -95,7 +121,7 @@ export async function POST(req: NextRequest) {
             console.error('Failed to download image:', path, error);
             continue;
           }
-          const blob = data as Blob;
+          const blob = data instanceof Blob ? data : new Blob([data]);
           const arrayBuffer = await blob.arrayBuffer();
           const buffer = Buffer.from(arrayBuffer);
           const base64 = buffer.toString('base64');
@@ -108,23 +134,23 @@ export async function POST(req: NextRequest) {
         if (error || !data) {
           continue;
         }
-        const blob = data as Blob;
+        const blob = data instanceof Blob ? data : new Blob([data]);
         const arrayBuf = await blob.arrayBuffer();
         const buffer = Buffer.from(arrayBuf);
-        const size = typeof obj.size === 'number' ? obj.size : (blob as any)?.size || buffer.byteLength;
+        const size = typeof obj.size === 'number' ? obj.size : blob.size || buffer.byteLength;
 
         // Create a minimal File-like object with required fields used by processMultipleFiles
-        const fileLike: any = {
+        const fileLike = {
           name,
           type,
           size,
           arrayBuffer: async () => buffer,
         };
-        (pseudoFiles as any).push(fileLike);
+        pseudoFiles.push(fileLike as unknown as File);
       }
 
       // Process text/doc files via existing logic
-      const result = await processMultipleFiles(pseudoFiles as any, userTier);
+      const result = await processMultipleFiles(pseudoFiles, userTier, { alreadyCountedChars: existingRawChars });
       const textCombined = result.extractedParts.join('\n\n');
 
       // Merge in image URLs gathered above
@@ -151,7 +177,11 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: 'No files uploaded' }, { status: 400 });
       }
 
-      const result = await processMultipleFiles(files, userTier);
+      const existingRawCharsInput = formData.get('existingRawChars');
+      const existingRawChars = typeof existingRawCharsInput === 'string'
+        ? Math.max(Number(existingRawCharsInput) || 0, 0)
+        : 0;
+      const result = await processMultipleFiles(files, userTier, { alreadyCountedChars: existingRawChars });
       const textCombined = result.extractedParts.join('\n\n');
       return NextResponse.json({
         text: textCombined,

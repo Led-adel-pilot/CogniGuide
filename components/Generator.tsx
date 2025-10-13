@@ -161,6 +161,26 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
     []
   );
 
+  const mergeNameSizeLists = useCallback(
+    (
+      primary: { name: string; size: number }[] = [],
+      secondary: { name: string; size: number }[] = []
+    ) => {
+      const map = new Map<string, { name: string; size: number }>();
+      primary.forEach((item) => {
+        map.set(`${item.name}::${item.size}`, item);
+      });
+      secondary.forEach((item) => {
+        const key = `${item.name}::${item.size}`;
+        if (!map.has(key)) {
+          map.set(key, item);
+        }
+      });
+      return Array.from(map.values());
+    },
+    []
+  );
+
   useEffect(() => {
     const init = async () => {
       const { data } = await supabase.auth.getUser();
@@ -250,8 +270,13 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
   // Upload files to Supabase Storage using signed URLs, then call JSON preparse
   const uploadAndPreparse = useCallback(async (
     selectedFiles: File[],
-    onProgress?: (progress?: number) => void
+    onProgress?: (progress?: number) => void,
+    options?: { existingRawChars?: number }
   ): Promise<Record<string, unknown>> => {
+    if (!selectedFiles || selectedFiles.length === 0) {
+      if (onProgress) onProgress(undefined);
+      return {};
+    }
     const { data: sessionData } = await supabase.auth.getSession();
     const accessToken = sessionData?.session?.access_token;
     const headers: Record<string, string> = { 'Content-Type': 'application/json' };
@@ -400,10 +425,15 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
       };
     });
 
+    const bodyPayload: Record<string, unknown> = { bucket: effectiveBucket, objects };
+    if (typeof options?.existingRawChars === 'number') {
+      bodyPayload.existingRawChars = options.existingRawChars;
+    }
+
     const preRes = await fetch('/api/preparse', {
       method: 'POST',
       headers,
-      body: JSON.stringify({ bucket: effectiveBucket, objects }),
+      body: JSON.stringify(bodyPayload),
     });
     if (!preRes.ok) {
       const j = await preRes.json().catch(() => null);
@@ -466,6 +496,7 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
       }
     }
 
+    const previousKey = lastPreparseKeyRef.current;
     setFiles(selectedFiles);
     // Generate a key for the current file set
     const fileSetKey = identityList.map((entry) => entry.signature).sort().join('__');
@@ -510,22 +541,71 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
       return;
     }
 
+    const previousCacheEntry = previousKey && previousKey !== fileSetKey
+      ? processedFileSetsCache.current.get(previousKey)
+      : undefined;
+    const previousCacheAge = previousCacheEntry ? Date.now() - previousCacheEntry.processedAt : 0;
+    const previousCacheValid = Boolean(previousCacheEntry && previousCacheAge < 5 * 60 * 1000);
+    const previousSignatures = previousKey
+      ? previousKey.split('__').filter((value) => value.length > 0)
+      : [];
+    const previousSignatureSet = new Set(previousSignatures);
+    const canReusePrevious = Boolean(
+      previousCacheValid &&
+      previousSignatures.length > 0 &&
+      previousSignatures.every((sig) => activeSignatures.has(sig))
+    );
+
+    const filesToProcess = canReusePrevious
+      ? identityList.filter((entry) => !previousSignatureSet.has(entry.signature)).map((entry) => entry.file)
+      : selectedFiles;
+
+    if (canReusePrevious) {
+      debugLog(
+        `Reusing ${previousSignatures.length} cached files from ${previousKey}; processing ${filesToProcess.length} new files.`
+      );
+    }
+
     // No valid cache, pre-parse now using Supabase Storage JSON flow (fallback to legacy on failure)
     try {
       setIsPreParsing(true);
       setUploadProgress(0);
+      const baseRecord = canReusePrevious ? previousCacheEntry?.result : undefined;
+      const baseText = typeof baseRecord?.text === 'string' ? (baseRecord.text as string) : '';
+      const baseImages = Array.isArray(baseRecord?.images) ? (baseRecord.images as string[]) : [];
+      const baseRawCharCount = typeof baseRecord?.totalRawChars === 'number' ? (baseRecord.totalRawChars as number) : 0;
+      const baseMaxChars = typeof baseRecord?.maxChars === 'number' ? (baseRecord.maxChars as number) : undefined;
+      const baseIncludedFiles = Array.isArray(baseRecord?.includedFiles)
+        ? (baseRecord.includedFiles as { name: string; size: number }[])
+        : [];
+      const baseExcludedFiles = Array.isArray(baseRecord?.excludedFiles)
+        ? (baseRecord.excludedFiles as { name: string; size: number }[])
+        : [];
+      const basePartialFile =
+        baseRecord?.partialFile && typeof baseRecord.partialFile === 'object'
+          ? (baseRecord.partialFile as { name: string; size: number; includedChars: number })
+          : null;
+      const baseLimitExceeded = Boolean(baseRecord?.limitExceeded);
+      const baseIsAuthed = Boolean(baseRecord?.isAuthed);
+
       let j: Record<string, unknown> = {};
       try {
-        j = await uploadAndPreparse(selectedFiles, (progress) => {
-          setUploadProgress(progress);
-        });
+        if (filesToProcess.length > 0) {
+          j = await uploadAndPreparse(
+            filesToProcess,
+            (progress) => {
+              setUploadProgress(progress);
+            },
+            canReusePrevious ? { existingRawChars: baseRawCharCount } : undefined
+          );
+        }
       } catch (e) {
         // Fallback: legacy small-upload path if JSON/storage fails
-        const totalBytes = selectedFiles.reduce((sum, f) => sum + (f.size || 0), 0);
+        const totalBytes = filesToProcess.reduce((sum, f) => sum + (f.size || 0), 0);
         const reason = extractErrorMessage(e) || 'Unknown error';
 
         // Check if it's an image-related error and provide more specific guidance
-        const hasImages = selectedFiles.some(f => f.type.startsWith('image/'));
+        const hasImages = filesToProcess.some(f => f.type.startsWith('image/'));
         if (hasImages && (reason.toLowerCase().includes('image') || reason.toLowerCase().includes('upload') || reason.toLowerCase().includes('storage'))) {
           setError(`Image upload failed: ${reason}. Please try uploading your images again or use a different image format.`);
           setPreParsed(null);
@@ -544,7 +624,10 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
           return;
         }
         const formData = new FormData();
-        selectedFiles.forEach((f) => formData.append('files', f));
+        filesToProcess.forEach((f) => formData.append('files', f));
+        if (canReusePrevious) {
+          formData.append('existingRawChars', String(baseRawCharCount));
+        }
         const { data: sessionData } = await supabase.auth.getSession();
         const accessToken = sessionData?.session?.access_token;
         const res = await fetch('/api/preparse', {
@@ -574,9 +657,50 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
         j = await res.json() as Record<string, unknown>;
       }
 
+      const newText = typeof j?.text === 'string' ? (j.text as string) : '';
+      const newImages = Array.isArray(j?.images) ? (j.images as string[]) : [];
+      const newRawCharCount = typeof j?.totalRawChars === 'number' ? (j.totalRawChars as number) : undefined;
+      const newMaxChars = typeof j?.maxChars === 'number' ? (j.maxChars as number) : undefined;
+      const newIncludedFiles = Array.isArray(j?.includedFiles)
+        ? (j.includedFiles as { name: string; size: number }[])
+        : [];
+      const newExcludedFiles = Array.isArray(j?.excludedFiles)
+        ? (j.excludedFiles as { name: string; size: number }[])
+        : [];
+      const newPartialFile = j?.partialFile && typeof j.partialFile === 'object'
+        ? (j.partialFile as { name: string; size: number; includedChars: number })
+        : null;
+      const newLimitExceeded = Boolean(j?.limitExceeded);
+      const newIsAuthed = typeof j?.isAuthed === 'boolean' ? (j.isAuthed as boolean) : undefined;
+
+      const combinedTextParts = [baseText, newText].filter((part) => part && part.length > 0);
+      const combinedText = combinedTextParts.join('\n\n');
+      const combinedImages = Array.from(new Set<string>([...baseImages, ...newImages]));
+      const combinedRawCharCount = typeof newRawCharCount === 'number' && !Number.isNaN(newRawCharCount)
+        ? newRawCharCount
+        : baseRawCharCount;
+      const combinedMaxChars = typeof newMaxChars === 'number' ? newMaxChars : baseMaxChars;
+      const combinedIncludedFiles = mergeNameSizeLists(baseIncludedFiles, newIncludedFiles);
+      const combinedExcludedFiles = mergeNameSizeLists(baseExcludedFiles, newExcludedFiles);
+      const combinedPartialFile = newPartialFile ?? basePartialFile ?? null;
+      const combinedLimitExceeded = baseLimitExceeded || newLimitExceeded;
+      const combinedIsAuthed = typeof newIsAuthed === 'boolean' ? newIsAuthed : baseIsAuthed;
+
+      const combinedResult: Record<string, unknown> = {
+        text: combinedText,
+        images: combinedImages,
+        totalRawChars: combinedRawCharCount,
+        maxChars: combinedMaxChars,
+        limitExceeded: combinedLimitExceeded,
+        includedFiles: combinedIncludedFiles,
+        excludedFiles: combinedExcludedFiles,
+        partialFile: combinedPartialFile ?? null,
+        isAuthed: combinedIsAuthed,
+      };
+
       // Cache the complete result for this file set
       processedFileSetsCache.current.set(fileSetKey, {
-        result: j,
+        result: combinedResult,
         processedAt: Date.now()
       });
 
@@ -593,25 +717,22 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
         debugLog(`Cleaned up cache, new size: ${processedFileSetsCache.current.size}`);
       }
 
-      const isAuthedFromApi = Boolean(j?.isAuthed);
-      const text = typeof j?.text === 'string' ? j.text : '';
-      const images = Array.isArray(j?.images) ? j.images as string[] : [];
-      const rawCharCount = typeof j?.totalRawChars === 'number' ? j.totalRawChars as number : undefined;
-      setPreParsed({ text, images, rawCharCount });
+      const rawCharCount = combinedRawCharCount;
+      setPreParsed({ text: combinedText, images: combinedImages, rawCharCount });
 
       // Handle cumulative pruning feedback
-      const limitExceeded = Boolean(j?.limitExceeded);
-      const includedFiles = Array.isArray(j?.includedFiles) ? j.includedFiles as { name: string; size: number }[] : [];
+      const limitExceeded = combinedLimitExceeded;
+      const includedFiles = combinedIncludedFiles;
       const includedSignature = getNameSizeSignature(includedFiles);
       if (limitExceeded) {
-        const truncationError = (isAuthedFromApi || isAuthed)
+        const truncationError = (combinedIsAuthed || isAuthed)
           ? 'Content exceeds the length limit for your current plan. the content has been truncated.'
           : null;
         setAllowedNameSizes(includedFiles);
         setError(truncationError);
         limitExceededCacheRef.current = {
           signature: includedSignature,
-          preParsed: { text, images, rawCharCount },
+          preParsed: { text: combinedText, images: combinedImages, rawCharCount },
           allowedNameSizes: includedFiles,
           error: truncationError,
         };
@@ -626,7 +747,7 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
       setIsPreParsing(false);
       setUploadProgress(undefined);
     }
-  }, [getFileSignature, debugLog, MAX_FILE_BYTES, isAuthed, uploadAndPreparse, getNameSizeSignature]);
+  }, [getFileSignature, debugLog, MAX_FILE_BYTES, isAuthed, uploadAndPreparse, getNameSizeSignature, mergeNameSizeLists]);
 
   const requireAuthErrorMessage = 'Please sign up to generate with CogniGuide.';
 

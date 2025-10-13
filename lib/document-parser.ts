@@ -4,7 +4,6 @@ import pptxTextParser from 'pptx-text-parser';
 import { writeFile, unlink } from 'fs/promises';
 import { tmpdir } from 'os';
 import { join } from 'path';
-import Pptx from 'pptx-text-parser/lib/node-pptx';
 
 // Constants for tier-based limits
 const CHARS_PER_CREDIT = 3800;
@@ -163,16 +162,20 @@ export interface MultiFileProcessResult {
  */
 export async function processMultipleFiles(
   files: File[],
-  userTier: 'non-auth' | 'free' | 'paid' = 'non-auth'
+  userTier: 'non-auth' | 'free' | 'paid' = 'non-auth',
+  options?: { alreadyCountedChars?: number }
 ): Promise<MultiFileProcessResult> {
   const maxChars = TIER_LIMITS[userTier];
   const extractedParts: string[] = [];
   const imageDataUrls: string[] = [];
   const includedFiles: { name: string; size: number }[] = [];
   const excludedFiles: { name: string; size: number }[] = [];
-  let totalRawChars = 0;
+  const initialRawChars = Number.isFinite(options?.alreadyCountedChars)
+    ? Math.max(options?.alreadyCountedChars ?? 0, 0)
+    : 0;
+  let totalRawChars = initialRawChars;
   let partialFile: { name: string; size: number; includedChars: number } | undefined;
-  let limitExceeded = false;
+  let limitExceeded = initialRawChars >= maxChars;
 
   for (const file of files) {
     try {
@@ -217,7 +220,7 @@ export async function processMultipleFiles(
       
       if (remaining <= 0) {
         // No more room for text content - exclude this file
-        excludedFiles.push({ name: file.name, size: (file as any).size ?? 0 });
+        excludedFiles.push({ name: file.name, size: typeof file.size === 'number' ? file.size : 0 });
         limitExceeded = true;
         continue;
       }
@@ -225,14 +228,14 @@ export async function processMultipleFiles(
       if (fileTextLength <= remaining) {
         // Include fully
         totalRawChars += fileTextLength;
-        includedFiles.push({ name: file.name, size: (file as any).size ?? 0 });
+        includedFiles.push({ name: file.name, size: typeof file.size === 'number' ? file.size : 0 });
         extractedParts.push(`--- START OF FILE: ${file.name} ---\n\n${text}\n\n--- END OF FILE: ${file.name} ---`);
       } else {
         // Include partially up to remaining, cut on a word boundary if possible
         const truncated = truncateToLimit(text, remaining);
         totalRawChars += truncated.length;
-        includedFiles.push({ name: file.name, size: (file as any).size ?? 0 });
-        partialFile = { name: file.name, size: (file as any).size ?? 0, includedChars: truncated.length };
+        includedFiles.push({ name: file.name, size: typeof file.size === 'number' ? file.size : 0 });
+        partialFile = { name: file.name, size: typeof file.size === 'number' ? file.size : 0, includedChars: truncated.length };
         extractedParts.push(`--- START OF FILE: ${file.name} ---\n\n${truncated}\n\n--- END OF FILE: ${file.name} ---`);
         limitExceeded = true;
         // After partial inclusion, all subsequent text files will be excluded in next iterations
