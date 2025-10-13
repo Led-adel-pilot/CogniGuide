@@ -18,6 +18,13 @@ type AuthModalProps = ComponentProps<typeof AuthModalComponent>;
 type MindMapModalProps = ComponentProps<typeof MindMapModalComponent>;
 type FlashcardsModalProps = ComponentProps<typeof FlashcardsModalComponent>;
 
+type PreparsedImageDescriptor = {
+  bucket: string;
+  path: string;
+  type?: string;
+  size?: number;
+};
+
 const AuthModal = dynamic<AuthModalProps>(() => import('@/components/AuthModal'), { ssr: false });
 const MindMapModal = dynamic<MindMapModalProps>(() => import('@/components/MindMapModal'), { ssr: false });
 const FlashcardsModal = dynamic<FlashcardsModalProps>(() => import('@/components/FlashcardsModal'), { ssr: false });
@@ -33,7 +40,12 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
   // Enforce a client-side per-file size cap to avoid server 413s (Vercel ~4.5MB)
   const MAX_FILE_BYTES = Math.floor(50 * 1024 * 1024); // 50MB per file when using Supabase Storage
   const [files, setFiles] = useState<File[]>([]);
-  const [preParsed, setPreParsed] = useState<{ text: string; images: string[]; rawCharCount?: number } | null>(null);
+  const [preParsed, setPreParsed] = useState<{
+    text: string;
+    images: string[];
+    rawCharCount?: number;
+    imageDescriptors?: PreparsedImageDescriptor[];
+  } | null>(null);
   const [isPreParsing, setIsPreParsing] = useState(false);
   const lastPreparseKeyRef = useRef<string | null>(null);
   // Cache for file set processing results (keyed by file set combination)
@@ -77,7 +89,7 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
   const router = useRouter();
   const limitExceededCacheRef = useRef<{
     signature: string;
-    preParsed: { text: string; images: string[]; rawCharCount?: number } | null;
+    preParsed: { text: string; images: string[]; rawCharCount?: number; imageDescriptors?: PreparsedImageDescriptor[] } | null;
     allowedNameSizes: { name: string; size: number }[] | undefined;
     error: string | null;
   } | null>(null);
@@ -172,6 +184,44 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
       });
       secondary.forEach((item) => {
         const key = `${item.name}::${item.size}`;
+        if (!map.has(key)) {
+          map.set(key, item);
+        }
+      });
+      return Array.from(map.values());
+    },
+    []
+  );
+
+  const parseImageDescriptors = useCallback((value: unknown): PreparsedImageDescriptor[] => {
+    if (!Array.isArray(value)) return [];
+    const descriptors: PreparsedImageDescriptor[] = [];
+    value.forEach((entry) => {
+      if (!entry || typeof entry !== 'object') return;
+      const record = entry as Record<string, unknown>;
+      const bucket = typeof record.bucket === 'string' ? record.bucket : undefined;
+      const path = typeof record.path === 'string' ? record.path : undefined;
+      if (!bucket || !path) return;
+      const type = typeof record.type === 'string' ? record.type : undefined;
+      const sizeValue = record.size;
+      const size = typeof sizeValue === 'number' && Number.isFinite(sizeValue) ? sizeValue : undefined;
+      descriptors.push({ bucket, path, type, size });
+    });
+    return descriptors;
+  }, []);
+
+  const mergeImageDescriptors = useCallback(
+    (
+      primary: PreparsedImageDescriptor[] = [],
+      secondary: PreparsedImageDescriptor[] = []
+    ) => {
+      const map = new Map<string, PreparsedImageDescriptor>();
+      primary.forEach((item) => {
+        const key = `${item.bucket}::${item.path}`;
+        map.set(key, item);
+      });
+      secondary.forEach((item) => {
+        const key = `${item.bucket}::${item.path}`;
         if (!map.has(key)) {
           map.set(key, item);
         }
@@ -516,7 +566,8 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
       const text = typeof j?.text === 'string' ? j.text : '';
       const images = Array.isArray(j?.images) ? j.images as string[] : [];
       const rawCharCount = typeof j?.totalRawChars === 'number' ? j.totalRawChars as number : undefined;
-      setPreParsed({ text, images, rawCharCount });
+      const imageDescriptors = parseImageDescriptors(j?.imageDescriptors);
+      setPreParsed({ text, images, rawCharCount, imageDescriptors });
 
       // Handle cumulative pruning feedback from cached result
       const limitExceeded = Boolean(j?.limitExceeded);
@@ -530,7 +581,7 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
         setError(truncationError);
         limitExceededCacheRef.current = {
           signature: includedSignature,
-          preParsed: { text, images, rawCharCount },
+          preParsed: { text, images, rawCharCount, imageDescriptors },
           allowedNameSizes: includedFiles,
           error: truncationError,
         };
@@ -573,6 +624,7 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
       const baseRecord = canReusePrevious ? previousCacheEntry?.result : undefined;
       const baseText = typeof baseRecord?.text === 'string' ? (baseRecord.text as string) : '';
       const baseImages = Array.isArray(baseRecord?.images) ? (baseRecord.images as string[]) : [];
+      const baseImageDescriptors = parseImageDescriptors(baseRecord?.imageDescriptors);
       const baseRawCharCount = typeof baseRecord?.totalRawChars === 'number' ? (baseRecord.totalRawChars as number) : 0;
       const baseMaxChars = typeof baseRecord?.maxChars === 'number' ? (baseRecord.maxChars as number) : undefined;
       const baseIncludedFiles = Array.isArray(baseRecord?.includedFiles)
@@ -659,6 +711,7 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
 
       const newText = typeof j?.text === 'string' ? (j.text as string) : '';
       const newImages = Array.isArray(j?.images) ? (j.images as string[]) : [];
+      const newImageDescriptors = parseImageDescriptors(j?.imageDescriptors);
       const newRawCharCount = typeof j?.totalRawChars === 'number' ? (j.totalRawChars as number) : undefined;
       const newMaxChars = typeof j?.maxChars === 'number' ? (j.maxChars as number) : undefined;
       const newIncludedFiles = Array.isArray(j?.includedFiles)
@@ -676,6 +729,7 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
       const combinedTextParts = [baseText, newText].filter((part) => part && part.length > 0);
       const combinedText = combinedTextParts.join('\n\n');
       const combinedImages = Array.from(new Set<string>([...baseImages, ...newImages]));
+      const combinedImageDescriptors = mergeImageDescriptors(baseImageDescriptors, newImageDescriptors);
       const combinedRawCharCount = typeof newRawCharCount === 'number' && !Number.isNaN(newRawCharCount)
         ? newRawCharCount
         : baseRawCharCount;
@@ -689,6 +743,7 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
       const combinedResult: Record<string, unknown> = {
         text: combinedText,
         images: combinedImages,
+        imageDescriptors: combinedImageDescriptors,
         totalRawChars: combinedRawCharCount,
         maxChars: combinedMaxChars,
         limitExceeded: combinedLimitExceeded,
@@ -718,7 +773,7 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
       }
 
       const rawCharCount = combinedRawCharCount;
-      setPreParsed({ text: combinedText, images: combinedImages, rawCharCount });
+      setPreParsed({ text: combinedText, images: combinedImages, rawCharCount, imageDescriptors: combinedImageDescriptors });
 
       // Handle cumulative pruning feedback
       const limitExceeded = combinedLimitExceeded;
@@ -732,7 +787,7 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
         setError(truncationError);
         limitExceededCacheRef.current = {
           signature: includedSignature,
-          preParsed: { text: combinedText, images: combinedImages, rawCharCount },
+          preParsed: { text: combinedText, images: combinedImages, rawCharCount, imageDescriptors: combinedImageDescriptors },
           allowedNameSizes: includedFiles,
           error: truncationError,
         };
@@ -747,7 +802,17 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
       setIsPreParsing(false);
       setUploadProgress(undefined);
     }
-  }, [getFileSignature, debugLog, MAX_FILE_BYTES, isAuthed, uploadAndPreparse, getNameSizeSignature, mergeNameSizeLists]);
+  }, [
+    getFileSignature,
+    debugLog,
+    MAX_FILE_BYTES,
+    isAuthed,
+    uploadAndPreparse,
+    getNameSizeSignature,
+    mergeNameSizeLists,
+    parseImageDescriptors,
+    mergeImageDescriptors,
+  ]);
 
   const requireAuthErrorMessage = 'Please sign up to generate with CogniGuide.';
 
@@ -809,7 +874,12 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
           });
         } else {
           // If we haven't pre-parsed yet, do it now (single upload)
-          let effectivePreParsed: { text: string; images: string[]; rawCharCount?: number } | null = preParsed;
+          let effectivePreParsed: {
+            text: string;
+            images: string[];
+            rawCharCount?: number;
+            imageDescriptors?: PreparsedImageDescriptor[];
+          } | null = preParsed;
           if (!effectivePreParsed) {
             try {
               setIsPreParsing(true);
@@ -820,7 +890,8 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
               const text = typeof j?.text === 'string' ? j.text : '';
               const images = Array.isArray(j?.images) ? j.images as string[] : [];
               const rawCharCount = typeof j?.totalRawChars === 'number' ? j.totalRawChars as number : undefined;
-              effectivePreParsed = { text, images, rawCharCount };
+              const imageDescriptors = parseImageDescriptors(j?.imageDescriptors);
+              effectivePreParsed = { text, images, rawCharCount, imageDescriptors };
               setPreParsed(effectivePreParsed);
             } catch(e) {
               const msg = (e instanceof Error) ? e.message : 'An unknown error occurred during pre-parse.';
@@ -832,9 +903,11 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
             }
           }
           if (effectivePreParsed) {
+            const descriptorList = effectivePreParsed.imageDescriptors || [];
+            const payloadImages = descriptorList.length > 0 ? descriptorList : (effectivePreParsed.images || []);
             const payload = {
               text: effectivePreParsed.text || '',
-              images: effectivePreParsed.images || [],
+              images: payloadImages,
               prompt: trimmedPrompt || '',
               rawCharCount: effectivePreParsed.rawCharCount,
               model: modelChoice,
@@ -844,8 +917,11 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
             debugLog('Flashcard payload:', {
               hasText: !!effectivePreParsed.text,
               imageCount: effectivePreParsed.images?.length || 0,
-              hasImages: (effectivePreParsed.images?.length || 0) > 0,
-              firstImagePreview: effectivePreParsed.images?.[0]?.startsWith('data:') ? effectivePreParsed.images[0].substring(0, 100) + '...' : (effectivePreParsed.images?.[0] || '')
+              descriptorCount: descriptorList.length,
+              hasImages: (effectivePreParsed.images?.length || 0) > 0 || descriptorList.length > 0,
+              firstImagePreview: effectivePreParsed.images?.[0]?.startsWith('data:')
+                ? effectivePreParsed.images[0].substring(0, 100) + '...'
+                : (effectivePreParsed.images?.[0] || ''),
             });
 
             const headers: Record<string, string> = { 'Content-Type': 'application/json' };
@@ -1026,7 +1102,12 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
       const accessToken = sessionData?.session?.access_token;
       let response: Response;
       // If we haven't pre-parsed yet, do it now (single upload)
-      let effectivePreParsed: { text: string; images: string[]; rawCharCount?: number } | null = preParsed;
+      let effectivePreParsed: {
+        text: string;
+        images: string[];
+        rawCharCount?: number;
+        imageDescriptors?: PreparsedImageDescriptor[];
+      } | null = preParsed;
       if (!effectivePreParsed && files.length > 0) {
         try {
           setIsPreParsing(true);
@@ -1037,7 +1118,8 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
           const text = typeof j?.text === 'string' ? j.text : '';
           const images = Array.isArray(j?.images) ? j.images as string[] : [];
           const rawCharCount = typeof j?.totalRawChars === 'number' ? j.totalRawChars as number : undefined;
-          effectivePreParsed = { text, images, rawCharCount };
+          const imageDescriptors = parseImageDescriptors(j?.imageDescriptors);
+          effectivePreParsed = { text, images, rawCharCount, imageDescriptors };
           setPreParsed(effectivePreParsed);
         } catch(e) {
             const msg = (e instanceof Error) ? e.message : 'An unknown error occurred during pre-parse.';
@@ -1049,14 +1131,25 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
         }
       }
       if (effectivePreParsed) {
-        const payload = { text: effectivePreParsed.text || '', images: effectivePreParsed.images || [], prompt: trimmedPrompt || '', rawCharCount: effectivePreParsed.rawCharCount, model: modelChoice };
+        const descriptorList = effectivePreParsed.imageDescriptors || [];
+        const payloadImages = descriptorList.length > 0 ? descriptorList : (effectivePreParsed.images || []);
+        const payload = {
+          text: effectivePreParsed.text || '',
+          images: payloadImages,
+          prompt: trimmedPrompt || '',
+          rawCharCount: effectivePreParsed.rawCharCount,
+          model: modelChoice,
+        };
 
         // Debug logging for image processing
         debugLog('Mindmap payload:', {
           hasText: !!effectivePreParsed.text,
           imageCount: effectivePreParsed.images?.length || 0,
-          hasImages: (effectivePreParsed.images?.length || 0) > 0,
-          firstImagePreview: effectivePreParsed.images?.[0]?.startsWith('data:') ? effectivePreParsed.images[0].substring(0, 100) + '...' : (effectivePreParsed.images?.[0] || '')
+          descriptorCount: descriptorList.length,
+          hasImages: (effectivePreParsed.images?.length || 0) > 0 || descriptorList.length > 0,
+          firstImagePreview: effectivePreParsed.images?.[0]?.startsWith('data:')
+            ? effectivePreParsed.images[0].substring(0, 100) + '...'
+            : (effectivePreParsed.images?.[0] || ''),
         });
 
         const headers: Record<string, string> = { 'Content-Type': 'application/json' };
