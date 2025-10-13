@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
 import type { ChatCompletionChunk } from 'openai/resources/chat/completions';
+import { Buffer } from 'node:buffer';
 import { getTextFromDocx, getTextFromPdf, getTextFromPptx, getTextFromPlainText, processMultipleFiles } from '@/lib/document-parser';
 import { MODEL_CREDIT_MULTIPLIERS, MODEL_REQUIRED_TIER, type ModelChoice } from '@/lib/plans';
 import { createClient } from '@supabase/supabase-js';
@@ -18,6 +19,79 @@ const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
 const supabaseAdmin = (supabaseUrl && supabaseServiceKey)
   ? createClient(supabaseUrl, supabaseServiceKey)
   : null;
+
+const SUPABASE_IMAGE_PREFIX = 'supabase://';
+
+async function resolveImageInputs(rawImages: string[]): Promise<{ resolved: string[]; cleanupPaths: string[] }> {
+  const resolved: string[] = [];
+  const cleanupPaths = new Set<string>();
+
+  for (const raw of rawImages) {
+    if (typeof raw !== 'string' || raw.trim() === '') continue;
+
+    if (raw.startsWith('data:')) {
+      resolved.push(raw);
+      continue;
+    }
+
+    if (raw.startsWith(SUPABASE_IMAGE_PREFIX)) {
+      if (!supabaseAdmin) {
+        console.warn('Supabase client unavailable to resolve image reference');
+        continue;
+      }
+      const withoutPrefix = raw.slice(SUPABASE_IMAGE_PREFIX.length);
+      const pipeIndex = withoutPrefix.lastIndexOf('|');
+      let bucketAndPath = withoutPrefix;
+      let mimeType = 'image/png';
+      if (pipeIndex !== -1) {
+        bucketAndPath = withoutPrefix.slice(0, pipeIndex);
+        const encodedMime = withoutPrefix.slice(pipeIndex + 1);
+        try {
+          const decoded = decodeURIComponent(encodedMime);
+          if (decoded) mimeType = decoded;
+        } catch {}
+      }
+      const firstSlash = bucketAndPath.indexOf('/');
+      if (firstSlash === -1) {
+        console.warn('Invalid supabase image reference (missing path):', raw);
+        continue;
+      }
+      const bucket = bucketAndPath.slice(0, firstSlash);
+      const path = bucketAndPath.slice(firstSlash + 1);
+      try {
+        const { data, error } = await supabaseAdmin.storage.from(bucket).download(path);
+        if (error || !data) {
+          console.error('Failed to download image from Supabase:', path, error);
+          continue;
+        }
+        let buffer: Buffer;
+        if (Buffer.isBuffer(data)) {
+          buffer = data;
+        } else if (data instanceof ArrayBuffer) {
+          buffer = Buffer.from(data);
+        } else if (data instanceof Blob) {
+          buffer = Buffer.from(await data.arrayBuffer());
+        } else if (typeof (data as any).arrayBuffer === 'function') {
+          buffer = Buffer.from(await (data as any).arrayBuffer());
+        } else {
+          buffer = Buffer.from(data as any);
+        }
+        const base64 = buffer.toString('base64');
+        resolved.push(`data:${mimeType};base64,${base64}`);
+        if (bucket === 'uploads' && path) {
+          cleanupPaths.add(path);
+        }
+      } catch (err) {
+        console.error('Error resolving Supabase image reference:', err);
+      }
+      continue;
+    }
+
+    resolved.push(raw);
+  }
+
+  return { resolved, cleanupPaths: Array.from(cleanupPaths) };
+}
 
 // In-memory cache for user tiers (userId -> { tier, expiresAt })
 const userTierCache = new Map<string, { tier: 'free' | 'paid'; expiresAt: number }>();
@@ -361,7 +435,13 @@ export async function POST(req: NextRequest) {
     const contentType = req.headers.get('content-type') || '';
 
     // Helper to stream NDJSON lines from a prompt, with optional credit refund on total failure
-    const streamNdjson = async (promptContent: any, modelChoice: ModelChoice, refundInfo?: { userId: string; credits: number }, images?: string[]) => {
+    const streamNdjson = async (
+      promptContent: any,
+      modelChoice: ModelChoice,
+      refundInfo?: { userId: string; credits: number },
+      images?: string[],
+      extraCleanupPaths: string[] = [],
+    ) => {
       const encoder = new TextEncoder();
       const streamStartedAt = Date.now();
       let stream: AsyncIterable<ChatCompletionChunk>;
@@ -436,7 +516,7 @@ export async function POST(req: NextRequest) {
       let firstTokenAt: number | null = null;
 
       // Extract file paths from images for cleanup (only for signed URLs, not base64 data URLs)
-      const filesToCleanup: string[] = [];
+      const cleanupSet = new Set<string>(extraCleanupPaths);
       if (images && images.length > 0) {
         images.forEach((url: string) => {
           if (typeof url === 'string' && url.includes('supabase') && url.includes('/uploads/') && !url.startsWith('data:')) {
@@ -448,12 +528,13 @@ export async function POST(req: NextRequest) {
               if (path) {
                 // Remove query parameters from signed URLs
                 path = path.split('?')[0];
-                filesToCleanup.push(path);
+                cleanupSet.add(path);
               }
             } catch {}
           }
         });
       }
+      const filesToCleanup = Array.from(cleanupSet);
 
       const processBufferFactory = (controller: ReadableStreamDefaultController<Uint8Array>) => {
         const emitJson = (raw: string): boolean => {
@@ -894,7 +975,13 @@ export async function POST(req: NextRequest) {
 
           logLlmInput('FLASHCARDS MARKDOWN STREAMING LLM INPUT', streamingPrompt, modelChoice);
 
-          return streamNdjson(streamingPrompt, modelChoice, (userIdForCredits && creditsNeeded > 0) ? { userId: userIdForCredits, credits: creditsNeeded } : undefined, undefined);
+          return streamNdjson(
+            streamingPrompt,
+            modelChoice,
+            (userIdForCredits && creditsNeeded > 0) ? { userId: userIdForCredits, credits: creditsNeeded } : undefined,
+            undefined,
+            [],
+          );
         }
         const prompt = buildFlashcardPrompt({ mode: 'json', sourceType: 'markmap', sourceContent: body.markdown!, numCards: body.numCards });
 
@@ -985,17 +1072,58 @@ export async function POST(req: NextRequest) {
           }, { status: 500 });
         }
       }
+
+      const { resolved: resolvedImages, cleanupPaths: supabaseCleanupPaths } = await resolveImageInputs(images);
+
+      const validImages: string[] = [];
+      for (const url of resolvedImages) {
+        try {
+          if (url.startsWith('data:')) {
+            validImages.push(url);
+          } else {
+            new URL(url);
+            validImages.push(url);
+          }
+        } catch {
+          console.warn('Invalid image URL:', url);
+        }
+      }
+
+      if (images.length > 0 && validImages.length === 0) {
+        return NextResponse.json({
+          error: 'Invalid image URLs',
+          message: 'All provided image URLs are invalid. Please try uploading your images again.',
+          code: 'INVALID_IMAGE_URLS'
+        }, { status: 400 });
+      }
       const streamingPrompt = buildFlashcardPrompt({ mode: shouldStream ? 'stream' : 'json', sourceType: 'text', sourceContent: text || 'No text provided. Analyze the attached image(s) only and build flashcards from their content.', userInstruction: promptText, imagesCount: images.length, numCards: body.numCards });
 
       logLlmInput('FLASHCARDS PRE-PARSED LLM INPUT', streamingPrompt, modelChoice);
-      const userContent: any = images.length > 0
-        ? [{ type: 'text', text: streamingPrompt }, ...images.map((url) => ({ type: 'image_url', image_url: { url } }))]
+      const userContent: any = validImages.length > 0
+        ? [{ type: 'text', text: streamingPrompt }, ...validImages.map((url) => ({ type: 'image_url', image_url: { url } }))]
         : streamingPrompt;
       if (shouldStream) {
-        return streamNdjson(userContent, modelChoice, (userIdForCredits && creditsNeeded > 0) ? { userId: userIdForCredits, credits: creditsNeeded } : undefined, images);
+        return streamNdjson(
+          userContent,
+          modelChoice,
+          (userIdForCredits && creditsNeeded > 0) ? { userId: userIdForCredits, credits: creditsNeeded } : undefined,
+          validImages,
+          supabaseCleanupPaths,
+        );
       }
       try {
         const result = await generateJsonFromModel(userContent, modelChoice);
+        if (supabaseCleanupPaths.length > 0) {
+          try {
+            await fetch(new URL('/api/storage/cleanup', req.url), {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ paths: Array.from(new Set(supabaseCleanupPaths)) }),
+            });
+          } catch (cleanupError) {
+            console.error('Cleanup failed:', cleanupError);
+          }
+        }
         return NextResponse.json(result);
       } catch (e) {
         console.error('Flashcard generation error:', e);
@@ -1213,7 +1341,13 @@ export async function POST(req: NextRequest) {
 
       const userContent: any = validImageParts.length > 0 ? [{ type: 'text', text: prompt }, ...validImageParts] : prompt;
       logLlmInput('FLASHCARDS STREAMING LLM INPUT', prompt, modelChoice);
-      return streamNdjson(userContent, modelChoice, (userId && creditsNeeded > 0) ? { userId, credits: creditsNeeded } : undefined, validImageParts.map(img => img.image_url.url));
+      return streamNdjson(
+        userContent,
+        modelChoice,
+        (userId && creditsNeeded > 0) ? { userId, credits: creditsNeeded } : undefined,
+        validImageParts.map(img => img.image_url.url),
+        [],
+      );
     }
 
     // Non-streaming JSON
