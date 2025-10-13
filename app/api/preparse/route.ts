@@ -19,6 +19,13 @@ type StorageObjectDescriptor = {
   size?: number;
 };
 
+type ImageDescriptor = {
+  bucket: string;
+  path: string;
+  type?: string;
+  size?: number;
+};
+
 async function getUserIdFromAuthHeader(req: NextRequest): Promise<string | null> {
   try {
     const authHeader = req.headers.get('authorization') || '';
@@ -108,6 +115,7 @@ export async function POST(req: NextRequest) {
 
       const pseudoFiles: File[] = [];
       const imageUrls: string[] = [];
+      const imageDescriptors: ImageDescriptor[] = [];
 
       for (const obj of objects) {
         const path = obj.path;
@@ -127,6 +135,12 @@ export async function POST(req: NextRequest) {
           const base64 = buffer.toString('base64');
           const dataUrl = `data:${type};base64,${base64}`;
           imageUrls.push(dataUrl);
+          imageDescriptors.push({
+            bucket,
+            path,
+            type,
+            size: typeof obj.size === 'number' ? obj.size : blob.size || buffer.byteLength,
+          });
           continue;
         }
 
@@ -159,6 +173,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({
         text: textCombined,
         images: allImages,
+        imageDescriptors,
         totalRawChars: result.totalRawChars,
         maxChars: result.maxChars,
         limitExceeded: result.limitExceeded,
@@ -186,6 +201,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({
         text: textCombined,
         images: result.imageDataUrls,
+        imageDescriptors: [],
         totalRawChars: result.totalRawChars,
         maxChars: result.maxChars,
         limitExceeded: result.limitExceeded,

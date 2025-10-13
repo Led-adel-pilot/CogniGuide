@@ -22,6 +22,80 @@ const supabaseAdmin = (supabaseUrl && supabaseServiceKey)
 const userTierCache = new Map<string, { tier: 'free' | 'paid'; expiresAt: number }>();
 const TIER_CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
+type ImageDescriptorInput = {
+  bucket?: string;
+  path?: string;
+  key?: string;
+  type?: string;
+  size?: number;
+  dataUrl?: string;
+  url?: string;
+};
+
+type ResolvedImages = {
+  dataUrls: string[];
+  cleanupPaths: string[];
+};
+
+async function resolveImageInputs(images: unknown[]): Promise<ResolvedImages> {
+  if (!images || images.length === 0) {
+    return { dataUrls: [], cleanupPaths: [] };
+  }
+
+  const resolved: string[] = [];
+  const cleanupPaths = new Set<string>();
+
+  for (const entry of images) {
+    if (!entry) continue;
+
+    if (typeof entry === 'string') {
+      resolved.push(entry);
+      continue;
+    }
+
+    if (typeof entry === 'object') {
+      const record = entry as ImageDescriptorInput;
+      if (record.dataUrl && typeof record.dataUrl === 'string') {
+        resolved.push(record.dataUrl);
+        continue;
+      }
+      if (record.url && typeof record.url === 'string') {
+        resolved.push(record.url);
+        continue;
+      }
+      const bucket = typeof record.bucket === 'string' ? record.bucket : undefined;
+      const path = typeof record.path === 'string'
+        ? record.path
+        : typeof record.key === 'string'
+          ? record.key
+          : undefined;
+      if (bucket && path) {
+        if (!supabaseAdmin) {
+          throw new Error('Storage client is not configured to resolve image references.');
+        }
+        const { data, error } = await supabaseAdmin.storage.from(bucket).download(path);
+        if (error || !data) {
+          throw new Error('Failed to download an uploaded image from storage.');
+        }
+        const blob = data instanceof Blob ? data : new Blob([data]);
+        const arrayBuffer = await blob.arrayBuffer();
+        const buffer = Buffer.from(arrayBuffer);
+        const contentType = typeof record.type === 'string' && record.type
+          ? record.type
+          : blob.type || 'application/octet-stream';
+        const base64 = buffer.toString('base64');
+        resolved.push(`data:${contentType};base64,${base64}`);
+        cleanupPaths.add(path);
+        continue;
+      }
+    }
+
+    console.warn('Unsupported image payload received in mind map generation:', entry);
+  }
+
+  return { dataUrls: resolved, cleanupPaths: Array.from(cleanupPaths) };
+}
+
 function isSameUtcMonth(a: Date, b: Date): boolean {
   return a.getUTCFullYear() === b.getUTCFullYear() && a.getUTCMonth() === b.getUTCMonth();
 }
@@ -198,8 +272,8 @@ export async function POST(req: NextRequest) {
   try {
     const contentType = req.headers.get('content-type') || '';
 
-    async function respondWithStream(opts: { text: string; prompt: string; images: string[]; userId: string | null; rawCharCount?: number; model?: string }) {
-      const { text, prompt, images, userId, rawCharCount, model } = opts;
+    async function respondWithStream(opts: { text: string; prompt: string; images: string[]; userId: string | null; rawCharCount?: number; model?: string; cleanupPaths?: string[] }) {
+      const { text, prompt, images, userId, rawCharCount, model, cleanupPaths = [] } = opts;
       const multimodalPreamble = images.length > 0
         ? `In addition to any text provided below, you are also given ${images.length} image(s). Carefully read text inside the images (OCR) and analyze diagrams to extract key concepts and relationships. Integrate insights from both text and images into a single coherent mind map.`
         : '';
@@ -406,25 +480,7 @@ export async function POST(req: NextRequest) {
       }
       let anyTokenSent = false;
 
-      // Extract file paths from images for cleanup (only for signed URLs, not base64 data URLs)
-      const filesToCleanup: string[] = [];
-      if (images.length > 0) {
-        images.forEach(url => {
-          if (typeof url === 'string' && url.includes('supabase') && url.includes('/uploads/') && !url.startsWith('data:')) {
-            try {
-              const urlObj = new URL(url);
-              // Handle both signed URLs (/sign/) and public URLs (/public/)
-              let path = urlObj.pathname.split('/storage/v1/object/sign/uploads/')[1] ||
-                        urlObj.pathname.split('/storage/v1/object/public/uploads/')[1];
-              if (path) {
-                // Remove query parameters from signed URLs
-                path = path.split('?')[0];
-                filesToCleanup.push(path);
-              }
-            } catch {}
-          }
-        });
-      }
+      const filesToCleanup = Array.from(new Set(cleanupPaths));
 
       const readable = new ReadableStream<Uint8Array>({
         async start(controller) {
@@ -480,10 +536,10 @@ export async function POST(req: NextRequest) {
     }
 
     if (contentType.includes('application/json')) {
-      let body: { text?: string; images?: string[]; prompt?: string; model?: string } | null = null;
+      let body: { text?: string; images?: Array<string | ImageDescriptorInput>; prompt?: string; model?: string } | null = null;
 
       try {
-        body = await req.json() as { text?: string; images?: string[]; prompt?: string; model?: string } | null;
+        body = await req.json() as { text?: string; images?: Array<string | ImageDescriptorInput>; prompt?: string; model?: string } | null;
       } catch (jsonError) {
         return NextResponse.json({
           error: 'Invalid JSON',
@@ -502,11 +558,27 @@ export async function POST(req: NextRequest) {
 
       const text = (body.text || '').toString();
       const prompt = (body.prompt || '').toString();
-      const images = Array.isArray(body.images) ? body.images.filter(img => typeof img === 'string') : [];
+      const rawImages = Array.isArray(body.images) ? (body.images as unknown[]) : [];
+      let resolvedImages: string[] = [];
+      let cleanupPaths: string[] = [];
+      if (rawImages.length > 0) {
+        try {
+          const resolved = await resolveImageInputs(rawImages);
+          resolvedImages = resolved.dataUrls;
+          cleanupPaths = resolved.cleanupPaths;
+        } catch (imageError) {
+          const message = imageError instanceof Error ? imageError.message : 'Failed to process uploaded images.';
+          return NextResponse.json({
+            error: 'Image processing failed',
+            message,
+            code: 'IMAGE_RESOLUTION_FAILED'
+          }, { status: 400 });
+        }
+      }
       const rawCharCount = typeof (body as any)?.rawCharCount === 'number' ? (body as any).rawCharCount as number : undefined;
 
       // Validate input
-      if (!text && !prompt && images.length === 0) {
+      if (!text && !prompt && resolvedImages.length === 0) {
         return NextResponse.json({
           error: 'No content provided',
           message: 'Please provide text content, a prompt, or image URLs to process.',
@@ -515,7 +587,7 @@ export async function POST(req: NextRequest) {
       }
 
       const userId = await getUserIdFromAuthHeader(req);
-      return await respondWithStream({ text, prompt, images, userId, rawCharCount, model: body.model });
+      return await respondWithStream({ text, prompt, images: resolvedImages, userId, rawCharCount, model: body.model, cleanupPaths });
     }
 
     // Fallback: multipart (legacy)
