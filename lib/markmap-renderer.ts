@@ -142,6 +142,61 @@ let lastTouchX = 0, lastTouchY = 0; // For single-finger panning
 // Transform animation state
 let transformAnimationToken = 0;
 
+const TEXT_PROXIMITY_THRESHOLD = 12;
+
+function getTextClientRects(nodeEl: HTMLElement): DOMRect[] {
+    const rects: DOMRect[] = [];
+    const walker = document.createTreeWalker(
+        nodeEl,
+        NodeFilter.SHOW_TEXT,
+        {
+            acceptNode(node) {
+                return node.textContent && node.textContent.trim().length > 0
+                    ? NodeFilter.FILTER_ACCEPT
+                    : NodeFilter.FILTER_REJECT;
+            }
+        }
+    );
+    let current: Node | null = walker.nextNode();
+    while (current) {
+        const range = document.createRange();
+        range.selectNodeContents(current);
+        const clientRects = range.getClientRects();
+        for (let i = 0; i < clientRects.length; i++) {
+            const rect = clientRects[i];
+            if (rect.width === 0 && rect.height === 0) continue;
+            rects.push(rect);
+        }
+        if (typeof range.detach === 'function') {
+            range.detach();
+        }
+        current = walker.nextNode();
+    }
+    return rects;
+}
+
+function isPointNearNodeText(nodeEl: HTMLElement, clientX: number, clientY: number): boolean {
+    const rects = getTextClientRects(nodeEl);
+    for (const rect of rects) {
+        const clampedX = Math.max(rect.left, Math.min(clientX, rect.right));
+        const clampedY = Math.max(rect.top, Math.min(clientY, rect.bottom));
+        const dx = clientX - clampedX;
+        const dy = clientY - clampedY;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        if (distance <= TEXT_PROXIMITY_THRESHOLD) {
+            return true;
+        }
+    }
+    return false;
+}
+
+function shouldBlockPanAtPoint(target: EventTarget | null, clientX: number, clientY: number): boolean {
+    if (!(target instanceof Element)) return false;
+    const nodeEl = target.closest('.mindmap-node') as HTMLElement | null;
+    if (!nodeEl) return false;
+    return isPointNearNodeText(nodeEl, clientX, clientY);
+}
+
 // ============== PERFORMANCE STATE (RAF + CACHING) ==============
 // Schedule transform writes to next animation frame to avoid flooding style updates
 let transformRafId: number | null = null;
@@ -1007,7 +1062,10 @@ function handleDarkModeChange() {
 }
 
 function handleMouseDown(e: MouseEvent) {
-    if ((e.target as HTMLElement).closest('.mindmap-node')) return;
+    if (shouldBlockPanAtPoint(e.target, e.clientX, e.clientY)) {
+        isPanning = false;
+        return;
+    }
     e.preventDefault();
     userHasInteracted = true;
     // Cancel ongoing transform animation on user interaction
@@ -1045,7 +1103,12 @@ function getMidpoint(touches: TouchList): { x: number, y: number } {
 }
 
 function handleTouchStart(e: TouchEvent) {
-    if ((e.target as HTMLElement).closest('.mindmap-node')) return;
+    const primaryTouch = e.touches[0];
+    if (primaryTouch && e.touches.length === 1 && shouldBlockPanAtPoint(e.target, primaryTouch.clientX, primaryTouch.clientY)) {
+        isPanning = false;
+        isPinching = false;
+        return;
+    }
     e.preventDefault();
     userHasInteracted = true;
     // Cancel ongoing transform animation on user interaction
