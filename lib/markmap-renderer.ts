@@ -142,7 +142,7 @@ let lastTouchX = 0, lastTouchY = 0; // For single-finger panning
 // Transform animation state
 let transformAnimationToken = 0;
 
-const TEXT_PROXIMITY_THRESHOLD = 12;
+const TEXT_PROXIMITY_THRESHOLD = 1;
 
 function getTextClientRects(nodeEl: HTMLElement): DOMRect[] {
     const rects: DOMRect[] = [];
