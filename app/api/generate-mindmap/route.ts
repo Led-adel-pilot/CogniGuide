@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
+import { Buffer } from 'node:buffer';
 import { getTextFromDocx, getTextFromPdf, getTextFromPptx, getTextFromPlainText, processMultipleFiles } from '@/lib/document-parser';
 import { MODEL_CREDIT_MULTIPLIERS, MODEL_REQUIRED_TIER, type ModelChoice } from '@/lib/plans';
 import { createClient } from '@supabase/supabase-js';
@@ -21,6 +22,79 @@ const supabaseAdmin = (supabaseUrl && supabaseServiceKey)
 // In-memory cache for user tiers (userId -> { tier, expiresAt })
 const userTierCache = new Map<string, { tier: 'free' | 'paid'; expiresAt: number }>();
 const TIER_CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+
+const SUPABASE_IMAGE_PREFIX = 'supabase://';
+
+async function resolveImageInputs(rawImages: string[]): Promise<{ resolved: string[]; cleanupPaths: string[] }> {
+  const resolved: string[] = [];
+  const cleanupPaths = new Set<string>();
+
+  for (const raw of rawImages) {
+    if (typeof raw !== 'string' || raw.trim() === '') continue;
+
+    if (raw.startsWith('data:')) {
+      resolved.push(raw);
+      continue;
+    }
+
+    if (raw.startsWith(SUPABASE_IMAGE_PREFIX)) {
+      if (!supabaseAdmin) {
+        console.warn('Supabase client unavailable to resolve image reference');
+        continue;
+      }
+      const withoutPrefix = raw.slice(SUPABASE_IMAGE_PREFIX.length);
+      const pipeIndex = withoutPrefix.lastIndexOf('|');
+      let bucketAndPath = withoutPrefix;
+      let mimeType = 'image/png';
+      if (pipeIndex !== -1) {
+        bucketAndPath = withoutPrefix.slice(0, pipeIndex);
+        const encodedMime = withoutPrefix.slice(pipeIndex + 1);
+        try {
+          const decoded = decodeURIComponent(encodedMime);
+          if (decoded) mimeType = decoded;
+        } catch {}
+      }
+      const firstSlash = bucketAndPath.indexOf('/');
+      if (firstSlash === -1) {
+        console.warn('Invalid supabase image reference (missing path):', raw);
+        continue;
+      }
+      const bucket = bucketAndPath.slice(0, firstSlash);
+      const path = bucketAndPath.slice(firstSlash + 1);
+      try {
+        const { data, error } = await supabaseAdmin.storage.from(bucket).download(path);
+        if (error || !data) {
+          console.error('Failed to download image from Supabase:', path, error);
+          continue;
+        }
+        let buffer: Buffer;
+        if (Buffer.isBuffer(data)) {
+          buffer = data;
+        } else if (data instanceof ArrayBuffer) {
+          buffer = Buffer.from(data);
+        } else if (data instanceof Blob) {
+          buffer = Buffer.from(await data.arrayBuffer());
+        } else if (typeof (data as any).arrayBuffer === 'function') {
+          buffer = Buffer.from(await (data as any).arrayBuffer());
+        } else {
+          buffer = Buffer.from(data as any);
+        }
+        const base64 = buffer.toString('base64');
+        resolved.push(`data:${mimeType};base64,${base64}`);
+        if (bucket === 'uploads' && path) {
+          cleanupPaths.add(path);
+        }
+      } catch (err) {
+        console.error('Error resolving Supabase image reference:', err);
+      }
+      continue;
+    }
+
+    resolved.push(raw);
+  }
+
+  return { resolved, cleanupPaths: Array.from(cleanupPaths) };
+}
 
 function isSameUtcMonth(a: Date, b: Date): boolean {
   return a.getUTCFullYear() === b.getUTCFullYear() && a.getUTCMonth() === b.getUTCMonth();
@@ -285,15 +359,17 @@ export async function POST(req: NextRequest) {
 
       const encoder = new TextEncoder();
 
+      const { resolved: resolvedImages, cleanupPaths: supabaseCleanupPaths } = await resolveImageInputs(images);
+
       // Validate image URLs before sending to API (handle both signed URLs and base64 data URLs)
       const validImages = [];
-      for (const url of images) {
+      for (const url of resolvedImages) {
         try {
           if (url.startsWith('data:')) {
             // Base64 data URLs are valid
             validImages.push(url);
           } else {
-            // Validate signed URLs
+            // Validate signed URLs or public URLs
             new URL(url);
             validImages.push(url);
           }
@@ -407,7 +483,7 @@ export async function POST(req: NextRequest) {
       let anyTokenSent = false;
 
       // Extract file paths from images for cleanup (only for signed URLs, not base64 data URLs)
-      const filesToCleanup: string[] = [];
+      const cleanupSet = new Set<string>(supabaseCleanupPaths);
       if (images.length > 0) {
         images.forEach(url => {
           if (typeof url === 'string' && url.includes('supabase') && url.includes('/uploads/') && !url.startsWith('data:')) {
@@ -419,12 +495,14 @@ export async function POST(req: NextRequest) {
               if (path) {
                 // Remove query parameters from signed URLs
                 path = path.split('?')[0];
-                filesToCleanup.push(path);
+                cleanupSet.add(path);
               }
             } catch {}
           }
         });
       }
+
+      const filesToCleanup = Array.from(cleanupSet);
 
       const readable = new ReadableStream<Uint8Array>({
         async start(controller) {
