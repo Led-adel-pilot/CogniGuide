@@ -19,7 +19,7 @@ export default function ContactPage() {
           <div className="rounded-[1.25rem] border bg-background p-6 shadow-sm mb-8">
             <h2 className="font-heading font-semibold mb-2">Customer Support</h2>
             <p className="text-sm text-muted-foreground">
-              Email us at: <a className="underline" href="mailto:cogniguide.dev@gmail.com">cogniguide.dev@gmail.com</a>
+              Email us at: <a className="underline" href="mailto:contact@cogniguide.app">contact@cogniguide.app</a>
             </p>
           </div>
 

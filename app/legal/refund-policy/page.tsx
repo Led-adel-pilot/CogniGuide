@@ -29,8 +29,8 @@ const RefundPolicyPage = () => {
             <h2 className="text-2xl font-semibold mb-2">2. Requests</h2>
             <p>
               To request a refund, contact our support team at{' '}
-              <a href="mailto:cogniguide.dev@gmail.com" className="text-blue-600 hover:underline">
-                cogniguide.dev@gmail.com
+              <a href="mailto:contact@cogniguide.app" className="text-blue-600 hover:underline">
+                contact@cogniguide.app
               </a>{' '}
               with your order email and a brief description of the issue.
             </p>

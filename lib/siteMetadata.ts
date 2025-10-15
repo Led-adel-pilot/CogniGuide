@@ -6,7 +6,7 @@ export const siteMetadata = {
     "CogniGuide transforms PDFs, slides, and notes into interactive mind maps and spaced-repetition flashcards so you can learn faster with AI.",
   url: "https://www.cogniguide.app",
   ogImage: "https://www.cogniguide.app/og-image.png",
-  contactEmail: "cogniguide.dev@gmail.com",
+  contactEmail: "contact@cogniguide.app",
   keywords: [
     "AI study assistant",
     "mind map generator",

@@ -80,7 +80,7 @@ const PrivacyPolicyPage = () => {
           <section>
             <h2 className="text-2xl font-semibold mb-2">6. Contact Us</h2>
             <p>
-              If you have questions or comments about this Privacy Policy, please contact us at: <a href="mailto:cogniguide.dev@gmail.com" className="text-blue-600 hover:underline">cogniguide.dev@gmail.com</a>
+              If you have questions or comments about this Privacy Policy, please contact us at: <a href="mailto:contact@cogniguide.app" className="text-blue-600 hover:underline">contact@cogniguide.app</a>
             </p>
           </section>
         </div>
