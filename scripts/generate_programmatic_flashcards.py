@@ -332,6 +332,17 @@ def serialize_pages(pages: List[Dict[str, Any]]) -> str:
   return f"{OUTPUT_HEADER}{body}\n{OUTPUT_FOOTER}"
 
 
+def write_output_file(path: Path, pages: List[Dict[str, Any]]) -> None:
+  """Atomically write the generated pages to ``path``."""
+
+  serialized = serialize_pages(pages)
+  path.parent.mkdir(parents=True, exist_ok=True)
+
+  temp_path = path.with_suffix(path.suffix + ".tmp")
+  temp_path.write_text(serialized, encoding="utf-8")
+  temp_path.replace(path)
+
+
 def load_existing_pages(path: Path) -> List[Dict[str, Any]]:
   if not path.exists():
     return []
@@ -410,6 +421,7 @@ def main(argv: Iterable[str] | None = None) -> int:
       slug_to_index[slug] = idx
 
   regenerated_count = 0
+  writes_performed = 0
 
   for row in rows:
     if row.slug in slug_to_index and not args.rerun_existing:
@@ -427,8 +439,11 @@ def main(argv: Iterable[str] | None = None) -> int:
 
     regenerated_count += 1
 
-  output_path.parent.mkdir(parents=True, exist_ok=True)
-  output_path.write_text(serialize_pages(generated_pages), encoding="utf-8")
+    write_output_file(output_path, generated_pages)
+    writes_performed += 1
+
+  if not output_path.exists() or not writes_performed:
+    write_output_file(output_path, generated_pages)
   print(
     f"Wrote {len(generated_pages)} programmatic pages to {output_path}"
     + (f" (regenerated {regenerated_count} rows)" if regenerated_count else "")
