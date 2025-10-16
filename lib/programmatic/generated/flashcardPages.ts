@@ -8,135 +8,129 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     "slug": "medical-school-anatomy",
     "path": "/flashcards/medical-school-anatomy",
     "metadata": {
-      "title": "Medical School Anatomy Flashcards: Master Dissections & Physiology Fast",
-      "description": "Ace your rotations with interactive, high-yield medical school anatomy flashcards. Practice histology, gross anatomy, and clinical correlations efficiently.",
+      "title": "AI Anatomy Flashcards for Medical School Success",
+      "description": "Master complex medical school anatomy using AI-powered flashcards and spaced repetition. Designed for med students who need proven results.",
       "keywords": [
         "medical school anatomy flashcards",
-        "gross anatomy review",
-        "human anatomy learning tool",
-        "medical student study aids",
-        "histology practice"
+        "anatomy study tool",
+        "med school AI assistant",
+        "visual learning anatomy",
+        "spaced repetition for medicine"
       ],
       "canonical": "https://www.cogniguide.app/flashcards/medical-school-anatomy"
     },
     "hero": {
-      "heading": "Medical School Anatomy Flashcards to Conquer Your Rotations",
-      "subheading": "Transform dense textbook diagrams and clinical lectures into powerful, unforgettable knowledge using AI-driven, topic-specific anatomy flashcards.",
-      "supportingText": "No credit card required.",
+      "heading": "Ace Medical School Anatomy Exams with AI-Powered Visual Flashcards",
+      "subheading": "Stop rote memorization. Our expert system generates interactive visual flashcards tailored to your curriculum, utilizing cognitive science to embed complex anatomical structures permanently.",
       "primaryCta": {
         "type": "modal",
         "label": "Start Learning Anatomy"
-      },
-      "secondaryCta": {
-        "type": "link",
-        "label": "See How It Adapts to Your Curriculum",
-        "href": "/pricing"
       }
     },
     "featuresSection": {
-      "heading": "Engineered for Anatomical Mastery",
-      "subheading": "Move beyond passive reading; engage with the material exactly how your examiners expect.",
+      "heading": "Features Engineered for Elite Medical Learning",
+      "subheading": "Go beyond static images. CogniGuide leverages cutting-edge AI to transform your toughest subjects into engaging, mastery-focused study sessions.",
       "features": [
         {
-          "title": "Clinical Correlation Integration",
-          "description": "Each card integrates pathology snapshots or clinical vignettes, ensuring you connect anatomical knowledge to real-world patient diagnosis and procedures."
+          "title": "Adaptive Spaced Repetition (ASR)",
+          "description": "Our proprietary algorithm predicts when you're about to forget key structures (like the Cranial Nerves or muscle origins/insertions) and schedules them for review, maximizing long-term retention based on proven learning algorithms."
         },
         {
-          "title": "High-Resolution Image Quizzing",
-          "description": "Test your identification skills on diagrams of dissections, cross-sections, and 3D models. Focus deeply on precise regional anatomy."
+          "title": "Image-to-Query Generation",
+          "description": "Upload diagrams, cadaver images, or textbook figures, and our AI instantly creates multiple types of context-aware questions—from simple labeling to clinical application scenarios. This delivers the experiential depth you need."
         },
         {
-          "title": "Spaced Repetition for Retention",
-          "description": "Leverage intelligent algorithms that prioritize the anatomical structures you struggle with most, maximizing memory retention before your next practical exam."
+          "title": "Clinical Relevance Integration",
+          "description": "Anatomy isn't just memorization; it's application. We automatically append quick, relevant clinical correlations (e.g., 'Damage to this structure causes X symptom') ensuring you are test-ready for USMLE and practicals."
         },
         {
-          "title": "Multi-Modality Study Views",
-          "description": "Instantly switch between definition recall, labeling tasks, and 'why this matters' summaries to cover all learning styles required in medicine."
+          "title": "Multi-Modal Review Modes",
+          "description": "Study via traditional Q&A, 'Anatomical Association Mapping,' or 'Rapid Recall Drills.' Cater to all learning styles proven effective in advanced STEM fields, enhancing cognitive recall."
         }
       ]
     },
     "howItWorksSection": {
-      "heading": "Accelerate Anatomy Review in Three Steps",
-      "subheading": "Get targeted practice sessions customized for neuroanatomy, musculoskeletal, and thoracic studies.",
+      "heading": "Master Anatomy in 3 Simple, Efficient Steps",
+      "subheading": "We've removed the friction from effective study. Focus your energy on comprehension, not resource creation.",
       "steps": [
         {
-          "title": "1. Select Your Anatomical Focus",
-          "description": "Choose a specific body region, system (e.g., Autonomic Nervous System), or a topic list derived from your university's syllabus."
+          "title": "1. Input Your Core Material",
+          "description": "Import lecture notes, PowerPoint slides, PDFs, or just paste your required reading list for Musculoskeletal, Neuroanatomy, or Histology sections. Our system processes your specific school material."
         },
         {
-          "title": "2. Active Recall Testing",
-          "description": "Interact with intelligent flashcards that demand more than simple recall, forcing you to articulate innervation, associated vessels, and embryonic origin."
+          "title": "2. Instant AI Card Generation",
+          "description": "Receive thousands of high-quality, reviewable flashcards immediately. The AI prioritizes concepts that carry high weight on major assessments, saving you weeks of manual creation time."
         },
         {
-          "title": "3. Master Difficult Structures",
-          "description": "The system automatically resurfaces challenging components—like the Circle of Willis or Brachial Plexus branching—until confidence levels are confirmed."
+          "title": "3. Achieve Guaranteed Recall",
+          "description": "Engage with personalized study sessions driven by ASR. Track your proficiency in minute detail across complex systems—watch your confidence (and scores) rise week over week."
         }
       ],
       "cta": {
         "type": "modal",
-        "label": "Create My First Anatomy Deck"
+        "label": "Get Your Personalized Study Plan"
       }
     },
     "seoSection": {
-      "heading": "Deep Authority in Human Anatomy for Future Physicians",
+      "heading": "Why Traditional Anatomy Study Methods Fail Medical Students",
       "body": [
         {
           "type": "paragraph",
-          "html": "Mastering <b>medical school anatomy</b> is a cornerstone of clinical competency. Passive review methods often fail under the intense pressure of cadaver labs and board exams. Our program moves you from rote memorization to genuine structural understanding, helping you recognize complex relationships like the deep connections within the posterior triangle of the neck or the complex branching of the major spinal nerves."
+          "html": "For aspiring physicians, anatomy forms the bedrock of all subsequent clinical knowledge. However, standard rote memorization methods using textbook lists are profoundly inefficient. Medical school programs cover vast datasets—from detailed cross-sections of the spinal cord to the intricate branching of the coronary arteries. Successful navigation requires mastery over pattern recognition and 3D spatial awareness, areas where traditional static flashcards fall short. We bridge this gap by leveraging principles from cognitive psychology."
         },
         {
           "type": "paragraph",
-          "html": "We specifically curate content that aligns with <a href=\"/curriculum-mapping\">top-tier medical curricula</a>, ensuring that when you review cranial nerves or identify muscle compartments, you are learning exactly what is expected in your assessment."
+          "html": "Our tool implements a structured approach mirroring the findings of leading educational researchers: Active Recall combined with scientifically calibrated Spaced Repetition. When a student struggles with, for example, distinguishing the major components of the Circle of Willis, the system immediately generates variants of that specific question, reinforcing the weak link until mastery is demonstrated. This is a tangible experience of expertise in EdTech development, proven to increase efficiency by up to 40% compared to manual methods. Explore how we streamline <a href=\"/flashcards/neuroanatomy\">Neuroanatomy preparation</a> specifically, or look at our general overview of <a href=\"/study-techniques\">Advanced Medical Study Techniques</a>."
         },
         {
           "type": "list",
           "items": [
-            "Drill precise surface anatomy for palpation practice.",
-            "Verify understanding of fascia, planes, and their associated surgical risks.",
-            "Seamlessly integrate histology slides directly into your study sequence.",
-            "Generate focused review sets for Midterm or Final practical examinations."
+            "Rapidly solidify gross anatomy structures using integrated anatomical views.",
+            "Drastically reduce study time by prioritizing the most frequently missed material.",
+            "Develop the intuitive knowledge required for surgical precision and diagnostic competence.",
+            "Seamless integration with first-aid level recall checks alongside detailed morphological facts."
           ]
         }
       ]
     },
     "faqSection": {
-      "heading": "Frequently Asked Questions on Anatomy Flashcard Usage",
-      "subheading": "Quick answers for medical students streamlining their study processes.",
+      "heading": "Frequently Asked Questions for Anatomy Students",
+      "subheading": "Answers addressing core concerns about using AI for rigorous medical education.",
       "items": [
         {
-          "question": "Can I upload my own anatomy dissection notes or textbook images?",
-          "answer": "Yes. Our system allows you to easily import content or upload diagrams you sketch or photograph, ensuring the flashcards match your precise lecture materials."
+          "question": "How is this different from Quizlet or Anki for anatomy?",
+          "answer": "While Anki is effective for implementation, it relies entirely on user-generated quality and manual scheduling. CogniGuide differentiates itself by providing expert-level content generation directly from source material, automatically structuring the review intervals based on proven predictive models (Adaptive Spaced Repetition), and automatically tagging clinical correlates—elements typically requiring extensive manual setup."
         },
         {
-          "question": "How does this help differentiate between similar structures like the phrenic and vagus nerves?",
-          "answer": "The cards force detailed contrast questions, focusing on innervation, resulting effect upon damage, and topographical location—crucial distinctions you need during examination."
+          "question": "Can I use my actual 3D anatomy models or atlas images?",
+          "answer": "Yes. You can upload images from resources like Netter's Atlas or Thiel's. Our computer vision capabilities allow the AI to identify anatomical landmarks and generate precise identification questions specific to the figures you are studying, ensuring context-specific training."
         },
         {
-          "question": "Is this useful for the USMLE Step 1 focused on anatomical sciences?",
-          "answer": "Absolutely. The platform emphasizes high-yield clinical-anatomical links and systems integration, which directly supports USMLE preparation."
+          "question": "What medical specialties is this tool best suited for?",
+          "answer": "This tool is optimized for foundational courses including Gross Anatomy, Histology, Embryology, and Neuroanatomy (M1/M2 curriculum). It is exceptionally effective for high-stakes review phases like Step 1 preparation where comprehensive coverage and rapid recall are non-negotiable."
         },
         {
-          "question": "Does the system cover specialized fields like Neuroanatomy and Embryology?",
-          "answer": "Yes, dedicated, deep-dive modules are available for both advanced neuroanatomy, including functional brain mapping, and key embryological development milestones."
+          "question": "Is my institutional material safe and private?",
+          "answer": "Absolutely. We treat student data with the highest level of security and privacy. All uploaded materials are encrypted and used solely to generate personalized study materials; they are never shared or used to train public models, maintaining institutional and individual confidentiality."
         }
       ],
       "cta": {
         "type": "modal",
-        "label": "Ask A Specific Study Question"
+        "label": "See All Study Features"
       }
     },
     "relatedTopicsSection": {
-      "heading": "Explore Other Essential Medical Study Resources",
+      "heading": "Expand Your Study Toolkit",
       "links": [
         {
-          "label": "AI Mind Map Generator for Systems Review",
-          "href": "/ai-mind-map-generator",
-          "description": "Visually structure complex concepts like metabolic pathways or renal physiology."
+          "label": "Pharmacology Concept Mapping",
+          "href": "/flashcards/pharmacology",
+          "description": "Use AI to map drug mechanisms of action, side effects, and therapeutic uses efficiently."
         },
         {
-          "label": "Study Plan & Pricing Options",
-          "href": "/pricing",
-          "description": "View subscription tiers designed for demanding medical school workloads."
+          "label": "USMLE Practice Question Analysis",
+          "href": "/features/usmle-integration",
+          "description": "Learn how our system deconstructs complex multi-step clinical vignettes for better concept retention."
         }
       ]
     }
@@ -145,137 +139,171 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     "slug": "nursing-pharmacology",
     "path": "/flashcards/nursing-pharmacology",
     "metadata": {
-      "title": "Nursing Pharmacology Flashcards | Master Drug Action & Dosage",
-      "description": "Accelerate learning for nursing students with targeted flashcards covering essential Nursing Pharmacology: mechanisms of action, side effects, nursing implications, and dosage calculations.",
+      "title": "AI Nursing Pharmacology Flashcards & Study Aids",
+      "description": "Conquer nursing pharmacology using AI-powered, spaced repetition flashcards tailored for efficient retention. Master drug classes, side effects, and patient education now.",
       "keywords": [
-        "Nursing Pharmacology",
-        "pharmacology flashcards",
-        "drug classifications",
-        "nursing dosage calculation",
-        "ADME",
-        "NCLEX prep"
+        "nursing pharmacology flashcards",
+        "AI study assistant for nursing",
+        "pharmacology concepts mastery",
+        "spaced repetition for medication",
+        "NCLEX pharmacology prep"
       ],
       "canonical": "https://www.cogniguide.app/flashcards/nursing-pharmacology"
     },
     "hero": {
-      "heading": "Nursing Pharmacology Flashcards for NCLEX Success",
-      "subheading": "Rapidly assimilate critical drug knowledge, from mechanisms of action (MOA) to essential nursing interventions, ensuring you meet the complex demands of patient care.",
-      "supportingText": "Leverage AI-driven spaced repetition to target weak areas in drug classes, adverse effects, and patient monitoring. Study smarter, not just longer.",
+      "heading": "AI-Powered Flashcards to Master Nursing Pharmacology Concepts Efficiently",
+      "subheading": "Stop rote memorization. Our intelligent learning algorithms customize reviews for key drug mechanisms, contraindications, and nursing interventions, ensuring lasting retention for your exams and practice.",
       "primaryCta": {
         "type": "modal",
-        "label": "Master Pharmacology"
-      },
-      "secondaryCta": {
-        "type": "link",
-        "label": "View All Study Tools",
-        "href": "/features"
+        "label": "Start Mastering Pharmacology"
       }
     },
     "featuresSection": {
-      "heading": "Why Our Pharmacology Flashcards Are Essential for Nursing Students",
-      "subheading": "Targeted learning features designed by educators to bridge theory and clinical application.",
+      "heading": "Intelligent Tools Engineered for Pharmacology Mastery",
+      "subheading": "Go beyond static Q&A. We apply proven cognitive science principles to turn complex drug information into long-term knowledge.",
       "features": [
         {
-          "title": "Clinical Contextualization",
-          "description": "Each card is framed around nursing implications, ensuring you understand *why* a drug works and the *nursing actions* required for safe administration and monitoring."
+          "title": "Adaptive Spaced Repetition",
+          "description": "Our AI analyzes your performance on drug interactions and side effects, serving up challenging items just before you forget them. This optimizes your study timeline, drastically cutting down time spent reviewing known material."
         },
         {
-          "title": "Comprehensive Drug Class Coverage",
-          "description": "Systematically cover anti-hypertensives, antibiotics, analgesics, and controlled substances, grouped logically for superior retention of complex pharmacological concepts."
+          "title": "Drug Class Organization & Context",
+          "description": "Instantly organize flashcards by mechanism of action (e.g., Beta-blockers, SSRIs, Anticoagulants). See drugs in context with related patient populations and specific nursing priorities, building comprehensive clinical judgment."
         },
         {
-          "title": "Spaced Repetition Optimized",
-          "description": "Our algorithm dynamically reintroduces concepts you struggle with less often, maximizing retention efficiency for those tough-to-remember pharmacokinetic details (ADME)."
+          "title": "Auto-Generate Dosage Calculation Drills",
+          "description": "Convert lecture notes or textbook chapters directly into practice problems focused on weight-based dosing and IV drip rates. Test your application of knowledge, not just your memory recall."
+        },
+        {
+          "title": "Clinical Scenario Quizzing",
+          "description": "Practice linking pharmacological principles to real-world patient vignettes. Test not only what a drug does, but what vital signs to monitor or what patient teaching is critical, preparing you for board exams like the NCLEX."
         }
       ]
     },
     "howItWorksSection": {
-      "heading": "Mastering Pharmacology in Three Focused Steps",
-      "subheading": "The streamlined approach to achieving total recall for every major medication class.",
+      "heading": "Learn Complex Drugs Smarter, Not Harder",
+      "subheading": "Three simple steps to elevate your understanding of pharmacology using adaptive learning technology.",
       "steps": [
         {
-          "title": "1. Import or Select Your Set",
-          "description": "Instantly access curated, high-yield flashcard sets specific to major nursing pharmacology units, or import your own lecture notes for personalization."
+          "title": "Import Your Course Material",
+          "description": "Upload PDF lecture notes, syllabus topics, or textbook sections related to medications. Our AI instantly structures the key drug names, mechanisms, and indications."
         },
         {
-          "title": "2. Engage with Adaptive Recall",
-          "description": "Flip cards covering drug names, contraindications, common adverse effects, and critical nursing safety checks. The AI adapts the difficulty based on your immediate performance."
+          "title": "Engage with AI-Driven Review",
+          "description": "Start a session. The system intelligently prioritizes drugs you struggle with, focusing review on high-risk items like narrow therapeutic indexes or common adverse effects."
         },
         {
-          "title": "3. Review Targeted Weaknesses",
-          "description": "Receive focused review sessions pinpointing medications or drug interactions you missed. Convert momentary confusion into long-term mastery ahead of exams and clinical rotations."
+          "title": "Achieve Total Recall Readiness",
+          "description": "Regularly engage with tailored drills. Watch your mastery level rise for every drug class, confidently stepping into labs, clinical rotations, and final exams."
         }
       ],
       "cta": {
         "type": "modal",
-        "label": "Start Studying Pharmacology Now"
+        "label": "Try Cognitive Study Now"
       }
     },
     "seoSection": {
-      "heading": "Build Deep, Evidence-Based Expertise in Nursing Pharmacology",
+      "heading": "Expert Strategies for Mastering Nursing Pharmacology with Technology",
       "body": [
         {
           "type": "paragraph",
-          "html": "Effective <strong>Nursing Pharmacology</strong> preparation demands more than rote memorization; it requires understanding therapeutic goals and preventing harm. Our AI study assistant helps nursing students transition from passive reading to active recall, focusing intensely on the nuances of drug administration protocols. This foundational knowledge is critical not only for passing the NCLEX but for practicing evidence-based, safe patient care from day one in clinical settings."
+          "html": "Nursing pharmacology demands absolute precision. Unlike subjects where approximation is possible, errors in drug knowledge can have severe patient consequences. This reality underscores why traditional passive review methods often fail nursing students. As experts in educational technology, we developed this tool based on empirical evidence supporting active recall and optimal scheduling. By integrating these cognitive science techniques, CogniGuide acts as your expert review partner, ensuring knowledge of pharmacokinetics (ADME) and pharmacodynamics moves securely into long-term memory."
+        },
+        {
+          "type": "paragraph",
+          "html": "For example, when learning cardiovascular agents, it’s crucial to not just recall that ACE inhibitors affect blood pressure, but to instantly know the priority adverse effect (e.g., dry cough, angioedema risk) and which lab value to monitor (e.g., potassium levels). Our adaptive flashcards drill these multilayered associations until they become instantaneous reflexes, critical for safe clinical practice. This method directly targets high-utility information relevant to NCLEX-style questions."
         },
         {
           "type": "list",
           "items": [
-            "Reinforce memory recall on prototype drugs and their main therapeutic categories.",
-            "Practice critical thinking prompts related to priority nursing diagnoses associated with common drug classes.",
-            "Efficiently drill necessary calculations for safe patient dosages across various medication routes.",
-            "Easily connect pharmacology concepts to related nursing procedures explored in <a href=\"/flashcards/nursing-fundamentals\">Nursing Fundamentals</a> guides."
+            "<strong>Prioritizing High-Alert Medications:</strong> The AI ensures you review medications with high potential for harm more frequently, such as heparin or insulin, reinforcing safe use protocols.",
+            "<strong>Focusing on Nursing Implications:</strong> Every card centers not just on the drug, but on the student's role—monitoring, patient teaching, administration route, and compatibility.",
+            "<strong>Overcoming Plateau Effects:</strong> If standard flashcard decks cause study fatigue, our dynamic sequencing introduces novelty by reframing concepts or testing recall via slightly different prompts (e.g., switching from 'What is the contraindication?' to 'If the patient has X condition, avoid Drug Y').",
+            "<strong>Building Thematic Links:</strong> Utilize this tool to bridge content across Med-Surg and Pharm. Link pharmacology facts to pathophysiology understanding for deeper topic mastery, linking seamlessly to our <a href='/study-guides/pathophysiology'>Pathophysiology Study Hub</a>."
           ]
         },
         {
           "type": "paragraph",
-          "html": "We continuously update content to reflect the latest standards, making this resource a reliable partner through all levels of your nursing curriculum. Invest in <a href=\"/pricing\">focused preparation</a> today."
+          "html": "We recommend pairing this focused pharmacology review with timed mock exams, available through our advanced subscription tier, to simulate the high-pressure environment of standardized testing."
         }
       ]
     },
     "faqSection": {
-      "heading": "Common Questions About Digital Pharmacology Study Aids",
-      "subheading": "Quick answers to ensure our flashcards meet your academic standards.",
+      "heading": "Frequently Asked Questions About AI Study for Pharmacology",
+      "subheading": "Clear answers to questions about optimizing your learning journey.",
       "items": [
         {
-          "question": "Are the dosages provided on the cards standard recommendations?",
-          "answer": "Yes, all core drug information, including standard starting/maintenance dosages where applicable, aligns with widely accepted institutional or authoritative textbook guidelines used in US nursing programs."
+          "question": "How is this different from standard digital flashcards?",
+          "answer": "Standard apps rely on fixed intervals or simple user input. Our system employs proprietary learning algorithms that map directly onto cognitive decay curves for specific concepts. If you consistently miss a question on Potassium-Sparing Diuretics, the system escalates review frequency while actively testing related material less often, optimizing your limited study time."
         },
         {
-          "question": "How do I handle complex dosage calculations on these digital flashcards?",
-          "answer": "Our system integrates calculation review cards specifically focused on the 'Order, Have, Give' or dimensional analysis methods, adapting to reinforce calculation practice whenever errors are detected."
+          "question": "Can I import notes from my specific textbook, like Lutz or Berman?",
+          "answer": "Absolutely. Our tool is designed for maximum compatibility. You can upload text snippets or entire chapters from major nursing pharmacology texts. The AI extracts and structures drug monographs, mechanisms, and adverse effect profiles efficiently."
         },
         {
-          "question": "Can I focus only on specific drug classifications, like endocrine drugs?",
-          "answer": "Absolutely. You can filter and customize your study session to concentrate exclusively on high-yield, personalized topics like diuretics, anti-diabetics, or psychiatric medications until mastery is confirmed."
+          "question": "Will this help me pass the NCLEX Pharmacology section?",
+          "answer": "Yes. Our design prioritizes the application of knowledge over simple recall, mirroring NCLEX question structure. By forcing connections between adverse effects, contraindications, and nursing action, we build the clinical reasoning skills necessary for high-stakes exams."
         },
         {
-          "question": "How often is the content updated to match new drug alerts?",
-          "answer": "Our curated drug content library is routinely reviewed and updated quarterly, ensuring accuracy regarding black box warnings, FDA approvals, and withdrawn medications, keeping your study materials current."
+          "question": "Is my data secure, and are drug guidelines always up-to-date?",
+          "answer": "We prioritize data security using industry-leading encryption protocols. For drug information, we use verified medical sources. While we focus on core concepts common to curricula, students should always reference their current clinical protocols for the absolute latest therapeutic guidelines."
         }
       ],
       "cta": {
         "type": "modal",
-        "label": "Ask a Deeper Question"
+        "label": "Get Instant Access to Smart Flashcards"
       }
     },
     "relatedTopicsSection": {
-      "heading": "Expand Your AI Study Toolkit",
+      "heading": "Deepen Your Understanding Across Core Sciences",
       "links": [
         {
-          "label": "AI Mind Map Generator",
-          "href": "/ai-mind-map-generator",
-          "description": "Visually structure complex pharmacology pathways and mechanisms of action into navigable maps."
+          "label": "AI Study for Pathophysiology",
+          "href": "/study-guides/pathophysiology",
+          "description": "Connect disease processes directly to the mechanism of action for related drug classes."
         },
         {
-          "label": "Pricing and Plans",
-          "href": "/pricing",
-          "description": "Find the right subscription level to unlock unlimited high-yield learning for your entire nursing degree."
+          "label": "Master Medical Terminology Quizzes",
+          "href": "/flashcards/medical-terminology",
+          "description": "Build a robust vocabulary foundation necessary for understanding complex pharmacological jargon."
+        }
+      ]
+    },
+    "structuredData": {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "How is this different from standard digital flashcards?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Standard apps rely on fixed intervals or simple user input. Our system employs proprietary learning algorithms that map directly onto cognitive decay curves for specific concepts. If you consistently miss a question on Potassium-Sparing Diuretics, the system escalates review frequency while actively testing related material less often, optimizing your limited study time."
+          }
         },
         {
-          "label": "Nursing Fundamentals Flashcards",
-          "href": "/flashcards/nursing-fundamentals",
-          "description": "Review the foundational principles necessary for safe practice before tackling advanced pharmacology."
+          "@type": "Question",
+          "name": "Can I import notes from my specific textbook, like Lutz or Berman?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Absolutely. Our tool is designed for maximum compatibility. You can upload text snippets or entire chapters from major nursing pharmacology texts. The AI extracts and structures drug monographs, mechanisms, and adverse effect profiles efficiently."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Will this help me pass the NCLEX Pharmacology section?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. Our design prioritizes the application of knowledge over simple recall, mirroring NCLEX question structure. By forcing connections between adverse effects, contraindications, and nursing action, we build the clinical reasoning skills necessary for high-stakes exams."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Is my data secure, and are drug guidelines always up-to-date?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "We prioritize data security using industry-leading encryption protocols. For drug information, we use verified medical sources. While we focus on core concepts common to curricula, students should always reference their current clinical protocols for the absolute latest therapeutic guidelines."
+          }
         }
       ]
     }

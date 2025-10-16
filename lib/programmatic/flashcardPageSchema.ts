@@ -68,9 +68,7 @@ export interface ProgrammaticFlashcardPage {
   metadata: ProgrammaticMetadata;
   hero: ProgrammaticSectionCopy & {
     eyebrow?: string;
-    supportingText?: string;
     primaryCta?: ProgrammaticCTA;
-    secondaryCta?: ProgrammaticCTA;
   };
   featuresSection: ProgrammaticSectionCopy & {
     features: ProgrammaticFeature[];

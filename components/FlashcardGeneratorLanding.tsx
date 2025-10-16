@@ -201,20 +201,9 @@ export default function FlashcardGeneratorLanding({ page }: FlashcardGeneratorLa
                           onOpenAuth={() => setShowAuth(true)}
                           className="inline-flex items-center justify-center rounded-full bg-primary px-10 py-3.5 text-lg font-semibold text-primary-foreground shadow-xl shadow-primary/30 transition-transform hover:-translate-y-0.5 hover:shadow-primary/40 z-10 relative"
                         />
-                        {page.hero.supportingText ? (
-                          <p className="text-sm text-muted-foreground">{page.hero.supportingText}</p>
-                        ) : null}
+                        <p className="text-sm text-muted-foreground">No credit card required</p>
                       </div>
                     </div>
-                    {page.hero.secondaryCta ? (
-                      <div className="mt-4 flex justify-center lg:justify-start">
-                        <CTAButton
-                          cta={page.hero.secondaryCta}
-                          onOpenAuth={() => setShowAuth(true)}
-                          className="text-sm font-semibold text-primary hover:text-primary/80 underline underline-offset-4"
-                        />
-                      </div>
-                    ) : null}
                   </div>
                 </div>
 

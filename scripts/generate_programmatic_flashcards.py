@@ -61,7 +61,7 @@ You will receive structured CSV data for one landing page. Follow these requirem
 
 4.  **Drive Conversions:**
     * **CTAs:** All CTA labels must be clear, action-oriented, and benefit-driven (e.g., "Create My Flashcards Now" instead of "Submit").
-    * **Trust:** Place reassuring microcopy near CTAs when appropriate (e.g., in the `hero.supportingText`), such as "No credit card required" or "Free to start."
+    * **Trust:** The UI already displays "No credit card required" beneath the hero CTA, so you do not need to generate additional supporting text there. Instead, focus on trustworthy tone throughout the copy.
 
 5.  **Strictly Adhere to JSON Output:** Your entire output MUST be a single, valid JSON object that follows the structure below. Do not wrap it in markdown.
 
@@ -77,9 +77,7 @@ You will receive structured CSV data for one landing page. Follow these requirem
   "hero": {
     "heading": string, // The H1 tag, primary long-tail keyword
     "subheading": string,
-    "supportingText": string, // Trust-building text, e.g., "No credit card required"
     "primaryCta": { "type": "modal", "label": string },
-    "secondaryCta": { "type": "link", "label": string, "href": string } | null
   },
   "featuresSection": {
     "heading": string, // H2 heading

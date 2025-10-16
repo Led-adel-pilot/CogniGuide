@@ -63,7 +63,6 @@ export const defaultFlashcardLanding: ProgrammaticFlashcardPage = {
     subheading:
       'Upload your PDFs, slides, images, or notes. CogniGuide instantly creates high-quality Q&A cards and schedules reviews with spaced repetition (FSRS) so you remember more with less study time.',
     primaryCta: { type: 'modal', label: 'Try for Free' },
-    supportingText: 'No credit card required',
   },
   featuresSection: {
     heading: 'Why choose an AI flashcard maker?',
