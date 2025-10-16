@@ -5,17 +5,18 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 
 type PageProps = {
-  params: {
+  params: Promise<{
     slug: string;
-  };
+  }>;
 };
 
 export function generateStaticParams() {
   return generatedFlashcardPages.map((page) => ({ slug: page.slug }));
 }
 
-export function generateMetadata({ params }: PageProps): Metadata {
-  const page = getProgrammaticFlashcardPage(params.slug);
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { slug } = await params;
+  const page = getProgrammaticFlashcardPage(slug);
   if (!page) {
     return {};
   }
@@ -23,8 +24,9 @@ export function generateMetadata({ params }: PageProps): Metadata {
   return buildProgrammaticMetadata(page);
 }
 
-export default function ProgrammaticFlashcardPage({ params }: PageProps) {
-  const page = getProgrammaticFlashcardPage(params.slug);
+export default async function ProgrammaticFlashcardPage({ params }: PageProps) {
+  const { slug } = await params;
+  const page = getProgrammaticFlashcardPage(slug);
 
   if (!page) {
     notFound();

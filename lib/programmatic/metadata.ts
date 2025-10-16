@@ -13,8 +13,6 @@ export function buildProgrammaticMetadata(page: ProgrammaticFlashcardPage): Meta
   const { metadata, path } = page;
   const canonical = metadata.canonical ?? absoluteUrl(path);
   const keywords = metadata.keywords?.length ? metadata.keywords : siteMetadata.keywords;
-  const openGraph = metadata.openGraph ?? {};
-  const twitter = metadata.twitter ?? {};
 
   return {
     title: metadata.title ?? siteMetadata.title,
@@ -25,18 +23,16 @@ export function buildProgrammaticMetadata(page: ProgrammaticFlashcardPage): Meta
     },
     robots: metadata.robots,
     openGraph: {
-      siteName: openGraph.siteName ?? siteMetadata.name,
-      type: openGraph.type ?? 'website',
-      url: openGraph.url ?? canonical,
-      title: openGraph.title ?? metadata.title ?? siteMetadata.title,
-      description: openGraph.description ?? metadata.description ?? siteMetadata.description,
-      images: openGraph.images ?? (siteMetadata.ogImage ? [{ url: siteMetadata.ogImage }] : undefined),
+      title: metadata.title ?? siteMetadata.title,
+      description: metadata.description ?? siteMetadata.description,
+      url: canonical,
+      siteName: siteMetadata.name,
+      images: siteMetadata.ogImage ? [{ url: siteMetadata.ogImage }] : undefined,
     },
     twitter: {
-      card: twitter.card ?? 'summary_large_image',
-      title: twitter.title ?? metadata.title ?? siteMetadata.title,
-      description: twitter.description ?? metadata.description ?? siteMetadata.description,
-      images: twitter.images ?? (siteMetadata.ogImage ? [siteMetadata.ogImage] : undefined),
+      title: metadata.title ?? siteMetadata.title,
+      description: metadata.description ?? siteMetadata.description,
+      images: siteMetadata.ogImage ? [siteMetadata.ogImage] : undefined,
     },
   } satisfies Metadata;
 }
