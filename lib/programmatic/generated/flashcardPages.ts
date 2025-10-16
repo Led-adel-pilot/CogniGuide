@@ -8,129 +8,131 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     "slug": "medical-school-anatomy",
     "path": "/flashcards/medical-school-anatomy",
     "metadata": {
-      "title": "AI Anatomy Flashcards for Medical School Success",
-      "description": "Master complex medical school anatomy using AI-powered flashcards and spaced repetition. Designed for med students who need proven results.",
+      "title": "AI Anatomy Flashcards: Ace Medical School",
+      "description": "Transform your medical notes and PDFs into intelligent, spaced-repetition flashcards tailored for complex anatomy study. Boost retention now.",
       "keywords": [
-        "medical school anatomy flashcards",
-        "anatomy study tool",
-        "med school AI assistant",
-        "visual learning anatomy",
-        "spaced repetition for medicine"
+        "AI flashcards",
+        "Anatomy study",
+        "Medical student aid",
+        "Spaced repetition for medicine",
+        "PDF to flashcards",
+        "Active recall tools"
       ],
       "canonical": "https://www.cogniguide.app/flashcards/medical-school-anatomy"
     },
     "hero": {
-      "heading": "Ace Medical School Anatomy Exams with AI-Powered Visual Flashcards",
-      "subheading": "Stop rote memorization. Our expert system generates interactive visual flashcards tailored to your curriculum, utilizing cognitive science to embed complex anatomical structures permanently.",
+      "heading": "Master Complex Anatomy with AI-Generated Flashcards",
+      "subheading": "Upload your medical textbooks, lecture slides, or course notes, and our system instantly creates targeted active recall prompts driven by proven spaced repetition algorithms.",
       "primaryCta": {
         "type": "modal",
-        "label": "Start Learning Anatomy"
+        "label": "Generate My Anatomy Deck"
       }
     },
     "featuresSection": {
-      "heading": "Features Engineered for Elite Medical Learning",
-      "subheading": "Go beyond static images. CogniGuide leverages cutting-edge AI to transform your toughest subjects into engaging, mastery-focused study sessions.",
+      "heading": "Built for Deep Medical Learning",
+      "subheading": "Move beyond passive reading. Leverage cognitive science principles applied directly to your specialized study materials for maximum information retention.",
       "features": [
         {
-          "title": "Adaptive Spaced Repetition (ASR)",
-          "description": "Our proprietary algorithm predicts when you're about to forget key structures (like the Cranial Nerves or muscle origins/insertions) and schedules them for review, maximizing long-term retention based on proven learning algorithms."
+          "title": "Intelligent Document Ingestion",
+          "description": "Simply upload PDFs or slide decks of detailed anatomical diagrams, complex terminology, or surgical notes. Our AI parses and extracts concepts ready for testing, saving weeks of manual prep time."
         },
         {
-          "title": "Image-to-Query Generation",
-          "description": "Upload diagrams, cadaver images, or textbook figures, and our AI instantly creates multiple types of context-aware questions—from simple labeling to clinical application scenarios. This delivers the experiential depth you need."
+          "title": "Adaptive Spaced Repetition Scheduling",
+          "description": "Our algorithm dynamically adjusts review intervals based on your proven mastery of specific systems (e.g., Cardiovascular, Nervous). Focus time only where you need it most, mirroring the structure of successful study methodologies."
         },
         {
-          "title": "Clinical Relevance Integration",
-          "description": "Anatomy isn't just memorization; it's application. We automatically append quick, relevant clinical correlations (e.g., 'Damage to this structure causes X symptom') ensuring you are test-ready for USMLE and practicals."
+          "title": "Concept Tagging and Linking",
+          "description": "Automatically categorize generated flashcards by anatomical region, function, or clinical relevance. Create hyper-organized review decks that connect disparate facts seamlessly during clinical reasoning exercises."
         },
         {
-          "title": "Multi-Modal Review Modes",
-          "description": "Study via traditional Q&A, 'Anatomical Association Mapping,' or 'Rapid Recall Drills.' Cater to all learning styles proven effective in advanced STEM fields, enhancing cognitive recall."
+          "title": "Rich Question Formatting",
+          "description": "Receive varied question types—from basic definition recall to advanced visualization matching prompts—ensuring holistic engagement with structures and spatial relationships inherent in anatomy."
         }
       ]
     },
     "howItWorksSection": {
-      "heading": "Master Anatomy in 3 Simple, Efficient Steps",
-      "subheading": "We've removed the friction from effective study. Focus your energy on comprehension, not resource creation.",
+      "heading": "The Fastest Path from Notes to Recall Mastery",
+      "subheading": "Our workflow integrates seamlessly with your existing medical curriculum resources, ensuring immediate, actionable study aids.",
       "steps": [
         {
-          "title": "1. Input Your Core Material",
-          "description": "Import lecture notes, PowerPoint slides, PDFs, or just paste your required reading list for Musculoskeletal, Neuroanatomy, or Histology sections. Our system processes your specific school material."
+          "title": "1. Upload Your Source Material",
+          "description": "Drag and drop your lecture slides (.pptx), PDF notes, or textbook chapters directly into the generator interface. Support for highly structured academic documents is optimized."
         },
         {
-          "title": "2. Instant AI Card Generation",
-          "description": "Receive thousands of high-quality, reviewable flashcards immediately. The AI prioritizes concepts that carry high weight on major assessments, saving you weeks of manual creation time."
+          "title": "2. AI Extraction & Card Generation",
+          "description": "Our specialized learning models instantly identify key anatomical structures, pathways, associations, and clinical correlations, turning static text into active recall flashcards."
         },
         {
-          "title": "3. Achieve Guaranteed Recall",
-          "description": "Engage with personalized study sessions driven by ASR. Track your proficiency in minute detail across complex systems—watch your confidence (and scores) rise week over week."
+          "title": "3. Review with Cognitive Science",
+          "description": "Begin practicing immediately. The spaced repetition scheduler takes over, prioritizing the high-yield areas you flagged or struggled with during previous review sessions."
         }
       ],
       "cta": {
         "type": "modal",
-        "label": "Get Your Personalized Study Plan"
+        "label": "Generate My Anatomy Deck"
       }
     },
     "seoSection": {
-      "heading": "Why Traditional Anatomy Study Methods Fail Medical Students",
+      "heading": "Precision Studying for Medical Education",
       "body": [
         {
           "type": "paragraph",
-          "html": "For aspiring physicians, anatomy forms the bedrock of all subsequent clinical knowledge. However, standard rote memorization methods using textbook lists are profoundly inefficient. Medical school programs cover vast datasets—from detailed cross-sections of the spinal cord to the intricate branching of the coronary arteries. Successful navigation requires mastery over pattern recognition and 3D spatial awareness, areas where traditional static flashcards fall short. We bridge this gap by leveraging principles from cognitive psychology."
-        },
-        {
-          "type": "paragraph",
-          "html": "Our tool implements a structured approach mirroring the findings of leading educational researchers: Active Recall combined with scientifically calibrated Spaced Repetition. When a student struggles with, for example, distinguishing the major components of the Circle of Willis, the system immediately generates variants of that specific question, reinforcing the weak link until mastery is demonstrated. This is a tangible experience of expertise in EdTech development, proven to increase efficiency by up to 40% compared to manual methods. Explore how we streamline <a href=\"/flashcards/neuroanatomy\">Neuroanatomy preparation</a> specifically, or look at our general overview of <a href=\"/study-techniques\">Advanced Medical Study Techniques</a>."
+          "html": "Medical school demands intense memorization of intricate relationships—spatial location, nerve innervation, vascular supply, and embryonic origins. Traditional flashcard creation is time-consuming and often incomplete, especially when dealing with complex medical illustrations. Our tool eliminates this bottleneck. By applying deep learning to your specific anatomy course material, we ensure every high-yield fact from your slides or texts is transformed into a measurable active recall opportunity. This methodical approach is crucial for long-term retention needed for high-stakes exams like the USMLE Step 1 or final course assessments."
         },
         {
           "type": "list",
           "items": [
-            "Rapidly solidify gross anatomy structures using integrated anatomical views.",
-            "Drastically reduce study time by prioritizing the most frequently missed material.",
-            "Develop the intuitive knowledge required for surgical precision and diagnostic competence.",
-            "Seamless integration with first-aid level recall checks alongside detailed morphological facts."
+            "Creating decks for specific systemic anatomy units (e.g., Neuroanatomy)",
+            "Generating flashcards from gross anatomy dissection guides",
+            "Efficiently reviewing cross-sectional imaging correlates",
+            "Using AI to identify and drill obscure but required terminology",
+            "Creating personalized study schedules optimized for retention spikes"
           ]
+        },
+        {
+          "type": "paragraph",
+          "html": "For medical students, achieving expertise means consistently outperforming the forgetting curve. Spaced repetition, when combined with precise content extraction from dense academic papers and slides, drastically improves learning efficiency. Instead of rote reading, you engage with knowledge in its most testable form, building strong, durable memory traces necessary for both standardized testing and real-world patient care."
         }
       ]
     },
     "faqSection": {
-      "heading": "Frequently Asked Questions for Anatomy Students",
-      "subheading": "Answers addressing core concerns about using AI for rigorous medical education.",
+      "heading": "Frequently Asked Questions",
+      "subheading": "Get clarity on how our AI leverages your materials for superior anatomical retention.",
       "items": [
         {
-          "question": "How is this different from Quizlet or Anki for anatomy?",
-          "answer": "While Anki is effective for implementation, it relies entirely on user-generated quality and manual scheduling. CogniGuide differentiates itself by providing expert-level content generation directly from source material, automatically structuring the review intervals based on proven predictive models (Adaptive Spaced Repetition), and automatically tagging clinical correlates—elements typically requiring extensive manual setup."
+          "question": "Can the AI correctly interpret diagrams in my lecture slides?",
+          "answer": "Yes. While our primary strength is extracting dense text definitions and correlations, our image processing layer is tuned to recognize labels, legends, and annotated structures within common medical presentation formats, incorporating these findings into concept-based flashcards."
         },
         {
-          "question": "Can I use my actual 3D anatomy models or atlas images?",
-          "answer": "Yes. You can upload images from resources like Netter's Atlas or Thiel's. Our computer vision capabilities allow the AI to identify anatomical landmarks and generate precise identification questions specific to the figures you are studying, ensuring context-specific training."
+          "question": "How does the spaced repetition work with specialized subjects like anatomy?",
+          "answer": "It's adaptive. When you correctly identify a muscle's insertion point, that item's next review interval lengthens significantly. If you confuse the path of the facial nerve, the system schedules highly targeted micro-reviews until your recall confidence improves, applying established learning algorithms tailored for vast information sets."
         },
         {
-          "question": "What medical specialties is this tool best suited for?",
-          "answer": "This tool is optimized for foundational courses including Gross Anatomy, Histology, Embryology, and Neuroanatomy (M1/M2 curriculum). It is exceptionally effective for high-stakes review phases like Step 1 preparation where comprehensive coverage and rapid recall are non-negotiable."
+          "question": "Is this tool safe for proprietary medical school documents?",
+          "answer": "We prioritize data privacy. All uploaded materials are processed securely and encrypted. Your source documents are never shared and are solely used to generate your personalized flashcard decks."
         },
         {
-          "question": "Is my institutional material safe and private?",
-          "answer": "Absolutely. We treat student data with the highest level of security and privacy. All uploaded materials are encrypted and used solely to generate personalized study materials; they are never shared or used to train public models, maintaining institutional and individual confidentiality."
+          "question": "What if my course uses specific mnemonics? Can the tool learn those?",
+          "answer": "Absolutely. If you include custom mnemonics or summary acronyms in your uploaded notes, the AI is trained to recognize and utilize those specific contextual learning aids when formulating question prompts."
         }
       ],
       "cta": {
         "type": "modal",
-        "label": "See All Study Features"
+        "label": "Generate My Anatomy Deck"
       }
     },
     "relatedTopicsSection": {
-      "heading": "Expand Your Study Toolkit",
+      "heading": "Explore Smarter Study Methods",
       "links": [
         {
-          "label": "Pharmacology Concept Mapping",
-          "href": "/flashcards/pharmacology",
-          "description": "Use AI to map drug mechanisms of action, side effects, and therapeutic uses efficiently."
+          "label": "Chemistry Concept Mapping Tools",
+          "href": "https://www.cogniguide.app/flashcards/chemistry-notes",
+          "description": "See how complex reaction pathways are distilled into actionable review sets."
         },
         {
-          "label": "USMLE Practice Question Analysis",
-          "href": "/features/usmle-integration",
-          "description": "Learn how our system deconstructs complex multi-step clinical vignettes for better concept retention."
+          "label": "AI for Textbook Chapter Summarization",
+          "href": "https://www.cogniguide.app/study-guides/textbook-summaries",
+          "description": "Leverage large-scale document processing before creating your active recall aids."
         }
       ]
     }
@@ -139,171 +141,131 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     "slug": "nursing-pharmacology",
     "path": "/flashcards/nursing-pharmacology",
     "metadata": {
-      "title": "AI Nursing Pharmacology Flashcards & Study Aids",
-      "description": "Conquer nursing pharmacology using AI-powered, spaced repetition flashcards tailored for efficient retention. Master drug classes, side effects, and patient education now.",
+      "title": "AI Pharmacology Flashcards for Nursing Mastery",
+      "description": "Convert your nursing pharmacology notes into smart, spaced repetition flashcards. Study medications efficiently and boost retention for exams.",
       "keywords": [
         "nursing pharmacology flashcards",
-        "AI study assistant for nursing",
-        "pharmacology concepts mastery",
-        "spaced repetition for medication",
-        "NCLEX pharmacology prep"
+        "spaced repetition for drugs",
+        "pharmacology study guide",
+        "AI note conversion",
+        "NCLEX prep flashcards",
+        "drug mechanism study"
       ],
       "canonical": "https://www.cogniguide.app/flashcards/nursing-pharmacology"
     },
     "hero": {
-      "heading": "AI-Powered Flashcards to Master Nursing Pharmacology Concepts Efficiently",
-      "subheading": "Stop rote memorization. Our intelligent learning algorithms customize reviews for key drug mechanisms, contraindications, and nursing interventions, ensuring lasting retention for your exams and practice.",
+      "heading": "Generate Nursing Pharmacology Flashcards Instantly",
+      "subheading": "Upload your drug notes, slides, or textbook chapters, and our AI creates precision flashcards tailored for active recall and spaced repetition scheduling.",
       "primaryCta": {
         "type": "modal",
-        "label": "Start Mastering Pharmacology"
+        "label": "Create My Flashcards Now"
       }
     },
     "featuresSection": {
-      "heading": "Intelligent Tools Engineered for Pharmacology Mastery",
-      "subheading": "Go beyond static Q&A. We apply proven cognitive science principles to turn complex drug information into long-term knowledge.",
+      "heading": "Smarter Studying Engineered for Clinical Success",
+      "subheading": "Move beyond rote memorization. Our tool uses cognitive science principles to ensure high retention rates across complex drug classes and indications.",
       "features": [
         {
-          "title": "Adaptive Spaced Repetition",
-          "description": "Our AI analyzes your performance on drug interactions and side effects, serving up challenging items just before you forget them. This optimizes your study timeline, drastically cutting down time spent reviewing known material."
+          "title": "Instant Material Ingestion",
+          "description": "Effortlessly upload large PDF lecture slides or lengthy review notes. Our engine intelligently extracts drug names, mechanisms of action, side effects, and dosages into ready-to-use question formats."
         },
         {
-          "title": "Drug Class Organization & Context",
-          "description": "Instantly organize flashcards by mechanism of action (e.g., Beta-blockers, SSRIs, Anticoagulants). See drugs in context with related patient populations and specific nursing priorities, building comprehensive clinical judgment."
+          "title": "Adaptive Spaced Repetition Scheduling",
+          "description": "Forget manual scheduling. Our algorithm determines the optimal time for you to review challenging drug families, minimizing burnout while maximizing long-term memory consolidation essential for clinical practice."
         },
         {
-          "title": "Auto-Generate Dosage Calculation Drills",
-          "description": "Convert lecture notes or textbook chapters directly into practice problems focused on weight-based dosing and IV drip rates. Test your application of knowledge, not just your memory recall."
+          "title": "Targeted Active Recall",
+          "description": "Flashcards focus on critical associations, such as 'What is the black box warning for Drug X?' or 'List three key nursing implications for Beta-Blockers,' enforcing deep conceptual understanding over simple term definitions."
         },
         {
-          "title": "Clinical Scenario Quizzing",
-          "description": "Practice linking pharmacological principles to real-world patient vignettes. Test not only what a drug does, but what vital signs to monitor or what patient teaching is critical, preparing you for board exams like the NCLEX."
+          "title": "Automated Tagging and Organization",
+          "description": "Cards are automatically organized by therapeutic class (e.g., Antihypertensives, Antibiotics), route, and patient population, creating an easily navigable digital study system superior to physical indexing."
         }
       ]
     },
     "howItWorksSection": {
-      "heading": "Learn Complex Drugs Smarter, Not Harder",
-      "subheading": "Three simple steps to elevate your understanding of pharmacology using adaptive learning technology.",
+      "heading": "Your Pharmacology Study Workflow, Automated",
+      "subheading": "In three simple steps, transform dense material into your most effective study asset, designed around proven learning methodologies.",
       "steps": [
         {
-          "title": "Import Your Course Material",
-          "description": "Upload PDF lecture notes, syllabus topics, or textbook sections related to medications. Our AI instantly structures the key drug names, mechanisms, and indications."
+          "title": "1. Upload Your Source Material",
+          "description": "Provide the AI with lecture PDFs, textbook excerpts, or handwritten scans containing pharmacology content. Specify which document sections are highest priority for testing."
         },
         {
-          "title": "Engage with AI-Driven Review",
-          "description": "Start a session. The system intelligently prioritizes drugs you struggle with, focusing review on high-risk items like narrow therapeutic indexes or common adverse effects."
+          "title": "2. AI Extraction and Card Generation",
+          "description": "Our proprietary extraction layer analyzes complex biological and clinical data, structuring questions and answers around clinical relevance, metabolism, and patient teaching points."
         },
         {
-          "title": "Achieve Total Recall Readiness",
-          "description": "Regularly engage with tailored drills. Watch your mastery level rise for every drug class, confidently stepping into labs, clinical rotations, and final exams."
+          "title": "3. Initiate Spaced Review Sessions",
+          "description": "Begin your session immediately. The system logs your performance and intelligently resurfaces material according to scientifically validated intervals, ensuring peak recall on exam day."
         }
       ],
       "cta": {
         "type": "modal",
-        "label": "Try Cognitive Study Now"
+        "label": "Create My Flashcards Now"
       }
     },
     "seoSection": {
-      "heading": "Expert Strategies for Mastering Nursing Pharmacology with Technology",
+      "heading": "Mastering Drug Concepts with AI and Cognitive Science",
       "body": [
         {
           "type": "paragraph",
-          "html": "Nursing pharmacology demands absolute precision. Unlike subjects where approximation is possible, errors in drug knowledge can have severe patient consequences. This reality underscores why traditional passive review methods often fail nursing students. As experts in educational technology, we developed this tool based on empirical evidence supporting active recall and optimal scheduling. By integrating these cognitive science techniques, CogniGuide acts as your expert review partner, ensuring knowledge of pharmacokinetics (ADME) and pharmacodynamics moves securely into long-term memory."
-        },
-        {
-          "type": "paragraph",
-          "html": "For example, when learning cardiovascular agents, it’s crucial to not just recall that ACE inhibitors affect blood pressure, but to instantly know the priority adverse effect (e.g., dry cough, angioedema risk) and which lab value to monitor (e.g., potassium levels). Our adaptive flashcards drill these multilayered associations until they become instantaneous reflexes, critical for safe clinical practice. This method directly targets high-utility information relevant to NCLEX-style questions."
+          "html": "Success in nursing pharmacology hinges on managing vast amounts of detailed, life-critical information—from narrow therapeutic indices to complex interactions. Relying solely on re-reading notes leaves essential information vulnerable to the forgetting curve. Our AI flashcard generator directly addresses this challenge by leveraging principles of spaced repetition, ensuring that the mechanism of action for that critical antihypertensive agent or the signature adverse effect of a chemotherapy drug is moved firmly into long-term memory."
         },
         {
           "type": "list",
           "items": [
-            "<strong>Prioritizing High-Alert Medications:</strong> The AI ensures you review medications with high potential for harm more frequently, such as heparin or insulin, reinforcing safe use protocols.",
-            "<strong>Focusing on Nursing Implications:</strong> Every card centers not just on the drug, but on the student's role—monitoring, patient teaching, administration route, and compatibility.",
-            "<strong>Overcoming Plateau Effects:</strong> If standard flashcard decks cause study fatigue, our dynamic sequencing introduces novelty by reframing concepts or testing recall via slightly different prompts (e.g., switching from 'What is the contraindication?' to 'If the patient has X condition, avoid Drug Y').",
-            "<strong>Building Thematic Links:</strong> Utilize this tool to bridge content across Med-Surg and Pharm. Link pharmacology facts to pathophysiology understanding for deeper topic mastery, linking seamlessly to our <a href='/study-guides/pathophysiology'>Pathophysiology Study Hub</a>."
+            "Efficiently convert thick pharmacology textbooks into bite-sized study units.",
+            "Systematically memorize critical dosage ranges and administration routes.",
+            "Drill core knowledge necessary for passing clinical rotations and the NCLEX.",
+            "Build associations between drug classes and prioritized nursing assessments.",
+            "Create personalized decks focusing only on areas where your current knowledge lags."
           ]
         },
         {
           "type": "paragraph",
-          "html": "We recommend pairing this focused pharmacology review with timed mock exams, available through our advanced subscription tier, to simulate the high-pressure environment of standardized testing."
+          "html": "This approach saves invaluable time for busy nursing students, redirecting focus from manual card creation toward clinical application and deeper critical thinking skills. Whether you are navigating the complex side effects of SSRIs or distinguishing between different classes of insulin, structured active recall accelerates confidence when it matters most: at the patient’s bedside."
         }
       ]
     },
     "faqSection": {
-      "heading": "Frequently Asked Questions About AI Study for Pharmacology",
-      "subheading": "Clear answers to questions about optimizing your learning journey.",
+      "heading": "Frequently Asked Questions About Drug Flashcards",
+      "subheading": "Get answers to common queries regarding material upload and learning technology.",
       "items": [
         {
-          "question": "How is this different from standard digital flashcards?",
-          "answer": "Standard apps rely on fixed intervals or simple user input. Our system employs proprietary learning algorithms that map directly onto cognitive decay curves for specific concepts. If you consistently miss a question on Potassium-Sparing Diuretics, the system escalates review frequency while actively testing related material less often, optimizing your limited study time."
+          "question": "Can the tool handle complex drug calculations or pharmacokinetic data?",
+          "answer": "Yes, while flashcards favor associative learning, the AI is proficient at extracting and testing on core calculation rules, half-lives, and half-life based dosing frequency requirements when they appear explicitly in your source material."
         },
         {
-          "question": "Can I import notes from my specific textbook, like Lutz or Berman?",
-          "answer": "Absolutely. Our tool is designed for maximum compatibility. You can upload text snippets or entire chapters from major nursing pharmacology texts. The AI extracts and structures drug monographs, mechanisms, and adverse effect profiles efficiently."
+          "question": "How is this better than using premade NCLEX decks?",
+          "answer": "Unlike static decks, our cards are context-specific to the exact curriculum you learned from (your professors’ emphasis, specific slide formats), ensuring 100% relevance to your upcoming exams or rotations."
         },
         {
-          "question": "Will this help me pass the NCLEX Pharmacology section?",
-          "answer": "Yes. Our design prioritizes the application of knowledge over simple recall, mirroring NCLEX question structure. By forcing connections between adverse effects, contraindications, and nursing action, we build the clinical reasoning skills necessary for high-stakes exams."
+          "question": "What type of scheduling does the spaced repetition use?",
+          "answer": "We employ optimized scheduling intervals based on established learning models designed to optimize retention for declarative and procedural knowledge acquisition, minimizing review time while maximizing long-term recall proficiency."
         },
         {
-          "question": "Is my data secure, and are drug guidelines always up-to-date?",
-          "answer": "We prioritize data security using industry-leading encryption protocols. For drug information, we use verified medical sources. While we focus on core concepts common to curricula, students should always reference their current clinical protocols for the absolute latest therapeutic guidelines."
+          "question": "Can I add my own custom cards or edit the AI's output?",
+          "answer": "Absolutely. All automatically generated decks are fully editable. You can tweak AI-generated questions, add manual cards related to a specific patient scenario, or adjust difficulty levels before starting your review cycle."
         }
       ],
       "cta": {
         "type": "modal",
-        "label": "Get Instant Access to Smart Flashcards"
+        "label": "Create My Flashcards Now"
       }
     },
     "relatedTopicsSection": {
-      "heading": "Deepen Your Understanding Across Core Sciences",
+      "heading": "Continue Mastering Your Study Workflow",
       "links": [
         {
-          "label": "AI Study for Pathophysiology",
-          "href": "/study-guides/pathophysiology",
-          "description": "Connect disease processes directly to the mechanism of action for related drug classes."
+          "label": "Anatomy Flashcard Generator",
+          "href": "https://www.cogniguide.app/flashcards/anatomy",
+          "description": "Convert dense diagrams and structural descriptions into effective spatial memory tools."
         },
         {
-          "label": "Master Medical Terminology Quizzes",
-          "href": "/flashcards/medical-terminology",
-          "description": "Build a robust vocabulary foundation necessary for understanding complex pharmacological jargon."
-        }
-      ]
-    },
-    "structuredData": {
-      "@context": "https://schema.org",
-      "@type": "FAQPage",
-      "mainEntity": [
-        {
-          "@type": "Question",
-          "name": "How is this different from standard digital flashcards?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Standard apps rely on fixed intervals or simple user input. Our system employs proprietary learning algorithms that map directly onto cognitive decay curves for specific concepts. If you consistently miss a question on Potassium-Sparing Diuretics, the system escalates review frequency while actively testing related material less often, optimizing your limited study time."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "Can I import notes from my specific textbook, like Lutz or Berman?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Absolutely. Our tool is designed for maximum compatibility. You can upload text snippets or entire chapters from major nursing pharmacology texts. The AI extracts and structures drug monographs, mechanisms, and adverse effect profiles efficiently."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "Will this help me pass the NCLEX Pharmacology section?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Yes. Our design prioritizes the application of knowledge over simple recall, mirroring NCLEX question structure. By forcing connections between adverse effects, contraindications, and nursing action, we build the clinical reasoning skills necessary for high-stakes exams."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "Is my data secure, and are drug guidelines always up-to-date?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "We prioritize data security using industry-leading encryption protocols. For drug information, we use verified medical sources. While we focus on core concepts common to curricula, students should always reference their current clinical protocols for the absolute latest therapeutic guidelines."
-          }
+          "label": "Pathophysiology AI Study Aids",
+          "href": "https://www.cogniguide.app/study-guides/pathophysiology",
+          "description": "Create question banks linking disease processes to clinical manifestations."
         }
       ]
     }

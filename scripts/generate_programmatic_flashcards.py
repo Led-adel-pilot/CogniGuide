@@ -12,7 +12,8 @@ Example usage::
         --input data/flashcard_pages.csv \
         --output lib/programmatic/generated/flashcardPages.ts \
         --model gemini-2.5-flash-lite \
-        --temperature 2.0
+        --temperature 2.0 \
+        --reasoning-effort high
 
 The input CSV must include, at minimum, the columns ``slug`` and ``topic``. Every
 other column becomes context that is injected into the LLM prompt so you can steer
@@ -43,90 +44,113 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
 OUTPUT_FOOTER = "];\n"
 
 PROMPT_TEMPLATE = """
-You are an expert content strategist and senior copywriter specializing in high-ranking, user-focused SEO for EdTech SaaS companies. Your goal is to generate comprehensive, E-E-A-T compliant landing pages that rank for long-tail keywords and convert users for a new AI study assistant.
+You will generate a complete landing page JSON for an AI flashcards generator app, suitable for static rendering.
+Info on app: You upload your PDFs, slides, or notes and generates flashcards, and implements spaced-repetition scheduling. Do not halucinate other features. 
 
 You will receive structured CSV data for one landing page. Follow these requirements precisely:
 
-1.  **Write "People-First" Content:** Your primary goal is to create helpful, reliable, and original content that satisfies user search intent. The copy must be in-depth and high-utility. Avoid thin, boilerplate, or repetitive text. Each page must be unique and valuable.
-
-2.  **Demonstrate E-E-A-T (Experience, Expertise, Authoritativeness, Trust):**
+CRITICAL WRITING RULES (people-first + E-E-A-T):
+1)  **Write "People-First" Content:** Your primary goal is to create helpful, reliable, and original content that satisfies user search intent. The copy must be in-depth and high-utility. Avoid thin, boilerplate, or repetitive text. Each page must be unique and valuable.
+2)  **Demonstrate E-E-A-T (Experience, Expertise, Authoritativeness, Trust):**
     * **Tone:** Write in a confident, informative, and trustworthy tone, as if from an expert in educational technology.
     * **Experience:** Show, don't just tell. Include specific benefits, use-cases, or hypothetical results (e.g., "...helped students cut study time in half" or "...improves exam scores by 20%").
     * **Expertise:** Weave in semantically related keywords and concepts naturally (e.g., "spaced repetition," "learning algorithms," "smarter studying," "cognitive science") to build topical authority.
+    * **Evidence & Claims Policy (no hard citations required):** You may state general, experience-based benefits without sources. **Do not** include precise numeric claims (percent improvements, time reductions), named studies, or quotes **unless** you can provide a clear, verifiable source URL to a reputable site. If unsure, rewrite conservatively and favor specific examples over statistics.
 
-3.  **Optimize On-Page SEO Elements:**
-    * **Headings:** The `hero.heading` should be a unique, keyword-rich H1 that targets a specific long-tail query based on the topic. Use a logical hierarchy of H2s and H3s for section headings (`featuresSection.heading`, `faqSection.heading`, etc.) to improve readability and structure.
-    * **Metadata:** The `metadata.title` should be compelling and keyword-focused. The `metadata.description` must be an engaging summary that encourages clicks from the SERP.
-    * **SEO Section:** The `seoSection` must be substantial, offering detailed information, examples, and use cases. This is a critical area for building topical authority and should contain a mix of paragraphs and lists. Weave in contextual internal links to other relevant pages.
 
-4.  **Drive Conversions:**
-    * **CTAs:** All CTA labels must be clear, action-oriented, and benefit-driven (e.g., "Create My Flashcards Now" instead of "Submit").
-    * **Trust:** The UI already displays "No credit card required" beneath the hero CTA, so you do not need to generate additional supporting text there. Instead, focus on trustworthy tone throughout the copy.
+ON-PAGE SEO REQUIREMENTS:
+3) Title: ≤60 characters, must contain the primary keyword or closest variant. Make it benefit-led.
+4) Meta description: 140–155 characters, promise the outcome without hype.
+5) H1 (hero.heading): include the primary keyword or close variant. H1 ≈ title but not identical.
+6) Headings hierarchy: Use concise H2/H3s; avoid keyword stuffing. Every section must be meaningfully different.
+7) Semantic coverage: Naturally weave related_terms and subject-specific subtopics (if given). Include spaced repetition, active recall, tagging, and study workflow concepts where relevant.
+8) Internal links: Use internal_links if provided; otherwise create at least two sensible links under relatedTopicsSection that point to topical neighbors at {base_url}.
+9) Accessibility: Any example references should describe content plainly so screen readers convey value (no images required in output).
 
-5.  **Strictly Adhere to JSON Output:** Your entire output MUST be a single, valid JSON object that follows the structure below. Do not wrap it in markdown.
+CONVERSION (CTAs):
+10) Use action-oriented, consistent CTAs. Allowed labels: 
+    - “Create My Flashcards Now”, “Try the Flashcard Generator — Free”, “Generate My {topic} Deck”.
+    Pick ONE primary label and reuse it consistently across the page.
+
+STRUCTURED DATA:
+11) Include FAQPage JSON-LD that mirrors the FAQ items. Also add a BreadcrumbList for:
+    - “/flashcards” → “/flashcards/{slug}” (use base_url + path). Do not invent deeper levels.
+
+OUTPUT FORMAT (STRICT):
+Return ONLY a single valid JSON object with this shape (no markdown, no commentary):
 
 {
   "slug": string,
   "path": string,
   "metadata": {
-    "title": string, // SEO-optimized, <60 chars
-    "description": string, // Meta description, ~155 chars
-    "keywords": string[],
-    "canonical": string
+    "title": string,            // ≤60 chars, includes primary keyword
+    "description": string,      // 140–155 chars
+    "keywords": string[],       // 5–10 semantic variants (for internal use; not meta keywords)
+    "canonical": string         // base_url + path if not provided
   },
   "hero": {
-    "heading": string, // The H1 tag, primary long-tail keyword
-    "subheading": string,
-    "primaryCta": { "type": "modal", "label": string },
+    "heading": string,          // H1, contains primary keyword/variant
+    "subheading": string,       // 1–2 sentences: outcome-focused, no hype (mentions the core value tuned to the primary keyword: upload doc -> get spaced rep flashcards)
+    "primaryCta": { "type": "modal", "label": string }
   },
   "featuresSection": {
-    "heading": string, // H2 heading
+    "heading": string,          // H2
     "subheading": string,
     "features": [{ "title": string, "description": string }, ...] // At least 3 features
   },
   "howItWorksSection": {
-    "heading": string, // H2 heading
+    "heading": string,          // H2
     "subheading": string,
     "steps": [{ "title": string, "description": string }, ...], // Exactly 3 steps
-    "cta": { "type": "link", "label": string, "href": string } | { "type": "modal", "label": string }
+    "cta": { "type": "modal", "label": string }
   },
   "seoSection": {
-    "heading": string, // H2 heading
-    "body": [ // In-depth, helpful content
-      { "type": "paragraph", "html": string } |
-      { "type": "list", "items": string[] }
+    "heading": string,          // H2 (e.g., “Study Better with AI Flashcards”)
+    "body": [
+      { "type": "paragraph", "html": string }, // 120–180 words
+      { "type": "list", "items": string[] },   // semantic/long-tail variants or use-cases
+      { "type": "paragraph", "html": string }  // examples tailored to topic/subtopics
     ]
   },
   "faqSection": {
-    "heading": string, // H2 heading
+    "heading": string,          // H2
     "subheading": string,
     "items": [{ "question": string, "answer": string }, ...], // 4 distinct, relevant questions
     "cta": { "type": "modal", "label": string }
   },
   "relatedTopicsSection": {
-    "heading": string, // H2 heading
+    "heading": string,          // H2
     "links": [{ "label": string, "href": string, "description": string }, ...] // At least 2 internal links
   },
-  "structuredData": { // Optional: Include FAQPage schema if relevant
-      "@context": "https://schema.org",
-      "@type": "FAQPage",
-      "mainEntity": [
-        {
-          "@type": "Question",
-          "name": string, // from faqSection
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": string // from faqSection
+  "structuredData": {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {"@type":"ListItem","position":1,"name":"Flashcards","item":"{base_url}/flashcards"},
+          {"@type":"ListItem","position":2,"name": "{context.topic || slug}", "item": "{base_url}{path}"}
+        ]
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "<FAQ 1 question>",
+            "acceptedAnswer": {"@type":"Answer","text":"<FAQ 1 answer>"}
           }
-        }
-      ]
-    }
+        ]
+      }
+    ]
+  }
 }
 
-6.  **Final Checks:**
-    * Use the provided "base_url" for canonical URLs. Default to https://www.cogniguide.app if not provided.
-    * Ensure all HTML strings are safe for JSX.
-    * No placeholder text. All fields must be complete and production-ready.
+QUALITY GATES (the model must self-check BEFORE returning JSON):
+- Keep title ≤60 chars; description 140–155.
+- H1 contains the primary keyword or the closest natural variant.
+- Ensure all HTML strings are safe for JSX.
+- No placeholder text; no lorem ipsum. All fields must be complete and production-ready.
 
 Return ONLY the JSON object.
 """
@@ -161,6 +185,12 @@ def parse_args(argv: Iterable[str] | None = None) -> argparse.Namespace:
     "--api-key",
     default=None,
     help="Explicit Gemini API key. Falls back to the GEMINI_API_KEY env var if omitted.",
+  )
+  parser.add_argument(
+    "--reasoning-effort",
+    choices=["low", "medium", "high", "none"],
+    default="none",
+    help="Reasoning effort for Gemini 2.5 models: low (1,024 tokens), medium (8,192 tokens), high (24,576 tokens), or none (disable thinking). Default: medium",
   )
   return parser.parse_args(argv)
 
@@ -210,11 +240,13 @@ def call_model(
   model: str,
   temperature: float,
   payload: str,
+  reasoning_effort: str | None = None,
 ) -> Dict[str, Any]:
-  response = client.chat.completions.create(
-    model=model,
-    temperature=temperature,
-    messages=[
+  # Prepare the request parameters
+  request_params = {
+    "model": model,
+    "temperature": temperature,
+    "messages": [
       {
         "role": "system",
         "content": PROMPT_TEMPLATE,
@@ -224,7 +256,7 @@ def call_model(
         "content": f"CSV row JSON:\n{payload}",
       },
     ],
-    response_format={
+    "response_format": {
       "type": "json_schema",
       "json_schema": {
         "name": "programmatic_flashcard_page",
@@ -256,7 +288,13 @@ def call_model(
         },
       },
     },
-  )
+  }
+
+  # Add reasoning_effort if provided and not "none"
+  if reasoning_effort and reasoning_effort != "none":
+    request_params["reasoning_effort"] = reasoning_effort
+
+  response = client.chat.completions.create(**request_params)
 
   if not response.choices or not response.choices[0].message.content:
     raise RuntimeError("Model returned an empty response")
@@ -305,7 +343,7 @@ def main(argv: Iterable[str] | None = None) -> int:
   generated_pages: List[Dict[str, Any]] = []
 
   for row in rows:
-    payload = call_model(client, args.model, args.temperature, row.prompt_payload())
+    payload = call_model(client, args.model, args.temperature, row.prompt_payload(), args.reasoning_effort)
     generated_pages.append(normalise_page(row, payload))
 
   output_path.parent.mkdir(parents=True, exist_ok=True)
