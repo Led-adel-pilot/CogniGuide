@@ -103,7 +103,7 @@ interface ProgrammaticFlashcardPage {
 - Keyword inheritance from site defaults
 - Absolute URL construction
 
-### 7. Dynamic Page Generation (`app/programmatic/flashcards/[slug]/page.tsx`)
+### 7. Dynamic Page Generation (`app/flashcards/[slug]/page.tsx`)
 
 **Purpose**: Next.js dynamic route handling
 
@@ -113,7 +113,7 @@ interface ProgrammaticFlashcardPage {
 - `notFound()`: Handle invalid slugs gracefully
 - Structured data injection for rich snippets
 
-**Route Structure**: `/programmatic/flashcards/{slug}`
+**Route Structure**: `/flashcards/{slug}`
 
 ### 8. Sitemap Integration (`app/sitemap.ts`)
 
@@ -205,7 +205,7 @@ lib/programmatic/
 │   └── flashcardPages.ts              # Generated content
 └── metadata.ts                        # SEO metadata
 
-app/programmatic/flashcards/[slug]/
+app/flashcards/[slug]/
 └── page.tsx                           # Dynamic page component
 
 app/

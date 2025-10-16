@@ -6,297 +6,276 @@ import type { ProgrammaticFlashcardPage } from '@/lib/programmatic/flashcardPage
 export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
   {
     "slug": "medical-school-anatomy",
-    "path": "/programmatic/flashcards/medical-school-anatomy",
+    "path": "/flashcards/medical-school-anatomy",
     "metadata": {
-      "title": "Medical School Anatomy Flashcards | Interactive Learning & Quizzes",
-      "description": "Master medical school anatomy with our interactive flashcards. Explore anatomical structures, quiz your knowledge, and ace your exams with targeted study tools.",
+      "title": "Medical School Anatomy Flashcards: Master Dissections & Physiology Fast",
+      "description": "Ace your rotations with interactive, high-yield medical school anatomy flashcards. Practice histology, gross anatomy, and clinical correlations efficiently.",
       "keywords": [
-        "medical school anatomy",
-        "anatomy flashcards",
-        "medical student study",
-        "human anatomy quiz",
-        "clinical anatomy",
-        "histology flashcards",
-        "embryology flashcards"
+        "medical school anatomy flashcards",
+        "gross anatomy review",
+        "human anatomy learning tool",
+        "medical student study aids",
+        "histology practice"
       ],
-      "canonical": "https://www.cogniguide.app/programmatic/flashcards/medical-school-anatomy"
+      "canonical": "https://www.cogniguide.app/flashcards/medical-school-anatomy"
     },
     "hero": {
-      "heading": "Medical School Anatomy Flashcards for Deeper Understanding",
-      "subheading": "Ace your anatomy exams with interactive digital flashcards designed for medical students.",
-      "supportingText": "Navigate complex anatomical structures and physiological systems with ease. Our platform provides a dynamic learning experience to solidify your knowledge base.",
+      "heading": "Medical School Anatomy Flashcards to Conquer Your Rotations",
+      "subheading": "Transform dense textbook diagrams and clinical lectures into powerful, unforgettable knowledge using AI-driven, topic-specific anatomy flashcards.",
+      "supportingText": "No credit card required.",
       "primaryCta": {
         "type": "modal",
         "label": "Start Learning Anatomy"
       },
       "secondaryCta": {
         "type": "link",
-        "label": "How It Works",
-        "href": "/programmatic/flashcards/medical-school-anatomy#how-it-works"
+        "label": "See How It Adapts to Your Curriculum",
+        "href": "/pricing"
       }
     },
     "featuresSection": {
-      "heading": "Why Choose Our Anatomy Flashcards?",
-      "subheading": "Tools tailored to enhance your medical education journey.",
+      "heading": "Engineered for Anatomical Mastery",
+      "subheading": "Move beyond passive reading; engage with the material exactly how your examiners expect.",
       "features": [
         {
-          "title": "High-Yield Anatomical Focus",
-          "description": "Concentrate on critical anatomical regions, systems, and clinical correlations essential for medical practice, presented in easily digestible flashcards."
+          "title": "Clinical Correlation Integration",
+          "description": "Each card integrates pathology snapshots or clinical vignettes, ensuring you connect anatomical knowledge to real-world patient diagnosis and procedures."
         },
         {
-          "title": "Interactive Quizzing Engine",
-          "description": "Test your recall and understanding with randomized quizzes, spaced repetition algorithms, and detailed feedback to identify and reinforce weak areas."
+          "title": "High-Resolution Image Quizzing",
+          "description": "Test your identification skills on diagrams of dissections, cross-sections, and 3D models. Focus deeply on precise regional anatomy."
         },
         {
-          "title": "Visualize and Learn",
-          "description": "Augment your learning with high-quality anatomical diagrams and illustrations on each flashcard, promoting better spatial comprehension and retention."
+          "title": "Spaced Repetition for Retention",
+          "description": "Leverage intelligent algorithms that prioritize the anatomical structures you struggle with most, maximizing memory retention before your next practical exam."
         },
         {
-          "title": "Personalized Study Paths",
-          "description": "Customize your learning experience by focusing on specific modules, or track your progress to ensure comprehensive coverage of all necessary anatomical topics."
+          "title": "Multi-Modality Study Views",
+          "description": "Instantly switch between definition recall, labeling tasks, and 'why this matters' summaries to cover all learning styles required in medicine."
         }
       ]
     },
     "howItWorksSection": {
-      "heading": "Master Anatomy in 3 Simple Steps",
-      "subheading": "Get started with your anatomy studies effortlessly.",
+      "heading": "Accelerate Anatomy Review in Three Steps",
+      "subheading": "Get targeted practice sessions customized for neuroanatomy, musculoskeletal, and thoracic studies.",
       "steps": [
         {
-          "title": "Select Your Module",
-          "description": "Choose from a comprehensive library of anatomy topics, including gross anatomy, histology, embryology, and neuroanatomy, to start your study session."
+          "title": "1. Select Your Anatomical Focus",
+          "description": "Choose a specific body region, system (e.g., Autonomic Nervous System), or a topic list derived from your university's syllabus."
         },
         {
-          "title": "Engage with Flashcards",
-          "description": "Review anatomical terms, structures, and functions using interactive flashcards. Flip them over to reveal definitions, images, and key clinical notes."
+          "title": "2. Active Recall Testing",
+          "description": "Interact with intelligent flashcards that demand more than simple recall, forcing you to articulate innervation, associated vessels, and embryonic origin."
         },
         {
-          "title": "Test Your Knowledge",
-          "description": "Solidify your learning by taking quizzes. Our adaptive system tracks your performance, providing immediate feedback and directing you to areas needing further review."
+          "title": "3. Master Difficult Structures",
+          "description": "The system automatically resurfaces challenging components—like the Circle of Willis or Brachial Plexus branching—until confidence levels are confirmed."
         }
       ],
       "cta": {
         "type": "modal",
-        "label": "Start Practicing Now"
+        "label": "Create My First Anatomy Deck"
       }
     },
     "seoSection": {
-      "heading": "Comprehensive Medical Anatomy Learning Resources",
+      "heading": "Deep Authority in Human Anatomy for Future Physicians",
       "body": [
         {
           "type": "paragraph",
-          "html": "Our <b>Medical School Anatomy Flashcards</b> are meticulously crafted to support aspiring physicians through their rigorous curriculum. Understanding human anatomy is foundational to all medical disciplines, from diagnosis to treatment. This digital tool goes beyond rote memorization, encouraging deep engagement with anatomical concepts."
+          "html": "Mastering <b>medical school anatomy</b> is a cornerstone of clinical competency. Passive review methods often fail under the intense pressure of cadaver labs and board exams. Our program moves you from rote memorization to genuine structural understanding, helping you recognize complex relationships like the deep connections within the posterior triangle of the neck or the complex branching of the major spinal nerves."
         },
         {
           "type": "paragraph",
-          "html": "We cover a vast range of anatomical subjects, ensuring that whether you are studying the intricate vasculature of the <em>Circle of Willis</em> or the cellular structures in <em>histology</em>, you have the resources to excel. The interactive nature of our flashcards is proven to enhance long-term retention, making difficult subjects more approachable."
+          "html": "We specifically curate content that aligns with <a href=\"/curriculum-mapping\">top-tier medical curricula</a>, ensuring that when you review cranial nerves or identify muscle compartments, you are learning exactly what is expected in your assessment."
         },
         {
           "type": "list",
           "items": [
-            "<strong>Systemic Anatomy:</strong> Cardiovascular, Respiratory, Nervous System, and more.",
-            "<strong>Regional Anatomy:</strong> Head & Neck, Thorax, Abdomen, Upper & Lower Limbs.",
-            "<strong>Histology:</strong> Cellular and tissue-level study.",
-            "<strong>Embryology:</strong> Developmental anatomy.",
-            "<strong>Neuroanatomy:</strong> Structure and function of the nervous system."
+            "Drill precise surface anatomy for palpation practice.",
+            "Verify understanding of fascia, planes, and their associated surgical risks.",
+            "Seamlessly integrate histology slides directly into your study sequence.",
+            "Generate focused review sets for Midterm or Final practical examinations."
           ]
-        },
-        {
-          "type": "paragraph",
-          "html": "By utilizing interactive flashcards, medical students can efficiently prepare for lectures, lab practicals, and board examinations. Explore how our <a href='/programmatic/flashcards/medical-school-neuroanatomy'>Neuroanatomy Flashcards</a> or <a href='/programmatic/flashcards/medical-school-histology'>Histology Flashcards</a> can further refine your specialized knowledge."
         }
       ]
     },
     "faqSection": {
-      "heading": "Frequently Asked Questions",
-      "subheading": "Get answers to common queries about our anatomy flashcards.",
+      "heading": "Frequently Asked Questions on Anatomy Flashcard Usage",
+      "subheading": "Quick answers for medical students streamlining their study processes.",
       "items": [
         {
-          "question": "How do the flashcards help with understanding complex anatomy?",
-          "answer": "Our flashcards combine concise text with detailed anatomical diagrams. This multi-modal approach aids in visualizing structures and understanding their spatial relationships, significantly improving comprehension and retention beyond simple memorization."
+          "question": "Can I upload my own anatomy dissection notes or textbook images?",
+          "answer": "Yes. Our system allows you to easily import content or upload diagrams you sketch or photograph, ensuring the flashcards match your precise lecture materials."
         },
         {
-          "question": "Are these flashcards suitable for all levels of medical anatomy study?",
-          "answer": "Yes, the content is designed to be comprehensive, starting with foundational concepts and progressing to more complex anatomical relationships and clinical correlations. Whether you're in your first year or preparing for residency exams, our flashcards provide valuable study material."
+          "question": "How does this help differentiate between similar structures like the phrenic and vagus nerves?",
+          "answer": "The cards force detailed contrast questions, focusing on innervation, resulting effect upon damage, and topographical location—crucial distinctions you need during examination."
         },
         {
-          "question": "Can I track my progress while using the anatomy flashcards?",
-          "answer": "Absolutely. The platform includes a progress tracking feature that monitors your performance on quizzes and identifies areas where you may need additional study, helping you optimize your learning sessions."
+          "question": "Is this useful for the USMLE Step 1 focused on anatomical sciences?",
+          "answer": "Absolutely. The platform emphasizes high-yield clinical-anatomical links and systems integration, which directly supports USMLE preparation."
         },
         {
-          "question": "What makes these anatomy flashcards different from traditional study methods?",
-          "answer": "Our digital flashcards offer interactive elements like randomized quizzing and spaced repetition, which are scientifically proven to enhance memory recall. They also provide instant feedback and the convenience of studying anytime, anywhere, compared to static paper-based methods."
+          "question": "Does the system cover specialized fields like Neuroanatomy and Embryology?",
+          "answer": "Yes, dedicated, deep-dive modules are available for both advanced neuroanatomy, including functional brain mapping, and key embryological development milestones."
         }
       ],
       "cta": {
         "type": "modal",
-        "label": "Get Started Today"
+        "label": "Ask A Specific Study Question"
       }
     },
     "relatedTopicsSection": {
-      "heading": "Explore More Medical Study Resources",
+      "heading": "Explore Other Essential Medical Study Resources",
       "links": [
         {
-          "label": "Medical School Neuroanatomy Flashcards",
-          "href": "/programmatic/flashcards/medical-school-neuroanatomy",
-          "description": "Master the complex structures and functions of the human brain and nervous system."
+          "label": "AI Mind Map Generator for Systems Review",
+          "href": "/ai-mind-map-generator",
+          "description": "Visually structure complex concepts like metabolic pathways or renal physiology."
         },
         {
-          "label": "Medical School Histology Flashcards",
-          "href": "/programmatic/flashcards/medical-school-histology",
-          "description": "Dive into the microscopic world of tissues and cells essential for understanding pathology."
-        },
-        {
-          "label": "Pricing Information",
+          "label": "Study Plan & Pricing Options",
           "href": "/pricing",
-          "description": "Discover the flexible plans available to access our full suite of study tools."
+          "description": "View subscription tiers designed for demanding medical school workloads."
         }
       ]
     }
   },
   {
     "slug": "nursing-pharmacology",
-    "path": "/programmatic/flashcards/nursing-pharmacology",
+    "path": "/flashcards/nursing-pharmacology",
     "metadata": {
-      "title": "Nursing Pharmacology Flashcards: Master Drug Classes & Dosages",
-      "description": "Ace your nursing exams with our interactive nursing pharmacology flashcards. Learn drug classifications, mechanisms of action, side effects, and dosages efficiently.",
+      "title": "Nursing Pharmacology Flashcards | Master Drug Action & Dosage",
+      "description": "Accelerate learning for nursing students with targeted flashcards covering essential Nursing Pharmacology: mechanisms of action, side effects, nursing implications, and dosage calculations.",
       "keywords": [
-        "nursing pharmacology",
+        "Nursing Pharmacology",
         "pharmacology flashcards",
-        "drug classes",
-        "medication dosage",
-        "nursing student study",
-        "pharmacology exam prep",
-        "spaced repetition"
+        "drug classifications",
+        "nursing dosage calculation",
+        "ADME",
+        "NCLEX prep"
       ],
-      "canonical": "https://www.cogniguide.app/programmatic/flashcards/nursing-pharmacology"
+      "canonical": "https://www.cogniguide.app/flashcards/nursing-pharmacology"
     },
     "hero": {
-      "heading": "Nursing Pharmacology: Master Drug Knowledge",
-      "subheading": "Effortlessly learn complex drug information for nursing success using effective spaced repetition.",
-      "supportingText": "Targeted flashcards designed for nursing students to build a strong foundation in pharmacodynamics, pharmacokinetics, and therapeutic drug uses. Improve retention and recall for patient safety and better clinical outcomes.",
+      "heading": "Nursing Pharmacology Flashcards for NCLEX Success",
+      "subheading": "Rapidly assimilate critical drug knowledge, from mechanisms of action (MOA) to essential nursing interventions, ensuring you meet the complex demands of patient care.",
+      "supportingText": "Leverage AI-driven spaced repetition to target weak areas in drug classes, adverse effects, and patient monitoring. Study smarter, not just longer.",
       "primaryCta": {
         "type": "modal",
         "label": "Master Pharmacology"
       },
       "secondaryCta": {
         "type": "link",
-        "label": "Learn How It Works",
-        "href": "/programmatic/flashcards/nursing-pharmacology#how-it-works"
+        "label": "View All Study Tools",
+        "href": "/features"
       }
     },
     "featuresSection": {
-      "heading": "Unlock Your Pharmacology Potential",
-      "subheading": "Why our flashcards are your essential study partner.",
+      "heading": "Why Our Pharmacology Flashcards Are Essential for Nursing Students",
+      "subheading": "Targeted learning features designed by educators to bridge theory and clinical application.",
       "features": [
         {
-          "title": "Comprehensive Drug Coverage",
-          "description": "Explore a vast array of drug classes, from antibiotics to cardiovascular medications, each detailed with essential information on actions, indications, and adverse effects."
+          "title": "Clinical Contextualization",
+          "description": "Each card is framed around nursing implications, ensuring you understand *why* a drug works and the *nursing actions* required for safe administration and monitoring."
         },
         {
-          "title": "Spaced Repetition Algorithm",
-          "description": "Our intelligent system schedules reviews at optimal intervals, reinforcing your memory and transforming recall of critical drug facts into long-term knowledge."
+          "title": "Comprehensive Drug Class Coverage",
+          "description": "Systematically cover anti-hypertensives, antibiotics, analgesics, and controlled substances, grouped logically for superior retention of complex pharmacological concepts."
         },
         {
-          "title": "Focus on Clinical Application",
-          "description": "Understand not just what drugs do, but *how* they are used in patient care, with context-specific scenarios that prepare you for real-world nursing practice."
-        },
-        {
-          "title": "Track Your Progress",
-          "description": "Monitor your mastery of specific drug categories and identify areas needing further study with intuitive progress tracking features."
+          "title": "Spaced Repetition Optimized",
+          "description": "Our algorithm dynamically reintroduces concepts you struggle with less often, maximizing retention efficiency for those tough-to-remember pharmacokinetic details (ADME)."
         }
       ]
     },
     "howItWorksSection": {
-      "heading": "Your Path to Pharmacology Mastery",
-      "subheading": "Get started in three simple steps.",
+      "heading": "Mastering Pharmacology in Three Focused Steps",
+      "subheading": "The streamlined approach to achieving total recall for every major medication class.",
       "steps": [
         {
-          "title": "Select Your Study Focus",
-          "description": "Choose specific drug classes, therapeutic areas, or even individual high-alert medications you need to learn or review."
+          "title": "1. Import or Select Your Set",
+          "description": "Instantly access curated, high-yield flashcard sets specific to major nursing pharmacology units, or import your own lecture notes for personalization."
         },
         {
-          "title": "Engage with Smart Flashcards",
-          "description": "Study detailed flashcards that present information concisely, with interactive elements to test your knowledge and understanding of pharmacology principles."
+          "title": "2. Engage with Adaptive Recall",
+          "description": "Flip cards covering drug names, contraindications, common adverse effects, and critical nursing safety checks. The AI adapts the difficulty based on your immediate performance."
         },
         {
-          "title": "Review with Spaced Repetition",
-          "description": "Let our algorithm guide your review sessions, presenting cards at precisely the right time to solidify your learning and prevent forgetting."
+          "title": "3. Review Targeted Weaknesses",
+          "description": "Receive focused review sessions pinpointing medications or drug interactions you missed. Convert momentary confusion into long-term mastery ahead of exams and clinical rotations."
         }
       ],
       "cta": {
         "type": "modal",
-        "label": "Start Studying Now"
+        "label": "Start Studying Pharmacology Now"
       }
     },
     "seoSection": {
-      "heading": "Build Essential Nursing Pharmacology Expertise",
+      "heading": "Build Deep, Evidence-Based Expertise in Nursing Pharmacology",
       "body": [
         {
           "type": "paragraph",
-          "html": "Mastering nursing pharmacology is crucial for providing safe and effective patient care. Our interactive flashcards are designed to help nursing students like you absorb complex drug information efficiently. We cover essential <b>drug classifications</b>, their <b>mechanisms of action</b>, <b>pharmacokinetics</b>, <b>adverse effects</b>, and key considerations for <b>dosage calculations</b> and administration. By leveraging the power of spaced repetition, these study tools ensure that critical information is not just memorized but deeply understood for long-term recall."
-        },
-        {
-          "type": "paragraph",
-          "html": "For nursing students preparing for NCLEX or advanced coursework, a strong grasp of pharmacology can significantly reduce test anxiety and improve performance. Explore our resources on <b>antibiotic pharmacology</b>, <b>cardiovascular drugs</b>, <b>neurological agents</b>, and more. These are built to complement your textbook studies and clinical experiences, ensuring you are well-prepared for any situation."
+          "html": "Effective <strong>Nursing Pharmacology</strong> preparation demands more than rote memorization; it requires understanding therapeutic goals and preventing harm. Our AI study assistant helps nursing students transition from passive reading to active recall, focusing intensely on the nuances of drug administration protocols. This foundational knowledge is critical not only for passing the NCLEX but for practicing evidence-based, safe patient care from day one in clinical settings."
         },
         {
           "type": "list",
           "items": [
-            "Learn drug interactions and contraindications.",
-            "Understand therapeutic ranges and peak/trough levels.",
-            "Practice identifying potential side effects and nursing interventions.",
-            "Enhance your critical thinking skills related to medication management."
+            "Reinforce memory recall on prototype drugs and their main therapeutic categories.",
+            "Practice critical thinking prompts related to priority nursing diagnoses associated with common drug classes.",
+            "Efficiently drill necessary calculations for safe patient dosages across various medication routes.",
+            "Easily connect pharmacology concepts to related nursing procedures explored in <a href=\"/flashcards/nursing-fundamentals\">Nursing Fundamentals</a> guides."
           ]
         },
         {
           "type": "paragraph",
-          "html": "Invest in your nursing career by building a solid pharmacology foundation. Visit our <a href=\"/pricing\">pricing page</a> to learn how you can access these powerful study tools and enhance your learning journey."
+          "html": "We continuously update content to reflect the latest standards, making this resource a reliable partner through all levels of your nursing curriculum. Invest in <a href=\"/pricing\">focused preparation</a> today."
         }
       ]
     },
     "faqSection": {
-      "heading": "Frequently Asked Questions",
-      "subheading": "Your common questions about nursing pharmacology study, answered.",
+      "heading": "Common Questions About Digital Pharmacology Study Aids",
+      "subheading": "Quick answers to ensure our flashcards meet your academic standards.",
       "items": [
         {
-          "question": "How do nursing pharmacology flashcards improve learning?",
-          "answer": "Our flashcards utilize spaced repetition, a scientifically proven method to enhance long-term memory. By reviewing information at optimal intervals, you move knowledge from short-term to long-term retention, making it readily accessible during exams and patient care."
+          "question": "Are the dosages provided on the cards standard recommendations?",
+          "answer": "Yes, all core drug information, including standard starting/maintenance dosages where applicable, aligns with widely accepted institutional or authoritative textbook guidelines used in US nursing programs."
         },
         {
-          "question": "What drug information is covered in these flashcards?",
-          "answer": "We cover essential details for each drug, including generic and brand names, drug class, mechanism of action, indications, common dosages, significant adverse effects, contraindications, and important nursing considerations."
+          "question": "How do I handle complex dosage calculations on these digital flashcards?",
+          "answer": "Our system integrates calculation review cards specifically focused on the 'Order, Have, Give' or dimensional analysis methods, adapting to reinforce calculation practice whenever errors are detected."
         },
         {
-          "question": "Can I focus on specific drug classes or topics?",
-          "answer": "Yes, you can select specific drug classes, therapeutic areas (like cardiovascular or endocrine), or even specific drugs you find challenging to master. This allows for personalized study plans tailored to your needs."
+          "question": "Can I focus only on specific drug classifications, like endocrine drugs?",
+          "answer": "Absolutely. You can filter and customize your study session to concentrate exclusively on high-yield, personalized topics like diuretics, anti-diabetics, or psychiatric medications until mastery is confirmed."
         },
         {
-          "question": "Are these flashcards suitable for NCLEX preparation?",
-          "answer": "Absolutely. The content is curated to cover the core pharmacology knowledge required for nursing licensure exams like the NCLEX, helping you build confidence and competence in medication-related questions."
+          "question": "How often is the content updated to match new drug alerts?",
+          "answer": "Our curated drug content library is routinely reviewed and updated quarterly, ensuring accuracy regarding black box warnings, FDA approvals, and withdrawn medications, keeping your study materials current."
         }
       ],
       "cta": {
         "type": "modal",
-        "label": "Get Started Learning"
+        "label": "Ask a Deeper Question"
       }
     },
     "relatedTopicsSection": {
-      "heading": "Explore Related Learning Resources",
+      "heading": "Expand Your AI Study Toolkit",
       "links": [
         {
           "label": "AI Mind Map Generator",
           "href": "/ai-mind-map-generator",
-          "description": "Visually organize complex nursing topics and drug information with our AI-powered mind map tool."
+          "description": "Visually structure complex pharmacology pathways and mechanisms of action into navigable maps."
         },
         {
-          "label": "Pricing Plans",
+          "label": "Pricing and Plans",
           "href": "/pricing",
-          "description": "Discover the best plan to access all our AI study assistant features for your nursing education."
+          "description": "Find the right subscription level to unlock unlimited high-yield learning for your entire nursing degree."
         },
         {
-          "label": "Nursing Study Strategies",
-          "href": "/blog/effective-nursing-study-strategies",
-          "description": "Find proven methods and tips to optimize your learning for nursing school and beyond."
+          "label": "Nursing Fundamentals Flashcards",
+          "href": "/flashcards/nursing-fundamentals",
+          "description": "Review the foundational principles necessary for safe practice before tackling advanced pharmacology."
         }
       ]
     }
