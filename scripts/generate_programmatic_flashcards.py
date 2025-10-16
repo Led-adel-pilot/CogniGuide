@@ -25,6 +25,7 @@ from __future__ import annotations
 import argparse
 import csv
 import json
+import re
 import sys
 from dataclasses import dataclass
 from pathlib import Path
@@ -45,7 +46,7 @@ OUTPUT_FOOTER = "];\n"
 
 PROMPT_TEMPLATE = """
 You will generate a complete landing page JSON for an AI flashcards generator app, suitable for static rendering.
-Info on app: You upload your PDFs, slides, or notes and generates flashcards, and implements spaced-repetition scheduling. Do not halucinate other features. 
+Info on app: You upload your PDFs, slides, or notes and generates flashcards, and implements spaced-repetition scheduling, you can also select the exam date, share flashcards with other through a public link. Do not hallucinate other features (e.g. the app does not automatically tag concepts). 
 
 You will receive structured CSV data for one landing page. Follow these requirements precisely:
 
@@ -180,6 +181,11 @@ def parse_args(argv: Iterable[str] | None = None) -> argparse.Namespace:
     type=int,
     default=None,
     help="Optional maximum number of rows to process (for testing)",
+  )
+  parser.add_argument(
+    "--rerun-existing",
+    action="store_true",
+    help="Regenerate rows whose slugs already exist in the output file",
   )
   parser.add_argument(
     "--api-key",
@@ -326,6 +332,61 @@ def serialize_pages(pages: List[Dict[str, Any]]) -> str:
   return f"{OUTPUT_HEADER}{body}\n{OUTPUT_FOOTER}"
 
 
+def load_existing_pages(path: Path) -> List[Dict[str, Any]]:
+  if not path.exists():
+    return []
+
+  text = path.read_text(encoding="utf-8")
+  # Find the opening "[" that starts the array literal assigned to
+  # generatedFlashcardPages. The first "[" in the file belongs to the
+  # ProgrammaticFlashcardPage[] type annotation, so we explicitly search for
+  # the "[" that follows the equals sign in the export.
+  array_start_match = re.search(
+    r"generatedFlashcardPages[^=]*=\s*\[",
+    text,
+    flags=re.MULTILINE,
+  )
+  if not array_start_match:
+    print(
+      f"Warning: Could not locate generatedFlashcardPages array in {path}. Ignoring its contents.",
+      file=sys.stderr,
+    )
+    return []
+
+  start = array_start_match.end() - 1
+
+  # The array literal is terminated by the final "]" in the "\n];" footer.
+  end_index = text.rfind("];")
+  if end_index == -1 or end_index < start:
+    print(
+      f"Warning: Could not locate JSON array terminator in existing file {path}. Ignoring its contents.",
+      file=sys.stderr,
+    )
+    return []
+
+  try:
+    parsed = json.loads(text[start : end_index + 1])
+  except json.JSONDecodeError as exc:
+    print(
+      f"Warning: Failed to parse existing pages from {path}: {exc}. Ignoring its contents.",
+      file=sys.stderr,
+    )
+    return []
+
+  if not isinstance(parsed, list):
+    print(
+      f"Warning: Expected a list of pages in {path}, found {type(parsed).__name__}. Ignoring its contents.",
+      file=sys.stderr,
+    )
+    return []
+
+  pages: List[Dict[str, Any]] = []
+  for item in parsed:
+    if isinstance(item, dict):
+      pages.append(item)
+  return pages
+
+
 def main(argv: Iterable[str] | None = None) -> int:
   args = parse_args(argv)
   input_path = Path(args.input)
@@ -340,15 +401,38 @@ def main(argv: Iterable[str] | None = None) -> int:
     api_key=args.api_key or "GEMINI_API_KEY",  # Use placeholder as per custom instructions
     base_url="https://generativelanguage.googleapis.com/v1beta/openai/"
   )
-  generated_pages: List[Dict[str, Any]] = []
+  existing_pages = load_existing_pages(output_path)
+  generated_pages: List[Dict[str, Any]] = list(existing_pages)
+  slug_to_index: Dict[str, int] = {}
+  for idx, page in enumerate(existing_pages):
+    slug = page.get("slug") if isinstance(page, dict) else None
+    if isinstance(slug, str):
+      slug_to_index[slug] = idx
+
+  regenerated_count = 0
 
   for row in rows:
+    if row.slug in slug_to_index and not args.rerun_existing:
+      print(f"Skipping slug '{row.slug}' (already present in {output_path})")
+      continue
+
     payload = call_model(client, args.model, args.temperature, row.prompt_payload(), args.reasoning_effort)
-    generated_pages.append(normalise_page(row, payload))
+    page = normalise_page(row, payload)
+
+    if row.slug in slug_to_index:
+      generated_pages[slug_to_index[row.slug]] = page
+    else:
+      slug_to_index[row.slug] = len(generated_pages)
+      generated_pages.append(page)
+
+    regenerated_count += 1
 
   output_path.parent.mkdir(parents=True, exist_ok=True)
   output_path.write_text(serialize_pages(generated_pages), encoding="utf-8")
-  print(f"Wrote {len(generated_pages)} programmatic pages to {output_path}")
+  print(
+    f"Wrote {len(generated_pages)} programmatic pages to {output_path}"
+    + (f" (regenerated {regenerated_count} rows)" if regenerated_count else "")
+  )
   return 0
 
 

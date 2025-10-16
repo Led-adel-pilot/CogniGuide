@@ -269,5 +269,133 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
         }
       ]
     }
+  },
+  {
+    "slug": "high-school-biology",
+    "path": "/flashcards/high-school-biology",
+    "metadata": {
+      "title": "AI Biology Flashcards: Study Smarter with Notes",
+      "description": "Transform your high school biology notes and PDFs into smart flashcards optimized by spaced repetition. Master complex topics faster.",
+      "keywords": [
+        "biology flashcards",
+        "AI study tools",
+        "high school notes to cards",
+        "spaced repetition biology",
+        "active recall learning"
+      ],
+      "canonical": "https://www.cogniguide.app/flashcards/high-school-biology"
+    },
+    "hero": {
+      "heading": "Master High School Biology with AI-Generated Flashcards",
+      "subheading": "Upload your biology PDFs, lecture slides, or class notes directly into our intelligent system and instantly receive curated, optimized flashcards ready for spaced repetition scheduling.",
+      "primaryCta": {
+        "type": "modal",
+        "label": "Create My Flashcards Now"
+      }
+    },
+    "featuresSection": {
+      "heading": "Efficiency Meets Cognitive Science",
+      "subheading": "Move beyond passive reading. Leverage technology designed by experts in learning algorithms to retain complex biological concepts long-term.",
+      "features": [
+        {
+          "title": "Instant Content Conversion",
+          "description": "Upload PDFs of textbook chapters or PowerPoints directly. Our AI extracts key definitions, processes, and diagrams to form robust Q&A flashcards immediately."
+        },
+        {
+          "title": "Built-in Spaced Repetition",
+          "description": "Stop guessing when to review. Our adaptive learning algorithm automatically schedules your cards based on established cognitive science principles for maximum long-term memory retention."
+        },
+        {
+          "title": "Concept Distillation & Tagging",
+          "description": "The system intelligently synthesizes lengthy explanations into concise facts perfect for active recall. Concepts are often automatically tagged (e.g., Cell Biology, Genetics) for organized review sessions."
+        }
+      ]
+    },
+    "howItWorksSection": {
+      "heading": "Your Accelerated Biology Study Workflow",
+      "subheading": "From bulky notes to pinpoint recall in three simple steps, transforming how you approach AP or introductory biology exams.",
+      "steps": [
+        {
+          "title": "Upload Your Study Materials",
+          "description": "Provide the system with any document type: scanned notes, lecture slides (PPT/PDF), or research papers relevant to your high school biology syllabus."
+        },
+        {
+          "title": "Generate & Refine Flashcards",
+          "description": "Our AI analyzes the uploaded text to generate concept pairs. Review the set quickly, making small edits or additions for perfect fidelity before scheduling."
+        },
+        {
+          "title": "Study Using Active Recall",
+          "description": "Engage with your personalized deck. The built-in spaced repetition scheduler ensures you review difficult material more often and mastered concepts less frequently, optimizing study time."
+        }
+      ],
+      "cta": {
+        "type": "modal",
+        "label": "Create My Flashcards Now"
+      }
+    },
+    "seoSection": {
+      "heading": "Study Better with AI Biology Flashcard Generation",
+      "body": [
+        {
+          "type": "paragraph",
+          "html": "High school biology demands mastery over immense terminology, complex cycles (like the Krebs cycle), and layered hierarchical systems (taxonomy, organelles). Relying on manual flashcard creation is inefficient and often leads to gaps in knowledge right before major tests. Our tool eliminates this friction. By automating the extraction process, we ensure every vital fact buried in dense text is converted into a high-utility active recall prompt. This drastically increases the quality of study sessions, moving students from passive reading to efficient, targeted memorization based on scientifically validated learning techniques."
+        },
+        {
+          "type": "list",
+          "items": [
+            "Simplifying cellular respiration mechanisms",
+            "Rapid review of genetic coding sequences",
+            "Organizing the classification hierarchy instantly",
+            "Ensuring accurate memorization of metabolic pathways",
+            "Creating review decks from teacher annotations on diagrams"
+          ]
+        },
+        {
+          "type": "paragraph",
+          "html": "Effective retention in biology relies on correctly spaced reviews, a principle central to our design. When you upload notes on ecology or anatomy, the system not only pulls out facts but queues them perfectly. Experienced students understand that seeing a concept just as you are about to forget it solidifies the memory—our intelligent scheduling does this work for you, meaning more reliable performance on quizzes covering evolution, mitosis, and fluid dynamics."
+        }
+      ]
+    },
+    "faqSection": {
+      "heading": "Frequently Asked Questions About Biology Flashcards",
+      "subheading": "Clarifying how our AI transforms your biology preparation.",
+      "items": [
+        {
+          "question": "Can the generator handle complex biological diagrams or figures from my slides?",
+          "answer": "While the primary focus is on extracting high-quality text definitions and factual relationships, you can manually associate external images or context with generated cards later for comprehensive visual reinforcement, which is crucial for subjects like histology or anatomy."
+        },
+        {
+          "question": "How does the spaced repetition feature know which cards I struggle with?",
+          "answer": "After you review each flashcard, you provide feedback (e.g., 'Easy,' 'Hard'). The underlying algorithm uses this performance data, combined with the card's age, to calculate the optimal next review interval using proven learning models."
+        },
+        {
+          "question": "What specific biology subjects work best with this tool?",
+          "answer": "The system excels with content rich in definitions, processes, and terminology. This includes topics like introductory Zoology, Microbiology, introductory College Biology, and most high school AP Biology domains."
+        },
+        {
+          "question": "Can I share the decks generated from my high school biology notes with classmates?",
+          "answer": "While the input document processing is proprietary to your account, you can export or share the resulting finalized flashcard sets with others using standard digital sharing methods, allowing collaborative study sessions."
+        }
+      ],
+      "cta": {
+        "type": "modal",
+        "label": "Create My Flashcards Now"
+      }
+    },
+    "relatedTopicsSection": {
+      "heading": "Enhance Your Academic Toolkit",
+      "links": [
+        {
+          "label": "AI Note Summarization Tools",
+          "href": "https://www.cogniguide.app/summarization-tools",
+          "description": "Learn how to distill lengthy lecture notes into core concepts before creating flashcards."
+        },
+        {
+          "label": "Science Test Prep Strategies",
+          "href": "https://www.cogniguide.app/test-strategies",
+          "description": "Explore advanced study plans leveraging active recall for challenging science curricula."
+        }
+      ]
+    }
   }
 ];
