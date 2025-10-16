@@ -5,24 +5,81 @@ import Image from 'next/image';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
+import type { ProgrammaticCTA, ProgrammaticFlashcardPage, RichTextBlock } from '@/lib/programmatic/flashcardPageSchema';
 import CogniGuideLogo from '../CogniGuide_logo.png';
 import { supabase } from '@/lib/supabaseClient';
 
-// Keep the hero/above-the-fold structure identical to HomeLanding
 const AuthModal = dynamic(() => import('@/components/AuthModal'), { ssr: false });
 const EmbeddedFlashcards = dynamic(() => import('@/components/EmbeddedFlashcards'), {
   ssr: false,
   loading: () => <div className="w-full h-full animate-pulse bg-muted/40" aria-hidden="true" />,
 });
 
-export default function FlashcardGeneratorLanding() {
+type FlashcardGeneratorLandingProps = {
+  page: ProgrammaticFlashcardPage;
+};
+
+const CTAButton = ({
+  cta,
+  onOpenAuth,
+  className,
+}: {
+  cta?: ProgrammaticCTA;
+  onOpenAuth: () => void;
+  className: string;
+}) => {
+  if (!cta) return null;
+
+  if (cta.type === 'modal') {
+    return (
+      <button
+        type="button"
+        onClick={onOpenAuth}
+        className={className}
+        aria-label={cta.ariaLabel ?? cta.label}
+      >
+        {cta.label}
+      </button>
+    );
+  }
+
+  return (
+    <Link
+      href={cta.href}
+      className={className}
+      aria-label={cta.ariaLabel ?? cta.label}
+      target={cta.target}
+      rel={cta.rel}
+    >
+      {cta.label}
+    </Link>
+  );
+};
+
+const renderRichTextBlock = (block: RichTextBlock, index: number) => {
+  if (block.type === 'list') {
+    const ListTag = block.ordered ? 'ol' : 'ul';
+    return (
+      <ListTag key={`list-${index}`} className="mb-6 space-y-2 list-disc list-inside marker:text-primary">
+        {block.items.map((item, itemIndex) => (
+          <li key={`list-${index}-${itemIndex}`} dangerouslySetInnerHTML={{ __html: item }} />
+        ))}
+      </ListTag>
+    );
+  }
+
+  return (
+    <p key={`paragraph-${index}`} className="mb-6 last:mb-0" dangerouslySetInnerHTML={{ __html: block.html }} />
+  );
+};
+
+export default function FlashcardGeneratorLanding({ page }: FlashcardGeneratorLandingProps) {
   const [showAuth, setShowAuth] = useState(false);
   const [isAuthed, setIsAuthed] = useState(false);
   const [shouldRenderFlashcards, setShouldRenderFlashcards] = useState(false);
   const router = useRouter();
   const flashcardsSectionRef = useRef<HTMLDivElement | null>(null);
 
-  // Referral code persistence (same behavior as HomeLanding)
   useEffect(() => {
     try {
       if (typeof window !== 'undefined') {
@@ -35,7 +92,6 @@ export default function FlashcardGeneratorLanding() {
     } catch {}
   }, []);
 
-  // Auth sync + lightweight cookie mirror (same behavior as HomeLanding)
   useEffect(() => {
     const syncAuthCookie = (signedIn: boolean) => {
       try {
@@ -61,10 +117,11 @@ export default function FlashcardGeneratorLanding() {
       if (signedIn) setShowAuth(false);
       syncAuthCookie(signedIn);
     });
-    return () => { sub.subscription.unsubscribe(); };
+    return () => {
+      sub.subscription.unsubscribe();
+    };
   }, []);
 
-  // Lazy render embedded flashcards when in view (perf for new domain Core Web Vitals)
   useEffect(() => {
     if (shouldRenderFlashcards) return;
     const node = flashcardsSectionRef.current;
@@ -89,7 +146,6 @@ export default function FlashcardGeneratorLanding() {
     <>
       <AuthModal open={showAuth} />
       <div className="flex flex-col min-h-screen font-sans bg-background text-foreground">
-        {/* Header (copied layout from HomeLanding to keep consistency) */}
         <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
           <div className="w-full h-16 flex items-center justify-between px-4 sm:px-6 lg:px-10">
             <div className="flex items-center gap-2">
@@ -97,18 +153,31 @@ export default function FlashcardGeneratorLanding() {
               <h1 className="text-2xl font-bold font-heading tracking-tighter">CogniGuide</h1>
             </div>
             <div className="flex items-center gap-4">
-              <Link href="/pricing" className="hidden text-sm text-muted-foreground hover:underline sm:inline">Pricing</Link>
+              <Link href="/pricing" className="hidden text-sm text-muted-foreground hover:underline sm:inline">
+                Pricing
+              </Link>
               {isAuthed ? (
-                <button onClick={() => router.push('/dashboard')} className="px-4 py-2 text-sm rounded-full border hover:bg-muted/50">Dashboard</button>
+                <button
+                  type="button"
+                  onClick={() => router.push('/dashboard')}
+                  className="px-4 py-2 text-sm rounded-full border hover:bg-muted/50"
+                >
+                  Dashboard
+                </button>
               ) : (
-                <button onClick={() => setShowAuth(true)} className="px-4 py-2 text-sm rounded-full bg-primary text-primary-foreground hover:bg-primary/90 transition-colors">Try for Free</button>
+                <button
+                  type="button"
+                  onClick={() => setShowAuth(true)}
+                  className="px-4 py-2 text-sm rounded-full bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
+                >
+                  Try for Free
+                </button>
               )}
             </div>
           </div>
         </header>
 
         <main className="flex-1">
-          {/* Above the fold — same structure as HomeLanding */}
           <section className="relative pt-4 pb-16 md:pt-9 md:pb-20 overflow-hidden">
             <div className="absolute inset-0 bg-grid-pattern opacity-5 pointer-events-none"></div>
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[40rem] h-[40rem] bg-primary/10 rounded-full blur-3xl -z-10 pointer-events-none"></div>
@@ -116,20 +185,36 @@ export default function FlashcardGeneratorLanding() {
               <div className="flex flex-col lg:flex-row gap-12 lg:gap-16 items-start">
                 <div className="w-full lg:w-[28rem] xl:w-[32rem]">
                   <div className="text-center lg:text-left">
+                    {page.hero.eyebrow ? (
+                      <p className="text-sm font-semibold uppercase tracking-widest text-primary/80">{page.hero.eyebrow}</p>
+                    ) : null}
                     <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold font-heading tracking-tighter md:leading-tight mb-4">
-                      AI Flashcard Generator — Master More in Less Time
+                      {page.hero.heading}
                     </h1>
                     <p className="mt-6 text-xl text-muted-foreground leading-relaxed max-w-2xl mx-auto lg:mx-0">
-                      Upload your PDFs, slides, images, or notes. CogniGuide instantly creates high‑quality Q&A cards and schedules reviews with spaced repetition (FSRS) so you remember more with less study time.
+                      {page.hero.subheading}
                     </p>
                     <div className="mt-6 flex justify-center lg:justify-start">
                       <div className="inline-flex flex-col items-center gap-1 sm:items-center">
-                        <button onClick={() => setShowAuth(true)} className="inline-flex items-center justify-center rounded-full bg-primary px-10 py-3.5 text-lg font-semibold text-primary-foreground shadow-xl shadow-primary/30 transition-transform hover:-translate-y-0.5 hover:shadow-primary/40 z-10 relative">
-                          Try for Free
-                        </button>
-                        <p className="text-sm text-muted-foreground">No credit card required</p>
+                        <CTAButton
+                          cta={page.hero.primaryCta}
+                          onOpenAuth={() => setShowAuth(true)}
+                          className="inline-flex items-center justify-center rounded-full bg-primary px-10 py-3.5 text-lg font-semibold text-primary-foreground shadow-xl shadow-primary/30 transition-transform hover:-translate-y-0.5 hover:shadow-primary/40 z-10 relative"
+                        />
+                        {page.hero.supportingText ? (
+                          <p className="text-sm text-muted-foreground">{page.hero.supportingText}</p>
+                        ) : null}
                       </div>
                     </div>
+                    {page.hero.secondaryCta ? (
+                      <div className="mt-4 flex justify-center lg:justify-start">
+                        <CTAButton
+                          cta={page.hero.secondaryCta}
+                          onOpenAuth={() => setShowAuth(true)}
+                          className="text-sm font-semibold text-primary hover:text-primary/80 underline underline-offset-4"
+                        />
+                      </div>
+                    ) : null}
                   </div>
                 </div>
 
@@ -148,147 +233,161 @@ export default function FlashcardGeneratorLanding() {
             </div>
           </section>
 
-          {/* Value Props */}
           <section className="pt-10 md:pt-12 pb-12 bg-muted/30 border-y">
             <div className="container">
               <div className="text-center mb-10">
-                <h2 className="text-3xl md:text-4xl font-bold font-heading tracking-tight">Why choose an AI flashcard maker?</h2>
-                <p className="text-muted-foreground mt-3 max-w-3xl mx-auto">
-                  Stop spending hours making cards by hand. CogniGuide turns your study material into clean, effective flashcards and optimises your review plan automatically with spaced repetition.
-                </p>
+                <h2 className="text-3xl md:text-4xl font-bold font-heading tracking-tight">{page.featuresSection.heading}</h2>
+                {page.featuresSection.subheading ? (
+                  <p className="text-muted-foreground mt-3 max-w-3xl mx-auto">{page.featuresSection.subheading}</p>
+                ) : null}
               </div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {[
-                  {
-                    title: 'Save hours every week',
-                    desc: 'Automatically extract key facts and definitions from PDFs, lecture slides, and images.'
-                  },
-                  {
-                    title: 'Remember longer with FSRS',
-                    desc: 'Our scheduler uses a proven spaced‑repetition algorithm to time reviews for maximum retention.'
-                  },
-                  {
-                    title: 'Study anywhere',
-                    desc: 'Open decks on desktop or mobile. Resume where you left off—your progress stays in sync.'
-                  },
-                ].map((f) => (
-                  <div key={f.title} className="bg-background rounded-2xl border p-6 shadow-sm">
-                    <h3 className="text-lg font-semibold">{f.title}</h3>
-                    <p className="mt-2 text-muted-foreground">{f.desc}</p>
+                {page.featuresSection.features.map((feature) => (
+                  <div key={feature.title} className="bg-background rounded-2xl border p-6 shadow-sm">
+                    <h3 className="text-lg font-semibold">{feature.title}</h3>
+                    <p className="mt-2 text-muted-foreground">{feature.description}</p>
                   </div>
                 ))}
               </div>
             </div>
           </section>
 
-          {/* How it works */}
           <section className="pt-12 md:pt-16 pb-12">
             <div className="container px-4 sm:px-6 lg:px-8">
               <div className="text-center mb-10">
-                <h2 className="text-3xl md:text-4xl font-bold font-heading tracking-tight">How to create flashcards with AI</h2>
-                <p className="text-muted-foreground mt-3 max-w-3xl mx-auto">Three simple steps from upload to study.</p>
+                <h2 className="text-3xl md:text-4xl font-bold font-heading tracking-tight">{page.howItWorksSection.heading}</h2>
+                {page.howItWorksSection.subheading ? (
+                  <p className="text-muted-foreground mt-3 max-w-3xl mx-auto">{page.howItWorksSection.subheading}</p>
+                ) : null}
               </div>
               <ol className="grid grid-cols-1 md:grid-cols-3 gap-6 list-none">
-                {[{
-                  title: 'Upload your material',
-                  desc: 'Add PDFs, DOCX, PPTX, images, or paste notes. We’ll parse and prepare the content.'
-                }, {
-                  title: 'Generate your deck',
-                  desc: 'Our AI creates clean question–answer cards. Saving you hours of manual work.'
-                }, {
-                  title: 'Study with spaced repetition',
-                  desc: 'Review on an FSRS schedule tuned to your exam date for deeper long‑term memory.'
-                }].map((s, i) => (
-                  <li key={i} className="bg-background rounded-2xl border p-6 shadow-sm">
+                {page.howItWorksSection.steps.map((step, index) => (
+                  <li key={step.title} className="bg-background rounded-2xl border p-6 shadow-sm">
                     <div className="flex items-start gap-3">
-                      <span className="flex-shrink-0 flex h-8 w-8 items-center justify-center rounded-full border text-sm font-semibold bg-background text-foreground">{i+1}</span>
+                      <span className="flex-shrink-0 flex h-8 w-8 items-center justify-center rounded-full border text-sm font-semibold bg-background text-foreground">
+                        {index + 1}
+                      </span>
                       <div className="flex-1">
-                        <h3 className="text-lg font-semibold mb-2">{s.title}</h3>
-                        <p className="text-muted-foreground">{s.desc}</p>
+                        <h3 className="text-lg font-semibold mb-2">{step.title}</h3>
+                        <p className="text-muted-foreground">{step.description}</p>
                       </div>
                     </div>
                   </li>
                 ))}
               </ol>
-              <div className="text-center mt-8">
-                <Link href="/pricing" className="inline-flex items-center justify-center rounded-full bg-primary px-8 py-3 text-base font-semibold text-primary-foreground hover:bg-primary/90">Get started free</Link>
-              </div>
+              {page.howItWorksSection.cta ? (
+                <div className="text-center mt-8">
+                  <CTAButton
+                    cta={page.howItWorksSection.cta}
+                    onOpenAuth={() => setShowAuth(true)}
+                    className="inline-flex items-center justify-center rounded-full bg-primary px-8 py-3 text-base font-semibold text-primary-foreground hover:bg-primary/90"
+                  />
+                </div>
+              ) : null}
             </div>
           </section>
 
-          {/* SEO text section targeting secondary variants */}
-          <section className="pt-8 md:pt-12 pb-16 bg-muted/20 border-t">
-            <div className="container prose prose-slate dark:prose-invert max-w-none">
-              <h2 id="ai-flashcard-generator-keywords" className="text-2xl md:text-3xl font-bold font-heading tracking-tight mb-6">AI flashcard generator & maker: who is this for?</h2>
-              <p className="mb-6">
-                CogniGuide is an <strong>AI flashcard generator</strong> built for medical and nursing students, engineers, language learners, and busy professionals preparing for certifications. If you’ve been searching for an <em>AI flashcard maker</em> or a faster alternative to manual card creation, this page is for you.
-              </p>
-              <ul className="mb-6 space-y-2">
-                <li><strong>Students:</strong> Turn dense lecture slides into concise Q–A cards.</li>
-                <li><strong>Professionals:</strong> Prep for AWS, PMP, CFA and more—without hand‑typing every card.</li>
-                <li><strong>Language learners:</strong> Build vocab decks from readings and images with text.</li>
-              </ul>
-              <p className="mb-0">
-                Prefer visual first? Try our <Link href="/ai-mind-map-generator" className="underline">AI mind map generator</Link> and then convert nodes into flashcards.
-              </p>
-            </div>
-          </section>
-
-          {/* FAQ */}
-          <section className="pt-12 md:pt-16 pb-20">
-            <div className="container">
-              <div className="text-center mb-10">
-                <h2 className="text-3xl md:text-4xl font-bold font-heading tracking-tight">AI flashcard generator FAQs</h2>
-                <p className="text-muted-foreground mt-3 max-w-3xl mx-auto">Everything you need to know before your first deck.</p>
+          {page.seoSection ? (
+            <section className="pt-8 md:pt-12 pb-16 bg-muted/20 border-t">
+              <div className="container prose prose-slate dark:prose-invert max-w-none">
+                <h2
+                  id={page.slug.replace(/[^a-z0-9-]/gi, '-')}
+                  className="text-2xl md:text-3xl font-bold font-heading tracking-tight mb-6"
+                >
+                  {page.seoSection.heading}
+                </h2>
+                {page.seoSection.body.map((block, index) => renderRichTextBlock(block, index))}
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
-                {[{
-                  q: 'What is an AI flashcard generator?',
-                  a: 'It is a tool that creates question–answer study cards from your documents and notes using large language models, then schedules reviews with spaced repetition.'
-                }, {
-                  q: 'Can I upload PDFs or slides?',
-                  a: 'Yes. Upload PDFs, DOCX, PPTX, plain text, or images with text—CogniGuide will parse them and generate cards.'
-                }, {
-                  q: 'How does spaced repetition work here?',
-                  a: 'We use an FSRS-based scheduler to predict the best time to review each card so you retain information longer with fewer sessions.'
-                }, {
-                  q: 'Is there a free plan?',
-                  a: 'You can try CogniGuide free—no credit card required. Upgrade anytime for larger decks and faster generation.'
-                }].map((item) => (
-                  <div key={item.q} className="bg-background rounded-2xl border p-6 shadow-sm">
-                    <h3 className="text-lg font-semibold">{item.q}</h3>
-                    <p className="mt-2 text-muted-foreground">{item.a}</p>
+            </section>
+          ) : null}
+
+          {page.relatedTopicsSection ? (
+            <section className="pt-12 pb-16 border-t bg-background">
+              <div className="container">
+                <div className="text-center mb-10">
+                  <h2 className="text-3xl md:text-4xl font-bold font-heading tracking-tight">
+                    {page.relatedTopicsSection.heading}
+                  </h2>
+                  {page.relatedTopicsSection.subheading ? (
+                    <p className="text-muted-foreground mt-3 max-w-3xl mx-auto">
+                      {page.relatedTopicsSection.subheading}
+                    </p>
+                  ) : null}
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {page.relatedTopicsSection.links.map((link) => (
+                    <Link
+                      key={link.href}
+                      href={link.href}
+                      className="group flex flex-col gap-2 rounded-2xl border bg-muted/20 p-6 transition-colors hover:bg-muted/40"
+                    >
+                      <span className="text-base font-semibold text-primary group-hover:underline">{link.label}</span>
+                      {link.description ? (
+                        <span className="text-sm text-muted-foreground">{link.description}</span>
+                      ) : null}
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            </section>
+          ) : null}
+
+          {page.faqSection ? (
+            <section className="pt-12 md:pt-16 pb-20">
+              <div className="container">
+                <div className="text-center mb-10">
+                  <h2 className="text-3xl md:text-4xl font-bold font-heading tracking-tight">{page.faqSection.heading}</h2>
+                  {page.faqSection.subheading ? (
+                    <p className="text-muted-foreground mt-3 max-w-3xl mx-auto">{page.faqSection.subheading}</p>
+                  ) : null}
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
+                  {page.faqSection.items.map((item) => (
+                    <div key={item.question} className="bg-background rounded-2xl border p-6 shadow-sm">
+                      <h3 className="text-lg font-semibold">{item.question}</h3>
+                      <p className="mt-2 text-muted-foreground">{item.answer}</p>
+                    </div>
+                  ))}
+                </div>
+                {page.faqSection.cta ? (
+                  <div className="text-center">
+                    <CTAButton
+                      cta={page.faqSection.cta}
+                      onOpenAuth={() => setShowAuth(true)}
+                      className="inline-flex items-center justify-center rounded-full bg-primary px-8 py-3 text-base font-semibold text-primary-foreground hover:bg-primary/90"
+                    />
                   </div>
-                ))}
+                ) : null}
               </div>
-              <div className="text-center">
-                <button onClick={() => setShowAuth(true)} className="inline-flex items-center justify-center rounded-full bg-primary px-8 py-3 text-base font-semibold text-primary-foreground hover:bg-primary/90">Generate my first deck</button>
-              </div>
-            </div>
-          </section>
+            </section>
+          ) : null}
         </main>
 
         <footer className="border-t bg-muted/40">
           <div className="container py-3 flex flex-col md:flex-row justify-between items-center gap-2">
             <p className="text-xs text-muted-foreground/70">&copy; {new Date().getFullYear()} CogniGuide. All rights reserved.</p>
             <nav className="flex flex-wrap justify-center gap-2 sm:gap-4">
-              <Link href="/pricing" className="text-xs text-muted-foreground/70 hover:underline md:hidden">Pricing</Link>
-              <Link
-                href="/ai-mind-map-generator"
-                className="text-xs text-muted-foreground/70 hover:underline"
-              >
+              <Link href="/pricing" className="text-xs text-muted-foreground/70 hover:underline md:hidden">
+                Pricing
+              </Link>
+              <Link href="/ai-mind-map-generator" className="text-xs text-muted-foreground/70 hover:underline">
                 Mind Map Generator
               </Link>
-              <Link
-                href="/ai-flashcard-generator"
-                className="text-xs text-muted-foreground/70 hover:underline"
-              >
+              <Link href="/ai-flashcard-generator" className="text-xs text-muted-foreground/70 hover:underline">
                 Flashcard Generator
               </Link>
-              <Link href="/contact" className="text-xs text-muted-foreground/70 hover:underline">Contact</Link>
-              <Link href="/legal/refund-policy" className="text-xs text-muted-foreground/70 hover:underline">Refund Policy</Link>
-              <Link href="/legal/cancellation-policy" className="text-xs text-muted-foreground/70 hover:underline">Cancellation Policy</Link>
-              <Link href="/legal/terms" className="text-xs text-muted-foreground/70 hover:underline">Terms of Service</Link>
+              <Link href="/contact" className="text-xs text-muted-foreground/70 hover:underline">
+                Contact
+              </Link>
+              <Link href="/legal/refund-policy" className="text-xs text-muted-foreground/70 hover:underline">
+                Refund Policy
+              </Link>
+              <Link href="/legal/cancellation-policy" className="text-xs text-muted-foreground/70 hover:underline">
+                Cancellation Policy
+              </Link>
+              <Link href="/legal/terms" className="text-xs text-muted-foreground/70 hover:underline">
+                Terms of Service
+              </Link>
             </nav>
           </div>
         </footer>
