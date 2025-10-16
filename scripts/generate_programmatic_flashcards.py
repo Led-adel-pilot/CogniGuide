@@ -43,85 +43,94 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
 OUTPUT_FOOTER = "];\n"
 
 PROMPT_TEMPLATE = """
-You are an SEO strategist and senior copywriter helping an AI study assistant
-launch programmatic landing pages.
+You are an expert content strategist and senior copywriter specializing in high-ranking, user-focused SEO for EdTech SaaS companies. Your goal is to generate comprehensive, E-E-A-T compliant landing pages that rank for long-tail keywords and convert users for a new AI study assistant.
 
-You will receive structured CSV data describing one page to generate. Follow
-these requirements:
+You will receive structured CSV data for one landing page. Follow these requirements precisely:
 
-1. Write unique, high-utility copy that aligns with the provided topic and intent.
-2. Mirror the structure of the ProgrammaticFlashcardPage schema:
-   - hero.heading (focus keyword up front), hero.subheading, CTA labels.
-   - featuresSection (3+ feature cards with differentiated benefits).
-   - howItWorksSection with exactly 3 sequential steps customised to the topic.
-   - seoSection with a mix of paragraphs and bullet lists that reinforce topical
-     authority and internal links opportunities. Use HTML tags for emphasis and links.
-   - faqSection with 4 distinct questions tailored to the topic. Provide concise,
-     helpful answers grounded in the product capabilities.
-   - relatedTopicsSection with at least 2 internal links (hrefs supplied in CSV or
-     sensible defaults such as /ai-mind-map-generator, /pricing).
-   - metadata fields (title, description, keywords array, canonical path) optimised
-     for long-tail search queries.
-3. Ensure every text block demonstrates E-E-A-T principles, includes concrete
-   benefits, and avoids duplicate phrasing across pages.
-4. All output MUST be valid JSON following this structure:
+1.  **Write "People-First" Content:** Your primary goal is to create helpful, reliable, and original content that satisfies user search intent. The copy must be in-depth and high-utility. Avoid thin, boilerplate, or repetitive text. Each page must be unique and valuable.
+
+2.  **Demonstrate E-E-A-T (Experience, Expertise, Authoritativeness, Trust):**
+    * **Tone:** Write in a confident, informative, and trustworthy tone, as if from an expert in educational technology.
+    * **Experience:** Show, don't just tell. Include specific benefits, use-cases, or hypothetical results (e.g., "...helped students cut study time in half" or "...improves exam scores by 20%").
+    * **Expertise:** Weave in semantically related keywords and concepts naturally (e.g., "spaced repetition," "learning algorithms," "smarter studying," "cognitive science") to build topical authority.
+
+3.  **Optimize On-Page SEO Elements:**
+    * **Headings:** The `hero.heading` should be a unique, keyword-rich H1 that targets a specific long-tail query based on the topic. Use a logical hierarchy of H2s and H3s for section headings (`featuresSection.heading`, `faqSection.heading`, etc.) to improve readability and structure.
+    * **Metadata:** The `metadata.title` should be compelling and keyword-focused. The `metadata.description` must be an engaging summary that encourages clicks from the SERP.
+    * **SEO Section:** The `seoSection` must be substantial, offering detailed information, examples, and use cases. This is a critical area for building topical authority and should contain a mix of paragraphs and lists. Weave in contextual internal links to other relevant pages.
+
+4.  **Drive Conversions:**
+    * **CTAs:** All CTA labels must be clear, action-oriented, and benefit-driven (e.g., "Create My Flashcards Now" instead of "Submit").
+    * **Trust:** Place reassuring microcopy near CTAs when appropriate (e.g., in the `hero.supportingText`), such as "No credit card required" or "Free to start."
+
+5.  **Strictly Adhere to JSON Output:** Your entire output MUST be a single, valid JSON object that follows the structure below. Do not wrap it in markdown.
 
 {
   "slug": string,
   "path": string,
   "metadata": {
-    "title": string,
-    "description": string,
+    "title": string, // SEO-optimized, <60 chars
+    "description": string, // Meta description, ~155 chars
     "keywords": string[],
     "canonical": string
   },
   "hero": {
-    "heading": string,
+    "heading": string, // The H1 tag, primary long-tail keyword
     "subheading": string,
-    "supportingText": string,
+    "supportingText": string, // Trust-building text, e.g., "No credit card required"
     "primaryCta": { "type": "modal", "label": string },
     "secondaryCta": { "type": "link", "label": string, "href": string } | null
   },
   "featuresSection": {
-    "heading": string,
+    "heading": string, // H2 heading
     "subheading": string,
-    "features": [{ "title": string, "description": string }, ...]
+    "features": [{ "title": string, "description": string }, ...] // At least 3 features
   },
   "howItWorksSection": {
-    "heading": string,
+    "heading": string, // H2 heading
     "subheading": string,
-    "steps": [{ "title": string, "description": string }, ...],
+    "steps": [{ "title": string, "description": string }, ...], // Exactly 3 steps
     "cta": { "type": "link", "label": string, "href": string } | { "type": "modal", "label": string }
   },
   "seoSection": {
-    "heading": string,
-    "body": [
+    "heading": string, // H2 heading
+    "body": [ // In-depth, helpful content
       { "type": "paragraph", "html": string } |
       { "type": "list", "items": string[] }
     ]
   },
   "faqSection": {
-    "heading": string,
+    "heading": string, // H2 heading
     "subheading": string,
-    "items": [{ "question": string, "answer": string }, ...],
+    "items": [{ "question": string, "answer": string }, ...], // 4 distinct, relevant questions
     "cta": { "type": "modal", "label": string }
   },
   "relatedTopicsSection": {
-    "heading": string,
-    "links": [{ "label": string, "href": string, "description": string }, ...]
-  }
+    "heading": string, // H2 heading
+    "links": [{ "label": string, "href": string, "description": string }, ...] // At least 2 internal links
+  },
+  "structuredData": { // Optional: Include FAQPage schema if relevant
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": string, // from faqSection
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": string // from faqSection
+          }
+        }
+      ]
+    }
 }
 
-5. Each HTML string must be safe to embed inside JSX without additional escaping.
-6. Reuse the provided "base_url" column to create canonical URLs. If none is
-   provided, default to https://www.cogniguide.app.
-7. Keep language clear, professional, and benefit-driven. No placeholder text.
-8. IMPORTANT: For CTA objects:
-   - Modal CTAs should ONLY have: {"type": "modal", "label": string}
-   - Link CTAs should ONLY have: {"type": "link", "label": string, "href": string}
-   - Never include "href" in modal CTAs or vice versa.
+6.  **Final Checks:**
+    * Use the provided "base_url" for canonical URLs. Default to https://www.cogniguide.app if not provided.
+    * Ensure all HTML strings are safe for JSX.
+    * No placeholder text. All fields must be complete and production-ready.
 
-Return ONLY the JSON object. Do not wrap the response in markdown.
+Return ONLY the JSON object.
 """
 
 
