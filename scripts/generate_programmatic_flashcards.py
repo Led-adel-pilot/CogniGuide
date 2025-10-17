@@ -16,7 +16,7 @@ Example usage::
         --reasoning-effort high
 
 The input CSV must include, at minimum, the columns ``slug`` and
-``primary_keyword``. Every other column becomes context that is injected into the
+``target_keyword``. Every other column becomes context that is injected into the
 LLM prompt so you can steer copy for different audiences, intents, CTAs, etc.
 """
 
@@ -64,9 +64,9 @@ CRITICAL WRITING RULES (people-first + E-E-A-T):
 
 
 ON-PAGE SEO REQUIREMENTS:
-3) Title: ≤60 characters, must contain the primary keyword or closest variant. Make it benefit-led.
-4) Meta description: 140–155 characters, promise the outcome without hype.
-5) H1 (hero.heading): include the primary keyword or close variant. H1 ≈ title but not identical.
+3) Title: ≤60 characters, must contain the target keyword or closest variant. Make it benefit-led.
+4) Meta description: 140–155 characters, must begin with the target keyword and promise the outcome without hype.
+5) H1 (hero.heading): must include the target keyword. H1 ≈ title but not identical.
 6) Headings hierarchy: Use concise H2/H3s; avoid keyword stuffing. Every section must be meaningfully different.
 7) Semantic coverage: Naturally weave related_terms and subject-specific subtopics (if given). Include spaced repetition, active recall, tagging, and study workflow concepts where relevant.
 8) Internal links: Use internal_links if provided; otherwise create at least two sensible links under relatedTopicsSection that point to topical neighbors at {base_url}.
@@ -92,14 +92,14 @@ Return ONLY a single valid JSON object with this shape (no markdown, no commenta
   "slug": string,
   "path": string,
   "metadata": {
-    "title": string,            // ≤60 chars, includes primary keyword
+    "title": string,            // ≤60 chars, includes target keyword
     "description": string,      // 140–155 chars
     "keywords": string[],       // 5–10 semantic variants (for internal use; not meta keywords)
     "canonical": string         // base_url + path if not provided
   },
   "hero": {
-    "heading": string,          // H1, contains primary keyword/variant
-    "subheading": string,       // 1–2 sentences: outcome-focused, no hype (mentions the core value tuned to the primary keyword: upload doc -> get spaced rep flashcards)
+    "heading": string,          // H1, contains target keyword/variant
+    "subheading": string,       // 1–2 sentences: outcome-focused, no hype (mentions the core value tuned to the target keyword: upload doc -> get spaced rep flashcards)
     "primaryCta": { "type": "modal", "label": string }
   },
   "featuresSection": {
@@ -143,7 +143,7 @@ Return ONLY a single valid JSON object with this shape (no markdown, no commenta
         "@type": "BreadcrumbList",
         "itemListElement": [
           {"@type":"ListItem","position":1,"name":"Flashcards","item":"{base_url}/flashcards"},
-          {"@type":"ListItem","position":2,"name": "{context.primary_keyword || slug}", "item": "{base_url}{path}"}
+          {"@type":"ListItem","position":2,"name": "{context.target_keyword || slug}", "item": "{base_url}{path}"}
         ]
       },
       {
@@ -162,7 +162,7 @@ Return ONLY a single valid JSON object with this shape (no markdown, no commenta
 
 QUALITY GATES (the model must self-check BEFORE returning JSON):
 - Keep title ≤60 chars; description 140–155.
-- H1 contains the primary keyword or the closest natural variant.
+- H1 contains the target keyword or the closest natural variant.
 - Ensure all HTML strings are safe for JSX.
 - No placeholder text; no lorem ipsum. All fields must be complete and production-ready.
 - Embedded flashcards must:
@@ -170,7 +170,7 @@ QUALITY GATES (the model must self-check BEFORE returning JSON):
   * Provide concise answers (≤2 sentences) that support active recall.
   * Avoid markdown unless needed for short lists.
 
-Return ONLY the JSON object.
+Return ONLY the JSON object. Ensure the first sentence of seoSection.body[0].html begins with the target keyword or its closest natural variant.
 """
 
 
@@ -252,8 +252,8 @@ def read_csv_rows(path: Path, max_rows: int | None = None) -> List[CsvRow]:
     reader = csv.DictReader(handle)
     if "slug" not in reader.fieldnames:
       raise ValueError("Input CSV must include a 'slug' column")
-    if "primary_keyword" not in reader.fieldnames:
-      raise ValueError("Input CSV must include a 'primary_keyword' column")
+    if "target_keyword" not in reader.fieldnames:
+      raise ValueError("Input CSV must include a 'target_keyword' column")
 
     rows: List[CsvRow] = []
     for idx, raw in enumerate(reader):
@@ -262,8 +262,8 @@ def read_csv_rows(path: Path, max_rows: int | None = None) -> List[CsvRow]:
       slug = (raw.get("slug") or "").strip()
       if not slug:
         raise ValueError(f"Row {idx + 2} is missing a slug")
-      if not (raw.get("primary_keyword") or "").strip():
-        raise ValueError(f"Row {idx + 2} is missing a primary_keyword")
+      if not (raw.get("target_keyword") or "").strip():
+        raise ValueError(f"Row {idx + 2} is missing a target_keyword")
       rows.append(CsvRow(slug=slug, data={k: (v or '').strip() for k, v in raw.items()}))
     return rows
 
@@ -412,7 +412,7 @@ def build_structured_data(row: CsvRow, payload: Dict[str, Any]) -> Dict[str, Any
     if isinstance(heading, str) and heading.strip():
       hero_heading = heading.strip()
 
-  breadcrumb_name = hero_heading or row.data.get("primary_keyword") or row.slug
+  breadcrumb_name = hero_heading or row.data.get("target_keyword") or row.slug
 
   faq_section = payload.get("faqSection") if isinstance(payload, dict) else {}
   faq_items = []
