@@ -190,15 +190,7 @@ export default function FlashcardGeneratorLanding({ page }: FlashcardGeneratorLa
                     ) : null}
                     <h1
                       className="font-bold font-heading tracking-tighter md:leading-tight mb-4"
-                      style={{
-                        fontSize: 'clamp(2.25rem, 4vw, 3.75rem)',
-                        '@media (min-width: 768px)': {
-                          fontSize: '3rem',
-                        },
-                        '@media (min-width: 1024px)': {
-                          fontSize: '3.75rem',
-                        },
-                      } as React.CSSProperties}
+                      style={{ fontSize: '3rem' } as React.CSSProperties}
                     >
                       {page.hero.heading}
                     </h1>
