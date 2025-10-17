@@ -156,9 +156,14 @@ type BuildFaqOptions = {
   faq: ProgrammaticFaqItem[];
 };
 
-export function buildFaqJsonLd({ url, faq }: BuildFaqOptions): Record<string, unknown> {
-  return {
-    '@context': 'https://schema.org',
+type BuildFaqJsonLdOptions = BuildFaqOptions & { includeContext?: boolean };
+
+export function buildFaqJsonLd({
+  url,
+  faq,
+  includeContext = true,
+}: BuildFaqJsonLdOptions): Record<string, unknown> {
+  const node = {
     '@type': 'FAQPage',
     mainEntity: faq.map((item) => ({
       '@type': 'Question',
@@ -172,6 +177,15 @@ export function buildFaqJsonLd({ url, faq }: BuildFaqOptions): Record<string, un
     inLanguage: 'en',
     name: siteMetadata.title,
   };
+
+  if (!includeContext) {
+    return node;
+  }
+
+  return {
+    '@context': 'https://schema.org',
+    ...node,
+  };
 }
 
 export function getProgrammaticFlashcardPage(slug: string): ProgrammaticFlashcardPage | undefined {
@@ -182,7 +196,51 @@ export { generatedFlashcardPages };
 
 export const allFlashcardPages: ProgrammaticFlashcardPage[] = [defaultFlashcardLanding, ...generatedFlashcardPages];
 
-(defaultFlashcardLanding as ProgrammaticFlashcardPage).structuredData = buildFaqJsonLd({
-  url: defaultFlashcardLanding.metadata.canonical ?? `${siteMetadata.url}${defaultFlashcardLanding.path}`,
-  faq: defaultFaqItems,
-});
+function ensureStructuredData(page: ProgrammaticFlashcardPage): void {
+  if (page.structuredData && typeof page.structuredData === 'object') {
+    return;
+  }
+
+  const canonical = page.metadata.canonical ?? `${siteMetadata.url}${page.path}`;
+
+  const breadcrumb = {
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: 'Flashcards',
+        item: `${siteMetadata.url}/flashcards`,
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: page.hero.heading ?? page.metadata.title ?? page.slug,
+        item: canonical,
+      },
+    ],
+  };
+
+  const faqItems = page.faqSection?.items ?? [];
+
+  const graph: Record<string, unknown>[] = [breadcrumb];
+
+  if (faqItems.length > 0) {
+    graph.push({
+      ...buildFaqJsonLd({ url: canonical, faq: faqItems, includeContext: false }),
+      '@id': `${canonical}#faq`,
+    });
+  }
+
+  if (graph.length === 0) {
+    return;
+  }
+
+  page.structuredData = {
+    '@context': 'https://schema.org',
+    '@graph': graph,
+  };
+}
+
+ensureStructuredData(defaultFlashcardLanding as ProgrammaticFlashcardPage);
+generatedFlashcardPages.forEach((page) => ensureStructuredData(page));
