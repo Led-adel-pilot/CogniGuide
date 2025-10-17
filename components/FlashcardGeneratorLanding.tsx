@@ -188,7 +188,18 @@ export default function FlashcardGeneratorLanding({ page }: FlashcardGeneratorLa
                     {page.hero.eyebrow ? (
                       <p className="text-sm font-semibold uppercase tracking-widest text-primary/80">{page.hero.eyebrow}</p>
                     ) : null}
-                    <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold font-heading tracking-tighter md:leading-tight mb-4">
+                    <h1
+                      className="font-bold font-heading tracking-tighter md:leading-tight mb-4"
+                      style={{
+                        fontSize: 'clamp(2.25rem, 4vw, 3.75rem)',
+                        '@media (min-width: 768px)': {
+                          fontSize: '3rem',
+                        },
+                        '@media (min-width: 1024px)': {
+                          fontSize: '3.75rem',
+                        },
+                      } as React.CSSProperties}
+                    >
                       {page.hero.heading}
                     </h1>
                     <p className="mt-6 text-xl text-muted-foreground leading-relaxed max-w-2xl mx-auto lg:mx-0">
