@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
@@ -79,6 +79,26 @@ export default function FlashcardGeneratorLanding({ page }: FlashcardGeneratorLa
   const [shouldRenderFlashcards, setShouldRenderFlashcards] = useState(false);
   const router = useRouter();
   const flashcardsSectionRef = useRef<HTMLDivElement | null>(null);
+
+  const headingFontSize = useMemo(() => {
+    const minChars = 51;
+    const maxChars = 59;
+    const maxFontSize = 3;
+    const minFontSize = 2.8;
+    const headingLength = page.hero.heading.length;
+
+    if (headingLength <= minChars) {
+      return `${maxFontSize}rem`;
+    }
+
+    if (headingLength >= maxChars) {
+      return `${minFontSize}rem`;
+    }
+
+    const ratio = (headingLength - minChars) / (maxChars - minChars);
+    const interpolated = maxFontSize - ratio * (maxFontSize - minFontSize);
+    return `${interpolated}rem`;
+  }, [page.hero.heading]);
 
   useEffect(() => {
     try {
@@ -188,10 +208,7 @@ export default function FlashcardGeneratorLanding({ page }: FlashcardGeneratorLa
                     {page.hero.eyebrow ? (
                       <p className="text-sm font-semibold uppercase tracking-widest text-primary/80">{page.hero.eyebrow}</p>
                     ) : null}
-                    <h1
-                      className="font-bold font-heading tracking-tighter md:leading-tight mb-4"
-                      style={{ fontSize: '3rem' } as React.CSSProperties}
-                    >
+                    <h1 className="font-bold font-heading tracking-tighter md:leading-tight mb-4" style={{ fontSize: headingFontSize }}>
                       {page.hero.heading}
                     </h1>
                     <p className="mt-6 text-xl text-muted-foreground leading-relaxed max-w-2xl mx-auto lg:mx-0">
