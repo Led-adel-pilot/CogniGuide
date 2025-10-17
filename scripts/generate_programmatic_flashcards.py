@@ -15,9 +15,9 @@ Example usage::
         --temperature 2.0 \
         --reasoning-effort high
 
-The input CSV must include, at minimum, the columns ``slug`` and ``topic``. Every
-other column becomes context that is injected into the LLM prompt so you can steer
-copy for different audiences, intents, CTAs, etc.
+The input CSV must include, at minimum, the columns ``slug`` and
+``primary_keyword``. Every other column becomes context that is injected into the
+LLM prompt so you can steer copy for different audiences, intents, CTAs, etc.
 """
 
 from __future__ import annotations
@@ -73,9 +73,7 @@ ON-PAGE SEO REQUIREMENTS:
 9) Accessibility: Any example references should describe content plainly so screen readers convey value (no images required in output).
 
 CONVERSION (CTAs):
-10) Use action-oriented, consistent CTAs. Allowed labels:
-    - “Create My Flashcards Now”, “Try the Flashcard Generator — Free”, “Generate My {topic} Deck”.
-    Pick ONE primary label and reuse it consistently across the page.
+10) Use action-oriented, consistent CTAs (3-4 words max). Pick ONE primary label and reuse it consistently across the page.
 
 EMBEDDED FLASHCARDS PREVIEW:
 11) Craft exactly three topic-specific flashcards that follow active recall best practices.
@@ -145,7 +143,7 @@ Return ONLY a single valid JSON object with this shape (no markdown, no commenta
         "@type": "BreadcrumbList",
         "itemListElement": [
           {"@type":"ListItem","position":1,"name":"Flashcards","item":"{base_url}/flashcards"},
-          {"@type":"ListItem","position":2,"name": "{context.topic || slug}", "item": "{base_url}{path}"}
+          {"@type":"ListItem","position":2,"name": "{context.primary_keyword || slug}", "item": "{base_url}{path}"}
         ]
       },
       {
@@ -254,6 +252,8 @@ def read_csv_rows(path: Path, max_rows: int | None = None) -> List[CsvRow]:
     reader = csv.DictReader(handle)
     if "slug" not in reader.fieldnames:
       raise ValueError("Input CSV must include a 'slug' column")
+    if "primary_keyword" not in reader.fieldnames:
+      raise ValueError("Input CSV must include a 'primary_keyword' column")
 
     rows: List[CsvRow] = []
     for idx, raw in enumerate(reader):
@@ -262,6 +262,8 @@ def read_csv_rows(path: Path, max_rows: int | None = None) -> List[CsvRow]:
       slug = (raw.get("slug") or "").strip()
       if not slug:
         raise ValueError(f"Row {idx + 2} is missing a slug")
+      if not (raw.get("primary_keyword") or "").strip():
+        raise ValueError(f"Row {idx + 2} is missing a primary_keyword")
       rows.append(CsvRow(slug=slug, data={k: (v or '').strip() for k, v in raw.items()}))
     return rows
 
@@ -410,7 +412,7 @@ def build_structured_data(row: CsvRow, payload: Dict[str, Any]) -> Dict[str, Any
     if isinstance(heading, str) and heading.strip():
       hero_heading = heading.strip()
 
-  breadcrumb_name = hero_heading or row.data.get("topic") or row.slug
+  breadcrumb_name = hero_heading or row.data.get("primary_keyword") or row.slug
 
   faq_section = payload.get("faqSection") if isinstance(payload, dict) else {}
   faq_items = []
