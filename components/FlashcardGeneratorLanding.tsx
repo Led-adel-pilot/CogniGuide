@@ -8,6 +8,7 @@ import { useRouter } from 'next/navigation';
 import type { ProgrammaticCTA, ProgrammaticFlashcardPage, RichTextBlock } from '@/lib/programmatic/flashcardPageSchema';
 import CogniGuideLogo from '../CogniGuide_logo.png';
 import { supabase } from '@/lib/supabaseClient';
+import type { Flashcard } from '@/components/FlashcardsModal';
 
 const AuthModal = dynamic(() => import('@/components/AuthModal'), { ssr: false });
 const EmbeddedFlashcards = dynamic(() => import('@/components/EmbeddedFlashcards'), {
@@ -79,6 +80,23 @@ export default function FlashcardGeneratorLanding({ page }: FlashcardGeneratorLa
   const [shouldRenderFlashcards, setShouldRenderFlashcards] = useState(false);
   const router = useRouter();
   const flashcardsSectionRef = useRef<HTMLDivElement | null>(null);
+
+  const embeddedFlashcardDeck = useMemo<Flashcard[] | null>(() => {
+    if (!Array.isArray(page.embeddedFlashcards)) {
+      return null;
+    }
+
+    const sanitized = page.embeddedFlashcards
+      .filter((card): card is { question: string; answer: string } => {
+        return Boolean(card?.question?.trim() && card?.answer?.trim());
+      })
+      .map((card) => ({
+        question: card.question.trim(),
+        answer: card.answer.trim(),
+      }));
+
+    return sanitized.length > 0 ? sanitized : null;
+  }, [page.embeddedFlashcards]);
 
   const headingFontSize = useMemo(() => {
     const minChars = 51;
@@ -231,7 +249,10 @@ export default function FlashcardGeneratorLanding({ page }: FlashcardGeneratorLa
                   <div className="bg-background rounded-[2rem] border shadow-xl shadow-slate-200/50 dark:shadow-slate-700/50 overflow-hidden">
                     <div className="w-full h-[65vh] md:h-[26rem] lg:h-[30rem]">
                       {shouldRenderFlashcards ? (
-                        <EmbeddedFlashcards />
+                        <EmbeddedFlashcards
+                          cards={embeddedFlashcardDeck}
+                          title={`${page.hero.heading} Flashcards Preview`}
+                        />
                       ) : (
                         <div className="w-full h-full animate-pulse bg-muted/40" aria-hidden="true" />
                       )}

@@ -8,63 +8,63 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     "slug": "medical-school-anatomy",
     "path": "/flashcards/medical-school-anatomy",
     "metadata": {
-      "title": "AI Anatomy Flashcards for Medical School Success",
-      "description": "Instantly convert your anatomy notes, slides, and PDFs into smart flashcards optimized with spaced repetition scheduling.",
+      "title": "AI Anatomy Flashcards: Master Medical School Facts",
+      "description": "Convert anatomy notes into effective, spaced-repetition flashcards. Prepare for exams using smart recall techniques based on your uploaded PDFs.",
       "keywords": [
-        "anatomy flashcards",
-        "medical school study aids",
-        "spaced repetition anatomy",
-        "PDF to flashcards",
-        "active recall learning",
-        "medical student tools"
+        "Anatomy flashcards",
+        "Medical study aids",
+        "Spaced repetition anatomy",
+        "Medical school learning",
+        "Active recall diagrams",
+        "PDF to flashcard converter"
       ],
       "canonical": "https://www.cogniguide.app/flashcards/medical-school-anatomy"
     },
     "hero": {
-      "heading": "Master Medical School Anatomy with AI-Powered Flashcards",
-      "subheading": "Upload your dense PDFs and lecture slides instantly to generate precise, review-optimized flashcards that utilize proven spaced repetition scheduling to lock in complex anatomical knowledge.",
+      "heading": "Generate AI Flashcards from Your Medical School Anatomy Notes",
+      "subheading": "Upload your lecture slides, textbooks, or lab notes, and instantly create structured decks optimized by spaced repetition scheduling for superior memory retention.",
       "primaryCta": {
         "type": "modal",
         "label": "Create My Flashcards Now"
       }
     },
     "featuresSection": {
-      "heading": "Engineered for Deep Anatomical Retention",
-      "subheading": "Stop manually creating notecards. Our system handles the heavy lifting, focusing your energy on active recall where it matters most.",
+      "heading": "Engineered for High-Stakes Medical Retention",
+      "subheading": "Move beyond passive reading. Our system leverages cognitive science principles to ensure complex anatomical structures stay locked in your long-term memory.",
       "features": [
         {
-          "title": "Instant Document Ingestion",
-          "description": "Convert bulky lecture slides, textbook chapters (PDFs), or handwritten notes into usable digital flashcards immediately. Focus on understanding structures, not formatting data."
+          "title": "Intelligent Document Ingestion",
+          "description": "Upload any PDF or lecture slide deck directly. Our AI parses dense anatomical texts, identifying key structures, functions, and clinical correlations to form precise study items."
         },
         {
-          "title": "Optimized Spaced Repetition",
-          "description": "Leverage cognitive science algorithms that intelligently schedule reviews based on how well you know each structure, ensuring you revisit difficult concepts right before forgetting them."
+          "title": "Spaced Repetition Scheduling",
+          "description": "Stop guessing when to review. The algorithm dynamically adjusts review intervals based on your performance, focusing your limited study time only on what you are about to forget."
         },
         {
-          "title": "Deadline-Driven Scheduling",
-          "description": "Set your Anatomy practical or final exam date, and the system adjusts the review cadence to maximize retention right up to exam day. Study smarter towards your goal."
+          "title": "Targeted Exam Date Planning",
+          "description": "Input your upcoming anatomy practical or written exam date, and the system paces your learning schedule backward, ensuring comprehensive coverage exactly when it matters most."
         },
         {
-          "title": "Collaborative Sharing Capabilities",
-          "description": "Easily share your highly specialized anatomy decks with study groups or classmates using a simple public link, promoting collective mastery of complex systems."
+          "title": "Effortless Collaboration",
+          "description": "Share mastery of complex topics immediately. Generate a secure, public link to your anatomy deck, allowing study groups to benefit from your generated material."
         }
       ]
     },
     "howItWorksSection": {
-      "heading": "Your Accelerated Anatomy Study Workflow",
-      "subheading": "From complex source material to perfectly timed review sessions in three simple steps.",
+      "heading": "Your Study Workflow Transformed",
+      "subheading": "From raw document to mastered concept in three simple, high-efficiency steps designed for the busy medical student.",
       "steps": [
         {
           "title": "1. Upload Your Source Material",
-          "description": "Upload any required reading material, PowerPoint slides, or extensive PDF notes covering physiology, histology, or gross anatomy directly to the platform."
+          "description": "Upload PDFs of histology atlases, gross anatomy diagrams, or review notes from your latest lecture series. Our tool handles the conversion."
         },
         {
-          "title": "2. AI Generates Smart Cards",
-          "description": "Our AI processes the document content, extracting key terms, relationships, and diagrams into high-yield question/answer pairs ready for review."
+          "title": "2. AI Generates Active Recall Cards",
+          "description": "The AI extracts facts and constructs flashcards focusing on active recall. We prioritize question formats that test understanding, not just memorization."
         },
         {
-          "title": "3. Master Through Active Recall",
-          "description": "Begin reviewing using the integrated spaced repetition scheduler. Focus on challenging terms like 'Innervation of the hand' until they are second nature."
+          "title": "3. Study Smarter with Scheduling",
+          "description": "Begin reviewing immediately. The integrated spaced repetition system optimizes subsequent sessions, ensuring you build foundational knowledge efficiently for your next assessment."
         }
       ],
       "cta": {
@@ -73,47 +73,47 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       }
     },
     "seoSection": {
-      "heading": "Why AI-Driven Active Recall is Essential for Medical Students",
+      "heading": "Mastering Anatomy Through Active Recall",
       "body": [
         {
           "type": "paragraph",
-          "html": "Medical school demands retention of massive amounts of structured, high-stakes data, making traditional rote memorization inefficient. Our tool directly addresses this challenge by automating the creation of flashcards from your existing curriculum materials. By integrating advanced spaced repetition, we move beyond simple memorization; we facilitate long-term encoding. This methodology, rooted in proven learning algorithms, significantly reduces the total time spent reviewing material while simultaneously boosting confidence and accuracy for practical exams and board certification assessments."
+          "html": "Successfully navigating medical school, especially anatomy, hinges on retaining vast amounts of structured, interrelated information. Simply rereading textbooks leads to familiarity, not true recall. Our platform directly addresses this pitfall by forcing retrieval practice. By generating atomic questions from your existing materials—whether it’s detailed musculoskeletal insertions or complex neurovascular pathways—we ensure every study session is an active test. This methodology is central to modern cognitive science and proves significantly more effective than traditional linear review methods for high-volume subjects like human anatomy."
         },
         {
           "type": "list",
           "items": [
-            "Generating comprehensive decks from PDF anatomy atlases",
-            "Creating review schedules optimized for upcoming finals",
-            "Efficiently reviewing complex cranial nerve pathways",
-            "Developing flashcards based on histological slides or gross anatomy diagrams",
-            "Sharing expertly curated study sets with colleagues"
+            "Converting lecture notes into reviewable Q&A format",
+            "Optimizing study schedules using evidence-based algorithms",
+            "Testing understanding of specific tissue layers or organ systems",
+            "Reducing study time by prioritizing weak areas",
+            "Creating portable, shareable study resources"
           ]
         },
         {
           "type": "paragraph",
-          "html": "For high-volume topics like the vascular supply or muscular origins and insertions, consistent, scheduled exposure is non-negotiable. Instead of relying on uncertain manual review cycles, let the adaptive scheduling engine manage the cadence. This targeted approach maximizes the efficiency of your study sessions, allowing medical students to dedicate more time to clinical reasoning and practical skills development, knowing their foundational anatomical knowledge is robustly secured."
+          "html": "Imagine finishing a long day in the dissection lab. Instead of flipping aimlessly through a printed guide, you upload the associated chapter content. Within minutes, you have a deck ready that targets the exact structures you struggled with during the practical session. This precise, responsive feedback loop—powered by smart scheduling—is how future clinicians solidify the bedrock knowledge required for subsequent clinical years."
         }
       ]
     },
     "faqSection": {
-      "heading": "Frequently Asked Questions About Anatomy Card Generation",
-      "subheading": "Clear answers on how to best leverage our AI tool for your rigorous medical curriculum.",
+      "heading": "Frequently Asked Questions for Anatomy Students",
+      "subheading": "Quick answers about using AI to enhance your learning efficiency.",
       "items": [
         {
-          "question": "Can the tool handle diagrams or images within my PDF notes?",
-          "answer": "The system primarily extracts and converts textual content from documents like PDFs and slides into question/answer pairs. For complex visual retention (like detailed anatomical diagrams), the output will be text-based prompts referencing concepts found near those visuals in your source material."
+          "question": "What file formats can I upload for my anatomy notes?",
+          "answer": "We primarily support PDF documents, which are excellent for retaining diagrams and lecture slides. Text-heavy notes are also processed effectively."
         },
         {
-          "question": "How accurate is the AI in extracting key anatomical terms?",
-          "answer": "The AI is highly specialized in recognizing scientific nomenclature. It excels at identifying structures, functions, innervation, and blood supply relationships common in standard medical textbooks, offering high fidelity extraction ready for active recall practice."
+          "question": "How does the spaced repetition schedule actually work?",
+          "answer": "The system uses performance data from your self-assessments. Concepts you answer correctly easily are shown less often, while those requiring more effort are brought up sooner, maximizing your retention efficiency."
         },
         {
-          "question": "What is the benefit of setting an exam date?",
-          "answer": "Setting a target date allows the spaced repetition scheduler to work backward. It ensures the most difficult concepts are reviewed with higher frequency as the deadline approaches, achieving peak retention precisely when you need it most for your practical or written assessment."
+          "question": "Can I customize the flashcards after they are generated?",
+          "answer": "Yes, while the AI provides a strong starting point, you always maintain full editing control to refine the question or answer wording to better fit your instructor’s specific emphasis."
         },
         {
-          "question": "Is sharing flashcards secure if I use a public link?",
-          "answer": "Public links are designed for sharing finalized study sets with peers. If your uploaded documents contain proprietary or sensitive personal information, ensure you only upload materials intended for external distribution."
+          "question": "Is sharing flashcards secure?",
+          "answer": "Shared decks use a secure, public, read-only link. No personal data associated with your account is shared when you distribute a study deck link to peers."
         }
       ],
       "cta": {
@@ -122,20 +122,34 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       }
     },
     "relatedTopicsSection": {
-      "heading": "Further Enhance Your Study Efficiency",
+      "heading": "Explore Other Essential Study Aids",
       "links": [
         {
-          "label": "AI Biochemistry Note Conversion",
-          "href": "https://www.cogniguide.app/flashcards/biochemistry-study",
-          "description": "Transform complex metabolic pathways and molecular structures into manageable review decks."
+          "label": "Chemistry Study Aids",
+          "href": "https://www.cogniguide.app/flashcards/chemistry-study-aids",
+          "description": "Generate decks from organic chemistry mechanisms and stoichiometry notes."
         },
         {
-          "label": "Optimizing Spaced Repetition Scheduling",
-          "href": "https://www.cogniguide.app/study-techniques",
-          "description": "Learn the cognitive science principles that power our adaptive review engine for maximum memory retention."
+          "label": "Pharmacology Summary Generator",
+          "href": "https://www.cogniguide.app/flashcards/pharmacology-summary-generator",
+          "description": "Transform drug mechanism PDFs into digestible, recall-focused flashcards."
         }
       ]
     },
+    "embeddedFlashcards": [
+      {
+        "question": "What is the primary muscle responsible for flexing the forearm at the elbow joint?",
+        "answer": "The Biceps Brachii is the main flexor. It also assists in supination of the forearm."
+      },
+      {
+        "question": "Which cranial nerve primarily innervates the muscles of mastication?",
+        "answer": "The Trigeminal Nerve (Cranial Nerve V) provides motor innervation to the muscles of mastication."
+      },
+      {
+        "question": "Describe the anatomical boundary of the diaphragm separating the thoracic and abdominal cavities.",
+        "answer": "The diaphragm separates these cavities at the level of the central tendon. Major structures pass through openings like the caval foramen, esophageal hiatus, and aortic hiatus."
+      }
+    ],
     "structuredData": {
       "@context": "https://schema.org",
       "@graph": [
@@ -151,7 +165,7 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
             {
               "@type": "ListItem",
               "position": 2,
-              "name": "Master Medical School Anatomy with AI-Powered Flashcards",
+              "name": "Generate AI Flashcards from Your Medical School Anatomy Notes",
               "item": "https://www.cogniguide.app/flashcards/medical-school-anatomy"
             }
           ]
@@ -161,38 +175,38 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
           "@id": "https://www.cogniguide.app/flashcards/medical-school-anatomy#faq",
           "url": "https://www.cogniguide.app/flashcards/medical-school-anatomy",
           "inLanguage": "en",
-          "name": "AI Anatomy Flashcards for Medical School Success",
+          "name": "AI Anatomy Flashcards: Master Medical School Facts",
           "mainEntity": [
             {
               "@type": "Question",
-              "name": "Can the tool handle diagrams or images within my PDF notes?",
+              "name": "What file formats can I upload for my anatomy notes?",
               "acceptedAnswer": {
                 "@type": "Answer",
-                "text": "The system primarily extracts and converts textual content from documents like PDFs and slides into question/answer pairs. For complex visual retention (like detailed anatomical diagrams), the output will be text-based prompts referencing concepts found near those visuals in your source material."
+                "text": "We primarily support PDF documents, which are excellent for retaining diagrams and lecture slides. Text-heavy notes are also processed effectively."
               }
             },
             {
               "@type": "Question",
-              "name": "How accurate is the AI in extracting key anatomical terms?",
+              "name": "How does the spaced repetition schedule actually work?",
               "acceptedAnswer": {
                 "@type": "Answer",
-                "text": "The AI is highly specialized in recognizing scientific nomenclature. It excels at identifying structures, functions, innervation, and blood supply relationships common in standard medical textbooks, offering high fidelity extraction ready for active recall practice."
+                "text": "The system uses performance data from your self-assessments. Concepts you answer correctly easily are shown less often, while those requiring more effort are brought up sooner, maximizing your retention efficiency."
               }
             },
             {
               "@type": "Question",
-              "name": "What is the benefit of setting an exam date?",
+              "name": "Can I customize the flashcards after they are generated?",
               "acceptedAnswer": {
                 "@type": "Answer",
-                "text": "Setting a target date allows the spaced repetition scheduler to work backward. It ensures the most difficult concepts are reviewed with higher frequency as the deadline approaches, achieving peak retention precisely when you need it most for your practical or written assessment."
+                "text": "Yes, while the AI provides a strong starting point, you always maintain full editing control to refine the question or answer wording to better fit your instructor’s specific emphasis."
               }
             },
             {
               "@type": "Question",
-              "name": "Is sharing flashcards secure if I use a public link?",
+              "name": "Is sharing flashcards secure?",
               "acceptedAnswer": {
                 "@type": "Answer",
-                "text": "Public links are designed for sharing finalized study sets with peers. If your uploaded documents contain proprietary or sensitive personal information, ensure you only upload materials intended for external distribution."
+                "text": "Shared decks use a secure, public, read-only link. No personal data associated with your account is shared when you distribute a study deck link to peers."
               }
             }
           ]
@@ -204,134 +218,148 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     "slug": "law-school-contracts",
     "path": "/flashcards/law-school-contracts",
     "metadata": {
-      "title": "AI Flashcards for Law School Contracts Study",
-      "description": "Convert your Contracts notes, PDFs, and slides into high-retention, spaced repetition flashcards optimized for law school exams.",
+      "title": "AI Flashcards for Law School Contracts Mastery",
+      "description": "Instantly convert your Contract Law documents into intelligent flashcards. Master doctrine using spaced repetition scheduling.",
       "keywords": [
-        "law school contracts",
         "contract law flashcards",
-        "legal study aids",
-        "spaced repetition law",
+        "law school study aids",
+        "spaced repetition legal",
         "active recall contracts",
-        "exam preparation law"
+        "exam prep law",
+        "upload notes for flashcards"
       ],
       "canonical": "https://www.cogniguide.app/flashcards/law-school-contracts"
     },
     "hero": {
-      "heading": "Master Law School Contracts with AI-Generated Flashcards",
-      "subheading": "Upload your lecture slides, case briefs, or textbook chapters, and instantly generate high-utility flashcards featuring scientifically-backed spaced repetition scheduling for maximum retention before your final exam.",
+      "heading": "Generate AI Flashcards from Your Contract Law Notes",
+      "subheading": "Upload complex case summaries, statutes, or outlines, and receive perfectly structured active recall flashcards, optimized by spaced repetition.",
       "primaryCta": {
         "type": "modal",
-        "label": "Create My Flashcards Now"
+        "label": "Generate My Contract Law Deck"
       }
     },
     "featuresSection": {
-      "heading": "Engineered for Legal Recall and Exam Readiness",
-      "subheading": "Move beyond rote memorization. Our system focuses on active recall for complex legal concepts, ensuring you are prepared for essay and multiple-choice questions.",
+      "heading": "Stop Reading, Start Mastering Legal Doctrine",
+      "subheading": "Leverage proven cognitive science techniques automatically applied to your source material for maximum information retention.",
       "features": [
         {
-          "title": "Document-to-Card Processing",
-          "description": "Effortlessly convert dense materials—PDFs of case opinions, lecture slides, or your own handwritten notes—directly into structured study sets without manual entry. Focus your energy on analysis, not data entry."
+          "title": "Document-to-Card Conversion",
+          "description": "Upload entire PDFs of casebooks, lecture slides, or personal outlines. Our AI extracts key rules, elements, and distinctions, saving you hours of manual card creation."
         },
         {
-          "title": "Optimized Spaced Repetition Scheduling",
-          "description": "Leverage proven cognitive science algorithms that adapt study intervals based on your performance. This targeted approach keeps critical elements like offer, acceptance, and consideration sharp until exam day."
+          "title": "Spaced Repetition Scheduling",
+          "description": "Forget forgetting. Our adaptive algorithm schedules reviews based on the forgetting curve, ensuring high-yield review sessions precisely when you need them before your exam."
         },
         {
-          "title": "Date-Driven Study Planning",
-          "description": "Input your exam date, and the system intelligently front-loads review sessions for challenging material, ensuring critical doctrines are fresh when you need them most. It builds your study timeline for you."
+          "title": "Targeted Exam Date Planning",
+          "description": "Input your final exam date, and the system intelligently calibrates review frequency, prioritizing weak areas to ensure comprehensive coverage when it matters most."
         },
         {
-          "title": "Secure, Sharable Study Sets",
-          "description": "Collaborate with your study group. Generate a public, read-only link for your completed Contracts deck, allowing peers to benefit from your expertly structured review materials."
+          "title": "Effortless Sharing",
+          "description": "Collaborate seamlessly with study groups. Share your refined Contract Law decks instantly using a unique public link for shared mastery."
         }
       ]
     },
     "howItWorksSection": {
-      "heading": "Your Path to Contract Law Mastery in Three Steps",
-      "subheading": "We automate the most tedious parts of studying so you can concentrate on understanding the nuances of common law and UCC provisions.",
+      "heading": "Your Workflow for Contract Law Mastery in Three Steps",
+      "subheading": "Transform dense legal text into efficient, memorizable review sessions with minimal effort.",
       "steps": [
         {
-          "title": "1. Upload Your Source Material",
-          "description": "Select and upload your required documents—PDFs of case summaries, digital outlines, or any textual notes related to Contract Law. Our AI parses and structures the content."
+          "title": "1. Upload Your Contracts Material",
+          "description": "Upload your lecture slides, case digests, statutory excerpts, or textbook chapters directly to the platform. We support all major document formats."
         },
         {
-          "title": "2. Generate and Review Cards",
-          "description": "The AI extracts key legal principles, definitions, and hypotheticals. You receive immediate access to your custom flashcard deck, ready for immediate review under the spaced repetition protocol."
+          "title": "2. Instant Card Generation & Review Setting",
+          "description": "The AI processes the content, generating atomic questions targeting core concepts. Set your upcoming exam date for optimized scheduling."
         },
         {
-          "title": "3. Schedule and Master Concepts",
-          "description": "Set your final exam date. Begin studying immediately, letting the learning algorithm guide your practice sessions for optimal long-term retention of rules like promissory estoppel and material breach."
+          "title": "3. Practice with Cognitive Science",
+          "description": "Engage with your new flashcards using spaced repetition. Review what you know less well more frequently until mastery is achieved."
         }
       ],
       "cta": {
         "type": "modal",
-        "label": "Create My Flashcards Now"
+        "label": "Generate My Contract Law Deck"
       }
     },
     "seoSection": {
-      "heading": "Accelerate Your Law School Study Workflow",
+      "heading": "Expert Study Methods for Law School Success",
       "body": [
         {
           "type": "paragraph",
-          "html": "Success in demanding fields like law hinges on the accurate recall of dense, interconnected rules. Traditional studying often involves hours spent manually creating study aids—time that should be spent synthesizing complex legal arguments. Our AI flashcard generator transforms this process by focusing strictly on extracting high-value concepts from your existing materials, whether it's the intricacies of the Statute of Frauds or the elements required for a successful assignment of rights. This method significantly enhances active recall, a technique proven superior to passive reading for encoding long-term memory."
+          "html": "Mastering the nuances of contract law—Offer, Acceptance, Consideration, and Defenses—requires disciplined application and active recall. Traditional methods often rely on passive reading, which proves ineffective for long-term retention of complex legal rules. Our platform moves beyond simple question-answer pairs by leveraging tools derived from educational psychology. By converting your specific case law notes into flashcards, you ensure that every review session directly targets material relevant to your curriculum. This focused approach, driven by algorithms that mimic expert tutor pacing, ensures that the principles of promissory estoppel or UCC Article 2 rules become second nature by exam day."
         },
         {
           "type": "list",
           "items": [
-            "Generating review materials from case brief PDFs",
-            "Implementing spaced repetition for complex legal doctrines",
-            "Creating targeted study schedules based on exam proximity",
-            "Ensuring high fidelity between source material and testable facts",
-            "Studying concepts like Consideration vs. Gift Promises effectively"
+            "Automated generation of flashcards from complex legal text.",
+            "Implementing true spaced repetition for long-term memory encoding.",
+            "Reducing study time wasted on already mastered concepts.",
+            "Creating shareable decks for effective peer study sessions.",
+            "Scheduling study intensity around critical final exam deadlines."
           ]
         },
         {
           "type": "paragraph",
-          "html": "For a Contracts course, mastering the subtle differences between implied and express warranties, or understanding the precise requirements for offer revocation, is crucial. By relying on adaptive learning, you ensure that concepts you struggle with—perhaps remedies for breach or the parol evidence rule—are presented to you more frequently until mastery is confirmed. This targeted focus replaces inefficient mass review sessions with precise, algorithm-driven practice, providing you with a demonstrable edge in complex legal examinations."
+          "html": "For law students grappling with doctrinal subjects, ensuring that you can instantly articulate the elements of a cause of action or the holding of a landmark case is paramount. Instead of spending evenings recreating 1L outlines, delegate that preparatory work to our AI. Focus your energy on deep analysis, knowing that the necessary rote memorization is being handled efficiently through scientifically validated scheduling protocols built directly into your study plan."
         }
       ]
     },
     "faqSection": {
-      "heading": "Frequently Asked Questions on AI Study Tools",
-      "subheading": "Quick answers regarding document compatibility, scheduling, and sharing features.",
+      "heading": "Frequently Asked Questions About Document-Based Flashcards",
+      "subheading": "Answers for law students looking to streamline their study process.",
       "items": [
         {
-          "question": "What types of documents can I upload for my Contracts deck?",
-          "answer": "We support standard PDF files, PowerPoint (.ppt/.pptx) slides, and basic text files (.txt) containing your lecture notes or textbook excerpts. The AI is optimized to handle dense, academic formatting common in legal documents."
+          "question": "What kind of documents can I upload for flashcard generation?",
+          "answer": "You can upload standard document formats like PDF, DOCX, and TXT files, which include lecture notes, case briefs, or statutory excerpts. The AI analyzes the text to extract essential facts and legal rules."
         },
         {
-          "question": "How accurate is the AI in extracting key legal principles?",
-          "answer": "The AI is trained on academic content structures. While highly accurate, we always recommend a quick initial review of the generated deck to ensure specific case names or nuanced rule interpretations meet your professor's emphasis."
+          "question": "How does spaced repetition scheduling work in this application?",
+          "answer": "The system uses an adaptive learning algorithm. It shows you cards you struggle with more frequently and defers cards you answer correctly, optimizing review intervals based on established cognitive science principles."
         },
         {
-          "question": "Can I adjust the spaced repetition schedule if I feel I need more review?",
-          "answer": "Yes. While the schedule is automatically optimized based on your input date and performance, you maintain full control to force immediate review sessions or extend intervals manually on any card set."
+          "question": "Can I adjust the flashcards after they are generated?",
+          "answer": "Yes. While the initial generation is highly accurate, you retain full editing control to refine questions or answers before they enter your spaced repetition schedule."
         },
         {
-          "question": "What happens when I share a flashcard link with a classmate?",
-          "answer": "When you share a public link, other users can access the generated flashcards for review using their own spaced repetition system within our platform, but they cannot edit or see your private notes or performance data."
+          "question": "Is sharing flashcards secure?",
+          "answer": "Sharing is managed via a public link you control. Only users who have this specific link can access and use that particular deck; your source documents remain private."
         }
       ],
       "cta": {
         "type": "modal",
-        "label": "Create My Flashcards Now"
+        "label": "Generate My Contract Law Deck"
       }
     },
     "relatedTopicsSection": {
-      "heading": "Explore Other Essential Law Study Resources",
+      "heading": "Explore Other Essential Law Study Aids",
       "links": [
         {
-          "label": "Constitutional Law Flashcards",
-          "href": "https://www.cogniguide.app/flashcards/constitutional-law",
-          "description": "Generate targeted study sets for complex constitutional theory, landmark cases, and separation of powers doctrines."
+          "label": "Evidence Law Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/evidence-law",
+          "description": "Convert Federal Rules of Evidence outlines into AI-powered review sets."
         },
         {
-          "label": "Evidence Rules Study Aids",
-          "href": "https://www.cogniguide.app/flashcards/evidence-rules",
-          "description": "Master the rules of admissibility, hearsay exceptions, and relevance using dynamic, AI-powered review."
+          "label": "Torts Study Materials",
+          "href": "https://www.cogniguide.app/flashcards/torts",
+          "description": "Generate active recall cards covering negligence, strict liability, and intentional torts from your notes."
         }
       ]
     },
+    "embeddedFlashcards": [
+      {
+        "question": "What are the four core elements required to form a valid contract?",
+        "answer": "The four primary elements are Offer, Acceptance, Consideration, and Mutual Assent (or Intent to be bound)."
+      },
+      {
+        "question": "Under the common law, what is the primary rule governing the modification of an existing contract?",
+        "answer": "Under the common law, contract modification requires new consideration to be enforceable, often summarized by the preexisting duty rule."
+      },
+      {
+        "question": "What defense arises when one party's promise induces justifiable and detrimental reliance by the other party?",
+        "answer": "This situation gives rise to the doctrine of Promissory Estoppel, which can serve as a substitute for consideration."
+      }
+    ],
     "structuredData": {
       "@context": "https://schema.org",
       "@graph": [
@@ -347,7 +375,7 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
             {
               "@type": "ListItem",
               "position": 2,
-              "name": "Master Law School Contracts with AI-Generated Flashcards",
+              "name": "Generate AI Flashcards from Your Contract Law Notes",
               "item": "https://www.cogniguide.app/flashcards/law-school-contracts"
             }
           ]
@@ -357,38 +385,38 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
           "@id": "https://www.cogniguide.app/flashcards/law-school-contracts#faq",
           "url": "https://www.cogniguide.app/flashcards/law-school-contracts",
           "inLanguage": "en",
-          "name": "AI Flashcards for Law School Contracts Study",
+          "name": "AI Flashcards for Law School Contracts Mastery",
           "mainEntity": [
             {
               "@type": "Question",
-              "name": "What types of documents can I upload for my Contracts deck?",
+              "name": "What kind of documents can I upload for flashcard generation?",
               "acceptedAnswer": {
                 "@type": "Answer",
-                "text": "We support standard PDF files, PowerPoint (.ppt/.pptx) slides, and basic text files (.txt) containing your lecture notes or textbook excerpts. The AI is optimized to handle dense, academic formatting common in legal documents."
+                "text": "You can upload standard document formats like PDF, DOCX, and TXT files, which include lecture notes, case briefs, or statutory excerpts. The AI analyzes the text to extract essential facts and legal rules."
               }
             },
             {
               "@type": "Question",
-              "name": "How accurate is the AI in extracting key legal principles?",
+              "name": "How does spaced repetition scheduling work in this application?",
               "acceptedAnswer": {
                 "@type": "Answer",
-                "text": "The AI is trained on academic content structures. While highly accurate, we always recommend a quick initial review of the generated deck to ensure specific case names or nuanced rule interpretations meet your professor's emphasis."
+                "text": "The system uses an adaptive learning algorithm. It shows you cards you struggle with more frequently and defers cards you answer correctly, optimizing review intervals based on established cognitive science principles."
               }
             },
             {
               "@type": "Question",
-              "name": "Can I adjust the spaced repetition schedule if I feel I need more review?",
+              "name": "Can I adjust the flashcards after they are generated?",
               "acceptedAnswer": {
                 "@type": "Answer",
-                "text": "Yes. While the schedule is automatically optimized based on your input date and performance, you maintain full control to force immediate review sessions or extend intervals manually on any card set."
+                "text": "Yes. While the initial generation is highly accurate, you retain full editing control to refine questions or answers before they enter your spaced repetition schedule."
               }
             },
             {
               "@type": "Question",
-              "name": "What happens when I share a flashcard link with a classmate?",
+              "name": "Is sharing flashcards secure?",
               "acceptedAnswer": {
                 "@type": "Answer",
-                "text": "When you share a public link, other users can access the generated flashcards for review using their own spaced repetition system within our platform, but they cannot edit or see your private notes or performance data."
+                "text": "Sharing is managed via a public link you control. Only users who have this specific link can access and use that particular deck; your source documents remain private."
               }
             }
           ]
@@ -400,134 +428,147 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     "slug": "computer-science-algorithms",
     "path": "/flashcards/computer-science-algorithms",
     "metadata": {
-      "title": "AI Flashcards for Algorithms Mastery",
-      "description": "Convert Computer Science notes, slides, or PDFs into intelligent, spaced repetition flashcards to ace your algorithm exams.",
+      "title": "AI Flashcards for Computer Science Algorithms Mastery",
+      "description": "Instantly turn algorithm notes into interactive flashcards. Master Big O, data structures, and core concepts using spaced repetition.",
       "keywords": [
-        "AI flashcards",
-        "algorithms study",
-        "computer science learning",
+        "AI algorithm flashcards",
         "spaced repetition CS",
-        "active recall algorithms",
-        "exam preparation"
+        "Big O notation practice",
+        "data structures study",
+        "computer science learning"
       ],
       "canonical": "https://www.cogniguide.app/flashcards/computer-science-algorithms"
     },
     "hero": {
-      "heading": "Generate AI Flashcards from Your Computer Science Algorithms Notes",
-      "subheading": "Upload your lecture slides, PDFs, or detailed notes on algorithms, and our system instantly creates custom flashcards optimized using spaced repetition scheduling.",
+      "heading": "Generate Smarter Flashcards for Computer Science Algorithms",
+      "subheading": "Upload your lecture slides or notes, and our AI instantly generates precise, exam-ready flashcards, primed for spaced repetition scheduling.",
       "primaryCta": {
         "type": "modal",
-        "label": "Create My Flashcards Now"
+        "label": "Generate My Algorithms Deck"
       }
     },
     "featuresSection": {
-      "heading": "Engineered for Deep Algorithm Understanding",
-      "subheading": "Move beyond rote memorization. Leverage cognitive science principles built directly into your study workflow.",
+      "heading": "Efficiency Meets Cognitive Science",
+      "subheading": "Move beyond passive review. Our system is built on proven learning principles to ensure long-term retention of complex algorithmic concepts.",
       "features": [
         {
-          "title": "Instant Conversion from Any Source",
-          "description": "Upload your complex algorithm documentation (PDFs, lecture slides, text notes). Our AI parses technical content, extracting key concepts, data structures, and complexity analyses directly into recall-focused question-answer pairs."
+          "title": "Document to Deck Automation",
+          "description": "Upload PDFs, presentation slides, or raw class notes. Our AI parses the content to identify key definitions, steps, and analyses for instant card creation, eliminating manual entry."
         },
         {
-          "title": "Optimized Spaced Repetition Scheduling",
-          "description": "Stop guessing when to review. Our proprietary learning algorithm schedules reviews based on your retention rate, ensuring you practice difficult concepts like Dijkstra's or quicksort exactly when you are about to forget them."
+          "title": "Integrated Spaced Repetition",
+          "description": "Stop guessing when to review. Our learning algorithm automatically schedules card reviews based on your performance and an optimized timeline, maximizing memory consolidation."
         },
         {
-          "title": "Targeted Exam Date Pacing",
-          "description": "Set your final exam date, and we calibrate the review frequency. This proactive approach ensures comprehensive coverage of complex topics like graph traversal or dynamic programming concepts leading up to your deadline."
+          "title": "Targeted Exam Preparation",
+          "description": "Input your target exam date, and the system adapts the spaced repetition schedule to ensure you reach peak recall right when it matters most for your algorithms assessment."
         },
         {
-          "title": "Collaborative Sharing Capabilities",
-          "description": "Easily share your meticulously generated algorithm flashcard decks with study partners or classmates via a simple public link, fostering group mastery of core computer science principles."
+          "title": "Collaborative Learning Tools",
+          "description": "Easily share your expertly generated algorithm decks with classmates or study groups via a public link, fostering collective mastery of challenging topics."
         }
       ]
     },
     "howItWorksSection": {
-      "heading": "Your Smarter Study Workflow in Three Steps",
-      "subheading": "Transform dense technical material into high-yield study sessions effortlessly.",
+      "heading": "Your Path to Algorithm Fluency in Three Steps",
+      "subheading": "From raw material to optimized review schedule—the process is fast, accurate, and tailored to how your brain learns best.",
       "steps": [
         {
-          "title": "1. Upload Your Algorithm Documents",
-          "description": "Drag and drop your study materials—PowerPoint slides, textbook chapters, or code comments—directly into the generator interface."
+          "title": "1. Upload Your Source Material",
+          "description": "Select your core study resources: lecture notes, textbook chapters, or slides covering sorting, graph traversal, dynamic programming, and more."
         },
         {
-          "title": "2. AI Processing and Card Generation",
-          "description": "The system analyzes the technical content, identifies definitions, pseudocode steps, and complexity notations, formatting them into active recall flashcards."
+          "title": "2. AI Generates Active Recall Cards",
+          "description": "Our system analyzes the text, creating atomic question-answer pairs focusing on critical definitions, proofs, and implementation details suitable for active recall testing."
         },
         {
-          "title": "3. Master Concepts with Adaptive Review",
-          "description": "Begin studying immediately. The spaced repetition engine takes over, managing your review schedule until you achieve true mastery over every algorithm concept."
+          "title": "3. Study with Smart Scheduling",
+          "description": "Begin reviewing immediately. The built-in spaced repetition mechanism tracks your mastery and ensures you revisit challenging algorithms at scientifically optimal intervals."
         }
       ],
       "cta": {
         "type": "modal",
-        "label": "Create My Flashcards Now"
+        "label": "Generate My Algorithms Deck"
       }
     },
     "seoSection": {
-      "heading": "Mastering Computer Science Algorithms Through Active Recall",
+      "heading": "Mastering Complex Algorithms Through AI and Active Recall",
       "body": [
         {
           "type": "paragraph",
-          "html": "For Computer Science students, successfully navigating modules on data structures and algorithms demands more than passive reading. True expertise in algorithms—understanding the nuances between breadth-first search (BFS) and depth-first search (DFS), or implementing efficient sorting methods—requires rigorous active recall. Our tool automates the most time-consuming part of studying: transforming exhaustive lecture notes into high-quality, targeted study material. By focusing on the application and theoretical underpinnings of concepts like Big O notation and tree balancing, you internalize complex structures faster."
+          "html": "Mastering computer science algorithms requires more than just reading theory; it demands consistent, active retrieval practice. Traditional flashcards are time-consuming to build, often resulting in poorly phrased questions that test recognition over true understanding. Our AI platform addresses this gap by leveraging advanced document processing to extract the core knowledge from your detailed notes on subjects like graph theory, hash tables, and time complexity analysis. By automating the card creation process, we save valuable study hours, redirecting that energy toward actual learning and synthesis."
         },
         {
           "type": "list",
           "items": [
-            "Generating flashcards on dynamic programming recurrence relations",
-            "Creating study sets for complexity analysis (time and space)",
-            "Reviewing foundational sorting and searching algorithms",
-            "Testing knowledge of graph algorithms like MSTs and shortest paths",
-            "Building decks focused on specific data structures (Heaps, Tries)"
+            "Efficiently learn Big O notation comparisons.",
+            "Practice tracing recursive algorithm steps.",
+            "Memorize the prerequisites for advanced data structures.",
+            "Quickly review proofs related to complexity classes.",
+            "Prepare for technical interviews involving algorithm design."
           ]
         },
         {
           "type": "paragraph",
-          "html": "Utilizing adaptive learning techniques means you spend less time reviewing what you already know and more time solidifying the gaps in your understanding of algorithms like hashing or specific compiler-related concepts. Prepare for exams by practicing retrieval under pressure, ensuring conceptual clarity when it matters most."
+          "html": "The true power lies in the integrated learning algorithm. Instead of reviewing everything equally, the spaced repetition schedule prioritizes the concepts you struggle with—perhaps the nuances of Dijkstra's algorithm versus Prim's. This focused approach is crucial for CS students facing comprehensive exams where every detail of algorithmic function and implementation correctness matters. Start building the memory pathways necessary for effortless recall under exam pressure today."
         }
       ]
     },
     "faqSection": {
-      "heading": "Frequently Asked Questions About Algorithm Flashcards",
-      "subheading": "Clear answers to get you started with intelligent exam preparation.",
+      "heading": "Frequently Asked Questions on Algorithm Flashcard Generation",
+      "subheading": "Answers to common queries about document processing and spaced review.",
       "items": [
         {
-          "question": "Can the AI handle mathematical notation found in algorithm proofs?",
-          "answer": "Yes, the generator is designed to interpret and correctly format common mathematical symbols and pseudocode structures often found in proofs and algorithm descriptions, converting them into clear question/answer pairs for effective study."
+          "question": "What types of documents can I upload for algorithm notes?",
+          "answer": "You can upload standard PDF documents, PowerPoint slides (.ppt or .pptx), and plain text or Word documents containing your lecture notes or textbook excerpts."
         },
         {
-          "question": "What specific file types are supported for uploading?",
-          "answer": "We support standard academic formats including PDF documents, Microsoft PowerPoint (.ppt, .pptx) slides, and plain text (.txt) files containing your lecture notes or study guides."
+          "question": "How does the AI handle mathematical notations in algorithms?",
+          "answer": "The AI is trained to recognize standard mathematical and pseudocode structures present in technical documents, ensuring that core formulas and complexity representations are accurately converted into testable card formats."
         },
         {
-          "question": "How is the spaced repetition scheduling calculated?",
-          "answer": "The schedule is managed by an algorithm based on proven cognitive science principles. It tracks the difficulty you report after each review session and adjusts the interval to maximize long-term memory retention, crucial for complex CS topics."
+          "question": "Can I edit the flashcards after they are generated?",
+          "answer": "Yes, while the initial deck is excellent, you retain full control. You can edit, delete, or add new cards manually to refine the content based on your specific study emphasis."
         },
         {
-          "question": "Is setting a specific exam date necessary for using the app?",
-          "answer": "Setting an exam date is highly recommended. It allows the system to prioritize high-volume review sessions as the date approaches, ensuring you cover all necessary material without last-minute cramming."
+          "question": "What happens if I miss a scheduled review session?",
+          "answer": "If you miss a review, the spaced repetition system intelligently adjusts the next appearance date. It typically schedules the cards you missed sooner than planned to ensure they are not forgotten."
         }
       ],
       "cta": {
         "type": "modal",
-        "label": "Create My Flashcards Now"
+        "label": "Generate My Algorithms Deck"
       }
     },
     "relatedTopicsSection": {
-      "heading": "Explore More AI Study Tools",
+      "heading": "Explore More Study Resources",
       "links": [
         {
-          "label": "Database Management Systems Flashcards",
-          "href": "https://www.cogniguide.app/flashcards/database-management-systems",
-          "description": "Generate study aids covering SQL, normalization, and transaction management from your DBMS lecture notes."
+          "label": "Database Systems Concepts",
+          "href": "https://www.cogniguide.app/flashcards/database-systems",
+          "description": "Automate card creation from normalization guides and SQL tutorials."
         },
         {
-          "label": "Operating Systems Concepts Generator",
+          "label": "Operating Systems Theory",
           "href": "https://www.cogniguide.app/flashcards/operating-systems",
-          "description": "Convert complex OS topics like concurrency and memory management into adaptive review decks."
+          "description": "Generate structured review sets covering memory management and process scheduling."
         }
       ]
     },
+    "embeddedFlashcards": [
+      {
+        "question": "What is the Big O notation for an efficient in-place merge sort?",
+        "answer": "The time complexity is generally O(N log N) in the average and worst cases. Merging often requires auxiliary space, which affects true in-place implementations."
+      },
+      {
+        "question": "Describe the primary use case for a Breadth-First Search (BFS) traversal.",
+        "answer": "BFS is ideal for finding the shortest path in an unweighted graph, as it explores all neighbors at the present depth level before moving to the next level."
+      },
+      {
+        "question": "When does a hash collision management strategy become critical in hash tables?",
+        "answer": "Collisions are critical whenever two different keys map to the same index. Strategies like chaining or open addressing manage these events to maintain O(1) average lookup time."
+      }
+    ],
     "structuredData": {
       "@context": "https://schema.org",
       "@graph": [
@@ -543,44 +584,48 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
             {
               "@type": "ListItem",
               "position": 2,
-              "name": "Computer Science Algorithms",
+              "name": "Generate Smarter Flashcards for Computer Science Algorithms",
               "item": "https://www.cogniguide.app/flashcards/computer-science-algorithms"
             }
           ]
         },
         {
           "@type": "FAQPage",
+          "@id": "https://www.cogniguide.app/flashcards/computer-science-algorithms#faq",
+          "url": "https://www.cogniguide.app/flashcards/computer-science-algorithms",
+          "inLanguage": "en",
+          "name": "AI Flashcards for Computer Science Algorithms Mastery",
           "mainEntity": [
             {
               "@type": "Question",
-              "name": "Can the AI handle mathematical notation found in algorithm proofs?",
+              "name": "What types of documents can I upload for algorithm notes?",
               "acceptedAnswer": {
                 "@type": "Answer",
-                "text": "Yes, the generator is designed to interpret and correctly format common mathematical symbols and pseudocode structures often found in proofs and algorithm descriptions, converting them into clear question/answer pairs for effective study."
+                "text": "You can upload standard PDF documents, PowerPoint slides (.ppt or .pptx), and plain text or Word documents containing your lecture notes or textbook excerpts."
               }
             },
             {
               "@type": "Question",
-              "name": "What specific file types are supported for uploading?",
+              "name": "How does the AI handle mathematical notations in algorithms?",
               "acceptedAnswer": {
                 "@type": "Answer",
-                "text": "We support standard academic formats including PDF documents, Microsoft PowerPoint (.ppt, .pptx) slides, and plain text (.txt) files containing your lecture notes or study guides."
+                "text": "The AI is trained to recognize standard mathematical and pseudocode structures present in technical documents, ensuring that core formulas and complexity representations are accurately converted into testable card formats."
               }
             },
             {
               "@type": "Question",
-              "name": "How is the spaced repetition scheduling calculated?",
+              "name": "Can I edit the flashcards after they are generated?",
               "acceptedAnswer": {
                 "@type": "Answer",
-                "text": "The schedule is managed by an algorithm based on proven cognitive science principles. It tracks the difficulty you report after each review session and adjusts the interval to maximize long-term memory retention, crucial for complex CS topics."
+                "text": "Yes, while the initial deck is excellent, you retain full control. You can edit, delete, or add new cards manually to refine the content based on your specific study emphasis."
               }
             },
             {
               "@type": "Question",
-              "name": "Is setting a specific exam date necessary for using the app?",
+              "name": "What happens if I miss a scheduled review session?",
               "acceptedAnswer": {
                 "@type": "Answer",
-                "text": "Setting an exam date is highly recommended. It allows the system to prioritize high-volume review sessions as the date approaches, ensuring you cover all necessary material without last-minute cramming."
+                "text": "If you miss a review, the spaced repetition system intelligently adjusts the next appearance date. It typically schedules the cards you missed sooner than planned to ensure they are not forgotten."
               }
             }
           ]
@@ -592,133 +637,148 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     "slug": "nursing-pharmacology",
     "path": "/flashcards/nursing-pharmacology",
     "metadata": {
-      "title": "AI Pharmacology Flashcards: Master Your Nursing Exams",
-      "description": "Instantly generate spaced repetition flashcards from your Nursing Pharmacology notes, slides, or PDFs. Prepare efficiently for your next exam date.",
+      "title": "AI Pharmacology Flashcards: Ace Nursing Exams Fast",
+      "description": "Transform your nursing notes and PDFs into effective flashcards powered by spaced repetition. Prepare for pharmacology exams efficiently and confidently.",
       "keywords": [
         "nursing pharmacology study",
-        "pharmacology flashcards",
+        "AI flashcard generator",
         "spaced repetition nursing",
-        "drug mechanism active recall",
-        "NCLEX prep flashcards"
+        "drug mechanism flashcards",
+        "active recall nursing school",
+        "study efficiently for NCLEX"
       ],
       "canonical": "https://www.cogniguide.app/flashcards/nursing-pharmacology"
     },
     "hero": {
-      "heading": "Transform Your Nursing Pharmacology Notes into Smart Flashcards",
-      "subheading": "Upload your lecture slides, PDFs, or study guides, and our AI instantly creates active recall flashcards optimized by spaced repetition scheduling to maximize retention.",
+      "heading": "Automate Your Nursing Pharmacology Study with AI Flashcards",
+      "subheading": "Upload your lecture slides or textbooks, and our system instantly generates targeted flashcards utilizing proven spaced repetition scheduling to ensure long-term retention of complex drug classes.",
       "primaryCta": {
         "type": "modal",
-        "label": "Create My Flashcards Now"
+        "label": "Generate My Pharmacology Deck"
       }
     },
     "featuresSection": {
-      "heading": "Built for High-Volume Medical Studying",
-      "subheading": "Stop manual entry and focus on understanding complex drug classes, mechanisms of action, and side effect profiles with intelligent learning tools.",
+      "heading": "Smarter Study, Deeper Understanding",
+      "subheading": "Move beyond rote memorization. Our tool focuses on deep conceptual integration required for critical clinical decision-making.",
       "features": [
         {
-          "title": "Instant Document Conversion",
-          "description": "Upload PDFs, PowerPoints, or text notes from your Nursing Pharmacology course. Our system intelligently extracts key concepts, drug names, dosages, and indications, converting dense material into precise Q&A flashcards instantly."
+          "title": "Document-to-Card Conversion",
+          "description": "Upload PDFs, slides, or typed notes directly. Our AI extracts key concepts, mechanisms of action, and side effects, transforming static material into active recall prompts immediately."
         },
         {
-          "title": "Spaced Repetition Scheduling",
-          "description": "Leverage proven cognitive science. Our algorithm schedules reviews based on the forgetting curve, ensuring you revisit critical pharmacology facts right before you need to recall them for an exam or clinical setting."
+          "title": "Adaptive Spaced Repetition",
+          "description": "Benefit from proven learning algorithms that schedule reviews based on your performance, ensuring you revisit difficult drug pathways right before you forget them, optimizing study time."
         },
         {
-          "title": "Date-Driven Study Planning",
-          "description": "Input your next major exam date (e.g., Midterm or NCLEX). The system automatically adjusts your study cadence, prioritizing weak areas to ensure comprehensive coverage by the deadline."
+          "title": "Exam Date Pacing",
+          "description": "Set your final exam or board date, and the system creates a reverse timeline, scaling back your review frequency as the date approaches, ensuring peak readiness when it matters most."
         },
         {
-          "title": "Collaborative Study Sharing",
-          "description": "Finished creating a deck on Antihypertensives? Generate a public share link to distribute the expertly structured flashcards to your study group, ensuring everyone masters the material uniformly."
+          "title": "Collaborative Sharing",
+          "description": "Generate a unique, public link to share your perfectly curated pharmacology decks with classmates, study groups, or clinical partners, fostering collective knowledge building."
         }
       ]
     },
     "howItWorksSection": {
-      "heading": "Your Smarter Pharmacology Study Workflow in Three Steps",
-      "subheading": "From disorganized notes to exam-ready recall in minutes, experience a seamless transition to evidence-based study techniques.",
+      "heading": "Three Steps to Master Pharmacology",
+      "subheading": "We streamline the transition from content consumption to active knowledge retrieval, making complex drug data manageable.",
       "steps": [
         {
-          "title": "1. Upload Source Material",
-          "description": "Upload your lecture slides, PDF study guides, or textbook chapters covering specific drug classes (e.g., diuretics, opiates, antibiotics). Ensure your documents are clearly formatted for optimal extraction."
+          "title": "1. Upload Your Source Material",
+          "description": "Drag and drop your Nursing Pharmacology PDFs, PowerPoint slides, or comprehensive study guides directly into the application interface."
         },
         {
-          "title": "2. AI Generates & Schedules",
-          "description": "Our AI processes the content, creating high-quality flashcards focused on active recall. Simultaneously, input your target exam date to initiate the adaptive spaced repetition plan."
+          "title": "2. AI Generation & Customization",
+          "description": "Our engine processes the text to create atomic flashcards. Review the generated sets and make any necessary adjustments before scheduling."
         },
         {
-          "title": "3. Master Through Active Recall",
-          "description": "Study the generated decks daily. When you get a card wrong, the algorithm prompts an earlier review. When you succeed, the interval lengthens, cementing complex pharmacology knowledge efficiently."
+          "title": "3. Study Using Proven Methods",
+          "description": "Engage with the cards according to the adaptive spaced repetition schedule, or manually set a target exam date for focused review sprints."
         }
       ],
       "cta": {
         "type": "modal",
-        "label": "Create My Flashcards Now"
+        "label": "Generate My Pharmacology Deck"
       }
     },
     "seoSection": {
-      "heading": "Achieve Confidence in Pharmacology Through Optimized Study",
+      "heading": "Expert-Backed Active Recall for Nursing Students",
       "body": [
         {
           "type": "paragraph",
-          "html": "Nursing pharmacology requires an unparalleled level of detail retention: drug classes, mechanisms of action, typical dosages, and critical patient teaching points. Traditional methods often fail because they don't account for how memory works. Our AI tool directly addresses this by applying principles of cognitive science. By automating the creation of flashcards from your existing materials, we save you hours of tedious transcription, allowing you to dedicate that time to genuine comprehension and clinical application."
+          "html": "Mastering nursing pharmacology requires more than just reading drug names; it demands deep recall of pharmacokinetics, contraindications, and administration routes. Our AI tool is engineered around the principles of cognitive science, specifically active recall and spaced repetition, which are far superior to passive review techniques often used by nursing students. By converting dense textbook passages into targeted question-and-answer formats, you force your brain to retrieve information, significantly strengthening neural pathways associated with complex drug classes like antivirals, antihypertensives, or narcotics."
         },
         {
           "type": "list",
           "items": [
-            "Generating concept maps from detailed lecture notes",
-            "Creating rapid-fire quizzes on adverse effects",
-            "Optimizing study sessions based on known weaknesses",
-            "Preparing specifically for fixed examination deadlines",
-            "Reviewing entire drug categories before clinical rotations"
+            "Creating flashcards for adverse effects recall",
+            "Generating Q&A pairs for drug mechanism of action",
+            "Optimizing study sessions based on personal forgetting curve",
+            "Creating shared study sets for clinical rotations",
+            "Testing knowledge against a set final exam deadline"
           ]
         },
         {
           "type": "paragraph",
-          "html": "For nursing students navigating complex psychotropic medications or cardiovascular drugs, the challenge is not just learning the facts, but ensuring they are retrievable under pressure. Implementing the automated spaced repetition system means you shift from passive reading to deliberate, proven active recall practice. This focused approach builds the foundational knowledge necessary for safe and effective patient care, directly impacting performance on academic tests and licensure exams."
+          "html": "Whether you are preparing for weekly quizzes or the comprehensive NCLEX exam, consistent, efficient practice is key. Instead of spending hours manually writing out hundreds of index cards, let the AI handle the tedious extraction. You gain back critical time to focus on applying that knowledge to patient scenarios, turning memorization into true clinical competency. This targeted approach ensures every minute spent studying directly contributes to better retention."
         }
       ]
     },
     "faqSection": {
-      "heading": "Frequently Asked Questions",
-      "subheading": "Quick answers to common queries about document processing and learning algorithms.",
+      "heading": "Frequently Asked Questions for Pharmacology Study",
+      "subheading": "Quick answers regarding our AI flashcard generation and scheduling features.",
       "items": [
         {
-          "question": "What file formats can I upload for pharmacology notes?",
-          "answer": "We support common educational formats including PDF documents, Microsoft PowerPoint (.ppt, .pptx), and standard text files (.txt, .docx). For best results, ensure slides have clear text contrast and defined headers."
+          "question": "What file types can I upload for card generation?",
+          "answer": "We support major document formats including PDF, DOCX, and PPTX. The AI extracts text content from these files to build your study decks."
         },
         {
-          "question": "How does the spaced repetition scheduling adapt to my performance?",
-          "answer": "If you answer a card correctly, the system increases the review interval (e.g., from 1 day to 3 days). If you struggle with a specific drug interaction or side effect, that card will be flagged for immediate review and tested more frequently until mastery is confirmed."
+          "question": "How does the spaced repetition scheduling work for pharmacology?",
+          "answer": "The system tracks which drug classes or concepts you struggle with and automatically increases the review interval for mastered items while prompting frequent review for weaker areas, aligning with established learning algorithms."
         },
         {
-          "question": "Can I edit the flashcards after the AI generates them?",
-          "answer": "Absolutely. While the AI aims for high accuracy, you have full editorial control. You can modify questions, refine answers, or add specific clinical notes that are unique to your instructor's teaching emphasis."
+          "question": "Can I share my pharmacology flashcards with my entire study group?",
+          "answer": "Yes, once your deck is finalized, you can generate a unique public share link. Anyone with the link can access and use your study set immediately."
         },
         {
-          "question": "Is sharing flashcards secure?",
-          "answer": "When you generate a public share link, the deck becomes accessible via that URL. If you need to share sensitive material privately, we recommend using the built-in collaborative features which require user accounts rather than public links."
+          "question": "Is this tool designed to replace my textbook or primary resources?",
+          "answer": "No. This tool is designed to optimize your review workflow. It requires source material (notes, slides) to generate high-quality, concept-specific flashcards for efficient active recall."
         }
       ],
       "cta": {
         "type": "modal",
-        "label": "Create My Flashcards Now"
+        "label": "Generate My Pharmacology Deck"
       }
     },
     "relatedTopicsSection": {
-      "heading": "Explore More Study Resources",
+      "heading": "Expand Your AI Study Toolkit",
       "links": [
         {
-          "label": "AI Medical Terminology Generator",
-          "href": "https://www.cogniguide.app/flashcards/medical-terminology",
-          "description": "Convert anatomy diagrams and complex procedural descriptions into instantly learnable flashcards using active recall."
+          "label": "AI Anatomy Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/anatomy",
+          "description": "Generate visual and structural recall cards from detailed diagrams and lecture notes."
         },
         {
-          "label": "Study Strategy Guides",
-          "href": "https://www.cogniguide.app/guides/study-strategies",
-          "description": "Read expert advice on integrating spaced repetition into your weekly study routine for maximum retention."
+          "label": "Study Workflow Optimization",
+          "href": "https://www.cogniguide.app/study-techniques",
+          "description": "Learn more about integrating active recall and time-blocking into your academic schedule."
         }
       ]
     },
+    "embeddedFlashcards": [
+      {
+        "question": "What is the primary mechanism of action for Beta-Blockers?",
+        "answer": "Beta-Blockers work by antagonizing the effects of epinephrine and norepinephrine at beta-adrenergic receptors, reducing heart rate and contractility."
+      },
+      {
+        "question": "Name two major side effects associated with Loop Diuretics like Furosemide.",
+        "answer": "Major side effects include hypokalemia (low potassium) due to increased renal excretion and potential ototoxicity (hearing damage) with rapid IV administration."
+      },
+      {
+        "question": "For which class of antibiotics is 'gray baby syndrome' a known contraindication?",
+        "answer": "Chloramphenicol is contraindicated in neonates because their immature liver function prevents proper drug clearance, leading to toxicity."
+      }
+    ],
     "structuredData": {
       "@context": "https://schema.org",
       "@graph": [
@@ -734,44 +794,48 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
             {
               "@type": "ListItem",
               "position": 2,
-              "name": "Nursing Pharmacology",
+              "name": "Automate Your Nursing Pharmacology Study with AI Flashcards",
               "item": "https://www.cogniguide.app/flashcards/nursing-pharmacology"
             }
           ]
         },
         {
           "@type": "FAQPage",
+          "@id": "https://www.cogniguide.app/flashcards/nursing-pharmacology#faq",
+          "url": "https://www.cogniguide.app/flashcards/nursing-pharmacology",
+          "inLanguage": "en",
+          "name": "AI Pharmacology Flashcards: Ace Nursing Exams Fast",
           "mainEntity": [
             {
               "@type": "Question",
-              "name": "What file formats can I upload for pharmacology notes?",
+              "name": "What file types can I upload for card generation?",
               "acceptedAnswer": {
                 "@type": "Answer",
-                "text": "We support common educational formats including PDF documents, Microsoft PowerPoint (.ppt, .pptx), and standard text files (.txt, .docx). For best results, ensure slides have clear text contrast and defined headers."
+                "text": "We support major document formats including PDF, DOCX, and PPTX. The AI extracts text content from these files to build your study decks."
               }
             },
             {
               "@type": "Question",
-              "name": "How does the spaced repetition scheduling adapt to my performance?",
+              "name": "How does the spaced repetition scheduling work for pharmacology?",
               "acceptedAnswer": {
                 "@type": "Answer",
-                "text": "If you answer a card correctly, the system increases the review interval (e.g., from 1 day to 3 days). If you struggle with a specific drug interaction or side effect, that card will be flagged for immediate review and tested more frequently until mastery is confirmed."
+                "text": "The system tracks which drug classes or concepts you struggle with and automatically increases the review interval for mastered items while prompting frequent review for weaker areas, aligning with established learning algorithms."
               }
             },
             {
               "@type": "Question",
-              "name": "Can I edit the flashcards after the AI generates them?",
+              "name": "Can I share my pharmacology flashcards with my entire study group?",
               "acceptedAnswer": {
                 "@type": "Answer",
-                "text": "Absolutely. While the AI aims for high accuracy, you have full editorial control. You can modify questions, refine answers, or add specific clinical notes that are unique to your instructor's teaching emphasis."
+                "text": "Yes, once your deck is finalized, you can generate a unique public share link. Anyone with the link can access and use your study set immediately."
               }
             },
             {
               "@type": "Question",
-              "name": "Is sharing flashcards secure?",
+              "name": "Is this tool designed to replace my textbook or primary resources?",
               "acceptedAnswer": {
                 "@type": "Answer",
-                "text": "When you generate a public share link, the deck becomes accessible via that URL. If you need to share sensitive material privately, we recommend using the built-in collaborative features which require user accounts rather than public links."
+                "text": "No. This tool is designed to optimize your review workflow. It requires source material (notes, slides) to generate high-quality, concept-specific flashcards for efficient active recall."
               }
             }
           ]
@@ -783,134 +847,146 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     "slug": "high-school-biology",
     "path": "/flashcards/high-school-biology",
     "metadata": {
-      "title": "AI Biology Flashcards: Master Concepts Fast",
-      "description": "Convert your Biology notes and PDFs into intelligent flashcards utilizing spaced repetition. Prepare efficiently for high school exams.",
+      "title": "AI Flashcards for High School Biology Mastery",
+      "description": "Convert your biology notes, PDFs, or slides into smart flashcards featuring spaced repetition scheduling for better exam recall.",
       "keywords": [
-        "high school biology",
-        "biology flashcards",
-        "spaced repetition",
-        "AI study tools",
-        "active recall biology",
-        "exam preparation"
+        "high school biology study",
+        "AI flashcard generator",
+        "spaced repetition biology",
+        "active recall tools",
+        "biology notes to cards"
       ],
       "canonical": "https://www.cogniguide.app/flashcards/high-school-biology"
     },
     "hero": {
-      "heading": "Generate Smart High School Biology Flashcards Instantly",
-      "subheading": "Upload your textbooks, lecture slides, or notes, and our AI converts them into scientifically proven, spaced-repetition flashcards tailored for mastering complex biology topics.",
+      "heading": "Ace High School Biology with AI Flashcards",
+      "subheading": "Stop wasting time reviewing everything. Upload your High School Biology materials—notes, slides, or textbooks—and instantly generate expertly structured flashcards optimized by spaced repetition scheduling.",
       "primaryCta": {
         "type": "modal",
-        "label": "Create My Flashcards Now"
+        "label": "Generate My Biology Deck"
       }
     },
     "featuresSection": {
-      "heading": "Study Smarter, Not Harder, for Biology Assessments",
-      "subheading": "Leverage cognitive science principles applied directly to your specific high school curriculum materials.",
+      "heading": "Study Smarter, Not Harder",
+      "subheading": "Harnessing cognitive science principles to maximize retention of complex biological concepts.",
       "features": [
         {
-          "title": "Intelligent Document Conversion",
-          "description": "Effortlessly turn dense PDF notes on cell division, genetics, or ecology into precise question-and-answer pairs. Focus your study time only on what you need to learn."
+          "title": "Instant Material Conversion",
+          "description": "Upload PDFs, lecture slides, or typed notes directly. Our AI extracts key terms, definitions, and complex processes, transforming them into ready-to-use active recall prompts."
         },
         {
-          "title": "Adaptive Spaced Repetition Scheduling",
-          "description": "Our algorithm tracks your mastery of concepts like photosynthesis or anatomy, scheduling reviews just before you're likely to forget, maximizing long-term retention."
+          "title": "Optimized Spaced Repetition",
+          "description": "Move beyond rote memorization. Our learning algorithm schedules reviews precisely when you are about to forget, proven to solidify long-term memory retention for concepts like cellular respiration or genetics."
         },
         {
-          "title": "Exam Date Targeting",
-          "description": "Set your upcoming exam date, and the system calibrates the review schedule backward, ensuring you reach peak recall performance precisely when it matters most."
+          "title": "Targeted Exam Preparation",
+          "description": "Input your upcoming exam date, and the system dynamically adjusts your review cadence to ensure peak performance when it matters most. Study with confidence for AP or standard exams."
         },
         {
-          "title": "Collaborative Sharing",
-          "description": "Easily share your generated biology flashcard decks with study groups or classmates using a simple, secure public link, fostering collective learning."
+          "title": "Effortless Sharing",
+          "description": "Collaborate with classmates by generating a secure public link for any generated deck. Perfect for group study sessions on difficult topics like biochemistry pathways."
         }
       ]
     },
     "howItWorksSection": {
-      "heading": "Your Accelerated Biology Study Workflow",
-      "subheading": "Three simple steps transform your study materials into an optimized review system based on proven learning algorithms.",
+      "heading": "Your Biology Study Workflow in Three Steps",
+      "subheading": "From dense textbook chapter to mastery, our system streamlines the path to learning retention.",
       "steps": [
         {
-          "title": "1. Upload Your Biology Materials",
-          "description": "Drag and drop your existing files—PowerPoint slides, chapter scans, or handwritten lecture notes—directly into the platform."
+          "title": "1. Upload Your Biology Source",
+          "description": "Drag and drop your study materials—PowerPoints on Mendelian genetics, lab reports, or textbook sections—into the generator interface."
         },
         {
-          "title": "2. AI Generates Active Recall Decks",
-          "description": "Our AI analyzes the content to generate high-quality flashcards focusing on core concepts, definitions, and processes essential for high school biology mastery."
+          "title": "2. AI Generates Active Recall Cards",
+          "description": "Our engine analyzes the text, intelligently creating atomic questions designed to promote deeper understanding rather than simple definition recall."
         },
         {
-          "title": "3. Study with Smart Scheduling",
-          "description": "Begin reviewing immediately. The system manages the spaced repetition schedule automatically, guiding you toward confident recall for every topic."
+          "title": "3. Study with Spaced Repetition",
+          "description": "Begin studying immediately. The integrated scheduling system manages when you see each card, ensuring maximum efficiency and superior retention leading up to your assessment."
         }
       ],
       "cta": {
         "type": "modal",
-        "label": "Create My Flashcards Now"
+        "label": "Generate My Biology Deck"
       }
     },
     "seoSection": {
-      "heading": "Master High School Biology with Active Recall",
+      "heading": "Mastering Complex Biology Topics with AI",
       "body": [
         {
           "type": "paragraph",
-          "html": "Excelling in high school biology requires more than just reading the textbook; it demands deep understanding and the ability to retrieve complex information quickly, especially under exam pressure. Traditional rote memorization often fails when faced with intricate systems like metabolic pathways or taxonomy classifications. Our AI flashcard generator bridges this gap by applying established principles of cognitive science. By converting your passive notes into active recall prompts, we force your brain to work harder during study sessions, which significantly strengthens memory encoding. This process is fundamental to effective learning and directly supports better performance on quizzes and final exams."
+          "html": "High school biology presents a unique challenge: balancing the sheer volume of vocabulary with complex structural and functional concepts. Traditional methods often rely on linear re-reading, which provides a false sense of fluency. Our approach integrates educational psychology principles directly into your study material. By converting dense text into question-and-answer formats suitable for active recall—the most potent study technique available—we shift the focus from recognition to retrieval. This intentional mental effort strengthens neural pathways far more effectively than passively reviewing highlighted notes. Whether you are tackling enzyme kinetics or cellular organization, this tool ensures you are actively engaging with the material."
         },
         {
           "type": "list",
           "items": [
-            "Converting complex biological diagrams into descriptive recall questions.",
-            "Optimizing review schedules for cellular biology topics.",
-            "Generating Q&A sets from lecture notes on human systems.",
-            "Effective preparation for AP/IB Biology review sessions.",
-            "Rapid mastering of scientific terminology and nomenclature."
+            "Creating flashcards from lecture notes on DNA replication",
+            "Using timed review sessions for metabolism pathways",
+            "Scheduling regular practice for human anatomy vocabulary",
+            "Preparing for standardized tests with targeted concept review"
           ]
         },
         {
           "type": "paragraph",
-          "html": "Whether you are struggling to keep up with anatomy details or need to solidify your grasp on ecological principles, this tool structures your study around evidence-based methods. By scheduling reviews according to the optimal interval for long-term memory consolidation—the core of spaced repetition—you replace inefficient cramming with targeted, efficient learning sessions. This approach builds genuine expertise across all core biology units."
+          "html": "Our system supports topic isolation, allowing you to focus intensely on difficult areas, such as understanding the nuances between mitosis and meiosis, or mastering the steps of the Krebs cycle. Furthermore, the ability to set a specific exam date allows the system to reverse-engineer the necessary study load, providing you with a sustainable, optimized review schedule. This precision removes study anxiety by ensuring your time is spent on material you genuinely need to reinforce."
         }
       ]
     },
     "faqSection": {
-      "heading": "Frequently Asked Questions for Biology Students",
-      "subheading": "Answers to common queries about using AI for biology study materials.",
+      "heading": "Frequently Asked Questions About AI Biology Flashcards",
+      "subheading": "Get clarity on how to best leverage our document uploading and scheduling features.",
       "items": [
         {
-          "question": "What file types can I upload for biology notes?",
-          "answer": "You can upload standard formats including PDF, DOCX, and common slide formats like PPTX. The AI processes text and layout to extract key information for card generation."
+          "question": "What formats can I upload for my biology notes?",
+          "answer": "We support common formats including PDF documents, Microsoft PowerPoint slides (.ppt, .pptx), and plain text files (.txt). The AI processes the content regardless of the original source structure."
         },
         {
-          "question": "How does the spaced repetition scheduling work for biology concepts?",
-          "answer": "It functions based on your performance during review. Easy concepts appear less frequently, while challenging topics, such as molecular genetics, are prioritized for recall at scientifically determined intervals to ensure long-term memory consolidation."
+          "question": "How does the spaced repetition scheduling actually work?",
+          "answer": "The system uses an interval-based algorithm. Cards you struggle with appear frequently, while mastered cards are spaced further apart, optimizing your review time according to cognitive science best practices for long-term memory."
         },
         {
-          "question": "Can I edit the flashcards after the AI generates them?",
-          "answer": "Yes, absolutely. While the AI provides a powerful starting point, you maintain full control. You can edit, delete, or manually add cards to refine the deck to perfectly match your teacher's emphasis."
+          "question": "Can I share the biology flashcards I create with my study group?",
+          "answer": "Yes, once your deck is generated, you can create a unique public share link. Anyone with the link can access the flashcards for review, facilitating collaborative study."
         },
         {
-          "question": "Is it possible to share a deck with a friend who is in a different biology class?",
-          "answer": "You can share any deck you create via a unique public link. However, please note that the effectiveness of the spaced repetition schedule will depend on their individual performance data."
+          "question": "Is the flashcard generation process customizable?",
+          "answer": "While the AI extracts the core concepts, you maintain control. You can easily edit, delete, or add new cards manually before beginning your spaced repetition review schedule."
         }
       ],
       "cta": {
         "type": "modal",
-        "label": "Create My Flashcards Now"
+        "label": "Generate My Biology Deck"
       }
     },
     "relatedTopicsSection": {
-      "heading": "Explore Other Study Resources",
+      "heading": "Expand Your AI Study Toolkit",
       "links": [
         {
-          "label": "Chemistry Flashcard Generator",
-          "href": "https://www.cogniguide.app/flashcards/chemistry",
-          "description": "Convert difficult chemistry problem sets and formulas into optimized study flashcards."
+          "label": "Physics Formula Practice",
+          "href": "https://www.cogniguide.app/flashcards/physics-formulas",
+          "description": "Generate flashcards optimized for recalling equations and constants from lecture notes."
         },
         {
-          "label": "Physics Study Aids",
-          "href": "https://www.cogniguide.app/flashcards/physics",
-          "description": "Use AI to break down complex physics equations and theoretical concepts for easier recall."
+          "label": "Chemistry Nomenclature Tool",
+          "href": "https://www.cogniguide.app/flashcards/chemistry-nomenclature",
+          "description": "Master complex naming conventions and molecular structures using AI-driven study schedules."
         }
       ]
     },
+    "embeddedFlashcards": [
+      {
+        "question": "What is the primary role of the mitochondrial inner membrane?",
+        "answer": "It houses the electron transport chain (ETC) and ATP synthase complexes necessary for oxidative phosphorylation and ATP production."
+      },
+      {
+        "question": "Describe the key difference between asexual and sexual reproduction regarding genetic diversity.",
+        "answer": "Asexual reproduction produces genetically identical offspring, while sexual reproduction introduces genetic variation through the combination of gametes."
+      },
+      {
+        "question": "What mechanism drives the movement of water across a semipermeable membrane in cells?",
+        "answer": "Osmosis is the passive movement of water from an area of high water potential (low solute concentration) to an area of low water potential (high solute concentration)."
+      }
+    ],
     "structuredData": {
       "@context": "https://schema.org",
       "@graph": [
@@ -926,7 +1002,7 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
             {
               "@type": "ListItem",
               "position": 2,
-              "name": "Generate Smart High School Biology Flashcards Instantly",
+              "name": "Ace High School Biology with AI Flashcards",
               "item": "https://www.cogniguide.app/flashcards/high-school-biology"
             }
           ]
@@ -936,38 +1012,38 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
           "@id": "https://www.cogniguide.app/flashcards/high-school-biology#faq",
           "url": "https://www.cogniguide.app/flashcards/high-school-biology",
           "inLanguage": "en",
-          "name": "AI Biology Flashcards: Master Concepts Fast",
+          "name": "AI Flashcards for High School Biology Mastery",
           "mainEntity": [
             {
               "@type": "Question",
-              "name": "What file types can I upload for biology notes?",
+              "name": "What formats can I upload for my biology notes?",
               "acceptedAnswer": {
                 "@type": "Answer",
-                "text": "You can upload standard formats including PDF, DOCX, and common slide formats like PPTX. The AI processes text and layout to extract key information for card generation."
+                "text": "We support common formats including PDF documents, Microsoft PowerPoint slides (.ppt, .pptx), and plain text files (.txt). The AI processes the content regardless of the original source structure."
               }
             },
             {
               "@type": "Question",
-              "name": "How does the spaced repetition scheduling work for biology concepts?",
+              "name": "How does the spaced repetition scheduling actually work?",
               "acceptedAnswer": {
                 "@type": "Answer",
-                "text": "It functions based on your performance during review. Easy concepts appear less frequently, while challenging topics, such as molecular genetics, are prioritized for recall at scientifically determined intervals to ensure long-term memory consolidation."
+                "text": "The system uses an interval-based algorithm. Cards you struggle with appear frequently, while mastered cards are spaced further apart, optimizing your review time according to cognitive science best practices for long-term memory."
               }
             },
             {
               "@type": "Question",
-              "name": "Can I edit the flashcards after the AI generates them?",
+              "name": "Can I share the biology flashcards I create with my study group?",
               "acceptedAnswer": {
                 "@type": "Answer",
-                "text": "Yes, absolutely. While the AI provides a powerful starting point, you maintain full control. You can edit, delete, or manually add cards to refine the deck to perfectly match your teacher's emphasis."
+                "text": "Yes, once your deck is generated, you can create a unique public share link. Anyone with the link can access the flashcards for review, facilitating collaborative study."
               }
             },
             {
               "@type": "Question",
-              "name": "Is it possible to share a deck with a friend who is in a different biology class?",
+              "name": "Is the flashcard generation process customizable?",
               "acceptedAnswer": {
                 "@type": "Answer",
-                "text": "You can share any deck you create via a unique public link. However, please note that the effectiveness of the spaced repetition schedule will depend on their individual performance data."
+                "text": "While the AI extracts the core concepts, you maintain control. You can easily edit, delete, or add new cards manually before beginning your spaced repetition review schedule."
               }
             }
           ]

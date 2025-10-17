@@ -73,12 +73,18 @@ ON-PAGE SEO REQUIREMENTS:
 9) Accessibility: Any example references should describe content plainly so screen readers convey value (no images required in output).
 
 CONVERSION (CTAs):
-10) Use action-oriented, consistent CTAs. Allowed labels: 
+10) Use action-oriented, consistent CTAs. Allowed labels:
     - “Create My Flashcards Now”, “Try the Flashcard Generator — Free”, “Generate My {topic} Deck”.
     Pick ONE primary label and reuse it consistently across the page.
 
+EMBEDDED FLASHCARDS PREVIEW:
+11) Craft exactly three topic-specific flashcards that follow active recall best practices.
+    - Questions must be open-ended and atomic (less than 80 characters).
+    - Answers must be concise (≤2 sentences) and accurate (less than 150 characters).
+    - Mirror the language of the page (e.g., same locale, terminology).
+
 STRUCTURED DATA:
-11) Include FAQPage JSON-LD that mirrors the FAQ items. Also add a BreadcrumbList for:
+12) Include FAQPage JSON-LD that mirrors the FAQ items. Also add a BreadcrumbList for:
     - “/flashcards” → “/flashcards/{slug}” (use base_url + path). Do not invent deeper levels.
 
 OUTPUT FORMAT (STRICT):
@@ -123,10 +129,15 @@ Return ONLY a single valid JSON object with this shape (no markdown, no commenta
     "items": [{ "question": string, "answer": string }, ...], // 4 distinct, relevant questions
     "cta": { "type": "modal", "label": string }
   },
-  "relatedTopicsSection": {
+ "relatedTopicsSection": {
     "heading": string,          // H2
     "links": [{ "label": string, "href": string, "description": string }, ...] // At least 2 internal links
   },
+  "embeddedFlashcards": [
+    { "question": string, "answer": string },
+    { "question": string, "answer": string },
+    { "question": string, "answer": string }
+  ],
   "structuredData": {
     "@context": "https://schema.org",
     "@graph": [
@@ -156,6 +167,10 @@ QUALITY GATES (the model must self-check BEFORE returning JSON):
 - H1 contains the primary keyword or the closest natural variant.
 - Ensure all HTML strings are safe for JSX.
 - No placeholder text; no lorem ipsum. All fields must be complete and production-ready.
+- Embedded flashcards must:
+  * Ask open-ended, atomic questions tailored to the topic.
+  * Provide concise answers (≤2 sentences) that support active recall.
+  * Avoid markdown unless needed for short lists.
 
 Return ONLY the JSON object.
 """
@@ -288,6 +303,20 @@ def call_model(
             "seoSection": {"type": "object"},
             "faqSection": {"type": "object"},
             "relatedTopicsSection": {"type": "object"},
+            "embeddedFlashcards": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "question": {"type": "string"},
+                  "answer": {"type": "string"},
+                },
+                "required": ["question", "answer"],
+                "additionalProperties": False,
+              },
+              "minItems": 3,
+              "maxItems": 3,
+            },
           },
           "required": [
             "slug",
@@ -299,6 +328,7 @@ def call_model(
             "seoSection",
             "faqSection",
             "relatedTopicsSection",
+            "embeddedFlashcards",
           ],
           "additionalProperties": True,
         },

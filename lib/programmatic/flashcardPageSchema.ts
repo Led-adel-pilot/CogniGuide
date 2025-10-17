@@ -41,6 +41,11 @@ export interface ProgrammaticFaqItem {
   answer: string;
 }
 
+export interface ProgrammaticEmbeddedFlashcard {
+  question: string;
+  answer: string;
+}
+
 export interface ProgrammaticRelatedLink {
   label: string;
   href: string;
@@ -88,6 +93,7 @@ export interface ProgrammaticFlashcardPage {
     links: ProgrammaticRelatedLink[];
   };
   structuredData?: Record<string, unknown>;
+  embeddedFlashcards?: ProgrammaticEmbeddedFlashcard[];
 }
 
 export type ProgrammaticFlashcardPageMap = Record<string, ProgrammaticFlashcardPage>;
