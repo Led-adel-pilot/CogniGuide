@@ -9,7 +9,7 @@ This document details the comprehensive programmatic SEO system implemented for 
 **Purpose**: Defines the structure and targeting for each programmatic page, for now its testing example, it would eventually filled with 100s to 1000s of pages after making the right keyword research.
 
 **Columns**:
-- `slug`: URL identifier (e.g., "medical-school-anatomy")
+- `slug`: URL identifier (e.g., "medical-school-anatomy"); consumed verbatim by the generator with no AI modifications
 - `topic`: Main subject area (e.g., "Medical School Anatomy")
 
 

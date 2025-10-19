@@ -50,7 +50,7 @@ OUTPUT_FOOTER = "];\n"
 
 PROMPT_TEMPLATE = """
 You will generate a complete landing page JSON for an AI flashcards generator app, suitable for static rendering.
-Info on app: You upload your PDFs, slides, or notes and generates flashcards, and implements spaced-repetition scheduling, you can also select the exam date, share flashcards with other through a public link. Do not hallucinate other features (e.g. the app does not automatically tag concepts). 
+Info on app: You upload your PDFs, DOCX, powerpoint or images and generates flashcards with spaced-repetition scheduling, you can also select the exam date, share flashcards with other through a public link. Do not hallucinate other features (e.g. the app does not automatically tag concepts). 
 
 You will receive structured CSV data for one landing page. Follow these requirements precisely:
 
@@ -65,7 +65,7 @@ CRITICAL WRITING RULES (people-first + E-E-A-T):
 
 ON-PAGE SEO REQUIREMENTS:
 3) Title: ≤60 characters, must contain the target keyword or closest variant. Make it benefit-led.
-4) Meta description: 140–155 characters, must begin with the target keyword and promise the outcome without hype.
+4) Meta description: 140–155 characters, must begin with the target keyword or closest variant and promise the outcome without hype.
 5) H1 (hero.heading): must include the target keyword. H1 ≈ title but not identical.
 6) Headings hierarchy: Use concise H2/H3s; avoid keyword stuffing. Every section must be meaningfully different.
 7) Semantic coverage: Naturally weave related_terms and subject-specific subtopics (if given). Include spaced repetition, active recall, tagging, and study workflow concepts where relevant.
@@ -76,30 +76,28 @@ CONVERSION (CTAs):
 10) Use action-oriented, consistent CTAs (3-4 words max). Pick ONE primary label and reuse it consistently across the page.
 
 EMBEDDED FLASHCARDS PREVIEW:
-11) Craft exactly three topic-specific flashcards that follow active recall best practices.
+11) Craft exactly three topic-specific flashcards that would be what the user wanted if he searched for the target keyword with the intent of finding ready-made Flashcards.
     - Questions must be open-ended and atomic (less than 80 characters).
-    - Answers must be concise (≤2 sentences) and accurate (less than 150 characters).
+    - Answers must be concise (≤2 sentences) and accurate (less than 120 characters).
     - Mirror the language of the page (e.g., same locale, terminology).
 
 STRUCTURED DATA:
 12) Include FAQPage JSON-LD that mirrors the FAQ items. Also add a BreadcrumbList for:
-    - “/flashcards” → “/flashcards/{slug}” (use base_url + path). Do not invent deeper levels.
+    - “/flashcards” → “/flashcards/{slug}” (use base_url + "/flashcards/" + slug). Do not invent deeper levels.
 
 OUTPUT FORMAT (STRICT):
-Return ONLY a single valid JSON object with this shape (no markdown, no commentary):
+Return ONLY a single valid JSON object with this shape (no markdown, no commentary). The slug and path are managed externally, so do not include them:
 
 {
-  "slug": string,
-  "path": string,
   "metadata": {
     "title": string,            // ≤60 chars, includes target keyword
     "description": string,      // 140–155 chars
     "keywords": string[],       // 5–10 semantic variants (for internal use; not meta keywords)
-    "canonical": string         // base_url + path if not provided
+    "canonical": string         // base_url + "/flashcards/" + slug if not provided
   },
   "hero": {
     "heading": string,          // H1, contains target keyword/variant
-    "subheading": string,       // 1–2 sentences: outcome-focused, no hype (mentions the core value tuned to the target keyword: upload doc -> get spaced rep flashcards)
+    "subheading": string,       // 1–2 sentences: Explains what the tool does and how it could be helpfull for someone searching for that target keyword.
     "primaryCta": { "type": "modal", "label": string }
   },
   "featuresSection": {
@@ -116,7 +114,7 @@ Return ONLY a single valid JSON object with this shape (no markdown, no commenta
   "seoSection": {
     "heading": string,          // H2 (e.g., “Study Better with AI Flashcards”)
     "body": [
-      { "type": "paragraph", "html": string }, // 120–180 words
+      { "type": "paragraph", "html": string }, // 180 words
       { "type": "list", "items": string[] },   // semantic/long-tail variants or use-cases
       { "type": "paragraph", "html": string }  // examples tailored to topic/subtopics
     ]
@@ -143,7 +141,7 @@ Return ONLY a single valid JSON object with this shape (no markdown, no commenta
         "@type": "BreadcrumbList",
         "itemListElement": [
           {"@type":"ListItem","position":1,"name":"Flashcards","item":"{base_url}/flashcards"},
-          {"@type":"ListItem","position":2,"name": "{context.target_keyword || slug}", "item": "{base_url}{path}"}
+          {"@type":"ListItem","position":2,"name": "{context.target_keyword || slug}", "item": "{base_url}/flashcards/{slug}"}
         ]
       },
       {
@@ -240,7 +238,6 @@ class CsvRow:
   def prompt_payload(self) -> str:
     payload = {
       "slug": self.slug,
-      "path": self.path,
       "base_url": self.base_url,
       "context": {k: v for k, v in self.data.items() if k not in {"slug", "path", "base_url"}},
     }
@@ -264,7 +261,7 @@ def read_csv_rows(path: Path, max_rows: int | None = None) -> List[CsvRow]:
         raise ValueError(f"Row {idx + 2} is missing a slug")
       if not (raw.get("target_keyword") or "").strip():
         raise ValueError(f"Row {idx + 2} is missing a target_keyword")
-      rows.append(CsvRow(slug=slug, data={k: (v or '').strip() for k, v in raw.items()}))
+      rows.append(CsvRow(slug=slug, data={k: str(v or '').strip() for k, v in raw.items()}))
     return rows
 
 
@@ -296,8 +293,6 @@ def call_model(
         "schema": {
           "type": "object",
           "properties": {
-            "slug": {"type": "string"},
-            "path": {"type": "string"},
             "metadata": {"type": "object"},
             "hero": {"type": "object"},
             "featuresSection": {"type": "object"},
@@ -321,8 +316,6 @@ def call_model(
             },
           },
           "required": [
-            "slug",
-            "path",
             "metadata",
             "hero",
             "featuresSection",
@@ -478,7 +471,7 @@ def normalise_page(row: CsvRow, payload: Dict[str, Any]) -> Dict[str, Any]:
     payload.setdefault("metadata", {})["canonical"] = canonical
 
   payload.setdefault("path", row.path)
-  payload.setdefault("slug", row.slug)
+  payload["slug"] = row.slug
 
   structured_data = payload.get("structuredData")
   if not isinstance(structured_data, dict) or not structured_data.get("@graph"):
