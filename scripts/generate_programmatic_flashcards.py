@@ -50,7 +50,7 @@ OUTPUT_FOOTER = "];\n"
 
 PROMPT_TEMPLATE = """
 You will generate a complete landing page JSON for an AI flashcards generator app, suitable for static rendering.
-Info on app: You upload your PDFs, DOCX, powerpoint or images and generates flashcards with spaced-repetition scheduling, you can also select the exam date, share flashcards with other through a public link. Do not hallucinate other features (e.g. the app does not automatically tag concepts). 
+Info on app: You upload your PDFs, DOCX, powerpoint or images and generates flashcards with spaced-repetition scheduling, you can also select the exam date, share flashcards with other through a public link. The app is free to use and also has a paid plan with more generation credits and the ability to use a more advanced AI model. Do not hallucinate other features (e.g. the app does not automatically tag concepts, or allow editing cards at the momment). 
 
 You will receive structured CSV data for one landing page. Follow these requirements precisely:
 
@@ -76,7 +76,7 @@ CONVERSION (CTAs):
 10) Use action-oriented, consistent CTAs (3-4 words max). Pick ONE primary label and reuse it consistently across the page.
 
 EMBEDDED FLASHCARDS PREVIEW:
-11) Craft exactly three topic-specific flashcards that would be what the user wanted if he searched for the target keyword with the intent of finding ready-made Flashcards.
+11) Craft exactly three topic-specific flashcards that would be what the user wanted if he searched for the target keyword with the intent of finding ready-made Flashcards, but if the target keyword is most likely not for a ready-made flashcard intent, then write flashcards upselling benefit of AI Flashcards vs manual making or benefits of active recall, spaced repetition, etc. Do not make flashcards related to memorizing features of the app (e.g Don't make flashcards asking about what are the file formats supported for uploading).
     - Questions must be open-ended and atomic (less than 80 characters).
     - Answers must be concise (≤2 sentences) and accurate (less than 120 characters).
     - Mirror the language of the page (e.g., same locale, terminology).
@@ -114,7 +114,7 @@ Return ONLY a single valid JSON object with this shape (no markdown, no commenta
   "seoSection": {
     "heading": string,          // H2 (e.g., “Study Better with AI Flashcards”)
     "body": [
-      { "type": "paragraph", "html": string }, // 180 words
+      { "type": "paragraph", "html": string }, // 180 words, contains target keyword/variant at the beginning.
       { "type": "list", "items": string[] },   // semantic/long-tail variants or use-cases
       { "type": "paragraph", "html": string }  // examples tailored to topic/subtopics
     ]
@@ -500,8 +500,29 @@ def write_output_file(path: Path, pages: List[Dict[str, Any]]) -> None:
   path.parent.mkdir(parents=True, exist_ok=True)
 
   temp_path = path.with_suffix(path.suffix + ".tmp")
-  temp_path.write_text(serialized, encoding="utf-8")
-  temp_path.replace(path)
+
+  max_retries = 3
+  for attempt in range(max_retries):
+    try:
+      temp_path.write_text(serialized, encoding="utf-8")
+      temp_path.replace(path)
+      return
+    except PermissionError as e:
+      if attempt == max_retries - 1:
+        # Last attempt failed, try alternative approach
+        print(f"Permission denied writing to {path}. Trying alternative method...", file=sys.stderr)
+        try:
+          # Try writing directly to the file (may leave partial content if interrupted)
+          path.write_text(serialized, encoding="utf-8")
+          return
+        except PermissionError:
+          raise PermissionError(
+            f"Cannot write to {path}. The file may be open in another application (like your editor). "
+            f"Please close the file and try again. Original error: {e}"
+          )
+      else:
+        print(f"Permission denied (attempt {attempt + 1}/{max_retries}). Retrying...", file=sys.stderr)
+        time.sleep(0.5)
 
 
 def load_existing_pages(path: Path) -> List[Dict[str, Any]]:
