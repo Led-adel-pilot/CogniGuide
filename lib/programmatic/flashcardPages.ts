@@ -5,6 +5,7 @@ import type {
   ProgrammaticFlashcardPageMap,
 } from './flashcardPageSchema';
 import { generatedFlashcardPages } from './generated/flashcardPages';
+import { useCaseHubs } from '@/lib/programmatic/useCaseData';
 
 const defaultFaqItems: ProgrammaticFaqItem[] = [
   {
@@ -196,29 +197,81 @@ export { generatedFlashcardPages };
 
 export const allFlashcardPages: ProgrammaticFlashcardPage[] = [defaultFlashcardLanding, ...generatedFlashcardPages];
 
-function ensureStructuredData(page: ProgrammaticFlashcardPage): void {
-  if (page.structuredData && typeof page.structuredData === 'object') {
-    return;
+type UseCaseBreadcrumb = {
+  hub: { name: string; slug: string };
+  subhub: { name: string; slug: string };
+};
+
+const useCaseBreadcrumbMap = new Map<string, UseCaseBreadcrumb>();
+
+useCaseHubs.forEach((hub) => {
+  hub.subhubs.forEach((subhub) => {
+    subhub.flashcards.forEach((flashcard) => {
+      if (!useCaseBreadcrumbMap.has(flashcard.slug)) {
+        useCaseBreadcrumbMap.set(flashcard.slug, {
+          hub: { name: hub.name, slug: hub.slug },
+          subhub: { name: subhub.name, slug: subhub.slug },
+        });
+      }
+    });
+  });
+});
+
+type BreadcrumbListItem = {
+  '@type': 'ListItem';
+  position: number;
+  name: string;
+  item: string;
+};
+
+const getHomeUrl = (): string =>
+  siteMetadata.url.endsWith('/') ? siteMetadata.url : `${siteMetadata.url}/`;
+
+const buildBreadcrumbItems = (
+  page: ProgrammaticFlashcardPage,
+  canonical: string
+): BreadcrumbListItem[] => {
+  const items: BreadcrumbListItem[] = [];
+  let position = 1;
+
+  const addItem = (name: string, item: string) => {
+    items.push({
+      '@type': 'ListItem',
+      position: position++,
+      name,
+      item,
+    });
+  };
+
+  const homeUrl = getHomeUrl();
+  addItem('CogniGuide', homeUrl);
+
+  const breadcrumb = useCaseBreadcrumbMap.get(page.slug);
+
+  if (breadcrumb) {
+    const useCasesUrl = `${homeUrl}use-cases`;
+    addItem('Use Cases', useCasesUrl);
+    addItem(breadcrumb.hub.name, `${useCasesUrl}/${breadcrumb.hub.slug}`);
+    addItem(
+      breadcrumb.subhub.name,
+      `${useCasesUrl}/${breadcrumb.hub.slug}/${breadcrumb.subhub.slug}`
+    );
+  } else {
+    addItem('Flashcards', `${siteMetadata.url}/flashcards`);
   }
 
-  const canonical = page.metadata.canonical ?? `${siteMetadata.url}${page.path}`;
+  addItem(page.metadata.title ?? page.hero.heading ?? page.slug, canonical);
+
+  return items;
+};
+
+function ensureStructuredData(page: ProgrammaticFlashcardPage): void {
+  const canonical =
+    page.metadata.canonical ?? `${siteMetadata.url}${page.path ?? `/flashcards/${page.slug}`}`;
 
   const breadcrumb = {
     '@type': 'BreadcrumbList',
-    itemListElement: [
-      {
-        '@type': 'ListItem',
-        position: 1,
-        name: 'Flashcards',
-        item: `${siteMetadata.url}/flashcards`,
-      },
-      {
-        '@type': 'ListItem',
-        position: 2,
-        name: page.hero.heading ?? page.metadata.title ?? page.slug,
-        item: canonical,
-      },
-    ],
+    itemListElement: buildBreadcrumbItems(page, canonical),
   };
 
   const faqItems = page.faqSection?.items ?? [];
@@ -230,10 +283,6 @@ function ensureStructuredData(page: ProgrammaticFlashcardPage): void {
       ...buildFaqJsonLd({ url: canonical, faq: faqItems, includeContext: false }),
       '@id': `${canonical}#faq`,
     });
-  }
-
-  if (graph.length === 0) {
-    return;
   }
 
   page.structuredData = {

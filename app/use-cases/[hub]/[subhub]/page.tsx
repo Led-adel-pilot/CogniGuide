@@ -18,8 +18,9 @@ export function generateStaticParams() {
   return params;
 }
 
-export function generateMetadata({ params }: { params: SubhubPageParams }): Metadata {
-  const resolved = getSubhubBySlugs(params.hub, params.subhub);
+export async function generateMetadata({ params }: { params: Promise<SubhubPageParams> }): Promise<Metadata> {
+  const { hub: hubSlug, subhub: subhubSlug } = await params;
+  const resolved = getSubhubBySlugs(hubSlug, subhubSlug);
   if (!resolved) {
     return useCasesMetadataBase;
   }
@@ -31,8 +32,9 @@ export function generateMetadata({ params }: { params: SubhubPageParams }): Meta
   };
 }
 
-export default function UseCaseSubhubPage({ params }: { params: SubhubPageParams }) {
-  const resolved = getSubhubBySlugs(params.hub, params.subhub);
+export default async function UseCaseSubhubPage({ params }: { params: Promise<SubhubPageParams> }) {
+  const { hub: hubSlug, subhub: subhubSlug } = await params;
+  const resolved = getSubhubBySlugs(hubSlug, subhubSlug);
   if (!resolved) {
     notFound();
   }

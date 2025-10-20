@@ -11,8 +11,9 @@ export function generateStaticParams() {
   return useCaseHubs.map((hub) => ({ hub: hub.slug }));
 }
 
-export function generateMetadata({ params }: { params: HubPageParams }): Metadata {
-  const hub = getHubBySlug(params.hub);
+export async function generateMetadata({ params }: { params: Promise<HubPageParams> }): Promise<Metadata> {
+  const { hub: hubSlug } = await params;
+  const hub = getHubBySlug(hubSlug);
   if (!hub) {
     return useCasesMetadataBase;
   }
@@ -23,8 +24,9 @@ export function generateMetadata({ params }: { params: HubPageParams }): Metadat
   };
 }
 
-export default function UseCaseHubPage({ params }: { params: HubPageParams }) {
-  const hub = getHubBySlug(params.hub);
+export default async function UseCaseHubPage({ params }: { params: Promise<HubPageParams> }) {
+  const { hub: hubSlug } = await params;
+  const hub = getHubBySlug(hubSlug);
   if (!hub) {
     notFound();
   }
