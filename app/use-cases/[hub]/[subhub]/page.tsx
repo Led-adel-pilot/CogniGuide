@@ -55,8 +55,8 @@ elated study pages.
             href={flashcard.href}
             className="flex flex-col rounded-lg border border-border bg-card p-4 shadow-sm transition hover:border-primary/60 hover:bg-card/80"
           >
-            <span className="font-medium text-primary">{flashcard.title}</span>
-            <span className="text-sm text-muted-foreground">{flashcard.href}</span>
+            <span className="font-medium text-primary">{flashcard.anchorText}</span>
+            <span className="text-sm text-muted-foreground">{flashcard.description}</span>
           </Link>
         ))}
       </div>

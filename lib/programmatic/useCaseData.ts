@@ -1,10 +1,13 @@
 import type { Metadata } from 'next';
 import { generatedFlashcardPages } from '@/lib/programmatic/generated/flashcardPages';
+import { flashcardLinkMetadata } from '@/lib/programmatic/generated/flashcardLinkMetadata';
 
 export type UseCaseLink = {
   slug: string;
   href: string;
   title: string;
+  anchorText: string;
+  description: string;
 };
 
 export type UseCaseSubhub = {
@@ -39,6 +42,7 @@ const flashcardPageMap = new Map(
     {
       href: page.path ?? `/flashcards/${page.slug}`,
       title: page.metadata?.title ?? humanize(page.slug),
+      description: page.metadata?.description,
     },
   ])
 );
@@ -482,13 +486,23 @@ const rawHubData: Record<string, Record<string, string[]>> = {
 const buildFlashcardLinks = (slugs: string[]): UseCaseLink[] =>
   slugs.map((slug) => {
     const entry = flashcardPageMap.get(slug);
-    if (entry) {
-      return { slug, ...entry };
-    }
+    const linkMetadata = flashcardLinkMetadata[slug];
+    const title = entry?.title ?? humanize(slug);
+    const anchorText =
+      linkMetadata?.anchorTextVar1 ??
+      linkMetadata?.anchorTextVar2 ??
+      title;
+    const description =
+      linkMetadata?.description ??
+      entry?.description ??
+      title;
+
     return {
       slug,
-      href: `/flashcards/${slug}`,
-      title: humanize(slug),
+      href: entry?.href ?? `/flashcards/${slug}`,
+      title,
+      anchorText,
+      description,
     };
   });
 
