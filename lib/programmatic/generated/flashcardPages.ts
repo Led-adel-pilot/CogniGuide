@@ -117,14 +117,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Enhance Your Study Strategy",
       "links": [
         {
-          "label": "Active Recall Techniques",
-          "href": "https://www.cogniguide.app/flashcards/active-recall-techniques",
-          "description": "Learn how retrieving information strengthens memory compared to passive review."
+          "label": "Shapes Flashcards Generator",
+          "href": "https://www.cogniguide.app/flashcards/shapes",
+          "description": "Instantly generate shapes flashcards from any file for mastering geometric concepts."
         },
         {
-          "label": "Spaced Repetition Explained",
-          "href": "https://www.cogniguide.app/flashcards/spaced-repetition-scheduling",
-          "description": "Discover the optimal timing intervals for reviewing any subject matter efficiently."
+          "label": "Docs to Study Cards",
+          "href": "https://www.cogniguide.app/flashcards/maker",
+          "description": "The ultimate AI flashcard maker for converting complex material into cards."
         }
       ]
     },
@@ -327,14 +327,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Related Study Tools",
       "links": [
         {
-          "label": "Generate Math Formula Flashcards",
-          "href": "https://www.cogniguide.app/flashcards/math-formulas",
-          "description": "Convert complex mathematical equations and proofs from textbooks directly into reviewable flashcards."
+          "label": "Long Vowel Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/long-vowel",
+          "description": "Create long vowel flashcards from any document instantly for phonics."
         },
         {
-          "label": "AI-Powered Terminology Cards",
-          "href": "https://www.cogniguide.app/flashcards/glossary",
-          "description": "Quickly build comprehensive vocabulary and technical glossary decks from research papers or industry documents."
+          "label": "AI PDF Converter",
+          "href": "https://www.cogniguide.app/flashcards/pdf-flashcards",
+          "description": "Convert any PDF to flashcards instantly with AI for content mastery."
         }
       ]
     },
@@ -532,14 +532,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Enhance Your Study Workflow",
       "links": [
         {
-          "label": "Active Recall Techniques Guide",
-          "href": "https://www.cogniguide.app/study-techniques",
-          "description": "Learn the science behind why AI-generated Q&A sessions beat passive reading."
+          "label": "Picture Cards from PDF",
+          "href": "https://www.cogniguide.app/flashcards/picture",
+          "description": "Create picture cards and flashcards from your PDF documents automatically."
         },
         {
-          "label": "Scheduling for Exam Success",
-          "href": "https://www.cogniguide.app/scheduling-tools",
-          "description": "Explore how integrating study schedules improves material retention over time."
+          "label": "AI Visual Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/creator-images",
+          "description": "The effortless flashcard creator with images, powered by visual AI."
         }
       ]
     },
@@ -742,14 +742,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Enhance Your Study Workflow",
       "links": [
         {
-          "label": "AI PDF to Study Guide Converter",
-          "href": "https://www.cogniguide.app/flashcards/pdf-to-study-guide",
-          "description": "Learn how to convert long PDFs into structured outlines instantly for faster conceptual understanding."
+          "label": "Create Anki Cards with AI",
+          "href": "https://www.cogniguide.app/flashcards/create-anki",
+          "description": "Stop manually making flashcards; use AI to create Anki cards instantly."
         },
         {
-          "label": "Mastering Active Recall Techniques",
-          "href": "https://www.cogniguide.app/blog/active-recall-mastery",
-          "description": "Read expert advice on how to maximize memory retention using active recall strategies."
+          "label": "Quizlet Alternative AI",
+          "href": "https://www.cogniguide.app/flashcards/sites-like-quizlet",
+          "description": "Generate smarter flashcards instantly—a better tool than sites like Quizlet."
         }
       ]
     },
@@ -952,14 +952,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Further Study Optimization Techniques",
       "links": [
         {
-          "label": "Active Recall Strategies",
-          "href": "https://www.cogniguide.app/flashcards/active-recall-strategies",
-          "description": "Learn how forcing your brain to retrieve information strengthens memory traces."
+          "label": "AI Online Flashcard Maker",
+          "href": "https://www.cogniguide.app/flashcards/online-maker",
+          "description": "Generate study decks with an AI online flashcard maker from any document."
         },
         {
-          "label": "Exam Date Planning",
-          "href": "https://www.cogniguide.app/flashcards/exam-planning",
-          "description": "Tips on structuring your study schedule backward from your critical test dates."
+          "label": "Docs to Study Cards",
+          "href": "https://www.cogniguide.app/flashcards/maker",
+          "description": "The ultimate AI flashcard maker for converting complex material into cards."
         }
       ]
     },
@@ -1162,14 +1162,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore Other Study Methods",
       "links": [
         {
-          "label": "Active Recall Techniques Guide",
-          "href": "https://www.cogniguide.app/study-methods/active-recall",
-          "description": "Learn the science behind memory retrieval and how it optimizes studying."
+          "label": "English Vocabulary Cards",
+          "href": "https://www.cogniguide.app/flashcards/english-vocabulary",
+          "description": "Create smart English vocabulary cards instantly to master words faster."
         },
         {
-          "label": "Document Conversion Tools",
-          "href": "https://www.cogniguide.app/features/document-conversion",
-          "description": "See all supported input file types for instant study material transformation."
+          "label": "Automated Anki Maker",
+          "href": "https://www.cogniguide.app/flashcards/create-anki",
+          "description": "Stop manually making flashcards; use AI to create Anki cards instantly."
         }
       ]
     },
@@ -1372,14 +1372,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore More Study Techniques",
       "links": [
         {
-          "label": "AI Summarizer Tool",
-          "href": "https://www.cogniguide.app/summarizer",
-          "description": "Condense long articles and documents into key takeaways before generating flashcards."
+          "label": "Counting Flashcards from PDF",
+          "href": "https://www.cogniguide.app/flashcards/counting",
+          "description": "Create counting flashcards directly from any PDF or document for math practice."
         },
         {
-          "label": "Active Recall Benefits",
-          "href": "https://www.cogniguide.app/learning-techniques",
-          "description": "Learn the science behind why active questioning beats passive reading for exam readiness."
+          "label": "AI Number Cards 1-20",
+          "href": "https://www.cogniguide.app/flashcards/1-20",
+          "description": "Instantly create 1-20 flashcards from any document for number recognition."
         }
       ]
     },
@@ -1577,14 +1577,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Boost Your Study Strategy",
       "links": [
         {
-          "label": "AI Study Planner Tools",
-          "href": "https://www.cogniguide.app/flashcards/study-planner",
-          "description": "Discover how integrated planning maximizes your preparation time when combined with active recall."
+          "label": "Online Note Cards",
+          "href": "https://www.cogniguide.app/flashcards/note-online-study",
+          "description": "Generate AI note cards online study aids instantly for faster learning."
         },
         {
-          "label": "Mastering Active Recall",
-          "href": "https://www.cogniguide.app/flashcards/active-recall",
-          "description": "Learn the cognitive benefits of testing yourself versus passive rereading of notes."
+          "label": "AI Web Notecard Maker",
+          "href": "https://www.cogniguide.app/flashcards/online",
+          "description": "Generate free notecards online instantly with AI from your study docs."
         }
       ]
     },
@@ -1786,14 +1786,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Optimize Other Areas of Your Studying",
       "links": [
         {
-          "label": "Biology Flashcard Generator",
-          "href": "https://www.cogniguide.app/flashcards/biology-terms",
-          "description": "Instantly convert complex biological processes and terms into effective review sets."
+          "label": "AI SAT Vocab Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/sat-vocab",
+          "description": "Generate instant SAT vocab flashcards with AI for essential exam prep."
         },
         {
-          "label": "History Timeline Flashcards",
-          "href": "https://www.cogniguide.app/flashcards/history-dates",
-          "description": "Create chronological study aids by uploading historical documents or lecture notes."
+          "label": "AI GRE Prep Generator",
+          "href": "https://www.cogniguide.app/flashcards/gre-magoosh",
+          "description": "Instantly generate AI flashcards from GRE Magoosh materials for smarter prep."
         }
       ]
     },
@@ -1997,14 +1997,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Further Your Study Strategy",
       "links": [
         {
-          "label": "Active Recall Techniques",
-          "href": "https://www.cogniguide.app/flashcards/active-recall-techniques",
-          "description": "Discover methods that boost retention beyond simple memorization."
+          "label": "High Frequency Words Cards",
+          "href": "https://www.cogniguide.app/flashcards/high-frequency",
+          "description": "Create high frequency words flashcards from any document for reading fluency."
         },
         {
-          "label": "Optimizing Study Schedules",
-          "href": "https://www.cogniguide.app/flashcards/study-scheduling",
-          "description": "Learn how setting deadlines impacts learning algorithms for better exam performance."
+          "label": "AI Dolch Word Generator",
+          "href": "https://www.cogniguide.app/flashcards/dolch-sight",
+          "description": "Create instant AI Dolch sight word flash cards, beating static PDF lists."
         }
       ]
     },
@@ -2206,14 +2206,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Boost Your Study Technique",
       "links": [
         {
-          "label": "Master Active Recall Strategies",
-          "href": "https://www.cogniguide.app/flashcards/active-recall",
-          "description": "Learn how testing yourself improves memory far more than passive reading."
+          "label": "AI Flashcard Creator",
+          "href": "https://www.cogniguide.app/flashcards/creator",
+          "description": "The fastest AI flashcard creator for serious students using any document."
         },
         {
-          "label": "Understanding Spaced Repetition",
-          "href": "https://www.cogniguide.app/flashcards/spaced-repetition-guide",
-          "description": "Dive into the science behind optimal review intervals for long-term memory encoding."
+          "label": "Fast Study Set Creation",
+          "href": "https://www.cogniguide.app/flashcards/generator",
+          "description": "The ultimate AI flashcard generator for mastering complex materials quickly."
         }
       ]
     },
@@ -2416,14 +2416,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Enhance Your Study Toolkit",
       "links": [
         {
-          "label": "AI Flashcards for IT Certifications",
-          "href": "https://www.cogniguide.app/flashcards/it-certifications",
-          "description": "See how others prepare for complex IT exams using automated recall tools."
+          "label": "API 570 Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/api-570",
+          "description": "Create your API 570 flashcards instantly using AI for certification."
         },
         {
-          "label": "Understanding Spaced Repetition",
-          "href": "https://www.cogniguide.app/blog/spaced-repetition-guide",
-          "description": "Learn the cognitive science behind why scheduling reviews improves memory retention."
+          "label": "AI PDF Converter",
+          "href": "https://www.cogniguide.app/flashcards/pdf-flashcards",
+          "description": "Convert any PDF to flashcards instantly with AI for content mastery."
         }
       ]
     },
@@ -2625,14 +2625,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore More Study Tools",
       "links": [
         {
-          "label": "AI for Technical Drawing Notes",
-          "href": "https://www.cogniguide.app/flashcards/technical-drawing",
-          "description": "Convert complex technical diagrams and specifications into structured Q&A sets."
+          "label": "AI Colors Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/colors",
+          "description": "Instantly generate vibrant colors flashcards from documents to accelerate visual learning."
         },
         {
-          "label": "Mastering Terminology with Active Recall",
-          "href": "https://www.cogniguide.app/flashcards/terminology",
-          "description": "Deep dive into how active recall beats passive review for vocabulary acquisition."
+          "label": "AI Alphabet Cards",
+          "href": "https://www.cogniguide.app/flashcards/abc",
+          "description": "Transform your documents into smart alphabet flashcards for learning letters."
         }
       ]
     },
@@ -2830,14 +2830,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Deepen Your Study Strategy",
       "links": [
         {
-          "label": "Active Recall Techniques",
-          "href": "https://www.cogniguide.app/flashcards/active-recall",
-          "description": "Learn how question-based study dramatically improves memory consolidation."
+          "label": "Days and Months Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/days-months",
+          "description": "Create days and months flashcards from any document for calendar mastery."
         },
         {
-          "label": "Using Spaced Repetition Effectively",
-          "href": "https://www.cogniguide.app/flashcards/spaced-repetition",
-          "description": "Discover the science behind optimal review timing for long-term retention."
+          "label": "Docs to Study Cards",
+          "href": "https://www.cogniguide.app/flashcards/maker",
+          "description": "The ultimate AI flashcard maker for converting complex material into cards."
         }
       ]
     },
@@ -3034,14 +3034,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore Other Study Resources",
       "links": [
         {
-          "label": "Ecology Study Guides Generator",
-          "href": "https://www.cogniguide.app/flashcards/ecology-guides",
-          "description": "Convert detailed ecology reports and fieldwork data into reviewable flashcards."
+          "label": "Zoo Animals Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/zoo-animals",
+          "description": "Create instant zoo animals flashcards from any document for biology."
         },
         {
-          "label": "Zoology Terminology Study Aids",
-          "href": "https://www.cogniguide.app/flashcards/zoology-terms",
-          "description": "Quickly build decks for mastering complex biological nomenclature and classifications."
+          "label": "AI Animal Study Guides",
+          "href": "https://www.cogniguide.app/flashcards/animals",
+          "description": "Create instant flash cards from your animals study materials with AI."
         }
       ]
     },
@@ -3239,14 +3239,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore More Study Techniques",
       "links": [
         {
-          "label": "Active Recall Strategies",
-          "href": "https://www.cogniguide.app/flashcards/active-recall-strategies",
-          "description": "Deep dive into the science behind testing yourself for better retention."
+          "label": "AI Flashcard Maker",
+          "href": "https://www.cogniguide.app/flashcards/maker",
+          "description": "The ultimate AI flashcard maker for converting complex material into cards."
         },
         {
-          "label": "Optimizing Study Schedules",
-          "href": "https://www.cogniguide.app/flashcards/study-scheduling",
-          "description": "Learn how to use time management for maximizing learning efficiency."
+          "label": "Fast Study Set Creation",
+          "href": "https://www.cogniguide.app/flashcards/generator",
+          "description": "The ultimate AI flashcard generator for mastering complex materials quickly."
         }
       ]
     },
@@ -3445,14 +3445,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore Other Study Strategies",
       "links": [
         {
-          "label": "Active Recall Techniques",
-          "href": "https://www.cogniguide.app/flashcards/active-recall",
-          "description": "Learn how testing yourself reinforces memory better than re-reading."
+          "label": "AI Digital Flashcard Maker",
+          "href": "https://www.cogniguide.app/flashcards/digital-maker",
+          "description": "Create intelligent digital flashcard decks from any file for modern studying."
         },
         {
-          "label": "Spaced Repetition Benefits",
-          "href": "https://www.cogniguide.app/flashcards/spaced-repetition",
-          "description": "Understand the science behind optimal review timing for long-term mastery."
+          "label": "Web-Based Flashcard Creator",
+          "href": "https://www.cogniguide.app/flashcards/online-maker",
+          "description": "Generate study decks with an AI online flashcard maker from any document."
         }
       ]
     },
@@ -3650,14 +3650,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Expand Your Study Toolkit",
       "links": [
         {
-          "label": "AI Biology Flashcards Generator",
-          "href": "https://www.cogniguide.app/flashcards/biology",
-          "description": "Convert complex biological diagrams and textbook sections into smart review questions."
+          "label": "AI French Flash Cards",
+          "href": "https://www.cogniguide.app/flashcards/french",
+          "description": "Create custom French flash cards from any document for language learning."
         },
         {
-          "label": "Document-Based Study Aids",
-          "href": "https://www.cogniguide.app/flashcards/study-workflow",
-          "description": "Learn how to integrate document ingestion seamlessly into your daily study routine."
+          "label": "Vocabulary Learning Tool",
+          "href": "https://www.cogniguide.app/flashcards/language-maker",
+          "description": "The ultimate AI language flashcard maker for mastering new vocabulary."
         }
       ]
     },
@@ -3854,14 +3854,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore More Study Optimization Strategies",
       "links": [
         {
-          "label": "AI Notes Summarization Tools",
-          "href": "https://www.cogniguide.app/summarizer",
-          "description": "Learn how to summarize dense academic texts instantly before converting them into study aids."
+          "label": "AI Biology Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/biology",
+          "description": "Create smart, free biology flashcards from any document for your class."
         },
         {
-          "label": "Mastering Active Recall Techniques",
-          "href": "https://www.cogniguide.app/active-recall",
-          "description": "Deep dive into the cognitive science behind why flashcards are superior to re-reading notes."
+          "label": "AI Orgo Study Sets",
+          "href": "https://www.cogniguide.app/flashcards/organic-chemistry",
+          "description": "Create organic chemistry flashcards from any PDF instantly for your course."
         }
       ]
     },
@@ -4059,14 +4059,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Enhance Your Study Toolkit",
       "links": [
         {
-          "label": "Biology Flashcards Generator",
-          "href": "https://www.cogniguide.app/flashcards/biology",
-          "description": "Generate AI-powered cards from general biology lecture notes and textbooks."
+          "label": "MedStudy Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/medstudy",
+          "description": "Create powerful MedStudy flashcards from any PDF or document instantly."
         },
         {
-          "label": "Anatomy Flashcards Workflow",
-          "href": "https://www.cogniguide.app/flashcards/anatomy",
-          "description": "Discover optimal techniques for mastering complex spatial and naming conventions in anatomy using active recall."
+          "label": "UWorld PDF to Cards",
+          "href": "https://www.cogniguide.app/flashcards/uworld",
+          "description": "Create UWorld flashcards from your PDF notes instantly with AI."
         }
       ]
     },
@@ -4264,14 +4264,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Enhance Your Study Toolkit",
       "links": [
         {
-          "label": "PowerPoint to Flashcards",
-          "href": "https://www.cogniguide.app/flashcards/powerpoint",
-          "description": "Convert lecture slides directly into active recall questions."
+          "label": "Action Verb Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/action-verb",
+          "description": "Create action verb flashcards from any document instantly for grammar."
         },
         {
-          "label": "Mastering Active Recall",
-          "href": "https://www.cogniguide.app/study-techniques/active-recall",
-          "description": "Learn the cognitive science behind effective self-testing."
+          "label": "AI Verb Conjugation",
+          "href": "https://www.cogniguide.app/flashcards/verbs",
+          "description": "Generate flash cards for verbs from PDF content automatically."
         }
       ]
     },
@@ -4473,14 +4473,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Enhance Your Study Strategy",
       "links": [
         {
-          "label": "AI History Notes to Flashcards",
-          "href": "https://www.cogniguide.app/flashcards/history-notes",
-          "description": "See how to convert narrative history lessons into structured study aids."
+          "label": "Weather Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/weather",
+          "description": "Instantly generate weather flashcards from any PDF for meteorology or ESL."
         },
         {
-          "label": "Document to Quiz Generator",
-          "href": "https://www.cogniguide.app/tools/document-quiz",
-          "description": "Explore our tool for turning documents into full practice tests instead of just flashcards."
+          "label": "AI Calendar Cards",
+          "href": "https://www.cogniguide.app/flashcards/months-year",
+          "description": "Generate smart months of the year flashcards from any PDF document."
         }
       ]
     },
@@ -4682,14 +4682,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "More Study Tools",
       "links": [
         {
-          "label": "High School Math Flashcards",
-          "href": "https://www.cogniguide.app/flashcards/math",
-          "description": "Convert algebra or calculus notes into structured study decks."
+          "label": "AP Chemistry Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/ap-chemistry",
+          "description": "Create smart AP Chemistry flashcards from your study materials instantly."
         },
         {
-          "label": "Study Techniques for Active Recall",
-          "href": "https://www.cogniguide.app/blog/active-recall-guide",
-          "description": "Learn the cognitive science behind why flashcards work so effectively."
+          "label": "AI SAT Vocab Builder",
+          "href": "https://www.cogniguide.app/flashcards/sat-vocabulary",
+          "description": "Generate SAT vocabulary flashcards from word lists to accelerate exam mastery."
         }
       ]
     },
@@ -4886,14 +4886,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore Other Study Tools",
       "links": [
         {
-          "label": "Spaced Repetition Techniques",
-          "href": "https://www.cogniguide.app/flashcards/spaced-repetition",
-          "description": "Learn the science behind optimized review scheduling."
+          "label": "Antonyms Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/antonyms",
+          "description": "Create powerful antonyms flashcards from your study materials for vocabulary."
         },
         {
-          "label": "Document Upload Benefits",
-          "href": "https://www.cogniguide.app/flashcards/document-conversion",
-          "description": "See how converting source material boosts study efficiency."
+          "label": "Grammar Pronoun Cards",
+          "href": "https://www.cogniguide.app/flashcards/pronouns",
+          "description": "Create instant pronouns flashcards from your study materials for grammar."
         }
       ]
     },
@@ -5095,14 +5095,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore Other Study Resources",
       "links": [
         {
-          "label": "Science Flashcards Generator",
-          "href": "https://www.cogniguide.app/flashcards/science",
-          "description": "Convert complex scientific papers and notes into structured study sets instantly."
+          "label": "Clothes Vocabulary Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/clothes-vocabulary",
+          "description": "Generate clothes vocabulary flashcards from any file to optimize memorization."
         },
         {
-          "label": "Language Vocabulary Builder",
-          "href": "https://www.cogniguide.app/flashcards/language",
-          "description": "Use AI to build robust vocabulary decks directly from textbooks or reading materials."
+          "label": "AI Home Vocabulary",
+          "href": "https://www.cogniguide.app/flashcards/household-items",
+          "description": "Create instant household items flashcards from your documents for vocab."
         }
       ]
     },
@@ -5304,14 +5304,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Enhance Your Study Strategy",
       "links": [
         {
-          "label": "Active Recall Techniques",
-          "href": "https://www.cogniguide.app/flashcards/active-recall-techniques",
-          "description": "Learn how to test yourself rather than passively rereading material for better retention."
+          "label": "AI Online Flashcard Maker",
+          "href": "https://www.cogniguide.app/flashcards/online-maker",
+          "description": "Generate study decks with an AI online flashcard maker from any document."
         },
         {
-          "label": "Mastering Spaced Repetition",
-          "href": "https://www.cogniguide.app/flashcards/mastering-spaced-repetition",
-          "description": "Deep dive into the science behind optimal timing for memory consolidation."
+          "label": "Online Digital Study Decks",
+          "href": "https://www.cogniguide.app/flashcards/digital-maker",
+          "description": "Create intelligent digital flashcard decks from any file for modern studying."
         }
       ]
     },
@@ -5514,14 +5514,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore More Study Strategies",
       "links": [
         {
-          "label": "AI Study Tools for Exams",
-          "href": "https://www.cogniguide.app/flashcards/exam-prep",
-          "description": "See how our AI optimizes study plans for specific testing dates."
+          "label": "Marathi Flashcards PDF",
+          "href": "https://www.cogniguide.app/flashcards/marathi",
+          "description": "Create custom Marathi flashcards instantly from any PDF for language study."
         },
         {
-          "label": "Improving Active Recall",
-          "href": "https://www.cogniguide.app/flashcards/active-recall",
-          "description": "Deep dive into the cognitive science behind effective flashcard learning."
+          "label": "Telugu Language Card Maker",
+          "href": "https://www.cogniguide.app/flashcards/telugu",
+          "description": "Generate Telugu flash cards from your PDF and documents instantly."
         }
       ]
     },
@@ -5723,14 +5723,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore More Study Techniques",
       "links": [
         {
-          "label": "Active Recall Techniques",
-          "href": "https://www.cogniguide.app/flashcards/active-recall",
-          "description": "Deep dive into how to maximize learning efficiency through self-testing."
+          "label": "Household Items Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/household-items",
+          "description": "Create instant household items flashcards from your documents for vocab."
         },
         {
-          "label": "Spaced Repetition Guide",
-          "href": "https://www.cogniguide.app/flashcards/spaced-repetition",
-          "description": "Understand the science behind optimal memory consolidation schedules."
+          "label": "AI Home Vocabulary Cards",
+          "href": "https://www.cogniguide.app/flashcards/house",
+          "description": "Create instant 'house' flashcards from any PDF for vocabulary."
         }
       ]
     },
@@ -5928,14 +5928,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore Study Technique Enhancements",
       "links": [
         {
-          "label": "Active Recall Techniques Explained",
-          "href": "https://www.cogniguide.app/flashcards/active-recall-techniques",
-          "description": "Learn how testing yourself improves memory retention far beyond simple review."
+          "label": "Make Anki Cards Fast",
+          "href": "https://www.cogniguide.app/flashcards/make-anki-fast",
+          "description": "Effortlessly make Anki cards fast from any document for efficient studying."
         },
         {
-          "label": "Optimizing Study Schedules",
-          "href": "https://www.cogniguide.app/flashcards/study-schedule-optimizer",
-          "description": "Tips and strategies for planning your study sessions effectively using algorithms."
+          "label": "Anki Decks from Files",
+          "href": "https://www.cogniguide.app/flashcards/anki-deck-generator",
+          "description": "The ultimate AI Anki deck generator for complex material; just upload."
         }
       ]
     },
@@ -6138,14 +6138,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Advanced Study Techniques",
       "links": [
         {
-          "label": "Active Recall Strategies",
-          "href": "https://www.cogniguide.app/flashcards/active-recall-strategies",
-          "description": "Learn how forcing retrieval practice outperforms passive rereading."
+          "label": "1-10 Counting Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/1-10",
+          "description": "Generate counting flashcards from any PDF to master numbers 1 to 10."
         },
         {
-          "label": "Mastering Spaced Repetition",
-          "href": "https://www.cogniguide.app/flashcards/spaced-repetition",
-          "description": "Deep dive into the science behind optimal scheduling for memory consolidation."
+          "label": "AI Math Facts Generator",
+          "href": "https://www.cogniguide.app/flashcards/multiplication",
+          "description": "Create instant flashcards from your multiplication PDF notes for quick practice."
         }
       ]
     },
@@ -6348,14 +6348,13 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore Other Study Tools",
       "links": [
         {
-          "label": "AI Math Formula Generator",
-          "href": "https://www.cogniguide.app/flashcards/math-formulas",
-          "description": "Generate flashcards specifically optimized for mathematical expressions and complex equations."
+          "label": "Family Members Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/family-members",
+          "description": "Generate family members flashcards from any document for vocabulary building."
         },
         {
-          "label": "Document Study Workflow Tips",
-          "href": "https://www.cogniguide.app/blog/study-workflow-optimization",
-          "description": "Read expert advice on integrating automated tools into your existing study schedule for maximum results."
+          "label": "Professions",
+          "href": "https://www.cogniguide.app/flashcards/professions"
         }
       ]
     },
@@ -6558,14 +6557,13 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Enhance Your Study Strategy",
       "links": [
         {
-          "label": "Active Recall Study Techniques",
-          "href": "https://www.cogniguide.app/flashcards/active-recall",
-          "description": "Learn the science behind testing yourself to improve knowledge retention."
+          "label": "Exercise Flash Cards",
+          "href": "https://www.cogniguide.app/flashcards/exercise",
+          "description": "Create AI flash cards from your exercise PDFs for personal training."
         },
         {
-          "label": "Optimizing Spaced Repetition",
-          "href": "https://www.cogniguide.app/flashcards/scheduling",
-          "description": "Discover how intelligent scheduling beats cramming for durable learning."
+          "label": "Hobbies",
+          "href": "https://www.cogniguide.app/flashcards/hobbies"
         }
       ]
     },
@@ -6768,14 +6766,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore Related Study Tools",
       "links": [
         {
-          "label": "Grammar Rule Study Guides",
-          "href": "https://www.cogniguide.app/flashcards/grammar-rules",
-          "description": "Transform complex language structure documents into easy-to-digest study sets."
+          "label": "Vowel Flashcards from PDF",
+          "href": "https://www.cogniguide.app/flashcards/vowel",
+          "description": "Transform study materials into smart vowel flashcards for mastering phonetic concepts."
         },
         {
-          "label": "Vocabulary Definition Cards",
-          "href": "https://www.cogniguide.app/flashcards/vocabulary",
-          "description": "Generate high-volume vocabulary decks specifically tailored for rapid word acquisition."
+          "label": "AI Phonics Deck Creator",
+          "href": "https://www.cogniguide.app/flashcards/phonics-sound",
+          "description": "Create phonics sound cards from any document instantly for reading."
         }
       ]
     },
@@ -6978,14 +6976,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Further Optimize Your Study Strategy",
       "links": [
         {
-          "label": "AI Flashcards for University Entrance",
-          "href": "https://www.cogniguide.app/flashcards/university-prep",
-          "description": "See how advanced learners use document conversion for complex higher-level material."
+          "label": "Class 10 Flashcard Download",
+          "href": "https://www.cogniguide.app/flashcards/class-10-download",
+          "description": "Generate AI flashcards for Class 10, no download searching required."
         },
         {
-          "label": "Mastering Active Recall Techniques",
-          "href": "https://www.cogniguide.app/study-techniques/active-recall",
-          "description": "Learn the science behind why retrieval practice leads to better exam performance."
+          "label": "AI NCERT Study Aids",
+          "href": "https://www.cogniguide.app/flashcards/ncert",
+          "description": "Instantly generate personalized NCERT flashcards for Indian curriculum studies."
         }
       ]
     },
@@ -7187,14 +7185,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Expand Your Study Toolkit",
       "links": [
         {
-          "label": "AI Flashcards for Calculus AB",
-          "href": "https://www.cogniguide.app/flashcards/calculus-ab",
-          "description": "Generate study aids from Calculus textbooks using spaced repetition."
+          "label": "AP Psychology Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/ap-psychology",
+          "description": "Generate perfect AP Psychology flashcards instantly for effective concept review."
         },
         {
-          "label": "Active Recall Techniques Guide",
-          "href": "https://www.cogniguide.app/study-techniques/active-recall",
-          "description": "Learn the cognitive science behind why flashcards are superior to passive reading."
+          "label": "AI AP Bio Study Cards",
+          "href": "https://www.cogniguide.app/flashcards/ap-biology",
+          "description": "Generate perfect AP Biology flashcards instantly for efficient, targeted exam review."
         }
       ]
     },
@@ -7396,14 +7394,13 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore Other Study Tools",
       "links": [
         {
-          "label": "AI Exam Prep Guides",
-          "href": "https://www.cogniguide.app/guides/exam-prep",
-          "description": "Learn how to structure your entire study timetable using AI assistance."
+          "label": "Flags of the World Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/flags-world",
+          "description": "Generate flags of the world flashcards from any document for geography."
         },
         {
-          "label": "Active Recall Techniques",
-          "href": "https://www.cogniguide.app/guides/active-recall",
-          "description": "Deep dive into the science behind why flashcards work better than re-reading."
+          "label": "Capitals",
+          "href": "https://www.cogniguide.app/flashcards/capitals"
         }
       ]
     },
@@ -7601,14 +7598,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore More Study Tools",
       "links": [
         {
-          "label": "General Study Technique Guides",
-          "href": "https://www.cogniguide.app/flashcards/study-techniques",
-          "description": "Learn more about the science behind active recall and memory improvement."
+          "label": "AP Biology Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/ap-biology",
+          "description": "Generate perfect AP Biology flashcards instantly for efficient, targeted exam review."
         },
         {
-          "label": "Science Flashcard Generators",
-          "href": "https://www.cogniguide.app/flashcards/science",
-          "description": "See how we convert complex diagrams and data into effective study cards for biology and chemistry."
+          "label": "AI AP Stats Cards",
+          "href": "https://www.cogniguide.app/flashcards/barrons-ap-statistics",
+          "description": "Generate AI Barron's AP Statistics flashcards instantly for top exam scores."
         }
       ]
     },
@@ -7802,14 +7799,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Expand Your Study Strategy",
       "links": [
         {
-          "label": "Active Recall Techniques",
-          "href": "https://www.cogniguide.app/flashcards/active-recall",
-          "description": "Learn how to maximize memory retention using proven study methods."
+          "label": "CVC Flash Cards from PDF",
+          "href": "https://www.cogniguide.app/flashcards/cvc",
+          "description": "Convert any CVC PDF to smart flash cards for mastering phonics."
         },
         {
-          "label": "Exam Date Scheduling Tools",
-          "href": "https://www.cogniguide.app/flashcards/scheduling",
-          "description": "Discover how to use target dates to manage your study workload effectively."
+          "label": "AI Jolly Phonics Generator",
+          "href": "https://www.cogniguide.app/flashcards/jolly-phonics-group-1",
+          "description": "Create Jolly Phonics Group 1 flashcards from any file for early reading."
         }
       ]
     },
@@ -8011,14 +8008,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore Other Study Aids",
       "links": [
         {
-          "label": "Math Facts Generator",
-          "href": "https://www.cogniguide.app/flashcards/math-facts",
-          "description": "Convert worksheets into dynamic math practice sets using spaced repetition."
+          "label": "Days of the Week Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/days-week",
+          "description": "Instantly create smart days of the week flashcards from your documents."
         },
         {
-          "label": "Vocabulary Builder Tools",
-          "href": "https://www.cogniguide.app/flashcards/vocabulary-builder",
-          "description": "Generate flashcards from text documents for rapid language acquisition."
+          "label": "AI Months of the Year Cards",
+          "href": "https://www.cogniguide.app/flashcards/months",
+          "description": "Generate months flashcards instantly from your PDF documents for calendar review."
         }
       ]
     },
@@ -8216,14 +8213,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore More Study Techniques",
       "links": [
         {
-          "label": "AI Flashcards for Technical Notes",
-          "href": "https://www.cogniguide.app/flashcards/technical-notes",
-          "description": "Learn how to convert dense technical documentation into structured active recall quizzes."
+          "label": "ESL Flashcards from PDF",
+          "href": "https://www.cogniguide.app/flashcards/esl",
+          "description": "Create powerful ESL flashcards from PDFs instantly for language learners."
         },
         {
-          "label": "Maximizing Active Recall Benefits",
-          "href": "https://www.cogniguide.app/study-strategies/active-recall",
-          "description": "Dive deeper into the cognitive science behind why testing yourself is superior to passive review."
+          "label": "AI ESL Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/english-learning",
+          "description": "Create AI English cards for learning from any PDF for vocabulary."
         }
       ]
     },
@@ -8425,14 +8422,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore Study Strategies",
       "links": [
         {
-          "label": "Optimizing Active Recall Techniques",
-          "href": "https://www.cogniguide.app/flashcards/active-recall-study",
-          "description": "Learn how testing yourself strengthens memory pathways."
+          "label": "Vocabulary Flash Cards",
+          "href": "https://www.cogniguide.app/flashcards/vocabulary",
+          "description": "Generate vocabulary flash cards from your PDF files for any subject."
         },
         {
-          "label": "Using Spaced Repetition for Exams",
-          "href": "https://www.cogniguide.app/flashcards/spaced-repetition-scheduling",
-          "description": "Deep dive into the science behind optimized review timing."
+          "label": "AI Idiom Study Sets",
+          "href": "https://www.cogniguide.app/flashcards/idioms",
+          "description": "Instantly generate idioms flashcards from your documents to master expressions."
         }
       ]
     },
@@ -8634,14 +8631,13 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Continue Building Your Study System",
       "links": [
         {
-          "label": "Study Schedule Optimization",
-          "href": "https://www.cogniguide.app/flashcards/scheduling",
-          "description": "Learn how AI manages your review sessions based on cognitive load."
+          "label": "Transport Flashcards from PDF",
+          "href": "https://www.cogniguide.app/flashcards/transport",
+          "description": "Create custom transport flashcards from your PDF uploads for vocabulary."
         },
         {
-          "label": "Active Recall Techniques",
-          "href": "https://www.cogniguide.app/flashcards/active-recall",
-          "description": "Discover methods to maximize memory encoding during your practice sessions."
+          "label": "Location",
+          "href": "https://www.cogniguide.app/flashcards/location"
         }
       ]
     },
@@ -8843,14 +8839,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore Other Study Tools",
       "links": [
         {
-          "label": "AI Summary Generator",
-          "href": "https://www.cogniguide.app/summaries",
-          "description": "Condense long research papers into concise summaries for faster initial comprehension."
+          "label": "Zoo Animals Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/zoo-animals",
+          "description": "Create instant zoo animals flashcards from any document for biology."
         },
         {
-          "label": "Subject-Specific Study Aids",
-          "href": "https://www.cogniguide.app/subjects",
-          "description": "View examples of AI-generated content tailored for STEM and Humanities subjects."
+          "label": "AI Wildlife Study Cards",
+          "href": "https://www.cogniguide.app/flashcards/wild-animals",
+          "description": "Create instant wild animals flashcards from any document for zoology."
         }
       ]
     },
@@ -9052,14 +9048,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore More Study Strategies",
       "links": [
         {
-          "label": "Active Recall Techniques",
-          "href": "https://www.cogniguide.app/flashcards/active-recall-techniques",
-          "description": "Deep dive into how challenging your memory improves learning outcomes."
+          "label": "AI Quizlet Flashcard Creator",
+          "href": "https://www.cogniguide.app/flashcards/create-quizlet",
+          "description": "Ditch manual entry and create smarter Quizlet-style decks from documents instantly."
         },
         {
-          "label": "Optimizing Spaced Repetition",
-          "href": "https://www.cogniguide.app/flashcards/spaced-repetition-guide",
-          "description": "Learn the science behind effective scheduling intervals for maximum retention."
+          "label": "Quizlet Alternative AI",
+          "href": "https://www.cogniguide.app/flashcards/sites-like-quizlet",
+          "description": "Generate smarter flashcards instantly—a better tool than sites like Quizlet."
         }
       ]
     },
@@ -9257,14 +9253,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Deepen Your Study Strategies",
       "links": [
         {
-          "label": "AI Flashcards for Technical Documents",
-          "href": "https://www.cogniguide.app/flashcards/technical-documents",
-          "description": "See how to extract complex concepts from dense technical PDFs."
+          "label": "Verbs Flash Cards PDF",
+          "href": "https://www.cogniguide.app/flashcards/verbs",
+          "description": "Generate flash cards for verbs from PDF content automatically."
         },
         {
-          "label": "Mastering Active Recall Techniques",
-          "href": "https://www.cogniguide.app/flashcards/active-recall-techniques",
-          "description": "Learn the science behind why retrieval practice boosts learning outcomes."
+          "label": "AI Irregular Verb Cards",
+          "href": "https://www.cogniguide.app/flashcards/past-simple-irregular-verbs",
+          "description": "Create past simple irregular verbs flashcards instantly for grammar practice."
         }
       ]
     },
@@ -9465,14 +9461,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore Other Study Methods",
       "links": [
         {
-          "label": "Improve Memory Recall Techniques",
-          "href": "https://www.cogniguide.app/flashcards/recall-techniques",
-          "description": "Learn advanced techniques to boost your active recall performance beyond simple repetition."
+          "label": "Days of the Week Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/days-week",
+          "description": "Instantly create smart days of the week flashcards from your documents."
         },
         {
-          "label": "Using AI for Lecture Notes",
-          "href": "https://www.cogniguide.app/flashcards/lecture-conversion",
-          "description": "See how to convert complex, unstructured lecture notes into structured, testable flashcard sets."
+          "label": "AI Calendar Cards",
+          "href": "https://www.cogniguide.app/flashcards/months-year",
+          "description": "Generate smart months of the year flashcards from any PDF document."
         }
       ]
     },
@@ -9673,14 +9669,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore More Study Utilities",
       "links": [
         {
-          "label": "AI Lecture Notes to Flashcards",
-          "href": "https://www.cogniguide.app/flashcards/lecture-notes",
-          "description": "Learn how to turn dense lecture transcripts into structured study aids instantly."
+          "label": "Family Flash Cards from PDF",
+          "href": "https://www.cogniguide.app/flashcards/family",
+          "description": "Create family flash cards from your PDFs and documents for social studies."
         },
         {
-          "label": "Understanding Spaced Repetition",
-          "href": "https://www.cogniguide.app/blog/spaced-repetition-guide",
-          "description": "Read about the science behind our scheduling algorithm and memory retention."
+          "label": "AI Family Tree Generator",
+          "href": "https://www.cogniguide.app/flashcards/my-family",
+          "description": "Create 'My Family Flashcards' directly from any document for projects."
         }
       ]
     },
@@ -9882,14 +9878,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Expand Your Study Toolkit",
       "links": [
         {
-          "label": "AI Flashcards for Technical Subjects",
-          "href": "https://www.cogniguide.app/flashcards/technical-subjects",
-          "description": "See how AI transforms complex technical manuals into organized study sets."
+          "label": "Filipino Flashcards from PDF",
+          "href": "https://www.cogniguide.app/flashcards/filipino",
+          "description": "Generate AI-powered Filipino flashcards from any PDF for faster learning."
         },
         {
-          "label": "Using Active Recall Techniques",
-          "href": "https://www.cogniguide.app/blog/active-recall-study-tips",
-          "description": "Learn the cognitive science behind why flashcards and retrieval practice work so effectively."
+          "label": "AI Filipino Language Cards",
+          "href": "https://www.cogniguide.app/flashcards/tagalog",
+          "description": "Create Tagalog flashcards from any document instantly to master the language."
         }
       ]
     },
@@ -10091,14 +10087,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Enhance Your Study Toolkit",
       "links": [
         {
-          "label": "AI Flashcards for Concept Mapping",
-          "href": "https://www.cogniguide.app/flashcards/concept-mapping",
-          "description": "Learn how to turn complex diagrams and structured concepts into testable flashcard sets."
+          "label": "ESL Flashcards from PDF",
+          "href": "https://www.cogniguide.app/flashcards/esl",
+          "description": "Create powerful ESL flashcards from PDFs instantly for language learners."
         },
         {
-          "label": "Understanding Spaced Repetition Benefits",
-          "href": "https://www.cogniguide.app/study-techniques/spaced-repetition",
-          "description": "Deep dive into the science behind scheduling reviews for optimal memory consolidation."
+          "label": "AI Verb Study Cards",
+          "href": "https://www.cogniguide.app/flashcards/action-verb",
+          "description": "Create action verb flashcards from any document instantly for grammar."
         }
       ]
     },
@@ -10300,14 +10296,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Deepen Your Study Toolkit",
       "links": [
         {
-          "label": "Biology Flashcard Generation",
-          "href": "https://www.cogniguide.app/flashcards/biology-notes",
-          "description": "Convert complex biological diagrams and definitions into powerful study aids."
+          "label": "Verbs Flash Cards PDF",
+          "href": "https://www.cogniguide.app/flashcards/verbs",
+          "description": "Generate flash cards for verbs from PDF content automatically."
         },
         {
-          "label": "History Notes Summarization",
-          "href": "https://www.cogniguide.app/study-guides/history-summaries",
-          "description": "Use our tools to condense large historical texts into manageable study summaries."
+          "label": "AI Verb Form Generator",
+          "href": "https://www.cogniguide.app/flashcards/irregular-verbs",
+          "description": "Generate smart flash cards from an irregular verbs PDF for grammar practice."
         }
       ]
     },
@@ -10504,14 +10500,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore Other Study Tools",
       "links": [
         {
-          "label": "AI Generated Biology Flashcards",
-          "href": "https://www.cogniguide.app/flashcards/biology",
-          "description": "See how scientific terms are converted into effective active recall prompts."
+          "label": "Family Members Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/family-members",
+          "description": "Generate family members flashcards from any document for vocabulary building."
         },
         {
-          "label": "Study Plan Optimization",
-          "href": "https://www.cogniguide.app/tools/scheduling",
-          "description": "Learn more about setting target dates and optimizing your review timeline."
+          "label": "AI Family Tree Generator",
+          "href": "https://www.cogniguide.app/flashcards/my-family",
+          "description": "Create 'My Family Flashcards' directly from any document for projects."
         }
       ]
     },
@@ -10710,14 +10706,13 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Deepen Your Study Strategies",
       "links": [
         {
-          "label": "Active Recall Techniques",
-          "href": "https://www.cogniguide.app/flashcards/active-recall",
-          "description": "Learn the cognitive science behind why testing yourself is the best way to learn."
+          "label": "AI Countries Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/countries",
+          "description": "Instantly create countries flashcards from any PDF for mastering geography facts."
         },
         {
-          "label": "Optimizing Study Timelines",
-          "href": "https://www.cogniguide.app/flashcards/study-scheduling",
-          "description": "Understand how setting target dates improves long-term knowledge retention."
+          "label": "Capitals",
+          "href": "https://www.cogniguide.app/flashcards/capitals"
         }
       ]
     },
@@ -10920,14 +10915,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Enhance Your Study Strategy",
       "links": [
         {
-          "label": "Active Recall Techniques",
-          "href": "https://www.cogniguide.app/flashcards/active-recall",
-          "description": "Deep dive into how active retrieval solidifies learning better than passive review."
+          "label": "English Vocabulary Cards",
+          "href": "https://www.cogniguide.app/flashcards/english-vocabulary",
+          "description": "Create smart English vocabulary cards instantly to master words faster."
         },
         {
-          "label": "Mastering Spaced Repetition",
-          "href": "https://www.cogniguide.app/flashcards/spaced-repetition",
-          "description": "Learn the cognitive science behind optimal review timing for long-term memory."
+          "label": "AI English as a Second Language",
+          "href": "https://www.cogniguide.app/flashcards/esl",
+          "description": "Create powerful ESL flashcards from PDFs instantly for language learners."
         }
       ]
     },
@@ -11129,14 +11124,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Expand Your Study Toolkit",
       "links": [
         {
-          "label": "AI Flashcards for Definitions",
-          "href": "https://www.cogniguide.app/flashcards/definitions",
-          "description": "Turn complex terminology and glossaries into high-retention study sets."
+          "label": "Emotions Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/emotions",
+          "description": "Instantly create emotions flashcards from any document for social learning."
         },
         {
-          "label": "Document Study Workflow",
-          "href": "https://www.cogniguide.app/workflow/document-study",
-          "description": "Learn strategies for integrating AI extraction into your overall academic schedule."
+          "label": "AI Emotion Cards",
+          "href": "https://www.cogniguide.app/flashcards/feeling",
+          "description": "Generate feeling flashcards from any PDF instantly to study psychology."
         }
       ]
     },
@@ -11334,14 +11329,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Enhance Your Study Strategy",
       "links": [
         {
-          "label": "Active Recall Techniques Guide",
-          "href": "https://www.cogniguide.app/blog/active-recall-guide",
-          "description": "Deep dive into the cognitive science behind why testing yourself is better than rereading notes."
+          "label": "Flashcard Maker Download Alt",
+          "href": "https://www.cogniguide.app/flashcards/maker-download",
+          "description": "An instant online tool, a smarter alternative to a flashcard maker download."
         },
         {
-          "label": "Mastering Spaced Repetition",
-          "href": "https://www.cogniguide.app/blog/spaced-repetition-explained",
-          "description": "Understand the optimal timing and algorithms used to maximize memory consolidation over time."
+          "label": "AI PDF to Cards Converter",
+          "href": "https://www.cogniguide.app/flashcards/flash-cards-pdf-free",
+          "description": "Create smart flash cards from your PDF for free for any subject."
         }
       ]
     },
@@ -11544,14 +11539,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Boost Your Study Technique",
       "links": [
         {
-          "label": "Mastering Active Recall",
-          "href": "https://www.cogniguide.app/flashcards/active-recall-techniques",
-          "description": "Deep dive into the cognitive benefits of testing yourself versus simple re-reading."
+          "label": "Goodnotes to Flash Cards",
+          "href": "https://www.cogniguide.app/flashcards/goodnotes",
+          "description": "Instantly turn Goodnotes material into smart AI-powered study flash cards."
         },
         {
-          "label": "Advanced Spaced Repetition",
-          "href": "https://www.cogniguide.app/flashcards/spaced-repetition-scheduling",
-          "description": "Learn how scheduling intervals maximize memory consolidation for long-term learning."
+          "label": "AI One Note Converter",
+          "href": "https://www.cogniguide.app/flashcards/one-note",
+          "description": "Transform your One Note pages into flash cards instantly with AI."
         }
       ]
     },
@@ -11754,14 +11749,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore More Study Tools",
       "links": [
         {
-          "label": "AI Flashcards for Medical School",
-          "href": "https://www.cogniguide.app/flashcards/medical-school",
-          "description": "See how complex anatomical and clinical information is turned into recall prompts."
+          "label": "SAT Vocabulary Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/sat-vocabulary",
+          "description": "Generate SAT vocabulary flashcards from word lists to accelerate exam mastery."
         },
         {
-          "label": "Document Summarization Tools",
-          "href": "https://www.cogniguide.app/summarization",
-          "description": "Learn how to condense long readings into key study notes instantly."
+          "label": "AI GMAT Prep",
+          "href": "https://www.cogniguide.app/flashcards/gmat",
+          "description": "Create AI-powered GMAT flashcards from any document for business school prep."
         }
       ]
     },
@@ -11960,14 +11955,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore Other Study Methods",
       "links": [
         {
-          "label": "Active Recall Techniques",
-          "href": "https://www.cogniguide.app/flashcards/active-recall",
-          "description": "Learn how testing yourself dramatically improves study outcomes."
+          "label": "Winter Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/winter",
+          "description": "Create powerful winter flashcards from any PDF for seasonal learning."
         },
         {
-          "label": "Document Study Tools",
-          "href": "https://www.cogniguide.app/flashcards/document-conversion",
-          "description": "Discover all the ways to convert lecture notes and textbooks into study aids."
+          "label": "AI Seasonal Vocabulary",
+          "href": "https://www.cogniguide.app/flashcards/summer",
+          "description": "Generate custom summer flashcards from any document for themed learning."
         }
       ]
     },
@@ -12165,14 +12160,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Expand Your Study Toolkit",
       "links": [
         {
-          "label": "Chemistry Flashcards Generator",
-          "href": "https://www.cogniguide.app/flashcards/chemistry",
-          "description": "Convert complex chemical structures and reaction pathways into reviewable flashcards."
+          "label": "Food Vocabulary Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/food-vocabulary",
+          "description": "Generate food vocabulary flashcards from any document for culinary studies."
         },
         {
-          "label": "Biology Study Aids",
-          "href": "https://www.cogniguide.app/flashcards/biology",
-          "description": "Automate the creation of detailed concept cards from dense biological research papers."
+          "label": "AI Produce Study Cards",
+          "href": "https://www.cogniguide.app/flashcards/fruits-vegetables",
+          "description": "Generate smart flashcards from your fruits and vegetables PDF for study."
         }
       ]
     },
@@ -12376,14 +12371,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Further Enhance Your Study Strategy",
       "links": [
         {
-          "label": "Active Recall Techniques Guide",
-          "href": "https://www.cogniguide.app/blog/active-recall-techniques",
-          "description": "Learn proven methods to maximize memory retention during study sessions."
+          "label": "Class 10 Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/class-10",
+          "description": "Generate instant Class 10 flashcards from any document for exam success."
         },
         {
-          "label": "Science Behind Spaced Repetition",
-          "href": "https://www.cogniguide.app/blog/spaced-repetition-benefits",
-          "description": "Understand the cognitive science that makes our scheduling feature effective."
+          "label": "AI NCERT Study Aids",
+          "href": "https://www.cogniguide.app/flashcards/ncert",
+          "description": "Instantly generate personalized NCERT flashcards for Indian curriculum studies."
         }
       ]
     },
@@ -12585,14 +12580,13 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore More Study Techniques",
       "links": [
         {
-          "label": "Active Recall Strategies",
-          "href": "https://www.cogniguide.app/flashcards/active-recall",
-          "description": "Deep dive into why testing yourself is superior to passive rereading for memory formation."
+          "label": "Fruit Flashcards from PDF",
+          "href": "https://www.cogniguide.app/flashcards/fruits",
+          "description": "Generate smart flashcards from fruit PDFs instantly for botanical learning."
         },
         {
-          "label": "Mastering Document Uploads",
-          "href": "https://www.cogniguide.app/flashcards/document-processing",
-          "description": "Tips and best practices for ensuring your PDFs and presentations convert perfectly into study material."
+          "label": "Vegetables",
+          "href": "https://www.cogniguide.app/flashcards/vegetables"
         }
       ]
     },
@@ -12790,14 +12784,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Enhance Your Study Toolkit",
       "links": [
         {
-          "label": "Anatomy Flashcards",
-          "href": "https://www.cogniguide.app/flashcards/anatomy",
-          "description": "Convert anatomy atlases and notes into effective review sets for spatial memory."
+          "label": "AI Biology Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/biology",
+          "description": "Create smart, free biology flashcards from any document for your class."
         },
         {
-          "label": "Medical Terminology Practice",
-          "href": "https://www.cogniguide.app/flashcards/medical-terminology",
-          "description": "Create powerful decks focused solely on mastering complex medical prefixes, suffixes, and roots."
+          "label": "AI Lange Pathology Decks",
+          "href": "https://www.cogniguide.app/flashcards/lange-pathology",
+          "description": "Instantly create Lange Pathology flash cards from any source material."
         }
       ]
     },
@@ -13000,14 +12994,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore Other Study Tools",
       "links": [
         {
-          "label": "Convert Lecture Notes to Flashcards",
-          "href": "https://www.cogniguide.app/flashcards/lecture-notes",
-          "description": "Transform lengthy, unstructured lecture recordings and transcriptions into actionable review material."
+          "label": "Phrasal Verbs Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/phrasal-verbs",
+          "description": "Generate flashcards for phrasal verbs instantly from PDFs for language fluency."
         },
         {
-          "label": "PowerPoint to Study Guides",
-          "href": "https://www.cogniguide.app/study-guides",
-          "description": "Create structured study guides from presentation decks optimized for quick scanning and comprehension."
+          "label": "AI Vocabulary Builder",
+          "href": "https://www.cogniguide.app/flashcards/english-vocabulary",
+          "description": "Create smart English vocabulary cards instantly to master words faster."
         }
       ]
     },
@@ -13211,14 +13205,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore More Study Strategies",
       "links": [
         {
-          "label": "Active Recall Techniques",
-          "href": "https://www.cogniguide.app/flashcards/active-recall",
-          "description": "Deep dive into why testing yourself is superior to passive review."
+          "label": "AI Alphabet Flash Cards",
+          "href": "https://www.cogniguide.app/flashcards/alphabet",
+          "description": "Generate free alphabet flash cards from any document for learning letters."
         },
         {
-          "label": "Advanced Spaced Repetition",
-          "href": "https://www.cogniguide.app/flashcards/scheduling",
-          "description": "Understand the science behind optimal review timing for long-term memory."
+          "label": "AI Alphabet Learning",
+          "href": "https://www.cogniguide.app/flashcards/lowercase-letter",
+          "description": "Create AI flashcards for lowercase letters from any document or PDF."
         }
       ]
     },
@@ -13420,14 +13414,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Deepen Your Study Strategy",
       "links": [
         {
-          "label": "Active Recall Techniques Explained",
-          "href": "https://www.cogniguide.app/flashcards/active-recall-study-methods",
-          "description": "Learn the science behind why testing yourself is superior to rereading material."
+          "label": "PDF to Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/pdf-flashcards",
+          "description": "Convert any PDF to flashcards instantly with AI for content mastery."
         },
         {
-          "label": "Optimizing Spaced Repetition",
-          "href": "https://www.cogniguide.app/flashcards/spaced-repetition-schedule",
-          "description": "Understand how personalized scheduling maximizes memory consolidation."
+          "label": "AI Notecard Generator",
+          "href": "https://www.cogniguide.app/flashcards/free-notecards",
+          "description": "Generate powerful, free notecards from any document for smarter studying."
         }
       ]
     },
@@ -13630,14 +13624,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore Other Study Strategies",
       "links": [
         {
-          "label": "Active Recall Techniques",
-          "href": "https://www.cogniguide.app/flashcards/active-recall-techniques",
-          "description": "Deep dive into the science behind testing yourself for better memory encoding."
+          "label": "AI Flashcard Maker",
+          "href": "https://www.cogniguide.app/flashcards/maker",
+          "description": "The ultimate AI flashcard maker for converting complex material into cards."
         },
         {
-          "label": "Spaced Repetition Mastery",
-          "href": "https://www.cogniguide.app/flashcards/spaced-repetition-mastery",
-          "description": "Learn how to time your reviews perfectly using proven learning algorithms."
+          "label": "Online Digital Study Decks",
+          "href": "https://www.cogniguide.app/flashcards/digital-maker",
+          "description": "Create intelligent digital flashcard decks from any file for modern studying."
         }
       ]
     },
@@ -13834,14 +13828,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Deepen Your Study Strategy",
       "links": [
         {
-          "label": "AI Biology Flashcards",
-          "href": "https://www.cogniguide.app/flashcards/biology",
-          "description": "See how AI handles complex biological diagrams and terminology conversion."
+          "label": "Fruits and Vegetables Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/fruits-vegetables",
+          "description": "Generate smart flashcards from your fruits and vegetables PDF for study."
         },
         {
-          "label": "Understanding Active Recall",
-          "href": "https://www.cogniguide.app/study-techniques",
-          "description": "Read more about the proven science behind testing yourself for better memory retention."
+          "label": "AI Food Vocabulary Cards",
+          "href": "https://www.cogniguide.app/flashcards/food",
+          "description": "Instantly create food flashcards from your PDFs for culinary or language study."
         }
       ]
     },
@@ -14045,14 +14039,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Expand Your Study Toolkit",
       "links": [
         {
-          "label": "AI Flashcards for Concepts",
-          "href": "https://www.cogniguide.app/flashcards/concepts",
-          "description": "Learn how to instantly turn complex definitions and theoretical summaries into powerful study cards."
+          "label": "AI Division Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/division",
+          "description": "Create smart division flashcards from any PDF for mastering math facts."
         },
         {
-          "label": "Mastering Active Recall",
-          "href": "https://www.cogniguide.app/strategies/active-recall",
-          "description": "Deep dive into proven study techniques that enhance memory encoding and retrieval for long-term success."
+          "label": "Math Problem Generator",
+          "href": "https://www.cogniguide.app/flashcards/math",
+          "description": "Create instant math flash cards from your study materials for any topic."
         }
       ]
     },
@@ -14250,14 +14244,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore Other Study Tools",
       "links": [
         {
-          "label": "Chemistry Flashcards Generator",
-          "href": "https://www.cogniguide.app/flashcards/chemistry",
-          "description": "Convert complex chemical formulae and reaction pathways directly from lab reports or textbooks."
+          "label": "Phoneme Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/phoneme",
+          "description": "Create instant phoneme flashcards from your study material for linguistic practice."
         },
         {
-          "label": "History Study Workflow",
-          "href": "https://www.cogniguide.app/flashcards/history",
-          "description": "Streamline memorization of dates, figures, and treaties using AI-driven review schedules."
+          "label": "AI Phonics Cards",
+          "href": "https://www.cogniguide.app/flashcards/phonogram",
+          "description": "Create smart phonogram flash cards from any document for reading."
         }
       ]
     },
@@ -14459,14 +14453,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore Other Study Resources",
       "links": [
         {
-          "label": "Calculus Flashcards Generator",
-          "href": "https://www.cogniguide.app/flashcards/calculus",
-          "description": "Convert complex calculus notes and derivative examples into structured learning cards."
+          "label": "AI Math Flash Cards",
+          "href": "https://www.cogniguide.app/flashcards/math",
+          "description": "Create instant math flash cards from your study materials for any topic."
         },
         {
-          "label": "Document Upload Study Tools",
-          "href": "https://www.cogniguide.app/features/document-upload",
-          "description": "Learn more about how our AI extracts knowledge from various document types beyond standard textbooks."
+          "label": "AI Math Fraction Helper",
+          "href": "https://www.cogniguide.app/flashcards/fraction",
+          "description": "Generate instant fraction flash cards from any PDF for math concepts."
         }
       ]
     },
@@ -14664,14 +14658,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Further Learning Resources",
       "links": [
         {
-          "label": "AI Flashcards for Medical Terminology",
-          "href": "https://www.cogniguide.app/flashcards/medical-terminology",
-          "description": "See how the tool handles complex, specialized vocabulary extraction."
+          "label": "Idioms Flashcards from PDFs",
+          "href": "https://www.cogniguide.app/flashcards/idioms",
+          "description": "Instantly generate idioms flashcards from your documents to master expressions."
         },
         {
-          "label": "Optimizing Study Workflow",
-          "href": "https://www.cogniguide.app/flashcards/study-workflow",
-          "description": "Tips and guides on integrating spaced repetition into your daily routine."
+          "label": "AI Verb Conjugation Cards",
+          "href": "https://www.cogniguide.app/flashcards/english-verbs",
+          "description": "Generate English verbs flashcards instantly for mastering grammar and conjugation."
         }
       ]
     },
@@ -14873,14 +14867,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore Other Study Tools",
       "links": [
         {
-          "label": "AI Science Notes Summarizer",
-          "href": "https://www.cogniguide.app/flashcards/science-notes",
-          "description": "Convert complex lecture notes into concise summaries and testable flashcards automatically."
+          "label": "Zoo Phonics Flash Cards",
+          "href": "https://www.cogniguide.app/flashcards/zoo-phonics",
+          "description": "Create Zoo Phonics flash cards from your learning materials with AI."
         },
         {
-          "label": "Document Upload for Exam Prep",
-          "href": "https://www.cogniguide.app/flashcards/exam-prep",
-          "description": "See how to use any textbook chapter to instantly create effective study materials for upcoming exams."
+          "label": "AI CVC Word Family Cards",
+          "href": "https://www.cogniguide.app/flashcards/cvc",
+          "description": "Convert any CVC PDF to smart flash cards for mastering phonics."
         }
       ]
     },
@@ -15075,14 +15069,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore More Study Techniques",
       "links": [
         {
-          "label": "Active Recall Strategies",
-          "href": "https://www.cogniguide.app/flashcards/active-recall",
-          "description": "Learn how to maximize memory retrieval using focused questioning."
+          "label": "GRE Magoosh Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/gre-magoosh",
+          "description": "Instantly generate AI flashcards from GRE Magoosh materials for smarter prep."
         },
         {
-          "label": "Optimizing Study Schedules",
-          "href": "https://www.cogniguide.app/flashcards/study-scheduling",
-          "description": "Deep dive into timing and rhythm for better long-term memory consolidation."
+          "label": "AI GRE Vocab Prep",
+          "href": "https://www.cogniguide.app/flashcards/kaplan-gre-vocabulary",
+          "description": "Generate Kaplan GRE vocabulary flashcards from your PDF instantly."
         }
       ]
     },
@@ -15281,14 +15275,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Enhance Your Study Strategy",
       "links": [
         {
-          "label": "Active Recall Techniques",
-          "href": "https://www.cogniguide.app/flashcards/active-recall",
-          "description": "Learn how to maximize retention by forcing your brain to retrieve information."
+          "label": "AI Quizlet Flashcard Creator",
+          "href": "https://www.cogniguide.app/flashcards/create-quizlet",
+          "description": "Ditch manual entry and create smarter Quizlet-style decks from documents instantly."
         },
         {
-          "label": "Best Practices for Spaced Repetition",
-          "href": "https://www.cogniguide.app/flashcards/spaced-repetition-guide",
-          "description": "Discover the science behind optimized review intervals for permanent learning."
+          "label": "Smarter Quizlet Set Builder",
+          "href": "https://www.cogniguide.app/flashcards/quizlet-make",
+          "description": "Bypass manual entry: make your own Quizlet flashcards the smarter way."
         }
       ]
     },
@@ -15486,14 +15480,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Further Your Study Optimization",
       "links": [
         {
-          "label": "AI Flashcards for Technical Documents",
-          "href": "https://www.cogniguide.app/flashcards/technical-study",
-          "description": "See how to convert complex technical manuals into actionable study guides."
+          "label": "AI Telugu Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/telugu",
+          "description": "Generate Telugu flash cards from your PDF and documents instantly."
         },
         {
-          "label": "Mastering Active Recall Techniques",
-          "href": "https://www.cogniguide.app/learning/active-recall",
-          "description": "Learn the cognitive science behind testing yourself for better information retrieval."
+          "label": "AI Hindi Vowel Cards",
+          "href": "https://www.cogniguide.app/flashcards/hindi-swar",
+          "description": "Create custom Hindi Swar flashcards from your study material."
         }
       ]
     },
@@ -15691,14 +15685,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore Other Study Resources",
       "links": [
         {
-          "label": "AI Flashcards for Medical School",
-          "href": "https://www.cogniguide.app/flashcards/medical",
-          "description": "See how medical students convert dense textbooks into active recall practice sets."
+          "label": "SIE Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/sie",
+          "description": "Convert your SIE study materials into AI flashcards for exam mastery."
         },
         {
-          "label": "Study Strategy Guides",
-          "href": "https://www.cogniguide.app/blog/study-strategy",
-          "description": "Find articles detailing best practices for active recall and long-term memory encoding."
+          "label": "AI CompTIA Prep",
+          "href": "https://www.cogniguide.app/flashcards/comptia",
+          "description": "Generate CompTIA A+ flashcards from any PDF instantly for IT certification."
         }
       ]
     },
@@ -15897,14 +15891,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Optimize Your Entire Study Workflow",
       "links": [
         {
-          "label": "Active Recall Techniques Guide",
-          "href": "https://www.cogniguide.app/flashcards/active-recall-techniques",
-          "description": "Learn how active recall accelerates knowledge retention compared to passive reading."
+          "label": "Create Anki Cards Quickly",
+          "href": "https://www.cogniguide.app/flashcards/create-anki-quickly",
+          "description": "Instantly create Anki cards from any document to streamline your study workflow."
         },
         {
-          "label": "Spaced Repetition Strategy",
-          "href": "https://www.cogniguide.app/flashcards/spaced-repetition-strategy",
-          "description": "Deep dive into the optimal schedules for long-term memory encoding."
+          "label": "Anki Decks from Files",
+          "href": "https://www.cogniguide.app/flashcards/anki-deck-generator",
+          "description": "The ultimate AI Anki deck generator for complex material; just upload."
         }
       ]
     },
@@ -16103,14 +16097,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Expand Your Study Toolkit",
       "links": [
         {
-          "label": "Active Recall Techniques Guide",
-          "href": "https://www.cogniguide.app/study-guides/active-recall-techniques",
-          "description": "Learn how to maximize the effectiveness of the flashcards generated by our tool."
+          "label": "GoodNotes 5 to Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/goodnotes-5",
+          "description": "Convert GoodNotes 5 notes into active recall flashcards instantly."
         },
         {
-          "label": "Mastering Spaced Repetition",
-          "href": "https://www.cogniguide.app/study-guides/spaced-repetition-mastery",
-          "description": "In-depth look at the science behind optimized study scheduling."
+          "label": "AI One Note Converter",
+          "href": "https://www.cogniguide.app/flashcards/one-note",
+          "description": "Transform your One Note pages into flash cards instantly with AI."
         }
       ]
     },
@@ -16309,14 +16303,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Expand Your Study Toolkit",
       "links": [
         {
-          "label": "Study Guide Generator",
-          "href": "https://www.cogniguide.app/flashcards/study-guide-generator",
-          "description": "Convert lecture notes into comprehensive study guides instantly."
+          "label": "SAT Vocabulary Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/sat-vocabulary",
+          "description": "Generate SAT vocabulary flashcards from word lists to accelerate exam mastery."
         },
         {
-          "label": "Active Recall Techniques",
-          "href": "https://www.cogniguide.app/flashcards/active-recall-techniques",
-          "description": "Learn how our AI enforces active recall for better memory encoding."
+          "label": "Instant Vocabulary Sets",
+          "href": "https://www.cogniguide.app/flashcards/vocab-maker",
+          "description": "The fastest AI vocab flashcard maker online for maximizing retention."
         }
       ]
     },
@@ -16518,14 +16512,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Expand Your Study Toolkit",
       "links": [
         {
-          "label": "AI Study Guide Generator",
-          "href": "https://www.cogniguide.app/flashcards/ai-study-guide-generator",
-          "description": "Transform lecture notes into structured study guides rather than just Q&A formats."
+          "label": "MedStudy Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/medstudy",
+          "description": "Create powerful MedStudy flashcards from any PDF or document instantly."
         },
         {
-          "label": "Chemistry Formula Flashcards",
-          "href": "https://www.cogniguide.app/flashcards/chemistry-formula-flashcards",
-          "description": "See how we apply the same extraction technology to subjects requiring memorization of symbols and equations."
+          "label": "UWorld PDF to Cards",
+          "href": "https://www.cogniguide.app/flashcards/uworld",
+          "description": "Create UWorld flashcards from your PDF notes instantly with AI."
         }
       ]
     },
@@ -16729,14 +16723,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Expand Your Study Toolkit",
       "links": [
         {
-          "label": "AI Flashcards for Medical Terminology",
-          "href": "https://www.cogniguide.app/flashcards/medical-terminology",
-          "description": "See how specialized fields benefit from automated card generation."
+          "label": "English Vocabulary Cards",
+          "href": "https://www.cogniguide.app/flashcards/english-vocabulary",
+          "description": "Create smart English vocabulary cards instantly to master words faster."
         },
         {
-          "label": "Mastering Active Recall Techniques",
-          "href": "https://www.cogniguide.app/study-techniques/active-recall",
-          "description": "Learn the cognitive science behind why flashcards are superior to passive reading."
+          "label": "Instant Vocabulary Sets",
+          "href": "https://www.cogniguide.app/flashcards/vocab-maker",
+          "description": "The fastest AI vocab flashcard maker online for maximizing retention."
         }
       ]
     },
@@ -16938,14 +16932,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore Other Study Tools",
       "links": [
         {
-          "label": "AI Chemistry Flashcard Generator",
-          "href": "https://www.cogniguide.app/flashcards/chemistry",
-          "description": "Convert complex chemical diagrams and formulas into active recall cards."
+          "label": "AI Cantonese Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/cantonese",
+          "description": "Create powerful Cantonese flashcards from any document to master new vocabulary."
         },
         {
-          "label": "Study Planner Optimization",
-          "href": "https://www.cogniguide.app/study-planner",
-          "description": "Tools to help integrate your study habits with cognitive science principles."
+          "label": "Spanish Vocabulary Generator",
+          "href": "https://www.cogniguide.app/flashcards/spanish",
+          "description": "Create powerful Spanish vocabulary flash cards automatically from your documents."
         }
       ]
     },
@@ -17147,14 +17141,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore More Study Optimization Tools",
       "links": [
         {
-          "label": "AI Course Notes Summarizer",
-          "href": "https://www.cogniguide.app/summarization",
-          "description": "Turn long lecture notes into concise summaries for quick reference."
+          "label": "GRE Magoosh Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/gre-magoosh",
+          "description": "Instantly generate AI flashcards from GRE Magoosh materials for smarter prep."
         },
         {
-          "label": "Understanding Active Recall",
-          "href": "https://www.cogniguide.app/learning-science",
-          "description": "Learn the cognitive science principles that make flashcards effective."
+          "label": "AI Magoosh Vocab Builder",
+          "href": "https://www.cogniguide.app/flashcards/magoosh-vocabulary",
+          "description": "Generate smart Magoosh vocabulary flashcards instantly from any study guide."
         }
       ]
     },
@@ -17352,14 +17346,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Enhance Your Cognitive Study Techniques",
       "links": [
         {
-          "label": "Active Recall Strategies",
-          "href": "https://www.cogniguide.app/flashcards/active-recall",
-          "description": "Learn how testing yourself strengthens memory pathways more effectively than re-reading."
+          "label": "AI Medical Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/anki-medical",
+          "description": "Ditch manual decks: AI flashcards for Anki medical prep are faster."
         },
         {
-          "label": "Spaced Repetition Algorithms",
-          "href": "https://www.cogniguide.app/flashcards/spaced-repetition",
-          "description": "Explore the science behind optimized review timing for long-term knowledge retention."
+          "label": "AI Lange Pathology Decks",
+          "href": "https://www.cogniguide.app/flashcards/lange-pathology",
+          "description": "Instantly create Lange Pathology flash cards from any source material."
         }
       ]
     },
@@ -17561,14 +17555,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore Related Study Techniques",
       "links": [
         {
-          "label": "Active Recall Techniques",
-          "href": "https://www.cogniguide.app/flashcards/active-recall-strategies",
-          "description": "Learn how to maximize retention by forcing memory retrieval instead of passive review."
+          "label": "Flashcards for Study Notes",
+          "href": "https://www.cogniguide.app/flashcards/study-notes",
+          "description": "Generate smart flashcards from your study notes instantly for active recall."
         },
         {
-          "label": "Optimizing Spaced Repetition",
-          "href": "https://www.cogniguide.app/flashcards/spaced-repetition-algorithms",
-          "description": "Deep dive into the science behind scheduling reviews for long-term memory formation."
+          "label": "Notes to Study Sets",
+          "href": "https://www.cogniguide.app/flashcards/revision-note",
+          "description": "Transform any revision note into smart flashcards instantly for exam prep."
         }
       ]
     },
@@ -17766,14 +17760,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "More Ways to Optimize Your Learning Workflow",
       "links": [
         {
-          "label": "Spaced Repetition Algorithms",
-          "href": "https://www.cogniguide.app/flashcards/spaced-repetition",
-          "description": "Learn the cognitive science behind optimally timed reviews."
+          "label": "MedStudy Internal Medicine Cards",
+          "href": "https://www.cogniguide.app/flashcards/medstudy-internal-medicine",
+          "description": "Generate instant AI flashcards from your MedStudy internal medicine files."
         },
         {
-          "label": "Active Recall Techniques",
-          "href": "https://www.cogniguide.app/flashcards/active-recall",
-          "description": "Discover how challenging your memory boosts long-term knowledge retention."
+          "label": "AI Peds Board Prep",
+          "href": "https://www.cogniguide.app/flashcards/medstudy-pediatrics",
+          "description": "Convert your MedStudy Pediatrics PDFs to smart flashcards for boards."
         }
       ]
     },
@@ -17975,14 +17969,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Expand Your Study Toolkit",
       "links": [
         {
-          "label": "Medical Terminology Flashcards",
-          "href": "https://www.cogniguide.app/flashcards/medical-terminology",
-          "description": "Convert complex anatomical texts into precise, test-ready recall cards."
+          "label": "Food Flashcards from PDFs",
+          "href": "https://www.cogniguide.app/flashcards/food",
+          "description": "Instantly create food flashcards from your PDFs for culinary or language study."
         },
         {
-          "label": "History Notes Summarizer",
-          "href": "https://www.cogniguide.app/summarizer/history-notes",
-          "description": "Turn lengthy historical essays into concise summaries for faster review."
+          "label": "AI Nutrition Study Cards",
+          "href": "https://www.cogniguide.app/flashcards/healthy-food",
+          "description": "Create healthy food flashcards from any document instantly for nutrition."
         }
       ]
     },
@@ -18180,14 +18174,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Advance Your Study Strategy",
       "links": [
         {
-          "label": "Master Active Recall Techniques",
-          "href": "https://www.cogniguide.app/flashcards/active-recall",
-          "description": "Deep dive into why testing yourself beats passive reading for retention."
+          "label": "AI Online Flashcard Maker",
+          "href": "https://www.cogniguide.app/flashcards/online-maker",
+          "description": "Generate study decks with an AI online flashcard maker from any document."
         },
         {
-          "label": "Understanding Spaced Repetition",
-          "href": "https://www.cogniguide.app/flashcards/spaced-repetition-guide",
-          "description": "Learn the science behind optimal study interval timing for long-term memory."
+          "label": "AI Online Card Generator",
+          "href": "https://www.cogniguide.app/flashcards/create-online",
+          "description": "Instantly create flashcards online free from any document with AI."
         }
       ]
     },
@@ -18390,14 +18384,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore Other High-Yield Study Resources",
       "links": [
         {
-          "label": "AI Flashcards for Contract Law Principles",
-          "href": "https://www.cogniguide.app/flashcards/contract-law-principles",
-          "description": "Generate study materials automatically from detailed contract texts and case summaries."
+          "label": "SIE Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/sie",
+          "description": "Convert your SIE study materials into AI flashcards for exam mastery."
         },
         {
-          "label": "Mastering Financial Terminology with AI",
-          "href": "https://www.cogniguide.app/flashcards/financial-terminology",
-          "description": "Create rapid recall sets for complex financial definitions extracted from reports or textbooks."
+          "label": "AI GED Test Prep",
+          "href": "https://www.cogniguide.app/flashcards/ged",
+          "description": "Create unlimited GED flashcards from any document for test preparation."
         }
       ]
     },
@@ -18595,14 +18589,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Master Active Recall Techniques",
       "links": [
         {
-          "label": "Best Practices for Active Recall",
-          "href": "https://www.cogniguide.app/flashcards/active-recall-guide",
-          "description": "Learn the cognitive science behind why testing yourself is the most effective way to learn."
+          "label": "AI Flashcard Maker",
+          "href": "https://www.cogniguide.app/flashcards/maker",
+          "description": "The ultimate AI flashcard maker for converting complex material into cards."
         },
         {
-          "label": "Understanding Spaced Repetition Systems",
-          "href": "https://www.cogniguide.app/flashcards/spaced-repetition-guide",
-          "description": "Explore how scientifically timed reviews prevent the forgetting curve from impacting your performance."
+          "label": "Instant Study Decks",
+          "href": "https://www.cogniguide.app/flashcards/creator",
+          "description": "The fastest AI flashcard creator for serious students using any document."
         }
       ]
     },
@@ -18800,14 +18794,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Related Study Tools",
       "links": [
         {
-          "label": "Vocabulary Flashcards Generator",
-          "href": "https://www.cogniguide.app/flashcards/vocabulary-builder",
-          "description": "Convert vocabulary lists or texts into powerful flashcards focused on word meaning and usage."
+          "label": "Irregular Verbs Flash Cards",
+          "href": "https://www.cogniguide.app/flashcards/irregular-verbs",
+          "description": "Generate smart flash cards from an irregular verbs PDF for grammar practice."
         },
         {
-          "label": "History Date Flashcards",
-          "href": "https://www.cogniguide.app/flashcards/history-dates",
-          "description": "Easily turn timelines and chronological data from readings into reviewable active recall cards."
+          "label": "AI English Verb Cards",
+          "href": "https://www.cogniguide.app/flashcards/verbs-english",
+          "description": "Generate AI flashcards for verbs in English from your PDFs."
         }
       ]
     },
@@ -19009,14 +19003,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Deepen Your Grammar and Study Efficiency",
       "links": [
         {
-          "label": "AI Concept Map Generator",
-          "href": "https://www.cogniguide.app/flashcards/concept-mapping",
-          "description": "Transform complex topics into visual outlines before generating structured study aids."
+          "label": "Personal Pronouns Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/personal-pronouns",
+          "description": "Create personal pronouns flashcards instantly from any document."
         },
         {
-          "label": "Active Recall Study Techniques",
-          "href": "https://www.cogniguide.app/flashcards/active-recall-guide",
-          "description": "Learn how to maximize your study time using retrieval practice methods."
+          "label": "Grammar Pronoun Cards",
+          "href": "https://www.cogniguide.app/flashcards/pronouns",
+          "description": "Create instant pronouns flashcards from your study materials for grammar."
         }
       ]
     },
@@ -19219,14 +19213,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Deepen Your Study Strategy",
       "links": [
         {
-          "label": "Active Recall Techniques Guide",
-          "href": "https://www.cogniguide.app/flashcards/active-recall-guide",
-          "description": "Learn the science behind testing yourself for better memory encoding."
+          "label": "AI Quizlet Flashcard Creator",
+          "href": "https://www.cogniguide.app/flashcards/create-quizlet",
+          "description": "Ditch manual entry and create smarter Quizlet-style decks from documents instantly."
         },
         {
-          "label": "Understanding Spaced Repetition",
-          "href": "https://www.cogniguide.app/flashcards/spaced-repetition-explained",
-          "description": "Discover how optimal scheduling beats brute-force memorization every time."
+          "label": "AI PDF Converter",
+          "href": "https://www.cogniguide.app/flashcards/pdf-flashcards",
+          "description": "Convert any PDF to flashcards instantly with AI for content mastery."
         }
       ]
     },
@@ -19429,14 +19423,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore Other Study Resources",
       "links": [
         {
-          "label": "Active Recall Techniques",
-          "href": "https://www.cogniguide.app/flashcards/active-recall",
-          "description": "Learn how active recall maximizes memory consolidation compared to passive review."
+          "label": "Possessive Pronouns Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/possessive-pronouns",
+          "description": "Generate possessive pronouns flashcards instantly for mastering English grammar."
         },
         {
-          "label": "Spaced Repetition Algorithms",
-          "href": "https://www.cogniguide.app/flashcards/spaced-repetition",
-          "description": "Discover the cognitive science behind perfectly timed study reviews."
+          "label": "Grammar Pronoun Cards",
+          "href": "https://www.cogniguide.app/flashcards/pronouns",
+          "description": "Create instant pronouns flashcards from your study materials for grammar."
         }
       ]
     },
@@ -19639,14 +19633,13 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore More Study Resources",
       "links": [
         {
-          "label": "Advanced Active Recall Techniques",
-          "href": "https://www.cogniguide.app/flashcards/active-recall",
-          "description": "Deep dive into proven methods for testing memory and enhancing learning retention."
+          "label": "Everybody Up Starter Cards",
+          "href": "https://www.cogniguide.app/flashcards/everybody-up-starter",
+          "description": "Create instant AI flashcards for Everybody Up Starter curriculum."
         },
         {
-          "label": "Maximizing Exam Preparation Schedules",
-          "href": "https://www.cogniguide.app/flashcards/study-scheduling",
-          "description": "Learn how to use time management strategies alongside spaced repetition for optimal results."
+          "label": "Textbook Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/textbook-flashcards"
         }
       ]
     },
@@ -19849,14 +19842,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore Other Study Resources",
       "links": [
         {
-          "label": "Nutrition Science Flashcards",
-          "href": "https://www.cogniguide.app/flashcards/nutrition-science",
-          "description": "Convert your biochemistry readings into high-efficiency study sets."
+          "label": "Food Flashcards from PDFs",
+          "href": "https://www.cogniguide.app/flashcards/food",
+          "description": "Instantly create food flashcards from your PDFs for culinary or language study."
         },
         {
-          "label": "Hospitality Management Guides",
-          "href": "https://www.cogniguide.app/guides/hospitality-management",
-          "description": "Find workflows and best practices for administrative study materials."
+          "label": "AI Produce Study Cards",
+          "href": "https://www.cogniguide.app/flashcards/fruits-vegetables",
+          "description": "Generate smart flashcards from your fruits and vegetables PDF for study."
         }
       ]
     },
@@ -20058,14 +20051,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Deepen Your Study Strategies",
       "links": [
         {
-          "label": "AI Study Planner Tools",
-          "href": "https://www.cogniguide.app/flashcards/study-planner",
-          "description": "Learn how to set actionable study goals based on your deadlines."
+          "label": "Months of the Year Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/months-year",
+          "description": "Generate smart months of the year flashcards from any PDF document."
         },
         {
-          "label": "Active Recall Techniques",
-          "href": "https://www.cogniguide.app/flashcards/active-recall",
-          "description": "Understand the cognitive science behind effective testing and memory encoding."
+          "label": "AI Calendar Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/days-months",
+          "description": "Create days and months flashcards from any document for calendar mastery."
         }
       ]
     },
@@ -20267,14 +20260,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Master Study Techniques",
       "links": [
         {
-          "label": "Active Recall Study Guides",
-          "href": "https://www.cogniguide.app/flashcards/active-recall-study",
-          "description": "Learn proven methods for testing yourself rather than passive reading."
+          "label": "Make Quizlet Sets with AI",
+          "href": "https://www.cogniguide.app/flashcards/make-quizlet",
+          "description": "Stop manual entry and make your Quizlet sets with AI instantly."
         },
         {
-          "label": "Spaced Repetition Explained",
-          "href": "https://www.cogniguide.app/flashcards/spaced-repetition-guide",
-          "description": "Explore the science behind how our scheduling algorithm maximizes retention."
+          "label": "Automated Quizlet Deck Builder",
+          "href": "https://www.cogniguide.app/flashcards/create-quizlet",
+          "description": "Ditch manual entry and create smarter Quizlet-style decks from documents instantly."
         }
       ]
     },
@@ -20477,14 +20470,13 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Expand Your Study Toolkit",
       "links": [
         {
-          "label": "Active Recall Techniques",
-          "href": "https://www.cogniguide.app/flashcards/active-recall",
-          "description": "Learn how to maximize memory retention using proven active recall strategies."
+          "label": "Planet Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/planet",
+          "description": "Generate AI planet flashcards from your study PDF for astronomy lessons."
         },
         {
-          "label": "Custom Study Schedules",
-          "href": "https://www.cogniguide.app/flashcards/scheduling",
-          "description": "Discover how to align your study sessions perfectly with your important deadlines."
+          "label": "Sustainability",
+          "href": "https://www.cogniguide.app/flashcards/sustainability"
         }
       ]
     },
@@ -20687,14 +20679,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Master Your Study Techniques",
       "links": [
         {
-          "label": "Understanding Active Recall",
-          "href": "https://www.cogniguide.app/flashcards/active-recall-techniques",
-          "description": "Deep dive into the science behind why testing yourself is superior to re-reading."
+          "label": "Flashcard Maker with Pictures",
+          "href": "https://www.cogniguide.app/flashcards/maker-pictures",
+          "description": "Automatically create engaging, visual study sets by adding pictures to flashcards."
         },
         {
-          "label": "Spaced Repetition Scheduling",
-          "href": "https://www.cogniguide.app/flashcards/spaced-repetition-guide",
-          "description": "Learn how optimized timing maximizes long-term memory retention for crucial topics."
+          "label": "AI Visual Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/creator-images",
+          "description": "The effortless flashcard creator with images, powered by visual AI."
         }
       ]
     },
@@ -20897,14 +20889,13 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore More Study Techniques",
       "links": [
         {
-          "label": "Active Recall Strategies",
-          "href": "https://www.cogniguide.app/flashcards/active-recall",
-          "description": "Learn how to structure study sessions to maximize information retrieval."
+          "label": "Preposition",
+          "href": "https://www.cogniguide.app/flashcards/preposition"
         },
         {
-          "label": "Document Scanning for Exams",
-          "href": "https://www.cogniguide.app/flashcards/document-scanning",
-          "description": "Discover the best practices for converting lecture notes into digital study aids."
+          "label": "AI Grammar Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/grammar-adults",
+          "description": "Instantly generate grammar flashcards for adults to master English."
         }
       ]
     },
@@ -21107,14 +21098,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore Other Study Strategies",
       "links": [
         {
-          "label": "Mastering Active Recall Techniques",
-          "href": "https://www.cogniguide.app/flashcards/active-recall-techniques",
-          "description": "Learn how our card structure forces retrieval practice for stronger memory formation."
+          "label": "Jolly Phonics Group 1 Cards",
+          "href": "https://www.cogniguide.app/flashcards/jolly-phonics-group-1",
+          "description": "Create Jolly Phonics Group 1 flashcards from any file for early reading."
         },
         {
-          "label": "Optimizing Study Schedules with Spaced Repetition",
-          "href": "https://www.cogniguide.app/flashcards/spaced-repetition-scheduling",
-          "description": "Deep dive into the science behind our intelligent scheduling algorithm."
+          "label": "AI Phonics Deck Creator",
+          "href": "https://www.cogniguide.app/flashcards/phonics-sound",
+          "description": "Create phonics sound cards from any document instantly for reading."
         }
       ]
     },
@@ -21317,14 +21308,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Deepen Your Study Strategy",
       "links": [
         {
-          "label": "Active Recall Techniques Guide",
-          "href": "https://www.cogniguide.app/study-techniques/active-recall",
-          "description": "Learn how to maximize learning efficiency during your review sessions."
+          "label": "IPA Flashcards from PDFs",
+          "href": "https://www.cogniguide.app/flashcards/ipa",
+          "description": "Create IPA flashcards from your study materials for mastering phonetics."
         },
         {
-          "label": "Using Spaced Repetition for Language Learning",
-          "href": "https://www.cogniguide.app/study-techniques/spaced-repetition-language",
-          "description": "Specific strategies for applying spaced learning to vocabulary and concepts."
+          "label": "AI Phonics Cards",
+          "href": "https://www.cogniguide.app/flashcards/phonogram",
+          "description": "Create smart phonogram flash cards from any document for reading."
         }
       ]
     },
@@ -21526,14 +21517,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore Other Study Tools",
       "links": [
         {
-          "label": "Active Recall Techniques",
-          "href": "https://www.cogniguide.app/flashcards/active-recall-techniques",
-          "description": "Learn how to maximize memory retention beyond simple memorization."
+          "label": "AI Adjective Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/adjective",
+          "description": "Create instant adjective flashcards from your PDF documents for grammar mastery."
         },
         {
-          "label": "Spaced Repetition Systems",
-          "href": "https://www.cogniguide.app/flashcards/spaced-repetition-systems",
-          "description": "Dive deeper into the science behind optimized study intervals."
+          "label": "Apparel Vocabulary Cards",
+          "href": "https://www.cogniguide.app/flashcards/clothes",
+          "description": "Generate smart clothes flashcards from any PDF for mastering apparel terminology."
         }
       ]
     },
@@ -21731,14 +21722,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Expand Your Study Tools",
       "links": [
         {
-          "label": "Generate JavaScript Flashcards",
-          "href": "https://www.cogniguide.app/flashcards/javascript",
-          "description": "Convert your notes on frameworks, DOM manipulation, and ES6 into spaced repetition decks."
+          "label": "Organic Chemistry Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/organic-chemistry",
+          "description": "Create organic chemistry flashcards from any PDF instantly for your course."
         },
         {
-          "label": "AI Study Techniques Overview",
-          "href": "https://www.cogniguide.app/study-techniques",
-          "description": "Learn more about the cognitive science backing active recall and spaced repetition."
+          "label": "Math Problem Generator",
+          "href": "https://www.cogniguide.app/flashcards/math",
+          "description": "Create instant math flash cards from your study materials for any topic."
         }
       ]
     },
@@ -21937,14 +21928,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Deepen Your Study Strategy",
       "links": [
         {
-          "label": "Biology Flashcards Generator",
-          "href": "https://www.cogniguide.app/flashcards/biology",
-          "description": "Transform complex cellular diagrams or anatomy lectures into high-yield study material."
+          "label": "AI Countries Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/countries",
+          "description": "Instantly create countries flashcards from any PDF for mastering geography facts."
         },
         {
-          "label": "History Study Tools",
-          "href": "https://www.cogniguide.app/flashcards/history",
-          "description": "Use AI to create chronological or thematic flashcards from dense historical texts."
+          "label": "AI Science Study Sets",
+          "href": "https://www.cogniguide.app/flashcards/science",
+          "description": "Convert your science PDFs into smart flashcards instantly for active recall."
         }
       ]
     },
@@ -22142,14 +22133,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Deepen Your Study Strategy",
       "links": [
         {
-          "label": "Master Active Recall Techniques",
-          "href": "https://www.cogniguide.app/flashcards/active-recall-guide",
-          "description": "Learn how question generation drives better memory encoding than simple reading."
+          "label": "AI Quiz Maker",
+          "href": "https://www.cogniguide.app/flashcards/quizlet-make-quiz",
+          "description": "Stop manually making quizzes; use our AI flashcard generator instead."
         },
         {
-          "label": "Understanding Spaced Repetition",
-          "href": "https://www.cogniguide.app/flashcards/spaced-repetition-benefits",
-          "description": "Dive into the cognitive science behind scheduling your reviews for maximum long-term retention."
+          "label": "Quiz Generator from Notes",
+          "href": "https://www.cogniguide.app/flashcards/test-maker",
+          "description": "The AI flashcard test maker that helps you prepare for any exam."
         }
       ]
     },
@@ -22348,14 +22339,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore More Study Techniques",
       "links": [
         {
-          "label": "Active Recall Strategies",
-          "href": "https://www.cogniguide.app/flashcards/active-recall-strategies",
-          "description": "Deep dive into how forcing retrieval improves memory consolidation."
+          "label": "AI Shichida Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/shichida",
+          "description": "Generate AI Shichida flashcards from any document for early learning."
         },
         {
-          "label": "Exam Date Planning Tools",
-          "href": "https://www.cogniguide.app/flashcards/exam-date-planning",
-          "description": "Learn how to structure your study timeline effectively toward a fixed deadline."
+          "label": "AI Baby Learning Cards",
+          "href": "https://www.cogniguide.app/flashcards/infant-stimulation",
+          "description": "Create infant stimulation flashcards from your study materials for development."
         }
       ]
     },
@@ -22557,14 +22548,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Enhance Your Study Strategy",
       "links": [
         {
-          "label": "Active Recall Techniques",
-          "href": "https://www.cogniguide.app/flashcards/active-recall",
-          "description": "Learn how testing yourself directly improves retention more than re-reading."
+          "label": "Filipino Flashcards from PDF",
+          "href": "https://www.cogniguide.app/flashcards/filipino",
+          "description": "Generate AI-powered Filipino flashcards from any PDF for faster learning."
         },
         {
-          "label": "Exam Date Scheduling Tools",
-          "href": "https://www.cogniguide.app/flashcards/scheduling",
-          "description": "Discover how to set study targets based on your specific test dates."
+          "label": "AI Baybayin Study Cards",
+          "href": "https://www.cogniguide.app/flashcards/filipino-alphabet",
+          "description": "Create instant Filipino alphabet flash cards from any source for language learning."
         }
       ]
     },
@@ -22762,14 +22753,13 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Deepen Your Study Strategy",
       "links": [
         {
-          "label": "Understand Active Recall Benefits",
-          "href": "https://www.cogniguide.app/flashcards/active-recall-techniques",
-          "description": "Learn the science behind why testing yourself is superior to passive reading."
+          "label": "ServSafe 7th Edition Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/servsafe-7th-edition-quizlet",
+          "description": "Generate AI flashcards for ServSafe 7th Edition, ditching Quizlet."
         },
         {
-          "label": "Optimize Spaced Repetition Scheduling",
-          "href": "https://www.cogniguide.app/flashcards/spaced-repetition-guide",
-          "description": "A detailed guide on how timing affects memory consolidation for long-term retention."
+          "label": "Certification Prep",
+          "href": "https://www.cogniguide.app/flashcards/certification-prep"
         }
       ]
     },
@@ -22972,14 +22962,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Expand Your AI Study Tools",
       "links": [
         {
-          "label": "AI Policy Flashcards",
-          "href": "https://www.cogniguide.app/flashcards/policy",
-          "description": "Generate specialized decks from regulatory documents and legal texts."
+          "label": "Vehicle Flashcards from PDF",
+          "href": "https://www.cogniguide.app/flashcards/vehicle",
+          "description": "Create instant vehicle flashcards from any PDF or document for study."
         },
         {
-          "label": "Engineering Study Aids",
-          "href": "https://www.cogniguide.app/flashcards/engineering",
-          "description": "Convert complex formulas and technical diagrams into actionable study material."
+          "label": "AI Navigation Cards",
+          "href": "https://www.cogniguide.app/flashcards/directions",
+          "description": "Instantly create directions flashcards from any file for spatial learning."
         }
       ]
     },
@@ -23183,14 +23173,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore Study Optimization Resources",
       "links": [
         {
-          "label": "Active Recall Techniques Guide",
-          "href": "https://www.cogniguide.app/flashcards/active-recall",
-          "description": "Learn proven methods to test yourself effectively beyond simple reading."
+          "label": "Sight Words Flash Cards",
+          "href": "https://www.cogniguide.app/flashcards/sight",
+          "description": "Generate smart sight words flash cards instantly from your learning materials."
         },
         {
-          "label": "Mastering Spaced Repetition",
-          "href": "https://www.cogniguide.app/flashcards/spaced-repetition",
-          "description": "Dive deeper into the science behind scheduling your learning for maximum retention."
+          "label": "AI Sight Word Lists",
+          "href": "https://www.cogniguide.app/flashcards/high-frequency",
+          "description": "Create high frequency words flashcards from any document for reading fluency."
         }
       ]
     },
@@ -23392,14 +23382,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore More Study Resources",
       "links": [
         {
-          "label": "Chemistry Formula Sheet Generator",
-          "href": "https://www.cogniguide.app/flashcards/chemistry-formulas",
-          "description": "Transform complex chemical equations and formulas into interactive flashcards instantly."
+          "label": "Hindi Swar Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/hindi-swar",
+          "description": "Create custom Hindi Swar flashcards from your study material."
         },
         {
-          "label": "History Timeline Study Aids",
-          "href": "https://www.cogniguide.app/flashcards/historical-events",
-          "description": "Convert historical texts or timelines into chronological study decks for better context retention."
+          "label": "AI Marathi Language Cards",
+          "href": "https://www.cogniguide.app/flashcards/marathi",
+          "description": "Create custom Marathi flashcards instantly from any PDF for language study."
         }
       ]
     },
@@ -23598,14 +23588,13 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore More Study Techniques",
       "links": [
         {
-          "label": "AI Study Notes Generator",
-          "href": "https://www.cogniguide.app/flashcards/notes",
-          "description": "Turn extensive lecture notes into structured revision material instantly."
+          "label": "Transport Flashcards from PDF",
+          "href": "https://www.cogniguide.app/flashcards/transport",
+          "description": "Create custom transport flashcards from your PDF uploads for vocabulary."
         },
         {
-          "label": "Active Recall Strategies",
-          "href": "https://www.cogniguide.app/flashcards/recall",
-          "description": "Learn how to maximize memory encoding using retrieval practice methods."
+          "label": "Cars",
+          "href": "https://www.cogniguide.app/flashcards/cars"
         }
       ]
     },
@@ -23804,14 +23793,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore More Study Tools",
       "links": [
         {
-          "label": "AI Math Problem Solvers",
-          "href": "https://www.cogniguide.app/flashcards/math",
-          "description": "Convert complex equations and proofs from notes into structured practice sets."
+          "label": "Verbs Flash Cards PDF",
+          "href": "https://www.cogniguide.app/flashcards/verbs",
+          "description": "Generate flash cards for verbs from PDF content automatically."
         },
         {
-          "label": "Concept Definition Card Generator",
-          "href": "https://www.cogniguide.app/flashcards/definitions",
-          "description": "Generate high-fidelity flashcards optimized for subject-specific terminology."
+          "label": "AI Verb Study Cards",
+          "href": "https://www.cogniguide.app/flashcards/action-verb",
+          "description": "Create action verb flashcards from any document instantly for grammar."
         }
       ]
     },
@@ -24009,14 +23998,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Deepen Your Study Resources",
       "links": [
         {
-          "label": "AI Calculus Flashcard Generator",
-          "href": "https://www.cogniguide.app/flashcards/calculus",
-          "description": "Generate mathematical formula and concept review cards instantly from calculus notes."
+          "label": "4 Seasons Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/4-seasons",
+          "description": "Generate your custom 4 seasons flashcards instantly from any learning file."
         },
         {
-          "label": "History Flashcards Guide",
-          "href": "https://www.cogniguide.app/flashcards/history",
-          "description": "Learn how to use AI to synthesize complex historical narratives into actionable review sets."
+          "label": "English Weather Vocabulary",
+          "href": "https://www.cogniguide.app/flashcards/esl-weather",
+          "description": "Generate AI ESL weather flashcards instantly for mastering English vocabulary."
         }
       ]
     },
@@ -24218,14 +24207,13 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Expand Your Study Resources",
       "links": [
         {
-          "label": "Biology Flashcards",
-          "href": "https://www.cogniguide.app/flashcards/biology",
-          "description": "Convert complex biological pathways and terminology into adaptive review sets."
+          "label": "Summer Sports",
+          "href": "https://www.cogniguide.app/flashcards/summer-sports"
         },
         {
-          "label": "History Flashcards",
-          "href": "https://www.cogniguide.app/flashcards/history",
-          "description": "Use timelines and key event summaries from documents to ace your history exams."
+          "label": "AI Fitness Study Aids",
+          "href": "https://www.cogniguide.app/flashcards/exercise",
+          "description": "Create AI flash cards from your exercise PDFs for personal training."
         }
       ]
     },
@@ -24427,14 +24415,13 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore More Study Tools",
       "links": [
         {
-          "label": "Active Recall Techniques",
-          "href": "https://www.cogniguide.app/flashcards/active-recall",
-          "description": "Deep dive into the science behind why questioning your memory works better than rereading."
+          "label": "Telling Time Flash Cards",
+          "href": "https://www.cogniguide.app/flashcards/telling-time",
+          "description": "Instant AI telling time flash cards from any document for kids."
         },
         {
-          "label": "Document Upload Guides",
-          "href": "https://www.cogniguide.app/guides/document-upload",
-          "description": "Tips for optimizing your PDFs and images for the best AI extraction results."
+          "label": "Clock Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/clock-flashcards"
         }
       ]
     },
@@ -24635,14 +24622,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Optimize Your Learning Workflow",
       "links": [
         {
-          "label": "AI Note Summarizer",
-          "href": "https://www.cogniguide.app/flashcards/ai-note-summarizer",
-          "description": "Instantly condense long study notes into key takeaways before generating cards."
+          "label": "AI to Make Quizlet Set",
+          "href": "https://www.cogniguide.app/flashcards/quizlet-make-set",
+          "description": "Ditch manual entry: use AI to make a Quizlet set instantly."
         },
         {
-          "label": "Best Active Recall Techniques",
-          "href": "https://www.cogniguide.app/flashcards/active-recall-techniques",
-          "description": "Learn how active recall solidifies knowledge better than passive review."
+          "label": "Beat Manual Quizlet Creation",
+          "href": "https://www.cogniguide.app/flashcards/create-study-set-quizlet",
+          "description": "Effortlessly create study sets faster and smarter than manual Quizlet entry."
         }
       ]
     },
@@ -24837,14 +24824,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore More Study Strategies",
       "links": [
         {
-          "label": "Active Recall Techniques",
-          "href": "https://www.cogniguide.app/flashcards/active-recall-techniques",
-          "description": "Learn how to shift from passive reading to active retrieval practice for better memory consolidation."
+          "label": "SAT Vocabulary Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/sat-vocabulary",
+          "description": "Generate SAT vocabulary flashcards from word lists to accelerate exam mastery."
         },
         {
-          "label": "Exam Preparation Scheduling",
-          "href": "https://www.cogniguide.app/flashcards/exam-preparation-scheduling",
-          "description": "Optimize your study timeline by setting target exam dates for automated review scheduling."
+          "label": "Digital SAT Prep",
+          "href": "https://www.cogniguide.app/flashcards/sat-online",
+          "description": "Generate custom SAT flashcards online from any document for test success."
         }
       ]
     },
@@ -25046,14 +25033,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore More Study Tools",
       "links": [
         {
-          "label": "Best Practices for Active Recall",
-          "href": "https://www.cogniguide.app/flashcards/active-recall",
-          "description": "Deep dive into cognitive science principles that maximize learning speed."
+          "label": "Goodnotes to Flash Cards",
+          "href": "https://www.cogniguide.app/flashcards/goodnotes",
+          "description": "Instantly turn Goodnotes material into smart AI-powered study flash cards."
         },
         {
-          "label": "Understanding Spaced Repetition",
-          "href": "https://www.cogniguide.app/flashcards/spaced-repetition-strategy",
-          "description": "Learn how intelligent scheduling prevents forgetting over long periods."
+          "label": "AI GoodNotes Converter",
+          "href": "https://www.cogniguide.app/flashcards/goodnotes-5",
+          "description": "Convert GoodNotes 5 notes into active recall flashcards instantly."
         }
       ]
     },
@@ -25255,14 +25242,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Continue Optimizing Your Study System",
       "links": [
         {
-          "label": "AI Document Study Tools",
-          "href": "https://www.cogniguide.app/flashcards/document-analysis",
-          "description": "Learn how to extract insights from long reports and technical documentation."
+          "label": "Marathi Flashcards PDF",
+          "href": "https://www.cogniguide.app/flashcards/marathi",
+          "description": "Create custom Marathi flashcards instantly from any PDF for language study."
         },
         {
-          "label": "Mastering Spaced Repetition",
-          "href": "https://www.cogniguide.app/flashcards/spaced-repetition",
-          "description": "In-depth guide on the cognitive science behind effective review scheduling."
+          "label": "AI Hindi Vowel Cards",
+          "href": "https://www.cogniguide.app/flashcards/hindi-swar",
+          "description": "Create custom Hindi Swar flashcards from your study material."
         }
       ]
     },
@@ -25465,14 +25452,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore Study Techniques",
       "links": [
         {
-          "label": "Active Recall Strategies",
-          "href": "https://www.cogniguide.app/flashcards/active-recall",
-          "description": "Learn how forcing retrieval improves memory retention over passive reading."
+          "label": "Flash Cards from Good Notes",
+          "href": "https://www.cogniguide.app/flashcards/good-notes",
+          "description": "Instantly create flash cards from your Good Notes for smart review."
         },
         {
-          "label": "Mastering Spaced Repetition",
-          "href": "https://www.cogniguide.app/flashcards/spaced-repetition-science",
-          "description": "Dive deeper into the cognitive science behind effective long-term learning schedules."
+          "label": "AI Note Converter",
+          "href": "https://www.cogniguide.app/flashcards/convert-notes",
+          "description": "Effortlessly convert your notes to flashcards using AI for active recall."
         }
       ]
     },
@@ -25671,14 +25658,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore Smarter Study Techniques",
       "links": [
         {
-          "label": "Active Recall Strategies",
-          "href": "https://www.cogniguide.app/flashcards/active-recall",
-          "description": "Learn how to structure your study time around testing yourself rather than rereading."
+          "label": "Quizlet Create a Set AI",
+          "href": "https://www.cogniguide.app/flashcards/quizlet-create-set",
+          "description": "Ditch 'Quizlet Create A Set'—generate smart flashcards from files now."
         },
         {
-          "label": "Optimizing Study Schedules",
-          "href": "https://www.cogniguide.app/flashcards/study-scheduling",
-          "description": "Guidance on how to use time management tools effectively alongside flashcards."
+          "label": "AI Quizlet Card Maker",
+          "href": "https://www.cogniguide.app/flashcards/make-quizlet",
+          "description": "Stop manual entry and make your Quizlet sets with AI instantly."
         }
       ]
     },
@@ -25881,14 +25868,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore More Study Techniques",
       "links": [
         {
-          "label": "AI Flashcard Generator",
-          "href": "https://www.cogniguide.app/flashcards/ai-generator",
-          "description": "Learn how our core technology powers learning across all subjects."
+          "label": "MedStudy Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/medstudy",
+          "description": "Create powerful MedStudy flashcards from any PDF or document instantly."
         },
         {
-          "label": "Active Recall Techniques",
-          "href": "https://www.cogniguide.app/flashcards/active-recall",
-          "description": "Dive deeper into why testing yourself is the most effective study habit."
+          "label": "Anki Alternative for Medicine",
+          "href": "https://www.cogniguide.app/flashcards/anki-medical",
+          "description": "Ditch manual decks: AI flashcards for Anki medical prep are faster."
         }
       ]
     },
@@ -26091,14 +26078,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Continue Building Smarter Study Habits",
       "links": [
         {
-          "label": "AI Study Guide Generator",
-          "href": "https://www.cogniguide.app/flashcards/study-guide-generator",
-          "description": "Generate comprehensive study guides from your class notes automatically."
+          "label": "Vocabulary Flash Cards",
+          "href": "https://www.cogniguide.app/flashcards/vocabulary",
+          "description": "Generate vocabulary flash cards from your PDF files for any subject."
         },
         {
-          "label": "Custom Quiz Creator",
-          "href": "https://www.cogniguide.app/flashcards/quiz-creator",
-          "description": "Test your knowledge instantly by creating customized quizzes from uploaded content."
+          "label": "AI Vocabulary Builder",
+          "href": "https://www.cogniguide.app/flashcards/english-vocabulary",
+          "description": "Create smart English vocabulary cards instantly to master words faster."
         }
       ]
     },
@@ -26298,14 +26285,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Deepen Your Study Strategies",
       "links": [
         {
-          "label": "Mastering Active Recall Techniques",
-          "href": "https://www.cogniguide.app/flashcards/active-recall-techniques",
-          "description": "Learn how retrieving information strengthens memory pathways."
+          "label": "AI Quizlet Flashcard Creator",
+          "href": "https://www.cogniguide.app/flashcards/create-quizlet",
+          "description": "Ditch manual entry and create smarter Quizlet-style decks from documents instantly."
         },
         {
-          "label": "Understanding Spaced Repetition",
-          "href": "https://www.cogniguide.app/flashcards/spaced-repetition-benefits",
-          "description": "Explore the cognitive science behind optimal study scheduling."
+          "label": "PDF to Quizlet Cards",
+          "href": "https://www.cogniguide.app/flashcards/quizlet",
+          "description": "Stop manually making Quizlet flashcards from PDFs; let AI do it instantly."
         }
       ]
     },
@@ -26508,14 +26495,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore Smarter Study Techniques",
       "links": [
         {
-          "label": "Active Recall Tools",
-          "href": "https://www.cogniguide.app/flashcards/active-recall-tools",
-          "description": "Learn how active recall boosts memory encoding compared to passive review."
+          "label": "AI Vocab Flashcard Maker",
+          "href": "https://www.cogniguide.app/flashcards/vocab-maker",
+          "description": "The fastest AI vocab flashcard maker online for maximizing retention."
         },
         {
-          "label": "AI Study Planner",
-          "href": "https://www.cogniguide.app/flashcards/ai-study-planner",
-          "description": "Discover how to align your study schedule with your specific academic deadlines."
+          "label": "AI Vocab from PDF",
+          "href": "https://www.cogniguide.app/flashcards/vocabulary",
+          "description": "Generate vocabulary flash cards from your PDF files for any subject."
         }
       ]
     },
@@ -26717,14 +26704,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore More Study Strategies",
       "links": [
         {
-          "label": "Active Recall Techniques",
-          "href": "https://www.cogniguide.app/flashcards/active-recall",
-          "description": "Deep dive into the study method essential for long-term memory formation."
+          "label": "AI Digital Flashcard Maker",
+          "href": "https://www.cogniguide.app/flashcards/digital-maker",
+          "description": "Create intelligent digital flashcard decks from any file for modern studying."
         },
         {
-          "label": "Understanding Spaced Repetition",
-          "href": "https://www.cogniguide.app/flashcards/spaced-repetition",
-          "description": "Learn the science behind scheduling reviews for maximum retention efficiency."
+          "label": "Online Study Set Generator",
+          "href": "https://www.cogniguide.app/flashcards/website",
+          "description": "The AI notecards website that creates your study sets in seconds."
         }
       ]
     },
@@ -26926,14 +26913,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore Other Study Tools",
       "links": [
         {
-          "label": "AI Flashcards for Anatomy",
-          "href": "https://www.cogniguide.app/flashcards/anatomy-study-ai",
-          "description": "Generate study material instantly from detailed anatomical diagrams and textbooks."
+          "label": "AI UWorld Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/uworld",
+          "description": "Create UWorld flashcards from your PDF notes instantly with AI."
         },
         {
-          "label": "Spaced Repetition Algorithm Deep Dive",
-          "href": "https://www.cogniguide.app/blog/spaced-repetition-science",
-          "description": "Learn the cognitive science principles that drive efficient learning and retention."
+          "label": "AI MedStudy PDF Converter",
+          "href": "https://www.cogniguide.app/flashcards/medstudy",
+          "description": "Create powerful MedStudy flashcards from any PDF or document instantly."
         }
       ]
     },
@@ -27135,14 +27122,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Enhance Your Learning Strategy",
       "links": [
         {
-          "label": "Active Recall Techniques",
-          "href": "https://www.cogniguide.app/flashcards/active-recall",
-          "description": "Learn how to maximize memory encoding through self-testing."
+          "label": "AI Online Flashcard Maker",
+          "href": "https://www.cogniguide.app/flashcards/online-maker",
+          "description": "Generate study decks with an AI online flashcard maker from any document."
         },
         {
-          "label": "Spaced Repetition Explained",
-          "href": "https://www.cogniguide.app/flashcards/spaced-repetition-guide",
-          "description": "Dive deeper into the science behind optimized study intervals."
+          "label": "Instant Study Decks",
+          "href": "https://www.cogniguide.app/flashcards/creator",
+          "description": "The fastest AI flashcard creator for serious students using any document."
         }
       ]
     },
@@ -27340,14 +27327,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Optimize Your Study Strategy Further",
       "links": [
         {
-          "label": "Active Recall Techniques",
-          "href": "https://www.cogniguide.app/flashcards/active-recall",
-          "description": "Deep dive into how retrieval practice beats passive review."
+          "label": "AI Flashcard Generator",
+          "href": "https://www.cogniguide.app/flashcards/generator",
+          "description": "The ultimate AI flashcard generator for mastering complex materials quickly."
         },
         {
-          "label": "Spaced Repetition Guide",
-          "href": "https://www.cogniguide.app/flashcards/spaced-repetition",
-          "description": "Learn the science behind memory scheduling for long-term retention."
+          "label": "Instant Study Decks",
+          "href": "https://www.cogniguide.app/flashcards/creator",
+          "description": "The fastest AI flashcard creator for serious students using any document."
         }
       ]
     },
@@ -27546,14 +27533,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore Study Methods",
       "links": [
         {
-          "label": "Active Recall Techniques",
-          "href": "https://www.cogniguide.app/flashcards/active-recall-techniques",
-          "description": "Deep dive into why retrieval practice outperforms passive review."
+          "label": "AI Flashcard Maker",
+          "href": "https://www.cogniguide.app/flashcards/maker",
+          "description": "The ultimate AI flashcard maker for converting complex material into cards."
         },
         {
-          "label": "Mastering Spaced Repetition",
-          "href": "https://www.cogniguide.app/flashcards/spaced-repetition",
-          "description": "Understand the science behind scheduling your study sessions optimally."
+          "label": "Fast Study Set Creation",
+          "href": "https://www.cogniguide.app/flashcards/generator",
+          "description": "The ultimate AI flashcard generator for mastering complex materials quickly."
         }
       ]
     },
@@ -27750,14 +27737,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Deepen Your Study Skills",
       "links": [
         {
-          "label": "Mastering Active Recall Techniques",
-          "href": "https://www.cogniguide.app/flashcards/active-recall-guide",
-          "description": "Learn the cognitive science behind why testing yourself dramatically improves long-term memory."
+          "label": "AI Flashcard Maker",
+          "href": "https://www.cogniguide.app/flashcards/maker",
+          "description": "The ultimate AI flashcard maker for converting complex material into cards."
         },
         {
-          "label": "Guide to Spaced Repetition Systems",
-          "href": "https://www.cogniguide.app/flashcards/spaced-repetition-explained",
-          "description": "Understand the math and scheduling behind optimizing when you review information for maximal retention."
+          "label": "Fast Document to Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/easy-maker",
+          "description": "The easiest flashcard maker: convert any document into a study set fast."
         }
       ]
     },
@@ -27960,14 +27947,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Expand Your Study Toolkit",
       "links": [
         {
-          "label": "Active Recall Techniques",
-          "href": "https://www.cogniguide.app/flashcards/active-recall-techniques",
-          "description": "Learn the cognitive science behind why flashcards work so well for memory retention."
+          "label": "AI Flashcard Maker",
+          "href": "https://www.cogniguide.app/flashcards/maker",
+          "description": "The ultimate AI flashcard maker for converting complex material into cards."
         },
         {
-          "label": "Spaced Repetition Guide",
-          "href": "https://www.cogniguide.app/flashcards/spaced-repetition-guide",
-          "description": "Deep dive into how optimizing review timing solidifies long-term knowledge."
+          "label": "Instant Study Decks",
+          "href": "https://www.cogniguide.app/flashcards/creator",
+          "description": "The fastest AI flashcard creator for serious students using any document."
         }
       ]
     },
@@ -28170,14 +28157,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore More Study Techniques",
       "links": [
         {
-          "label": "Active Recall Strategies",
-          "href": "https://www.cogniguide.app/flashcards/active-recall",
-          "description": "Learn how testing yourself improves long-term memory compared to passive reading."
+          "label": "Months Flashcards from PDF",
+          "href": "https://www.cogniguide.app/flashcards/months",
+          "description": "Generate months flashcards instantly from your PDF documents for calendar review."
         },
         {
-          "label": "Document Study Optimization",
-          "href": "https://www.cogniguide.app/flashcards/document-optimization",
-          "description": "Tips on structuring your PDFs for the best AI conversion results."
+          "label": "AI Calendar Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/days-months",
+          "description": "Create days and months flashcards from any document for calendar mastery."
         }
       ]
     },
@@ -28380,14 +28367,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Enhance Your Study Workflow",
       "links": [
         {
-          "label": "Active Recall Techniques Guide",
-          "href": "https://www.cogniguide.app/blog/active-recall",
-          "description": "Learn why generating questions is better than simply reading answers."
+          "label": "Convert Notes to Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/convert-notes",
+          "description": "Effortlessly convert your notes to flashcards using AI for active recall."
         },
         {
-          "label": "Understanding Spaced Repetition",
-          "href": "https://www.cogniguide.app/blog/spaced-repetition-science",
-          "description": "Dive into the cognitive science that powers our scheduling system for better retention."
+          "label": "Notes to Study Sets",
+          "href": "https://www.cogniguide.app/flashcards/revision-note",
+          "description": "Transform any revision note into smart flashcards instantly for exam prep."
         }
       ]
     },
@@ -28589,14 +28576,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore Other Study Tools",
       "links": [
         {
-          "label": "AI History Study Guides",
-          "href": "https://www.cogniguide.app/flashcards/history-study-guides",
-          "description": "Generate deep-dive active recall sets from complex historical texts."
+          "label": "ServiceNow CIS ITSM Cards",
+          "href": "https://www.cogniguide.app/flashcards/servicenow-cis-itsm-quizlet",
+          "description": "Ditch Quizlet: create ServiceNow CIS ITSM flashcards instantly with AI."
         },
         {
-          "label": "Active Recall Techniques Overview",
-          "href": "https://www.cogniguide.app/study-strategies/active-recall",
-          "description": "Learn the cognitive science behind why flashcards are the superior study method."
+          "label": "AI CompTIA Prep",
+          "href": "https://www.cogniguide.app/flashcards/comptia",
+          "description": "Generate CompTIA A+ flashcards from any PDF instantly for IT certification."
         }
       ]
     },
@@ -28799,14 +28786,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Deepen Your Study Strategy",
       "links": [
         {
-          "label": "AI Study Planners",
-          "href": "https://www.cogniguide.app/study-planner",
-          "description": "Learn how to map out long-term study goals based on cognitive load management."
+          "label": "Phonics Sound Cards",
+          "href": "https://www.cogniguide.app/flashcards/phonics-sound",
+          "description": "Create phonics sound cards from any document instantly for reading."
         },
         {
-          "label": "Active Recall Techniques",
-          "href": "https://www.cogniguide.app/active-recall",
-          "description": "Discover advanced methods for testing memory retrieval beyond simple flashcards."
+          "label": "AI Phonics Generator",
+          "href": "https://www.cogniguide.app/flashcards/letter-sound",
+          "description": "Create AI letter sound cards from any PDF for mastering phonics."
         }
       ]
     },
@@ -29008,14 +28995,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Expand Your Study Toolkit",
       "links": [
         {
-          "label": "Technical Documentation Study Tools",
-          "href": "https://www.cogniguide.app/flashcards/technical-documentation-study",
-          "description": "Explore tools for mastering other complex technical manuals and standards."
+          "label": "Bicsi RCDD Flash Cards",
+          "href": "https://www.cogniguide.app/flashcards/bicsi-rcdd",
+          "description": "Generate Bicsi RCDD flash cards from any document for your certification."
         },
         {
-          "label": "Active Recall Strategies",
-          "href": "https://www.cogniguide.app/flashcards/active-recall-strategies",
-          "description": "Learn more about the learning science behind why active recall beats passive review."
+          "label": "AI Trade School Prep",
+          "href": "https://www.cogniguide.app/flashcards/nccer-pipefitter",
+          "description": "Master NCCER Pipefitter concepts with AI flashcards for your certification."
         }
       ]
     },
@@ -29218,14 +29205,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore Related Study Tools",
       "links": [
         {
-          "label": "AI Flashcards for Medical Concepts",
-          "href": "https://www.cogniguide.app/flashcards/medical-concepts",
-          "description": "See how complex biological structures and processes are converted into memorable flashcards."
+          "label": "Flash Cards for Animals",
+          "href": "https://www.cogniguide.app/flashcards/animals",
+          "description": "Create instant flash cards from your animals study materials with AI."
         },
         {
-          "label": "Document Upload Study Guides",
-          "href": "https://www.cogniguide.app/guides/document-upload-features",
-          "description": "Learn more about supported document types and best practices for parsing dense academic materials."
+          "label": "AI Wildlife Study Cards",
+          "href": "https://www.cogniguide.app/flashcards/wild-animals",
+          "description": "Create instant wild animals flashcards from any document for zoology."
         }
       ]
     },
@@ -29423,14 +29410,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Continue Building Your Study Library",
       "links": [
         {
-          "label": "AI Biology Study Guide Generator",
-          "href": "https://www.cogniguide.app/flashcards/biology-study-guide",
-          "description": "Transform anatomy diagrams and complex biological processes into spaced repetition cards."
+          "label": "SmartServe Quizlet Alternative",
+          "href": "https://www.cogniguide.app/flashcards/smartserve-quizlet",
+          "description": "Ditch manual creation: use AI flashcards for faster SmartServe mastery."
         },
         {
-          "label": "Generate Flashcards from Lecture Notes",
-          "href": "https://www.cogniguide.app/flashcards/lecture-notes-to-cards",
-          "description": "Turn unstructured handwritten or typed lecture notes into organized review sets effortlessly."
+          "label": "AI EPA Test Prep",
+          "href": "https://www.cogniguide.app/flashcards/epa-608",
+          "description": "Instant EPA 608 flashcards generated from your study materials for certification."
         }
       ]
     },
@@ -29633,14 +29620,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore Related Study Guides",
       "links": [
         {
-          "label": "AI Flashcards for ITIL Foundation",
-          "href": "https://www.cogniguide.app/flashcards/itil-foundation-guide",
-          "description": "Convert your ITIL study guides into smart, adaptive flashcards."
+          "label": "FEMA ICS 200 Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/fema-ics-200-quizlet",
+          "description": "Generate AI flashcards for FEMA ICS 200, better than generic Quizlet sets."
         },
         {
-          "label": "Automated Study Notes Generator",
-          "href": "https://www.cogniguide.app/tools/note-generation",
-          "description": "Learn how to transform lecture recordings into summarized study notes."
+          "label": "AI CompTIA Prep",
+          "href": "https://www.cogniguide.app/flashcards/comptia",
+          "description": "Generate CompTIA A+ flashcards from any PDF instantly for IT certification."
         }
       ]
     },
@@ -29839,14 +29826,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Deepen Your Study Strategy",
       "links": [
         {
-          "label": "Active Recall Techniques",
-          "href": "https://www.cogniguide.app/flashcards/active-recall",
-          "description": "Learn the science behind why retrieval practice beats passive review."
+          "label": "AI Telugu Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/telugu",
+          "description": "Generate Telugu flash cards from your PDF and documents instantly."
         },
         {
-          "label": "Spaced Repetition Guide",
-          "href": "https://www.cogniguide.app/flashcards/spaced-repetition",
-          "description": "Understand how scheduling reviews optimizes long-term memory retention."
+          "label": "AI Marathi Language Cards",
+          "href": "https://www.cogniguide.app/flashcards/marathi",
+          "description": "Create custom Marathi flashcards instantly from any PDF for language study."
         }
       ]
     },
@@ -30045,14 +30032,13 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Expand Your Study Toolkit",
       "links": [
         {
-          "label": "AI Flashcards for ESL Grammar",
-          "href": "https://www.cogniguide.app/flashcards/esl-grammar",
-          "description": "Focus generation specifically on complex ESL grammar rules extracted from notes."
+          "label": "Tesol",
+          "href": "https://www.cogniguide.app/flashcards/tesol"
         },
         {
-          "label": "Document to Study Guide Converter",
-          "href": "https://www.cogniguide.app/features/document-conversion",
-          "description": "Learn more about the underlying technology for processing complex educational documents."
+          "label": "AI English as a Second Language",
+          "href": "https://www.cogniguide.app/flashcards/esl",
+          "description": "Create powerful ESL flashcards from PDFs instantly for language learners."
         }
       ]
     },
@@ -30254,14 +30240,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore More Study Techniques",
       "links": [
         {
-          "label": "AI for Active Recall",
-          "href": "https://www.cogniguide.app/flashcards/active-recall",
-          "description": "Learn how active recall drastically improves long-term memory compared to passive reading."
+          "label": "AI Quizlet Flashcard Creator",
+          "href": "https://www.cogniguide.app/flashcards/create-quizlet",
+          "description": "Ditch manual entry and create smarter Quizlet-style decks from documents instantly."
         },
         {
-          "label": "Mastering Spaced Repetition",
-          "href": "https://www.cogniguide.app/flashcards/spaced-repetition",
-          "description": "Dive deeper into the algorithms that power optimal study timing for peak efficiency."
+          "label": "Quizlet Alternative AI",
+          "href": "https://www.cogniguide.app/flashcards/sites-like-quizlet",
+          "description": "Generate smarter flashcards instantly—a better tool than sites like Quizlet."
         }
       ]
     },
@@ -30464,14 +30450,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Deepen Your Study Strategy",
       "links": [
         {
-          "label": "Benefits of Active Recall Training",
-          "href": "https://www.cogniguide.app/flashcards/active-recall-benefits",
-          "description": "Learn the science behind why testing yourself is more effective than rereading notes."
+          "label": "AI Quizlet PDF Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/quizlet",
+          "description": "Stop manually making Quizlet flashcards from PDFs; let AI do it instantly."
         },
         {
-          "label": "Advanced Spaced Repetition Schedules",
-          "href": "https://www.cogniguide.app/flashcards/spaced-repetition-guides",
-          "description": "Understand how optimized review timing drastically improves memory retention over time."
+          "label": "AI Knowt Alternative",
+          "href": "https://www.cogniguide.app/flashcards/knowt",
+          "description": "Instantly generate Knowt-style flashcards using AI for faster concept mastery."
         }
       ]
     },
@@ -30673,14 +30659,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Deepen Your Learning Strategies",
       "links": [
         {
-          "label": "Active Recall Techniques",
-          "href": "https://www.cogniguide.app/flashcards/active-recall",
-          "description": "Learn how transforming passive review into active retrieval dramatically boosts memory encoding."
+          "label": "Flashcard Maker with Pictures",
+          "href": "https://www.cogniguide.app/flashcards/maker-pictures",
+          "description": "Automatically create engaging, visual study sets by adding pictures to flashcards."
         },
         {
-          "label": "Spaced Repetition Benefits",
-          "href": "https://www.cogniguide.app/flashcards/spaced-repetition",
-          "description": "Understand the proven cognitive science behind optimal study timing and scheduling."
+          "label": "AI Visual Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/creator-images",
+          "description": "The effortless flashcard creator with images, powered by visual AI."
         }
       ]
     },
@@ -30878,14 +30864,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore Other Study Techniques",
       "links": [
         {
-          "label": "PDF to Flashcard Converter",
-          "href": "https://www.cogniguide.app/flashcards/pdf-converter",
-          "description": "Learn how to turn research papers and PDFs into efficient study decks."
+          "label": "One Note to Flash Cards",
+          "href": "https://www.cogniguide.app/flashcards/one-note",
+          "description": "Transform your One Note pages into flash cards instantly with AI."
         },
         {
-          "label": "Active Recall Strategies",
-          "href": "https://www.cogniguide.app/flashcards/active-recall",
-          "description": "Understand the science behind why active recall dramatically improves memory strength."
+          "label": "AI Goodnotes Note Converter",
+          "href": "https://www.cogniguide.app/flashcards/goodnotes",
+          "description": "Instantly turn Goodnotes material into smart AI-powered study flash cards."
         }
       ]
     },
@@ -31084,14 +31070,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Continue Building Smarter Study Habits",
       "links": [
         {
-          "label": "How to Use Active Recall Effectively",
-          "href": "https://www.cogniguide.app/study-techniques/active-recall",
-          "description": "Learn the science behind testing yourself for stronger memory encoding."
+          "label": "AI Vocab Flashcard Maker",
+          "href": "https://www.cogniguide.app/flashcards/vocab-maker",
+          "description": "The fastest AI vocab flashcard maker online for maximizing retention."
         },
         {
-          "label": "Understanding Spaced Repetition Algorithms",
-          "href": "https://www.cogniguide.app/learning-algorithms/spaced-repetition",
-          "description": "Deep dive into the cognitive science that drives our scheduling feature."
+          "label": "AI Vocabulary Builder",
+          "href": "https://www.cogniguide.app/flashcards/english-vocabulary",
+          "description": "Create smart English vocabulary cards instantly to master words faster."
         }
       ]
     },
@@ -31290,14 +31276,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore Smarter Study Methods",
       "links": [
         {
-          "label": "Active Recall Techniques",
-          "href": "https://www.cogniguide.app/flashcards/active-recall-techniques",
-          "description": "Learn how actively retrieving information strengthens memory formation."
+          "label": "AI Flashcard Quiz Maker",
+          "href": "https://www.cogniguide.app/flashcards/quiz-maker",
+          "description": "The fastest AI flashcard quiz maker available for smarter studying."
         },
         {
-          "label": "Spaced Repetition Explained",
-          "href": "https://www.cogniguide.app/flashcards/spaced-repetition-explained",
-          "description": "Dive into the science behind optimal study timing for long-term mastery."
+          "label": "Smarter than Quizlet",
+          "href": "https://www.cogniguide.app/flashcards/create-quiz-quizlet",
+          "description": "Instantly create quizzes and flashcards from any document with AI."
         }
       ]
     },
@@ -31499,14 +31485,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Deepen Your Study Strategy",
       "links": [
         {
-          "label": "Active Recall Techniques",
-          "href": "https://www.cogniguide.app/flashcards/active-recall-techniques",
-          "description": "Understand the science behind testing yourself for superior memory retention."
+          "label": "Quizlet Create a Set AI",
+          "href": "https://www.cogniguide.app/flashcards/quizlet-create-set",
+          "description": "Ditch 'Quizlet Create A Set'—generate smart flashcards from files now."
         },
         {
-          "label": "Mastering Spaced Repetition",
-          "href": "https://www.cogniguide.app/flashcards/mastering-spaced-repetition",
-          "description": "Learn how interval timing dramatically improves long-term knowledge consolidation."
+          "label": "Automated Quizlet Deck Builder",
+          "href": "https://www.cogniguide.app/flashcards/create-quizlet",
+          "description": "Ditch manual entry and create smarter Quizlet-style decks from documents instantly."
         }
       ]
     },
@@ -31709,14 +31695,13 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore More Study Techniques",
       "links": [
         {
-          "label": "Active Recall Study Guides",
-          "href": "{base_url}/guides/active-recall",
-          "description": "Deep dive into the science behind active recall and how to apply it."
+          "label": "Bedroom Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/bedroom",
+          "description": "Instantly create flashcards of bedroom items from any PDF or document."
         },
         {
-          "label": "Document Analysis Tools",
-          "href": "{base_url}/tools/document-analysis",
-          "description": "Find other ways to process and extract knowledge from large text bodies."
+          "label": "Kitchen Items",
+          "href": "https://www.cogniguide.app/flashcards/kitchen-items"
         }
       ]
     },
@@ -31914,14 +31899,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore Study Techniques",
       "links": [
         {
-          "label": "Mastering Active Recall",
-          "href": "https://www.cogniguide.app/flashcards/active-recall-guide",
-          "description": "Deep dive into why testing yourself is superior to rereading."
+          "label": "Quizlet Make Alternative",
+          "href": "https://www.cogniguide.app/flashcards/quizlet-make",
+          "description": "Bypass manual entry: make your own Quizlet flashcards the smarter way."
         },
         {
-          "label": "Understanding Spaced Learning",
-          "href": "https://www.cogniguide.app/flashcards/spaced-repetition-basics",
-          "description": "Learn the science behind optimizing study intervals for memory."
+          "label": "AI Quizlet Card Maker",
+          "href": "https://www.cogniguide.app/flashcards/make-quizlet",
+          "description": "Stop manual entry and make your Quizlet sets with AI instantly."
         }
       ]
     },
@@ -32124,14 +32109,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Further Optimize Your Study Strategy",
       "links": [
         {
-          "label": "Active Recall Techniques",
-          "href": "https://www.cogniguide.app/flashcards/active-recall",
-          "description": "Learn how forcing retrieval enhances memory encoding beyond simple recognition."
+          "label": "AI Flashcard Maker",
+          "href": "https://www.cogniguide.app/flashcards/maker",
+          "description": "The ultimate AI flashcard maker for converting complex material into cards."
         },
         {
-          "label": "Spaced Repetition Guides",
-          "href": "https://www.cogniguide.app/flashcards/spaced-repetition",
-          "description": "In-depth guidance on optimizing review intervals for maximum retention."
+          "label": "Online Digital Study Decks",
+          "href": "https://www.cogniguide.app/flashcards/digital-maker",
+          "description": "Create intelligent digital flashcard decks from any file for modern studying."
         }
       ]
     },
@@ -32330,14 +32315,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Expand Your Study Toolkit",
       "links": [
         {
-          "label": "AI Flashcards for Medical School",
-          "href": "https://www.cogniguide.app/flashcards/medical-school-notes",
-          "description": "Learn how to convert dense lecture notes into smart review sets."
+          "label": "GRE Magoosh Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/gre-magoosh",
+          "description": "Instantly generate AI flashcards from GRE Magoosh materials for smarter prep."
         },
         {
-          "label": "Using Active Recall Techniques",
-          "href": "https://www.cogniguide.app/blog/active-recall-benefits",
-          "description": "Deep dive into the cognitive science behind active recall and how our tool implements it."
+          "label": "AI GRE Vocab Prep",
+          "href": "https://www.cogniguide.app/flashcards/kaplan-gre-vocabulary",
+          "description": "Generate Kaplan GRE vocabulary flashcards from your PDF instantly."
         }
       ]
     },
@@ -32539,14 +32524,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Deepen Your Study Strategies",
       "links": [
         {
-          "label": "Mastering Active Recall Techniques",
-          "href": "https://www.cogniguide.app/flashcards/active-recall",
-          "description": "Learn how to maximize the effectiveness of flashcard practice sessions."
+          "label": "AI Quizlet PDF Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/quizlet",
+          "description": "Stop manually making Quizlet flashcards from PDFs; let AI do it instantly."
         },
         {
-          "label": "Understanding Spaced Repetition",
-          "href": "https://www.cogniguide.app/flashcards/spaced-repetition",
-          "description": "Dive into the science behind optimal study timing and memory retention."
+          "label": "AI Knowt Alternative",
+          "href": "https://www.cogniguide.app/flashcards/knowt",
+          "description": "Instantly generate Knowt-style flashcards using AI for faster concept mastery."
         }
       ]
     },
@@ -32748,14 +32733,12 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Optimize Your Study Workflow",
       "links": [
         {
-          "label": "Active Recall Techniques",
-          "href": "https://www.cogniguide.app/flashcards/active-recall-techniques",
-          "description": "Learn how to maximize the benefits of your newly generated flashcards using proven recall methods."
+          "label": "Music Theory",
+          "href": "https://www.cogniguide.app/flashcards/music-theory"
         },
         {
-          "label": "Exam Date Scheduling Tools",
-          "href": "https://www.cogniguide.app/flashcards/exam-date-scheduling",
-          "description": "Discover advanced strategies for setting optimal study timelines leading up to major exams."
+          "label": "Instrument Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/instrument-flashcards"
         }
       ]
     },
@@ -32957,14 +32940,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore Study Techniques",
       "links": [
         {
-          "label": "Master Active Recall",
-          "href": "https://www.cogniguide.app/flashcards/active-recall-techniques",
-          "description": "Learn how retrieving information strengthens memory more effectively than passive review."
+          "label": "AI Digital Flashcard Maker",
+          "href": "https://www.cogniguide.app/flashcards/digital-maker",
+          "description": "Create intelligent digital flashcard decks from any file for modern studying."
         },
         {
-          "label": "Optimize Spaced Repetition",
-          "href": "https://www.cogniguide.app/flashcards/spaced-repetition-guide",
-          "description": "Deep dive into the science behind scheduling reviews for long-term retention."
+          "label": "Web-Based Flashcard Creator",
+          "href": "https://www.cogniguide.app/flashcards/online-maker",
+          "description": "Generate study decks with an AI online flashcard maker from any document."
         }
       ]
     },
@@ -33166,14 +33149,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore Related Study Techniques",
       "links": [
         {
-          "label": "Spaced Repetition Explained",
-          "href": "https://www.cogniguide.app/flashcards/spaced-repetition-guide",
-          "description": "Learn the cognitive science behind why spaced review drastically improves long-term memory."
+          "label": "Fundations Digraph Sound Cards",
+          "href": "https://www.cogniguide.app/flashcards/fundations-digraph-sound",
+          "description": "Create Fundations digraph sound cards instantly with AI for phonics learning."
         },
         {
-          "label": "Active Recall Benefits",
-          "href": "https://www.cogniguide.app/flashcards/active-recall-power",
-          "description": "Discover how forcing retrieval from memory accelerates the learning process for complex subjects."
+          "label": "AI Phonics Deck Creator",
+          "href": "https://www.cogniguide.app/flashcards/phonics-sound",
+          "description": "Create phonics sound cards from any document instantly for reading."
         }
       ]
     },
@@ -33375,14 +33358,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Expand Your Study Toolkit",
       "links": [
         {
-          "label": "Active Recall Techniques",
-          "href": "https://www.cogniguide.app/flashcards/active-recall",
-          "description": "Learn how retrieval practice supercharges memory encoding."
+          "label": "AI Anki Flashcards Maker",
+          "href": "https://www.cogniguide.app/flashcards/anki-maker",
+          "description": "The smart AI Anki flashcards maker for fast, free study set creation."
         },
         {
-          "label": "Study Scheduling Tools",
-          "href": "https://www.cogniguide.app/flashcards/study-scheduler",
-          "description": "Discover advanced methods for planning effective study time blocks."
+          "label": "Fast Anki Deck Generation",
+          "href": "https://www.cogniguide.app/flashcards/create-anki-quickly",
+          "description": "Instantly create Anki cards from any document to streamline your study workflow."
         }
       ]
     },
@@ -33584,14 +33567,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore More Study Resources",
       "links": [
         {
-          "label": "Active Recall Techniques Guide",
-          "href": "https://www.cogniguide.app/flashcards/active-recall-guide",
-          "description": "Deep dive into why testing yourself is the most effective study strategy."
+          "label": "AI Anki Deck Generator",
+          "href": "https://www.cogniguide.app/flashcards/anki-deck-generator",
+          "description": "The ultimate AI Anki deck generator for complex material; just upload."
         },
         {
-          "label": "Guide to Spaced Repetition",
-          "href": "https://www.cogniguide.app/flashcards/spaced-repetition-guide",
-          "description": "Learn the science behind the scheduling system that powers long-term memory."
+          "label": "AI Anki Card Generator",
+          "href": "https://www.cogniguide.app/flashcards/make-anki",
+          "description": "Effortlessly make Anki cards from any study material with our AI tool."
         }
       ]
     },
@@ -33792,14 +33775,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Expand Your Study Toolkit",
       "links": [
         {
-          "label": "Active Recall Techniques",
-          "href": "https://www.cogniguide.app/flashcards/active-recall",
-          "description": "Learn how immediate testing boosts memory retention far beyond passive review."
+          "label": "Evernote Flashcards Converter",
+          "href": "https://www.cogniguide.app/flashcards/evernote",
+          "description": "Transform your Evernote notes into smart flashcards for efficient studying."
         },
         {
-          "label": "Advanced Spaced Repetition Theory",
-          "href": "https://www.cogniguide.app/flashcards/spaced-repetition",
-          "description": "Understand the science behind efficient review scheduling for maximum retention."
+          "label": "AI Goodnotes Note Converter",
+          "href": "https://www.cogniguide.app/flashcards/goodnotes",
+          "description": "Instantly turn Goodnotes material into smart AI-powered study flash cards."
         }
       ]
     },
@@ -33997,14 +33980,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore Smarter Study Techniques",
       "links": [
         {
-          "label": "Master Active Recall Methods",
-          "href": "https://www.cogniguide.app/flashcards/active-recall",
-          "description": "Learn how forcing retrieval strengthens memory connections."
+          "label": "Make Anki Cards Instantly",
+          "href": "https://www.cogniguide.app/flashcards/make-anki",
+          "description": "Effortlessly make Anki cards from any study material with our AI tool."
         },
         {
-          "label": "Understanding Spaced Repetition",
-          "href": "https://www.cogniguide.app/flashcards/spaced-repetition",
-          "description": "Deep dive into the algorithms that schedule optimal review timing."
+          "label": "Smart Anki Card Creator",
+          "href": "https://www.cogniguide.app/flashcards/anki-maker",
+          "description": "The smart AI Anki flashcards maker for fast, free study set creation."
         }
       ]
     },
@@ -34208,14 +34191,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore More Study Techniques",
       "links": [
         {
-          "label": "How Spaced Repetition Works",
-          "href": "https://www.cogniguide.app/flashcards/spaced-repetition-guide",
-          "description": "Understand the cognitive science behind efficient long-term learning."
+          "label": "SAT Vocabulary Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/sat-vocabulary",
+          "description": "Generate SAT vocabulary flashcards from word lists to accelerate exam mastery."
         },
         {
-          "label": "Active Recall Strategies",
-          "href": "https://www.cogniguide.app/flashcards/active-recall-strategies",
-          "description": "Discover proven methods to test your knowledge instead of just rereading notes."
+          "label": "AI Barron's SAT Prep",
+          "href": "https://www.cogniguide.app/flashcards/barrons-sat-vocabulary",
+          "description": "Stop manually making Barron's SAT vocabulary flashcards; use AI instead."
         }
       ]
     },
@@ -34417,14 +34400,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Master Active Recall Techniques",
       "links": [
         {
-          "label": "The Science of Spaced Repetition",
-          "href": "https://www.cogniguide.app/flashcards/spaced-repetition-science",
-          "description": "Understand the proven memory techniques our AI scheduling is built upon."
+          "label": "Create Anki Cards with AI",
+          "href": "https://www.cogniguide.app/flashcards/create-anki",
+          "description": "Stop manually making flashcards; use AI to create Anki cards instantly."
         },
         {
-          "label": "Optimizing Study Workflow",
-          "href": "https://www.cogniguide.app/flashcards/study-workflow-hacks",
-          "description": "Tips on integrating automated card generation into your daily routine for peak performance."
+          "label": "Smart Anki Card Creator",
+          "href": "https://www.cogniguide.app/flashcards/anki-maker",
+          "description": "The smart AI Anki flashcards maker for fast, free study set creation."
         }
       ]
     },
@@ -34624,14 +34607,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Enhance Your Study Strategy",
       "links": [
         {
-          "label": "Active Recall Techniques",
-          "href": "https://www.cogniguide.app/flashcards/active-recall-techniques",
-          "description": "Learn proven methods to maximize information retention beyond simple reading."
+          "label": "Quizlet Create a Set AI",
+          "href": "https://www.cogniguide.app/flashcards/quizlet-create-set",
+          "description": "Ditch 'Quizlet Create A Set'—generate smart flashcards from files now."
         },
         {
-          "label": "Science of Spaced Repetition",
-          "href": "https://www.cogniguide.app/flashcards/spaced-repetition-science",
-          "description": "Understand the cognitive basis behind effective, long-term memory building."
+          "label": "Beat Manual Quizlet Creation",
+          "href": "https://www.cogniguide.app/flashcards/create-study-set-quizlet",
+          "description": "Effortlessly create study sets faster and smarter than manual Quizlet entry."
         }
       ]
     },
@@ -34833,14 +34816,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore Other Study Methods",
       "links": [
         {
-          "label": "Active Recall Techniques",
-          "href": "https://www.cogniguide.app/flashcards/active-recall-study",
-          "description": "Learn how to structure your study sessions to force better memory retrieval."
+          "label": "AI Online Flashcard Maker",
+          "href": "https://www.cogniguide.app/flashcards/online-maker",
+          "description": "Generate study decks with an AI online flashcard maker from any document."
         },
         {
-          "label": "Mastering Spaced Repetition",
-          "href": "https://www.cogniguide.app/flashcards/spaced-repetition-scheduling",
-          "description": "Understand the science behind optimizing your review intervals for long-term learning."
+          "label": "Online Study Set Creator",
+          "href": "https://www.cogniguide.app/flashcards/create-study-online",
+          "description": "Create study flashcards online instantly from your materials using smart AI."
         }
       ]
     },
@@ -35044,14 +35027,12 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore Other Study Resources",
       "links": [
         {
-          "label": "General Study Techniques",
-          "href": "https://www.cogniguide.app/flashcards/study-techniques",
-          "description": "Learn how active recall and testing optimize learning effectiveness."
+          "label": "Boat Safety",
+          "href": "https://www.cogniguide.app/flashcards/boat-safety"
         },
         {
-          "label": "AI Document Summary Tool",
-          "href": "https://www.cogniguide.app/summarizer",
-          "description": "Generate concise summaries from lengthy study documents instantly."
+          "label": "Navigation Rules",
+          "href": "https://www.cogniguide.app/flashcards/navigation-rules"
         }
       ]
     },
@@ -35249,14 +35230,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Advanced Study Techniques",
       "links": [
         {
-          "label": "Active Recall Strategies",
-          "href": "https://www.cogniguide.app/flashcards/active-recall",
-          "description": "Learn how testing yourself reinforces memory pathways better than re-reading."
+          "label": "Create Anki Cards with AI",
+          "href": "https://www.cogniguide.app/flashcards/create-anki",
+          "description": "Stop manually making flashcards; use AI to create Anki cards instantly."
         },
         {
-          "label": "Spaced Repetition Explained",
-          "href": "https://www.cogniguide.app/flashcards/spaced-repetition",
-          "description": "Discover the optimal timing algorithms for long-term knowledge retention."
+          "label": "AI Anki Note Converter",
+          "href": "https://www.cogniguide.app/flashcards/anki-notes",
+          "description": "Instantly create dynamic AI flashcards from your static Anki notes."
         }
       ]
     },
@@ -35459,14 +35440,13 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Advanced Study Techniques",
       "links": [
         {
-          "label": "AI Flashcards for Biology",
-          "href": "https://www.cogniguide.app/flashcards/biology",
-          "description": "See how to convert complex biological pathways and diagrams into study sets."
+          "label": "Chemistry",
+          "href": "https://www.cogniguide.app/flashcards/chemistry"
         },
         {
-          "label": "Mastering Spaced Repetition",
-          "href": "https://www.cogniguide.app/study-methods/spaced-repetition",
-          "description": "Dive deeper into the science behind why spaced review maximizes long-term memory."
+          "label": "PDF to Biology Study Guide",
+          "href": "https://www.cogniguide.app/flashcards/biology",
+          "description": "Create smart, free biology flashcards from any document for your class."
         }
       ]
     },
@@ -35665,14 +35645,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore Other Study Resources",
       "links": [
         {
-          "label": "AI Biology Flashcard Generator",
-          "href": "https://www.cogniguide.app/flashcards/biology",
-          "description": "Create detailed flashcards for complex biological systems and processes."
+          "label": "AI Plants Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/plants",
+          "description": "Generate plants flashcards instantly with AI for mastering botany concepts."
         },
         {
-          "label": "Chemistry Periodic Table Cards",
-          "href": "https://www.cogniguide.app/flashcards/chemistry",
-          "description": "Instantly generate memorization aids for elements, structures, and reactions."
+          "label": "AI Fruit Study Cards",
+          "href": "https://www.cogniguide.app/flashcards/fruits",
+          "description": "Generate smart flashcards from fruit PDFs instantly for botanical learning."
         }
       ]
     },
@@ -35870,14 +35850,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore More Study Tools",
       "links": [
         {
-          "label": "AI Flashcard Generator",
-          "href": "https://www.cogniguide.app/flashcards/ai-generator",
-          "description": "Learn how to use AI to convert any text into study cards."
+          "label": "SAT Vocabulary Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/sat-vocabulary",
+          "description": "Generate SAT vocabulary flashcards from word lists to accelerate exam mastery."
         },
         {
-          "label": "Spaced Repetition Guide",
-          "href": "https://www.cogniguide.app/study-methods/spaced-repetition",
-          "description": "Understand the science behind optimized review scheduling."
+          "label": "AI SAT Prep Cards",
+          "href": "https://www.cogniguide.app/flashcards/barrons-sat",
+          "description": "Create instant AI Barron's SAT flashcards from your study materials."
         }
       ]
     },
@@ -36080,14 +36060,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore More Study Techniques",
       "links": [
         {
-          "label": "Active Recall Workflows",
-          "href": "https://www.cogniguide.app/flashcards/active-recall",
-          "description": "Learn how to maximize memory encoding using retrieval practice."
+          "label": "AI Anki Note Cards",
+          "href": "https://www.cogniguide.app/flashcards/anki-note",
+          "description": "Stop making Anki note cards manually and let AI create them for you."
         },
         {
-          "label": "Study Planning Tools",
-          "href": "https://www.cogniguide.app/flashcards/study-planner",
-          "description": "Discover tools to structure your study time efficiently toward a goal date."
+          "label": "Automated Anki Maker",
+          "href": "https://www.cogniguide.app/flashcards/create-anki",
+          "description": "Stop manually making flashcards; use AI to create Anki cards instantly."
         }
       ]
     },
@@ -36284,14 +36264,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Optimize Your Study Workflow",
       "links": [
         {
-          "label": "AI Flashcards for Licensing Exams",
-          "href": "https://www.cogniguide.app/flashcards/licensing-exams",
-          "description": "See how professionals use AI to master high-volume certification knowledge."
+          "label": "AI NASM Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/nasm",
+          "description": "Create NASM flashcards from your PDF study guide instantly for certification."
         },
         {
-          "label": "Mastering Active Recall Techniques",
-          "href": "https://www.cogniguide.app/study-guides/active-recall",
-          "description": "In-depth guide on the learning science behind effective studying."
+          "label": "AI CompTIA Prep",
+          "href": "https://www.cogniguide.app/flashcards/comptia",
+          "description": "Generate CompTIA A+ flashcards from any PDF instantly for IT certification."
         }
       ]
     },
@@ -36493,14 +36473,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore More Study Tools",
       "links": [
         {
-          "label": "Concept Flashcard Generator",
-          "href": "https://www.cogniguide.app/flashcards/concepts",
-          "description": "Convert dense academic texts into conceptual question/answer cards."
+          "label": "Vocabulary Flash Cards",
+          "href": "https://www.cogniguide.app/flashcards/vocabulary",
+          "description": "Generate vocabulary flash cards from your PDF files for any subject."
         },
         {
-          "label": "Exam Date Study Planner",
-          "href": "https://www.cogniguide.app/planning/exam-schedule",
-          "description": "Set your target date and get an optimized review calendar."
+          "label": "AI Vocabulary Builder",
+          "href": "https://www.cogniguide.app/flashcards/english-vocabulary",
+          "description": "Create smart English vocabulary cards instantly to master words faster."
         }
       ]
     },
@@ -36703,14 +36683,13 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore More Smart Study Techniques",
       "links": [
         {
-          "label": "AI Flashcards for Technical Manuals",
-          "href": "https://www.cogniguide.app/flashcards/technical-manual-summary",
-          "description": "See how to turn dense technical documentation into actionable study sets."
+          "label": "ServSafe 7th Edition Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/servsafe-7th-edition-quizlet",
+          "description": "Generate AI flashcards for ServSafe 7th Edition, ditching Quizlet."
         },
         {
-          "label": "Optimizing Study Time with Active Recall",
-          "href": "https://www.cogniguide.app/flashcards/active-recall-strategy",
-          "description": "Learn the cognitive science behind why active recall beats passive reading."
+          "label": "Food Safety",
+          "href": "https://www.cogniguide.app/flashcards/food-safety"
         }
       ]
     },
@@ -36913,14 +36892,13 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Further Study Resources",
       "links": [
         {
-          "label": "Active Recall Techniques",
-          "href": "https://www.cogniguide.app/flashcards/active-recall-techniques",
-          "description": "Learn advanced strategies to maximize memory retention beyond simple reading."
+          "label": "Note Recognition Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/note-recognition",
+          "description": "Generate AI note recognition flashcards instantly for mastering music theory."
         },
         {
-          "label": "Optimizing Study Schedules",
-          "href": "https://www.cogniguide.app/flashcards/study-schedule-optimization",
-          "description": "Deep dive into planning study sessions around cognitive load and effective timing."
+          "label": "Music Theory",
+          "href": "https://www.cogniguide.app/flashcards/music-theory"
         }
       ]
     },
@@ -37123,14 +37101,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore Other Study Tools",
       "links": [
         {
-          "label": "AI Textbook Summarizer",
-          "href": "https://www.cogniguide.app/flashcards/summarizer",
-          "description": "Quickly condense long chapters into manageable summaries for fast review."
+          "label": "AI Spanish Flash Cards",
+          "href": "https://www.cogniguide.app/flashcards/spanish",
+          "description": "Create powerful Spanish vocabulary flash cards automatically from your documents."
         },
         {
-          "label": "Concept Explainer Tool",
-          "href": "https://www.cogniguide.app/flashcards/explainer",
-          "description": "Get simple, expert explanations for complex technical topics."
+          "label": "French Vocabulary Generator",
+          "href": "https://www.cogniguide.app/flashcards/french",
+          "description": "Create custom French flash cards from any document for language learning."
         }
       ]
     },
@@ -37332,14 +37310,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore More Study Tools",
       "links": [
         {
-          "label": "Biology Note Summarizer",
-          "href": "https://www.cogniguide.app/flashcards/biology-notes",
-          "description": "Instantly summarize complex biology lecture notes for quicker review."
+          "label": "Flash Cards for Animals",
+          "href": "https://www.cogniguide.app/flashcards/animals",
+          "description": "Create instant flash cards from your animals study materials with AI."
         },
         {
-          "label": "Exam Preparation Scheduling",
-          "href": "https://www.cogniguide.app/tools/exam-prep",
-          "description": "Learn how to structure your entire study timeline effectively using date-based planning."
+          "label": "AI Animal Study Decks",
+          "href": "https://www.cogniguide.app/flashcards/zoo-animals",
+          "description": "Create instant zoo animals flashcards from any document for biology."
         }
       ]
     },
@@ -37541,14 +37519,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Expand Your Study Toolkit",
       "links": [
         {
-          "label": "AI Notes Summarizer",
-          "href": "https://www.cogniguide.app/flashcards/summarization",
-          "description": "Quickly distill long articles or meeting transcripts into key takeaways for better comprehension."
+          "label": "Multiplication Flashcards PDF",
+          "href": "https://www.cogniguide.app/flashcards/multiplication",
+          "description": "Create instant flashcards from your multiplication PDF notes for quick practice."
         },
         {
-          "label": "Active Recall Techniques",
-          "href": "https://www.cogniguide.app/flashcards/recall-techniques",
-          "description": "Learn more about the cognitive science behind effective study strategies like self-testing."
+          "label": "AI Math Fraction Helper",
+          "href": "https://www.cogniguide.app/flashcards/fraction",
+          "description": "Generate instant fraction flash cards from any PDF for math concepts."
         }
       ]
     },
@@ -37747,14 +37725,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Master Your Study Techniques",
       "links": [
         {
-          "label": "How Active Recall Boosts Memory",
-          "href": "https://www.cogniguide.app/flashcards/active-recall-guide",
-          "description": "Learn the cognitive science behind testing yourself and why it outperforms passive reading."
+          "label": "AI Digital Flashcard Maker",
+          "href": "https://www.cogniguide.app/flashcards/digital-maker",
+          "description": "Create intelligent digital flashcard decks from any file for modern studying."
         },
         {
-          "label": "Understanding Spaced Repetition",
-          "href": "https://www.cogniguide.app/flashcards/spaced-repetition-explained",
-          "description": "Dive deeper into scheduling algorithms that optimize long-term retention."
+          "label": "Web-Based Flashcard Creator",
+          "href": "https://www.cogniguide.app/flashcards/online-maker",
+          "description": "Generate study decks with an AI online flashcard maker from any document."
         }
       ]
     },
@@ -37956,14 +37934,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore Other Study Methods",
       "links": [
         {
-          "label": "Active Recall Techniques Guide",
-          "href": "https://www.cogniguide.app/flashcards/active-recall-guide",
-          "description": "Deep dive into how actively retrieving information strengthens memory pathways."
+          "label": "Fundations Digraph Sound Cards",
+          "href": "https://www.cogniguide.app/flashcards/fundations-digraph-sound",
+          "description": "Create Fundations digraph sound cards instantly with AI for phonics learning."
         },
         {
-          "label": "Maximizing Study Efficiency",
-          "href": "https://www.cogniguide.app/flashcards/study-efficiency",
-          "description": "Strategies for optimizing your study workflow beyond simple memorization."
+          "label": "AI Sight Words Generator",
+          "href": "https://www.cogniguide.app/flashcards/sight",
+          "description": "Generate smart sight words flash cards instantly from your learning materials."
         }
       ]
     },
@@ -38166,14 +38144,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Expand Your Study Toolkit",
       "links": [
         {
-          "label": "Best Practices for Active Recall",
-          "href": "https://www.cogniguide.app/flashcards/active-recall-techniques",
-          "description": "Discover proven methods to make your study sessions more effective using retrieval practice."
+          "label": "AI Quizlet PDF Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/quizlet",
+          "description": "Stop manually making Quizlet flashcards from PDFs; let AI do it instantly."
         },
         {
-          "label": "Understanding Spaced Repetition Benefits",
-          "href": "https://www.cogniguide.app/flashcards/spaced-repetition-guide",
-          "description": "Learn the science behind why spacing out reviews leads to superior long-term retention."
+          "label": "Quizlet Alternative AI",
+          "href": "https://www.cogniguide.app/flashcards/sites-like-quizlet",
+          "description": "Generate smarter flashcards instantly—a better tool than sites like Quizlet."
         }
       ]
     },
@@ -38377,14 +38355,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Expand Your Study Toolkit",
       "links": [
         {
-          "label": "AI Study Planners",
-          "href": "https://www.cogniguide.app/study-planners",
-          "description": "Learn how dynamic scheduling tools can integrate with your flashcards."
+          "label": "Convert Notes to Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/convert-notes",
+          "description": "Effortlessly convert your notes to flashcards using AI for active recall."
         },
         {
-          "label": "Mastering Active Recall",
-          "href": "https://www.cogniguide.app/active-recall-guide",
-          "description": "Deep dive into proven learning techniques that maximize memory retention."
+          "label": "Note to Flashcard Converter",
+          "href": "https://www.cogniguide.app/flashcards/study-notes",
+          "description": "Generate smart flashcards from your study notes instantly for active recall."
         }
       ]
     },
@@ -38586,14 +38564,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Deepen Your Study Strategy",
       "links": [
         {
-          "label": "Master Active Recall Techniques",
-          "href": "https://www.cogniguide.app/flashcards/active-recall-benefits",
-          "description": "Learn how immediate testing improves long-term memory formation."
+          "label": "Make Your Own Quizlet AI",
+          "href": "https://www.cogniguide.app/flashcards/make-my-quizlet",
+          "description": "Stop manual entry: make your own Quizlet sets instantly with AI."
         },
         {
-          "label": "Understanding Spaced Repetition",
-          "href": "https://www.cogniguide.app/flashcards/spaced-repetition-guide",
-          "description": "Discover the proven algorithm behind efficient study scheduling."
+          "label": "AI Flashcard Creator",
+          "href": "https://www.cogniguide.app/flashcards/quizlet-create",
+          "description": "Effortlessly create your own flashcards with AI, faster than Quizlet."
         }
       ]
     },
@@ -38795,14 +38773,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore Related Study Tools",
       "links": [
         {
-          "label": "AI Flashcards for Law School Exams",
-          "href": "https://www.cogniguide.app/flashcards/law-school",
-          "description": "See how students transform case law and statutes into powerful recall exercises."
+          "label": "GRE Magoosh Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/gre-magoosh",
+          "description": "Instantly generate AI flashcards from GRE Magoosh materials for smarter prep."
         },
         {
-          "label": "Leveraging Active Recall Principles",
-          "href": "https://www.cogniguide.app/blog/active-recall-guide",
-          "description": "Read our guide on the cognitive science behind why flashcards are superior to highlighting."
+          "label": "AI SAT Vocab Builder",
+          "href": "https://www.cogniguide.app/flashcards/sat-vocabulary",
+          "description": "Generate SAT vocabulary flashcards from word lists to accelerate exam mastery."
         }
       ]
     },
@@ -39004,14 +38982,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Deepen Your Study Strategy",
       "links": [
         {
-          "label": "Active Recall Techniques",
-          "href": "https://www.cogniguide.app/flashcards/active-recall-strategies",
-          "description": "Learn how to maximize memory retention using proven recall methods."
+          "label": "Best Flashcard Maker App",
+          "href": "https://www.cogniguide.app/flashcards/best-maker",
+          "description": "The best flashcard maker app powered by AI for instant study sets."
         },
         {
-          "label": "Understanding Spaced Repetition",
-          "href": "https://www.cogniguide.app/flashcards/spaced-repetition-guide",
-          "description": "Dive into the science behind scheduling reviews for long-term memory encoding."
+          "label": "AI Note to Card App",
+          "href": "https://www.cogniguide.app/flashcards/best-creating",
+          "description": "The best app for creating flashcards from your study materials."
         }
       ]
     },
@@ -39206,14 +39184,13 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore Advanced Study Techniques",
       "links": [
         {
-          "label": "Mastering Active Recall",
-          "href": "https://www.cogniguide.app/flashcards/active-recall-techniques",
-          "description": "Learn how challenging your memory leads to stronger, lasting knowledge retention."
+          "label": "Best App to Make Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/best-make",
+          "description": "The best app to make your own flashcards instantly with AI."
         },
         {
-          "label": "Understanding Spaced Repetition",
-          "href": "https://www.cogniguide.app/flashcards/spaced-repetition-guide",
-          "description": "Dive into the science behind timing your study sessions perfectly for maximum memory benefit."
+          "label": "Best Creator",
+          "href": "https://www.cogniguide.app/flashcards/best-creator"
         }
       ]
     },
@@ -39416,14 +39393,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Enhance Your Study Workflow",
       "links": [
         {
-          "label": "AI Study Guides from Textbooks",
-          "href": "https://www.cogniguide.app/flashcards/study-guides",
-          "description": "Learn how to transform entire chapters into structured learning paths."
+          "label": "Create Study Flashcards Online",
+          "href": "https://www.cogniguide.app/flashcards/create-study-online",
+          "description": "Create study flashcards online instantly from your materials using smart AI."
         },
         {
-          "label": "Understanding Active Recall Principles",
-          "href": "https://www.cogniguide.app/flashcards/active-recall",
-          "description": "Discover the cognitive science behind why testing yourself works better than rereading."
+          "label": "Best AI Study Tool",
+          "href": "https://www.cogniguide.app/flashcards/maker-studying",
+          "description": "The ultimate flashcard maker for studying, with AI-generated sets."
         }
       ]
     },
@@ -39622,14 +39599,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore Other Study Techniques",
       "links": [
         {
-          "label": "Science Flashcard Generators",
-          "href": "https://www.cogniguide.app/flashcards/science",
-          "description": "See how AI can accelerate concept mapping for Biology and Chemistry."
+          "label": "Multiplication Flashcards PDF",
+          "href": "https://www.cogniguide.app/flashcards/multiplication",
+          "description": "Create instant flashcards from your multiplication PDF notes for quick practice."
         },
         {
-          "label": "History Study Decks",
-          "href": "https://www.cogniguide.app/flashcards/history",
-          "description": "Generate cards focusing on dates, figures, and timelines efficiently."
+          "label": "Math Division Practice",
+          "href": "https://www.cogniguide.app/flashcards/division",
+          "description": "Create smart division flashcards from any PDF for mastering math facts."
         }
       ]
     },
@@ -39832,14 +39809,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore Smarter Study Methods",
       "links": [
         {
-          "label": "Active Recall Techniques",
-          "href": "https://www.cogniguide.app/flashcards/active-recall-techniques",
-          "description": "Learn the science behind testing yourself for better memory encoding."
+          "label": "Flashcards for Study Notes",
+          "href": "https://www.cogniguide.app/flashcards/study-notes",
+          "description": "Generate smart flashcards from your study notes instantly for active recall."
         },
         {
-          "label": "Spaced Repetition Guides",
-          "href": "https://www.cogniguide.app/flashcards/spaced-repetition-guides",
-          "description": "Deep dive into optimal scheduling algorithms for long-term retention."
+          "label": "AI Note Converter",
+          "href": "https://www.cogniguide.app/flashcards/convert-notes",
+          "description": "Effortlessly convert your notes to flashcards using AI for active recall."
         }
       ]
     },
@@ -40034,14 +40011,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore Other Study Tools",
       "links": [
         {
-          "label": "AI Quiz Generator",
-          "href": "https://www.cogniguide.app/flashcards/quiz-generator",
-          "description": "Turn materials into interactive quizzes instead of static flashcards for varied practice."
+          "label": "Online SAT Vocabulary Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/sat-vocabulary-online",
+          "description": "Generate SAT vocabulary flashcards online instantly for smarter digital prep."
         },
         {
-          "label": "Study Schedule Planner",
-          "href": "https://www.cogniguide.app/flashcards/schedule-planner",
-          "description": "Integrate your study goals with a smart calendar optimizing review times."
+          "label": "AI SAT Prep Cards",
+          "href": "https://www.cogniguide.app/flashcards/barrons-sat",
+          "description": "Create instant AI Barron's SAT flashcards from your study materials."
         }
       ]
     },
@@ -40244,14 +40221,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore Related Study Methods",
       "links": [
         {
-          "label": "Master Active Recall Techniques",
-          "href": "https://www.cogniguide.app/flashcards/active-recall-techniques",
-          "description": "Learn how to maximize retention by forcing your brain to retrieve information actively."
+          "label": "AI Flashcard Test Maker",
+          "href": "https://www.cogniguide.app/flashcards/test-maker",
+          "description": "The AI flashcard test maker that helps you prepare for any exam."
         },
         {
-          "label": "Understanding Spaced Repetition",
-          "href": "https://www.cogniguide.app/flashcards/spaced-repetition-benefits",
-          "description": "Deep dive into the science behind optimal memory scheduling for exams."
+          "label": "Study Set Quiz Generator",
+          "href": "https://www.cogniguide.app/flashcards/quiz-maker",
+          "description": "The fastest AI flashcard quiz maker available for smarter studying."
         }
       ]
     },
@@ -40452,14 +40429,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Expand Your Study Toolkit",
       "links": [
         {
-          "label": "AI Flashcard Generator",
-          "href": "https://www.cogniguide.app/flashcards/generator",
-          "description": "Explore the core technology behind automated study material creation."
+          "label": "AI Language Flashcard Maker",
+          "href": "https://www.cogniguide.app/flashcards/language-maker",
+          "description": "The ultimate AI language flashcard maker for mastering new vocabulary."
         },
         {
-          "label": "Spaced Repetition Techniques",
-          "href": "https://www.cogniguide.app/study-techniques/spaced-repetition",
-          "description": "Deep dive into the cognitive science that powers efficient learning scheduling."
+          "label": "Spanish Vocabulary Generator",
+          "href": "https://www.cogniguide.app/flashcards/spanish",
+          "description": "Create powerful Spanish vocabulary flash cards automatically from your documents."
         }
       ]
     },
@@ -40661,14 +40638,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Expand Your Study Toolkit",
       "links": [
         {
-          "label": "AI Quiz Generator",
-          "href": "https://www.cogniguide.app/quizzes/generator",
-          "description": "Instantly create comprehensive quizzes based on your uploaded documents for self-assessment."
+          "label": "AI Flashcard Maker",
+          "href": "https://www.cogniguide.app/flashcards/maker",
+          "description": "The ultimate AI flashcard maker for converting complex material into cards."
         },
         {
-          "label": "Active Recall Techniques",
-          "href": "https://www.cogniguide.app/study-guides/active-recall",
-          "description": "Learn advanced strategies for maximizing memory retention beyond simple card review."
+          "label": "Best AI Study Tool",
+          "href": "https://www.cogniguide.app/flashcards/maker-studying",
+          "description": "The ultimate flashcard maker for studying, with AI-generated sets."
         }
       ]
     },
@@ -40871,14 +40848,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore More Study Techniques",
       "links": [
         {
-          "label": "Active Recall Strategies",
-          "href": "https://www.cogniguide.app/flashcards/active-recall",
-          "description": "Learn how to leverage self-testing principles for deeper learning."
+          "label": "ESL Flashcards for Adults",
+          "href": "https://www.cogniguide.app/flashcards/esl-adults",
+          "description": "Create instant ESL flashcards for adults from your documents for learning English."
         },
         {
-          "label": "Study Planning Tools",
-          "href": "https://www.cogniguide.app/flashcards/study-scheduling",
-          "description": "Discover how to map out your study time effectively using deadlines."
+          "label": "AI ESL Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/english-learning",
+          "description": "Create AI English cards for learning from any PDF for vocabulary."
         }
       ]
     },
@@ -41081,14 +41058,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Deepen Your Study Strategy",
       "links": [
         {
-          "label": "Active Recall Techniques",
-          "href": "{base_url}/flashcards/active-recall-techniques",
-          "description": "Learn the cognitive science behind testing yourself versus rereading material."
+          "label": "AI Notecards Website",
+          "href": "https://www.cogniguide.app/flashcards/website",
+          "description": "The AI notecards website that creates your study sets in seconds."
         },
         {
-          "label": "Benefits of Spaced Repetition",
-          "href": "{base_url}/flashcards/spaced-repetition-benefits",
-          "description": "Explore how scientifically scheduled reviews lock in long-term memory."
+          "label": "Web-Based Flashcard Creator",
+          "href": "https://www.cogniguide.app/flashcards/online-maker",
+          "description": "Generate study decks with an AI online flashcard maker from any document."
         }
       ]
     },
@@ -41286,14 +41263,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore More Effective Study Tools",
       "links": [
         {
-          "label": "Active Recall Techniques Guide",
-          "href": "https://www.cogniguide.app/flashcards/active-recall-techniques",
-          "description": "Learn the science behind testing yourself to improve memory encoding."
+          "label": "AI Flashcard Maker",
+          "href": "https://www.cogniguide.app/flashcards/maker",
+          "description": "The ultimate AI flashcard maker for converting complex material into cards."
         },
         {
-          "label": "Optimizing Study Timetables",
-          "href": "https://www.cogniguide.app/flashcards/study-scheduling",
-          "description": "Discover best practices for planning reviews around critical exam dates."
+          "label": "Online Digital Study Decks",
+          "href": "https://www.cogniguide.app/flashcards/digital-maker",
+          "description": "Create intelligent digital flashcard decks from any file for modern studying."
         }
       ]
     },
@@ -41496,14 +41473,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Master Your Study Workflow",
       "links": [
         {
-          "label": "Active Recall Techniques Explained",
-          "href": "https://www.cogniguide.app/flashcards/active-recall",
-          "description": "Learn how challenging your brain directly leads to better long-term memory formation."
+          "label": "Best Flashcard Maker App",
+          "href": "https://www.cogniguide.app/flashcards/best-maker",
+          "description": "The best flashcard maker app powered by AI for instant study sets."
         },
         {
-          "label": "Guide to Spaced Repetition",
-          "href": "https://www.cogniguide.app/flashcards/spaced-repetition",
-          "description": "Understand the science behind optimal scheduling for memory retention."
+          "label": "Instant Study Decks",
+          "href": "https://www.cogniguide.app/flashcards/creator",
+          "description": "The fastest AI flashcard creator for serious students using any document."
         }
       ]
     },
@@ -41705,14 +41682,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Expand Your Study Strategy",
       "links": [
         {
-          "label": "Active Recall Techniques",
-          "href": "https://www.cogniguide.app/flashcards/active-recall",
-          "description": "Learn how testing yourself directly strengthens memory encoding."
+          "label": "AI Online Flashcard Maker",
+          "href": "https://www.cogniguide.app/flashcards/online-maker",
+          "description": "Generate study decks with an AI online flashcard maker from any document."
         },
         {
-          "label": "Optimizing Study Schedules",
-          "href": "https://www.cogniguide.app/flashcards/scheduling",
-          "description": "Deep dive into the mathematics behind spaced repetition algorithms."
+          "label": "Top Online Flashcard Maker",
+          "href": "https://www.cogniguide.app/flashcards/best-website-make",
+          "description": "The best website to make flashcards using your own study material."
         }
       ]
     },
@@ -41913,14 +41890,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore Other Certification Study Aids",
       "links": [
         {
-          "label": "HVAC Troubleshooting Guides",
-          "href": "https://www.cogniguide.app/flashcards/hvac-troubleshooting",
-          "description": "Generate AI flashcards covering common HVAC diagnostic procedures and system failures."
+          "label": "ServSafe 7th Edition Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/servsafe-7th-edition-quizlet",
+          "description": "Generate AI flashcards for ServSafe 7th Edition, ditching Quizlet."
         },
         {
-          "label": "OSHA Safety Certification",
-          "href": "https://www.cogniguide.app/flashcards/osha-safety",
-          "description": "Convert OSHA standards and safety regulations into active recall practice sets."
+          "label": "AI API 570 Prep",
+          "href": "https://www.cogniguide.app/flashcards/api-570",
+          "description": "Create your API 570 flashcards instantly using AI for certification."
         }
       ]
     },
@@ -42119,14 +42096,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Deepen Your Study Strategy",
       "links": [
         {
-          "label": "Active Recall Techniques",
-          "href": "https://www.cogniguide.app/flashcards/active-recall-techniques",
-          "description": "Learn how to maximize retention using retrieval practice for better long-term memory."
+          "label": "Online Note Cards",
+          "href": "https://www.cogniguide.app/flashcards/note-online-study",
+          "description": "Generate AI note cards online study aids instantly for faster learning."
         },
         {
-          "label": "Spaced Repetition Benefits",
-          "href": "https://www.cogniguide.app/flashcards/spaced-repetition-benefits",
-          "description": "Understand the learning algorithms that power efficient, science-backed studying."
+          "label": "Note to Flashcard Tool",
+          "href": "https://www.cogniguide.app/flashcards/study-note",
+          "description": "Transform your study notes into powerful AI flashcards for any subject."
         }
       ]
     },
@@ -42329,14 +42306,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore Other Study Methods",
       "links": [
         {
-          "label": "AI Chemistry Notes Generator",
-          "href": "https://www.cogniguide.app/flashcards/chemistry-notes",
-          "description": "Turn complex chemical diagrams and formulas from notes into study sets."
+          "label": "Times Table Flash Cards",
+          "href": "https://www.cogniguide.app/flashcards/times-table",
+          "description": "Generate times table flash cards from any document for math practice."
         },
         {
-          "label": "Spaced Repetition Science Explained",
-          "href": "https://www.cogniguide.app/guides/spaced-repetition-science",
-          "description": "Learn the cognitive science backing why our scheduling algorithm works."
+          "label": "AI Math Facts Generator",
+          "href": "https://www.cogniguide.app/flashcards/multiplication",
+          "description": "Create instant flashcards from your multiplication PDF notes for quick practice."
         }
       ]
     },
@@ -42538,14 +42515,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore Other Study Techniques",
       "links": [
         {
-          "label": "Active Recall Study Guides",
-          "href": "https://www.cogniguide.app/flashcards/active-recall",
-          "description": "Deep dive into the most effective study method our tool supports."
+          "label": "AI Spanish Flash Cards",
+          "href": "https://www.cogniguide.app/flashcards/spanish",
+          "description": "Create powerful Spanish vocabulary flash cards automatically from your documents."
         },
         {
-          "label": "Exam Preparation Tools",
-          "href": "https://www.cogniguide.app/flashcards/exam-prep",
-          "description": "Find resources for structuring your entire study timeline around major assessments."
+          "label": "Vocabulary Learning Tool",
+          "href": "https://www.cogniguide.app/flashcards/language-maker",
+          "description": "The ultimate AI language flashcard maker for mastering new vocabulary."
         }
       ]
     },
@@ -42746,14 +42723,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Deepen Your Study Strategy",
       "links": [
         {
-          "label": "AI Math Formula Sheet Generator",
-          "href": "https://www.cogniguide.app/flashcards/math-formulas",
-          "description": "Convert complex mathematical proofs or formula sheets into active recall prompts."
+          "label": "CVC Blending Flash Cards",
+          "href": "https://www.cogniguide.app/flashcards/cvc-blending",
+          "description": "Create CVC blending flash cards instantly from any source for phonics practice."
         },
         {
-          "label": "Benefits of Active Recall Training",
-          "href": "https://www.cogniguide.app/blog/active-recall-benefits",
-          "description": "Learn the cognitive science principles behind why flashcards are more effective than rereading notes."
+          "label": "AI Phonics Deck Creator",
+          "href": "https://www.cogniguide.app/flashcards/phonics-sound",
+          "description": "Create phonics sound cards from any document instantly for reading."
         }
       ]
     },
@@ -42952,14 +42929,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore More Study Tools",
       "links": [
         {
-          "label": "Biology Flashcards Generator",
-          "href": "https://www.cogniguide.app/flashcards/biology",
-          "description": "Generate study aids directly from complex biological research papers and textbooks."
+          "label": "5 Senses Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/5-senses",
+          "description": "Instantly create your 5 senses flashcards from any document."
         },
         {
-          "label": "Active Recall Techniques Overview",
-          "href": "https://www.cogniguide.app/study-guides/active-recall",
-          "description": "Learn the cognitive science behind why asking questions is more effective than re-reading."
+          "label": "AI Sensory System Cards",
+          "href": "https://www.cogniguide.app/flashcards/senses",
+          "description": "Generate senses flashcards instantly from any document for biology."
         }
       ]
     },
@@ -43160,14 +43137,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Deepen Your Learning Strategy",
       "links": [
         {
-          "label": "Active Recall Techniques",
-          "href": "https://www.cogniguide.app/flashcards/active-recall-techniques",
-          "description": "Learn how our tool maximizes retrieval practice effectiveness."
+          "label": "Flash Card Maker Software",
+          "href": "https://www.cogniguide.app/flashcards/maker-software",
+          "description": "The easiest AI flash card maker software available for instant studying."
         },
         {
-          "label": "Spaced Repetition Guide",
-          "href": "https://www.cogniguide.app/flashcards/spaced-repetition-guide",
-          "description": "Understand the scheduling algorithm powering your custom study plan."
+          "label": "Docs to Study Cards",
+          "href": "https://www.cogniguide.app/flashcards/maker",
+          "description": "The ultimate AI flashcard maker for converting complex material into cards."
         }
       ]
     },
@@ -43369,14 +43346,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Deepen Your Study Techniques",
       "links": [
         {
-          "label": "AI Document Summarization Tools",
-          "href": "https://www.cogniguide.app/flashcards/summarization-tools",
-          "description": "Learn how AI extracts key summaries from long reports for faster comprehension."
+          "label": "Food Flashcards from PDFs",
+          "href": "https://www.cogniguide.app/flashcards/food",
+          "description": "Instantly create food flashcards from your PDFs for culinary or language study."
         },
         {
-          "label": "Mastering Active Recall Methods",
-          "href": "https://www.cogniguide.app/flashcards/active-recall-guide",
-          "description": "Read our guide on maximizing memory retention through retrieval practice."
+          "label": "Culinary Vocab Cards",
+          "href": "https://www.cogniguide.app/flashcards/food-vocabulary",
+          "description": "Generate food vocabulary flashcards from any document for culinary studies."
         }
       ]
     },
@@ -43580,14 +43557,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Enhance Your Study Strategy",
       "links": [
         {
-          "label": "Active Recall Techniques",
-          "href": "https://www.cogniguide.app/flashcards/active-recall-techniques",
-          "description": "Discover how testing yourself dramatically improves long-term memory retention."
+          "label": "Flashcards for Study Notes",
+          "href": "https://www.cogniguide.app/flashcards/study-notes",
+          "description": "Generate smart flashcards from your study notes instantly for active recall."
         },
         {
-          "label": "Spaced Repetition Optimization",
-          "href": "https://www.cogniguide.app/flashcards/spaced-repetition-optimization",
-          "description": "Learn the science behind optimal review intervals for maximum recall efficiency."
+          "label": "AI Note Converter",
+          "href": "https://www.cogniguide.app/flashcards/convert-notes",
+          "description": "Effortlessly convert your notes to flashcards using AI for active recall."
         }
       ]
     },
@@ -43791,14 +43768,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore Study Techniques",
       "links": [
         {
-          "label": "Mastering Active Recall",
-          "href": "https://www.cogniguide.app/flashcards/active-recall-strategies",
-          "description": "Learn how to structure your study sessions for maximum knowledge retention."
+          "label": "AI Digital Flashcard Maker",
+          "href": "https://www.cogniguide.app/flashcards/digital-maker",
+          "description": "Create intelligent digital flashcard decks from any file for modern studying."
         },
         {
-          "label": "Understanding Spaced Repetition",
-          "href": "https://www.cogniguide.app/flashcards/spaced-repetition-benefits",
-          "description": "Discover the science behind when and how often to review material for long-term memory."
+          "label": "Web-Based Flashcard Creator",
+          "href": "https://www.cogniguide.app/flashcards/online-maker",
+          "description": "Generate study decks with an AI online flashcard maker from any document."
         }
       ]
     },
@@ -43995,14 +43972,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Related Study Resources",
       "links": [
         {
-          "label": "AI Chemistry Flashcards",
-          "href": "https://www.cogniguide.app/flashcards/chemistry",
-          "description": "Generate powerful study aids instantly from complex chemistry notes and diagrams."
+          "label": "Multiplication Table Cards",
+          "href": "https://www.cogniguide.app/flashcards/multiplication-table",
+          "description": "Generate multiplication table flash cards from any document for math mastery."
         },
         {
-          "label": "Mastering Active Recall Techniques",
-          "href": "https://www.cogniguide.app/blog/active-recall-guide",
-          "description": "Learn the cognitive science behind why pulling information out is better than putting it in."
+          "label": "AI Math Facts Generator",
+          "href": "https://www.cogniguide.app/flashcards/multiplication",
+          "description": "Create instant flashcards from your multiplication PDF notes for quick practice."
         }
       ]
     },
@@ -44204,14 +44181,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Deepen Your Study Strategy",
       "links": [
         {
-          "label": "Active Recall Techniques",
-          "href": "https://www.cogniguide.app/flashcards/active-recall",
-          "description": "Learn how challenging your memory actively leads to better long-term retention."
+          "label": "Right Brain Education Cards",
+          "href": "https://www.cogniguide.app/flashcards/right-brain-education",
+          "description": "Instantly create right brain education flashcards from any document."
         },
         {
-          "label": "Spaced Repetition Science",
-          "href": "https://www.cogniguide.app/flashcards/spaced-repetition",
-          "description": "Understand the cognitive science behind scheduling reviews for maximum efficiency."
+          "label": "AI Baby Learning Cards",
+          "href": "https://www.cogniguide.app/flashcards/infant-stimulation",
+          "description": "Create infant stimulation flashcards from your study materials for development."
         }
       ]
     },
@@ -44413,14 +44390,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Expand Your Study Toolkit",
       "links": [
         {
-          "label": "Active Recall Techniques",
-          "href": "https://www.cogniguide.app/flashcards/active-recall",
-          "description": "Discover the science behind retrieving information for better memory encoding."
+          "label": "Best App to Create Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/best-create",
+          "description": "The best app to create flashcards from any document with AI."
         },
         {
-          "label": "Study Schedule Optimization",
-          "href": "https://www.cogniguide.app/flashcards/scheduling",
-          "description": "Learn how to map out your study sessions effectively using time management strategies."
+          "label": "Top AI Study Set Creator",
+          "href": "https://www.cogniguide.app/flashcards/best-maker",
+          "description": "The best flashcard maker app powered by AI for instant study sets."
         }
       ]
     },
@@ -44623,14 +44600,13 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore More Study Techniques",
       "links": [
         {
-          "label": "Active Recall Practice Guides",
-          "href": "https://www.cogniguide.app/flashcards/active-recall-techniques",
-          "description": "Learn proven methods to maximize memory retention using question-based learning."
+          "label": "Time Flashcards from PDF",
+          "href": "https://www.cogniguide.app/flashcards/time",
+          "description": "Create instant AI time flashcards from any PDF for learning to tell time."
         },
         {
-          "label": "Mastering Spaced Repetition",
-          "href": "https://www.cogniguide.app/flashcards/spaced-repetition-strategy",
-          "description": "Understand the cognitive science behind optimized study schedules."
+          "label": "Clock Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/clock-flashcards"
         }
       ]
     },
@@ -44833,14 +44809,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Further Optimize Your Study Techniques",
       "links": [
         {
-          "label": "Active Recall Techniques",
-          "href": "https://www.cogniguide.app/flashcards/active-recall",
-          "description": "Learn how testing yourself is superior to passive reading for knowledge retention."
+          "label": "PDF to Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/pdf-flashcards",
+          "description": "Convert any PDF to flashcards instantly with AI for content mastery."
         },
         {
-          "label": "Mastering Spaced Repetition",
-          "href": "https://www.cogniguide.app/flashcards/spaced-repetition-guide",
-          "description": "A deep dive into the scheduling algorithms that maximize memory recall efficiency."
+          "label": "AI PDF to Cards Converter",
+          "href": "https://www.cogniguide.app/flashcards/flash-cards-pdf-free",
+          "description": "Create smart flash cards from your PDF for free for any subject."
         }
       ]
     },
@@ -45039,14 +45015,13 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Expand Your Study Toolkit",
       "links": [
         {
-          "label": "Active Recall Techniques Guide",
-          "href": "https://www.cogniguide.app/study-techniques/active-recall",
-          "description": "Learn how to maximize retention using proven memory techniques."
+          "label": "Class 10 Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/class-10",
+          "description": "Generate instant Class 10 flashcards from any document for exam success."
         },
         {
-          "label": "Science of Spaced Repetition",
-          "href": "https://www.cogniguide.app/learning-algorithms/spaced-repetition",
-          "description": "Understand the algorithms that power efficient learning schedules."
+          "label": "Cbse Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/cbse-flashcards"
         }
       ]
     },
@@ -45247,14 +45222,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Deepen Your Study Workflow",
       "links": [
         {
-          "label": "AI Biology Study Guides",
-          "href": "https://www.cogniguide.app/flashcards/biology",
-          "description": "Generate flashcards for complex biological concepts like cell structure and genetics."
+          "label": "Flash Cards for Animals",
+          "href": "https://www.cogniguide.app/flashcards/animals",
+          "description": "Create instant flash cards from your animals study materials with AI."
         },
         {
-          "label": "Advanced Exam Preparation Tools",
-          "href": "https://www.cogniguide.app/flashcards/exam-prep",
-          "description": "Discover strategies for utilizing AI to prepare for high-stakes professional examinations."
+          "label": "AI Wildlife Study Cards",
+          "href": "https://www.cogniguide.app/flashcards/wild-animals",
+          "description": "Create instant wild animals flashcards from any document for zoology."
         }
       ]
     },
@@ -45456,14 +45431,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Expand Your Study Toolkit",
       "links": [
         {
-          "label": "Best Techniques for Active Recall",
-          "href": "https://www.cogniguide.app/flashcards/active-recall-techniques",
-          "description": "Learn the science behind effective memory retrieval."
+          "label": "Anki for Medical Students",
+          "href": "https://www.cogniguide.app/flashcards/medical-student-anki",
+          "description": "Create instant flashcards for medical student Anki prep, skipping manual entry."
         },
         {
-          "label": "Mastering Spaced Repetition Algorithms",
-          "href": "https://www.cogniguide.app/flashcards/spaced-repetition-explained",
-          "description": "Understand how smart scheduling optimizes your study time."
+          "label": "UWorld PDF to Cards",
+          "href": "https://www.cogniguide.app/flashcards/uworld",
+          "description": "Create UWorld flashcards from your PDF notes instantly with AI."
         }
       ]
     },
@@ -45666,14 +45641,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Deepen Your Study Strategy",
       "links": [
         {
-          "label": "Active Recall Techniques",
-          "href": "https://www.cogniguide.app/flashcards/active-recall-techniques",
-          "description": "Learn evidence-based methods to maximize memory encoding during study sessions."
+          "label": "Consonant Blends Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/consonant-blends",
+          "description": "Create smart consonant blends flashcards instantly for foundational reading skills."
         },
         {
-          "label": "Mastering Spaced Repetition",
-          "href": "https://www.cogniguide.app/flashcards/spaced-repetition",
-          "description": "Explore the algorithm behind long-term memory retention and scheduling."
+          "label": "AI Phonics Digraph Cards",
+          "href": "https://www.cogniguide.app/flashcards/digraph",
+          "description": "Instantly create digraph flashcards from your documents for reading practice."
         }
       ]
     },
@@ -45876,14 +45851,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore Other Study Tools",
       "links": [
         {
-          "label": "AI Study Guide Generator",
-          "href": "https://www.cogniguide.app/study-guides",
-          "description": "Convert lecture notes into structured study guides instantly."
+          "label": "Sight Words Flash Cards",
+          "href": "https://www.cogniguide.app/flashcards/sight",
+          "description": "Generate smart sight words flash cards instantly from your learning materials."
         },
         {
-          "label": "Active Recall Technique Guide",
-          "href": "https://www.cogniguide.app/learning-theory",
-          "description": "Learn the science behind why active recall beats passive review."
+          "label": "AI Dolch Word Generator",
+          "href": "https://www.cogniguide.app/flashcards/dolch-sight",
+          "description": "Create instant AI Dolch sight word flash cards, beating static PDF lists."
         }
       ]
     },
@@ -46085,14 +46060,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Deepen Your Study Strategy",
       "links": [
         {
-          "label": "Active Recall Techniques",
-          "href": "https://www.cogniguide.app/flashcards/active-recall",
-          "description": "Learn how to use our generated cards for maximum memory encoding."
+          "label": "Vocabulary Flash Cards",
+          "href": "https://www.cogniguide.app/flashcards/vocabulary",
+          "description": "Generate vocabulary flash cards from your PDF files for any subject."
         },
         {
-          "label": "Spaced Repetition Guides",
-          "href": "https://www.cogniguide.app/flashcards/spaced-repetition",
-          "description": "Understand the science behind optimal review timing for long-term learning."
+          "label": "Instant Vocabulary Sets",
+          "href": "https://www.cogniguide.app/flashcards/vocab-maker",
+          "description": "The fastest AI vocab flashcard maker online for maximizing retention."
         }
       ]
     },
@@ -46291,14 +46266,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore Other Study Methodologies",
       "links": [
         {
-          "label": "Master Active Recall Techniques",
-          "href": "https://www.cogniguide.app/flashcards/active-recall",
-          "description": "Deep dive into testing effects and self-explanation for maximum learning."
+          "label": "AI Flashcard Quiz Maker",
+          "href": "https://www.cogniguide.app/flashcards/quiz-maker",
+          "description": "The fastest AI flashcard quiz maker available for smarter studying."
         },
         {
-          "label": "Understanding Spaced Repetition",
-          "href": "https://www.cogniguide.app/flashcards/spaced-repetition",
-          "description": "Learn the cognitive science behind scheduling reviews for long-term memory."
+          "label": "Quiz Generator from Notes",
+          "href": "https://www.cogniguide.app/flashcards/test-maker",
+          "description": "The AI flashcard test maker that helps you prepare for any exam."
         }
       ]
     },
@@ -46500,14 +46475,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Enhance Your Study Strategy",
       "links": [
         {
-          "label": "Active Recall Techniques",
-          "href": "https://www.cogniguide.app/flashcards/active-recall",
-          "description": "Learn the cognitive science behind why retrieval practice works better than rereading."
+          "label": "AI Online Flashcard Maker",
+          "href": "https://www.cogniguide.app/flashcards/online-maker",
+          "description": "Generate study decks with an AI online flashcard maker from any document."
         },
         {
-          "label": "Spaced Repetition Benefits",
-          "href": "https://www.cogniguide.app/flashcards/spaced-repetition",
-          "description": "Deep dive into optimizing your memory retention curve with strategic review timing."
+          "label": "AI Online Card Creator",
+          "href": "https://www.cogniguide.app/flashcards/make-online",
+          "description": "Instantly make your flashcards online from any source using AI power."
         }
       ]
     },
@@ -46708,14 +46683,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore Related Study Tools",
       "links": [
         {
-          "label": "Chemistry Flashcards Generator",
-          "href": "https://www.cogniguide.app/flashcards/chemistry",
-          "description": "Convert complex molecular structures and reaction mechanisms from documents into study cards."
+          "label": "Flowers Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/flowers",
+          "description": "Generate flowers flashcards from your PDFs and docs with AI."
         },
         {
-          "label": "History Study Guides",
-          "href": "https://www.cogniguide.app/study-guides/history",
-          "description": "Find specialized tools designed for chronological learning and concept mapping for historical periods."
+          "label": "PDF to Biology Study Guide",
+          "href": "https://www.cogniguide.app/flashcards/biology",
+          "description": "Create smart, free biology flashcards from any document for your class."
         }
       ]
     },
@@ -46918,14 +46893,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore Related Study Tools",
       "links": [
         {
-          "label": "Generate Science Notes Summaries",
-          "href": "https://www.cogniguide.app/flashcards/science-summary",
-          "description": "Convert lengthy scientific papers into concise summaries for quicker comprehension."
+          "label": "Flash Cards for Animals",
+          "href": "https://www.cogniguide.app/flashcards/animals",
+          "description": "Create instant flash cards from your animals study materials with AI."
         },
         {
-          "label": "AI Document Q&A Tool",
-          "href": "https://www.cogniguide.app/flashcards/document-qa",
-          "description": "Upload documents and ask specific questions to extract immediate, context-aware answers."
+          "label": "PDF to Biology Study Guide",
+          "href": "https://www.cogniguide.app/flashcards/biology",
+          "description": "Create smart, free biology flashcards from any document for your class."
         }
       ]
     },
@@ -47128,14 +47103,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Deepen Your Study Strategy",
       "links": [
         {
-          "label": "Active Recall Techniques",
-          "href": "https://www.cogniguide.app/flashcards/active-recall",
-          "description": "Learn proven methods to test yourself effectively instead of just rereading material."
+          "label": "AI Alphabet Flash Cards",
+          "href": "https://www.cogniguide.app/flashcards/alphabet",
+          "description": "Generate free alphabet flash cards from any document for learning letters."
         },
         {
-          "label": "Mastering Spaced Repetition",
-          "href": "https://www.cogniguide.app/flashcards/spaced-repetition-guide",
-          "description": "Understand the science behind why scheduling your reviews prevents forgetting."
+          "label": "AI Alphabet Cards",
+          "href": "https://www.cogniguide.app/flashcards/abc",
+          "description": "Transform your documents into smart alphabet flashcards for learning letters."
         }
       ]
     },
@@ -47334,14 +47309,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore Study Efficiency Tools",
       "links": [
         {
-          "label": "Active Recall Techniques Guide",
-          "href": "https://www.cogniguide.app/flashcards/active-recall-guide",
-          "description": "Deep dive into the science behind why active recall outperforms passive reading."
+          "label": "AI Flashcard Test Maker",
+          "href": "https://www.cogniguide.app/flashcards/test-maker",
+          "description": "The AI flashcard test maker that helps you prepare for any exam."
         },
         {
-          "label": "Best Spaced Repetition Software",
-          "href": "https://www.cogniguide.app/flashcards/spaced-repetition-software",
-          "description": "Compare methods and find the best tools to schedule your learning effectively."
+          "label": "Study Set Quiz Generator",
+          "href": "https://www.cogniguide.app/flashcards/quiz-maker",
+          "description": "The fastest AI flashcard quiz maker available for smarter studying."
         }
       ]
     },
@@ -47544,14 +47519,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Expand Your Study Toolkit",
       "links": [
         {
-          "label": "Active Recall Strategies",
-          "href": "https://www.cogniguide.app/flashcards/active-recall",
-          "description": "Learn how active recall boosts memory retention far beyond re-reading."
+          "label": "English Vocabulary Cards",
+          "href": "https://www.cogniguide.app/flashcards/english-vocabulary",
+          "description": "Create smart English vocabulary cards instantly to master words faster."
         },
         {
-          "label": "Spaced Repetition Explained",
-          "href": "https://www.cogniguide.app/flashcards/spaced-repetition",
-          "description": "Discover the science behind optimal review timing for long-term learning."
+          "label": "AI Grammar Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/grammar-adults",
+          "description": "Instantly generate grammar flashcards for adults to master English."
         }
       ]
     },
@@ -47754,14 +47729,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore More Study Tools",
       "links": [
         {
-          "label": "AI Study Guides Generator",
-          "href": "https://www.cogniguide.app/flashcards/study-guides",
-          "description": "Turn lecture transcripts into structured study guides optimized for deep learning."
+          "label": "ABC Flashcards from PDF",
+          "href": "https://www.cogniguide.app/flashcards/abc",
+          "description": "Transform your documents into smart alphabet flashcards for learning letters."
         },
         {
-          "label": "Document Summarizer Tool",
-          "href": "https://www.cogniguide.app/flashcards/summarizer",
-          "description": "Quickly condense lengthy research papers or articles into concise summaries."
+          "label": "AI Alphabet Learning",
+          "href": "https://www.cogniguide.app/flashcards/lowercase-letter",
+          "description": "Create AI flashcards for lowercase letters from any document or PDF."
         }
       ]
     },
@@ -47963,14 +47938,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Deepen Your Study Strategy",
       "links": [
         {
-          "label": "Understanding Active Recall",
-          "href": "{base_url}/flashcards/active-recall-techniques",
-          "description": "Learn the cognitive science behind why flashcards work so well for long-term memory formation."
+          "label": "Personal Pronouns Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/personal-pronouns",
+          "description": "Create personal pronouns flashcards instantly from any document."
         },
         {
-          "label": "Document Upload Guide",
-          "href": "{base_url}/flashcards/document-upload-guide",
-          "description": "Tips for optimizing your PDFs and DOCX files for the best AI extraction results."
+          "label": "AI Pronoun Grammar Cards",
+          "href": "https://www.cogniguide.app/flashcards/possessive-pronouns",
+          "description": "Generate possessive pronouns flashcards instantly for mastering English grammar."
         }
       ]
     },
@@ -48169,14 +48144,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Deepen Your Study Strategy",
       "links": [
         {
-          "label": "Master Active Recall Techniques",
-          "href": "https://www.cogniguide.app/flashcards/active-recall",
-          "description": "Learn how our generated cards push effective active recall practice."
+          "label": "PDF to Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/pdf-flashcards",
+          "description": "Convert any PDF to flashcards instantly with AI for content mastery."
         },
         {
-          "label": "Optimize Your Study Schedule",
-          "href": "https://www.cogniguide.app/flashcards/scheduling",
-          "description": "Understand how to utilize target exam dates for smarter scheduling."
+          "label": "Docs to Study Cards",
+          "href": "https://www.cogniguide.app/flashcards/maker",
+          "description": "The ultimate AI flashcard maker for converting complex material into cards."
         }
       ]
     },
@@ -48377,14 +48352,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore More Study Tools",
       "links": [
         {
-          "label": "Active Recall Techniques",
-          "href": "https://www.cogniguide.app/flashcards/active-recall-techniques",
-          "description": "Learn how to maximize memory retention using proven active recall strategies."
+          "label": "Vowel Flashcards from PDF",
+          "href": "https://www.cogniguide.app/flashcards/vowel",
+          "description": "Transform study materials into smart vowel flashcards for mastering phonetic concepts."
         },
         {
-          "label": "Document Summarization Tools",
-          "href": "https://www.cogniguide.app/summaries/document-summarization",
-          "description": "See how AI can condense long texts before you turn them into study guides."
+          "label": "AI Short Vowel Sound Cards",
+          "href": "https://www.cogniguide.app/flashcards/short-vowel",
+          "description": "Instantly create short vowel flashcards from your documents for phonics."
         }
       ]
     },
@@ -48588,14 +48563,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore Smarter Study Methods",
       "links": [
         {
-          "label": "Active Recall Techniques",
-          "href": "{base_url}/flashcards/active-recall-techniques",
-          "description": "Deep dive into proven methods that force memory retrieval for stronger learning."
+          "label": "Sight Words Flash Cards",
+          "href": "https://www.cogniguide.app/flashcards/sight",
+          "description": "Generate smart sight words flash cards instantly from your learning materials."
         },
         {
-          "label": "Optimizing Spaced Repetition",
-          "href": "{base_url}/flashcards/spaced-repetition-optimization",
-          "description": "Learn how our algorithms adapt review intervals for maximum retention efficiency."
+          "label": "AI Dolch Word Generator",
+          "href": "https://www.cogniguide.app/flashcards/dolch-sight",
+          "description": "Create instant AI Dolch sight word flash cards, beating static PDF lists."
         }
       ]
     },
@@ -48797,14 +48772,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Further Enhance Your Study Strategy",
       "links": [
         {
-          "label": "Master Active Recall Techniques",
-          "href": "https://www.cogniguide.app/flashcards/active-recall",
-          "description": "Learn how to structure your study sessions for maximum information retention."
+          "label": "AI Flashcard Maker",
+          "href": "https://www.cogniguide.app/flashcards/maker",
+          "description": "The ultimate AI flashcard maker for converting complex material into cards."
         },
         {
-          "label": "Understanding Spaced Repetition",
-          "href": "https://www.cogniguide.app/flashcards/spaced-repetition",
-          "description": "Dive into the science behind scheduling reviews for long-term memory."
+          "label": "Instant Study Decks",
+          "href": "https://www.cogniguide.app/flashcards/creator",
+          "description": "The fastest AI flashcard creator for serious students using any document."
         }
       ]
     },
@@ -49006,14 +48981,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Expand Your Study Toolkit",
       "links": [
         {
-          "label": "AI Study Guide Summarizer",
-          "href": "https://www.cogniguide.app/flashcards/study-guide-summarizer",
-          "description": "Summarize large textbooks into key study concepts instantly."
+          "label": "Jolly Phonics Group 1 Cards",
+          "href": "https://www.cogniguide.app/flashcards/jolly-phonics-group-1",
+          "description": "Create Jolly Phonics Group 1 flashcards from any file for early reading."
         },
         {
-          "label": "Science Terminology Flashcards",
-          "href": "https://www.cogniguide.app/flashcards/science-terminology",
-          "description": "Generate vocabulary flashcards optimized for complex scientific definitions."
+          "label": "AI Phonics Deck Creator",
+          "href": "https://www.cogniguide.app/flashcards/phonics-sound",
+          "description": "Create phonics sound cards from any document instantly for reading."
         }
       ]
     },
@@ -49216,14 +49191,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Optimize Your Study Workflow",
       "links": [
         {
-          "label": "Active Recall Techniques",
-          "href": "https://www.cogniguide.app/flashcards/active-recall-techniques",
-          "description": "Deep dive into the proven methods that make flashcards effective."
+          "label": "AI Flashcard Maker",
+          "href": "https://www.cogniguide.app/flashcards/maker",
+          "description": "The ultimate AI flashcard maker for converting complex material into cards."
         },
         {
-          "label": "Understanding Spaced Repetition",
-          "href": "https://www.cogniguide.app/flashcards/spaced-repetition-scheduling",
-          "description": "Learn the science behind optimized memory retention schedules."
+          "label": "Fast Study Set Creation",
+          "href": "https://www.cogniguide.app/flashcards/generator",
+          "description": "The ultimate AI flashcard generator for mastering complex materials quickly."
         }
       ]
     },
@@ -49425,14 +49400,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore More AI Study Tools",
       "links": [
         {
-          "label": "Generate Biology Study Cards",
-          "href": "https://www.cogniguide.app/flashcards/biology-notes",
-          "description": "Convert detailed lecture notes or textbook chapters into high-yield biology flashcards."
+          "label": "GRE Magoosh Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/gre-magoosh",
+          "description": "Instantly generate AI flashcards from GRE Magoosh materials for smarter prep."
         },
         {
-          "label": "Master Active Recall Techniques",
-          "href": "https://www.cogniguide.app/blog/active-recall-guide",
-          "description": "Read our expert guide on how active recall improves memory encoding far beyond passive reading."
+          "label": "AI GRE Vocab Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/magoosh-gre-vocabulary",
+          "description": "Create smart AI flashcards from Magoosh GRE Vocabulary lists instantly."
         }
       ]
     },
@@ -49633,14 +49608,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Enhance Your Study Workflow",
       "links": [
         {
-          "label": "AI Biology Flashcard Generator",
-          "href": "https://www.cogniguide.app/flashcards/biology-study-aids",
-          "description": "See how our AI handles complex biological pathways and nomenclature extraction."
+          "label": "MedStudy Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/medstudy",
+          "description": "Create powerful MedStudy flashcards from any PDF or document instantly."
         },
         {
-          "label": "Spaced Repetition Learning Guide",
-          "href": "https://www.cogniguide.app/learning-techniques/spaced-repetition",
-          "description": "Learn the cognitive science principles behind making your study time count."
+          "label": "AI Peds Board Prep",
+          "href": "https://www.cogniguide.app/flashcards/medstudy-pediatrics",
+          "description": "Convert your MedStudy Pediatrics PDFs to smart flashcards for boards."
         }
       ]
     },
@@ -49837,14 +49812,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore Other Study Tools",
       "links": [
         {
-          "label": "How Spaced Repetition Works",
-          "href": "https://www.cogniguide.app/blog/spaced-repetition-science",
-          "description": "Understand the cognitive science behind our scheduling engine."
+          "label": "AP Biology Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/ap-biology",
+          "description": "Generate perfect AP Biology flashcards instantly for efficient, targeted exam review."
         },
         {
-          "label": "Generate Biology Flashcards",
-          "href": "https://www.cogniguide.app/flashcards/biology",
-          "description": "Apply our AI generator to your Biology or AP Biology notes."
+          "label": "AI Orgo Study Sets",
+          "href": "https://www.cogniguide.app/flashcards/organic-chemistry",
+          "description": "Create organic chemistry flashcards from any PDF instantly for your course."
         }
       ]
     },
@@ -50046,14 +50021,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore Other Study Tools",
       "links": [
         {
-          "label": "AI Study Note Summarizer",
-          "href": "https://www.cogniguide.app/flashcards/summarize-notes",
-          "description": "Condense long study documents into concise summaries for quick comprehension."
+          "label": "Make Vocabulary Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/make-vocabulary",
+          "description": "Effortlessly make vocabulary flashcards from any source or word list."
         },
         {
-          "label": "Optimizing Active Recall Techniques",
-          "href": "https://www.cogniguide.app/flashcards/active-recall-guide",
-          "description": "Learn the science behind why testing yourself with flashcards is superior to passive rereading."
+          "label": "Instant Vocabulary Sets",
+          "href": "https://www.cogniguide.app/flashcards/vocab-maker",
+          "description": "The fastest AI vocab flashcard maker online for maximizing retention."
         }
       ]
     },
@@ -50251,14 +50226,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore Other Study Resources",
       "links": [
         {
-          "label": "AI Flashcards for Medical Textbooks",
-          "href": "https://www.cogniguide.app/flashcards/medical-textbooks",
-          "description": "See how AI transforms complex medical notes into active recall material."
+          "label": "Barron's SAT Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/barrons-sat",
+          "description": "Create instant AI Barron's SAT flashcards from your study materials."
         },
         {
-          "label": "Generate Cards from Lecture Notes",
-          "href": "https://www.cogniguide.app/flashcards/lecture-notes",
-          "description": "Quickly process unstructured notes into structured learning sets."
+          "label": "AI SAT Vocab Builder",
+          "href": "https://www.cogniguide.app/flashcards/sat-vocabulary",
+          "description": "Generate SAT vocabulary flashcards from word lists to accelerate exam mastery."
         }
       ]
     },
@@ -50461,14 +50436,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Advance Your Study Techniques",
       "links": [
         {
-          "label": "Spaced Repetition System Guide",
-          "href": "https://www.cogniguide.app/spaced-repetition-guide",
-          "description": "Understand the science behind scheduling reviews for long-term retention."
+          "label": "Flashcard Maker with Pictures",
+          "href": "https://www.cogniguide.app/flashcards/maker-pictures",
+          "description": "Automatically create engaging, visual study sets by adding pictures to flashcards."
         },
         {
-          "label": "Active Recall Strategies",
-          "href": "https://www.cogniguide.app/active-recall-strategies",
-          "description": "Learn how to test yourself effectively instead of passively reading notes."
+          "label": "AI Picture Flashcard Generator",
+          "href": "https://www.cogniguide.app/flashcards/picture",
+          "description": "Create picture cards and flashcards from your PDF documents automatically."
         }
       ]
     },
@@ -50670,14 +50645,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Expand Your Study Toolkit",
       "links": [
         {
-          "label": "AI History Flashcards Generator",
-          "href": "https://www.cogniguide.app/flashcards/history",
-          "description": "See how to automate study creation for conceptual subjects, not just technical ones."
+          "label": "AI NASM Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/nasm",
+          "description": "Create NASM flashcards from your PDF study guide instantly for certification."
         },
         {
-          "label": "Active Recall Strategies Guide",
-          "href": "https://www.cogniguide.app/study-techniques",
-          "description": "Learn the science behind why AI-generated flashcards are superior to passive reading."
+          "label": "AI SIE Exam Prep",
+          "href": "https://www.cogniguide.app/flashcards/sie",
+          "description": "Convert your SIE study materials into AI flashcards for exam mastery."
         }
       ]
     },
@@ -50879,14 +50854,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Enhance Your Study Techniques",
       "links": [
         {
-          "label": "Active Recall Strategies",
-          "href": "https://www.cogniguide.app/flashcards/active-recall",
-          "description": "Learn how to use flashcards for maximum memory retention."
+          "label": "AI Math Flash Cards",
+          "href": "https://www.cogniguide.app/flashcards/math",
+          "description": "Create instant math flash cards from your study materials for any topic."
         },
         {
-          "label": "Scientific Study Scheduling",
-          "href": "https://www.cogniguide.app/flashcards/study-scheduling",
-          "description": "Dive deeper into the science behind spaced repetition algorithms."
+          "label": "AI Number Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/counting",
+          "description": "Create counting flashcards directly from any PDF or document for math practice."
         }
       ]
     },
@@ -51085,14 +51060,13 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore Related Study Resources",
       "links": [
         {
-          "label": "HVAC Technician Study Guides",
-          "href": "https://www.cogniguide.app/flashcards/hvac-tech-prep",
-          "description": "Generate flashcards from HVAC manuals covering electrical theory and diagnostic procedures."
+          "label": "API 570 Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/api-570",
+          "description": "Create your API 570 flashcards instantly using AI for certification."
         },
         {
-          "label": "Welding Certification Prep",
-          "href": "https://www.cogniguide.app/flashcards/welding-certification",
-          "description": "Create study sets covering WPS procedures and metallurgy concepts from your reference guides."
+          "label": "Trades Prep",
+          "href": "https://www.cogniguide.app/flashcards/trades-prep"
         }
       ]
     },
@@ -51290,14 +51264,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore More Study Strategies",
       "links": [
         {
-          "label": "Active Recall Techniques",
-          "href": "https://www.cogniguide.app/flashcards/active-recall",
-          "description": "Deep dive into how testing yourself improves memory encoding compared to passive review."
+          "label": "SAT Vocabulary Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/sat-vocabulary",
+          "description": "Generate SAT vocabulary flashcards from word lists to accelerate exam mastery."
         },
         {
-          "label": "Spaced Repetition Explained",
-          "href": "https://www.cogniguide.app/flashcards/spaced-repetition",
-          "description": "Understand the cognitive science behind scheduling reviews for optimal long-term memory."
+          "label": "AI GMAT Prep",
+          "href": "https://www.cogniguide.app/flashcards/gmat",
+          "description": "Create AI-powered GMAT flashcards from any document for business school prep."
         }
       ]
     },
@@ -51500,14 +51474,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Advance Your Study Strategy",
       "links": [
         {
-          "label": "Active Recall Techniques",
-          "href": "https://www.cogniguide.app/flashcards/active-recall",
-          "description": "Learn how forcing retrieval improves memory encoding."
+          "label": "AI Study Flashcard Maker",
+          "href": "https://www.cogniguide.app/flashcards/study-maker",
+          "description": "The smartest AI study flashcard maker available for any subject."
         },
         {
-          "label": "Science of Spaced Repetition",
-          "href": "https://www.cogniguide.app/flashcards/spaced-repetition-science",
-          "description": "Understand the proven memory algorithms powering your reviews."
+          "label": "Docs to Study Cards",
+          "href": "https://www.cogniguide.app/flashcards/maker",
+          "description": "The ultimate AI flashcard maker for converting complex material into cards."
         }
       ]
     },
@@ -51706,14 +51680,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Enhance Your Study Techniques",
       "links": [
         {
-          "label": "Active Recall Strategies",
-          "href": "https://www.cogniguide.app/flashcards/active-recall",
-          "description": "Learn proven methods to test memory retrieval for superior long-term recall."
+          "label": "Free AI Notecards",
+          "href": "https://www.cogniguide.app/flashcards/free-notecards",
+          "description": "Generate powerful, free notecards from any document for smarter studying."
         },
         {
-          "label": "Mastering Spaced Repetition",
-          "href": "https://www.cogniguide.app/flashcards/spaced-repetition",
-          "description": "Dive deep into the science behind optimal review timing and scheduling."
+          "label": "Web-Based Flashcard Creator",
+          "href": "https://www.cogniguide.app/flashcards/online-maker",
+          "description": "Generate study decks with an AI online flashcard maker from any document."
         }
       ]
     },
@@ -51915,14 +51889,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Master Any Subject",
       "links": [
         {
-          "label": "Study Hacks for Technical Exams",
-          "href": "https://www.cogniguide.app/flashcards/technical-study-hacks",
-          "description": "Learn advanced techniques for mastering complex, dense, and technical subject matter efficiently."
+          "label": "Make Your Own Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/make",
+          "description": "Instantly make your own flashcards app content from documents using AI."
         },
         {
-          "label": "Optimizing Active Recall Sessions",
-          "href": "https://www.cogniguide.app/flashcards/active-recall-optimization",
-          "description": "Deep dive into the cognitive science behind why testing yourself drastically improves retention."
+          "label": "Instant Study Decks",
+          "href": "https://www.cogniguide.app/flashcards/creator",
+          "description": "The fastest AI flashcard creator for serious students using any document."
         }
       ]
     },
@@ -52125,14 +52099,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore More Study Tools",
       "links": [
         {
-          "label": "AI Concept Summarizer",
-          "href": "https://www.cogniguide.app/flashcards/summarizer",
-          "description": "Quickly condense long academic papers into core takeaways."
+          "label": "Shapes Flashcards Generator",
+          "href": "https://www.cogniguide.app/flashcards/shapes",
+          "description": "Instantly generate shapes flashcards from any file for mastering geometric concepts."
         },
         {
-          "label": "Active Recall Techniques Guide",
-          "href": "https://www.cogniguide.app/study-techniques/active-recall",
-          "description": "Learn the science behind why flashcards outperform passive reading."
+          "label": "Colors Flashcard Generator",
+          "href": "https://www.cogniguide.app/flashcards/colors",
+          "description": "Instantly generate vibrant colors flashcards from documents to accelerate visual learning."
         }
       ]
     },
@@ -52331,14 +52305,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Deepen Your Study Strategy",
       "links": [
         {
-          "label": "Active Recall Techniques Guide",
-          "href": "https://www.cogniguide.app/flashcards/active-recall",
-          "description": "Learn how targeted question-and-answer practice locks in knowledge permanently."
+          "label": "Flashcard Maker Program",
+          "href": "https://www.cogniguide.app/flashcards/maker-program",
+          "description": "The ultimate AI flashcard maker program for students and professionals."
         },
         {
-          "label": "Understanding Learning Algorithms",
-          "href": "https://www.cogniguide.app/flashcards/scheduling",
-          "description": "Read about the science behind spaced repetition and optimal review timing."
+          "label": "Online Digital Study Decks",
+          "href": "https://www.cogniguide.app/flashcards/digital-maker",
+          "description": "Create intelligent digital flashcard decks from any file for modern studying."
         }
       ]
     },
@@ -52541,14 +52515,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Enhance Your Study Strategy",
       "links": [
         {
-          "label": "Cognitive Science Flashcards",
-          "href": "https://www.cogniguide.app/flashcards/cognitive-science",
-          "description": "Discover how AI applies cognitive principles to create better study materials."
+          "label": "Feelings Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/feelings",
+          "description": "Instantly create feelings flashcards from any document for emotional vocabulary."
         },
         {
-          "label": "Psychology Terminology Decks",
-          "href": "https://www.cogniguide.app/flashcards/psychology-terminology",
-          "description": "See examples of highly specific terminology sets generated from textbooks."
+          "label": "AI Social-Emotional Learning",
+          "href": "https://www.cogniguide.app/flashcards/emotions-feelings",
+          "description": "Instantly create emotions and feelings flashcards from any file."
         }
       ]
     },
@@ -52749,14 +52723,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore Other Study Tools",
       "links": [
         {
-          "label": "Advanced Spaced Repetition Techniques",
-          "href": "https://www.cogniguide.app/study-techniques/spaced-repetition",
-          "description": "Learn the cognitive science behind optimal study timing for academic success."
+          "label": "Sight Words Flash Cards",
+          "href": "https://www.cogniguide.app/flashcards/sight",
+          "description": "Generate smart sight words flash cards instantly from your learning materials."
         },
         {
-          "label": "Generating Vocabulary Flashcards",
-          "href": "https://www.cogniguide.app/flashcards/vocabulary-generation",
-          "description": "See how to convert any specialized vocabulary list into study cards."
+          "label": "AI Sight Word Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/pre-primer-sight",
+          "description": "Instantly generate Pre-Primer sight words flash cards beyond static PDFs."
         }
       ]
     },
@@ -52958,14 +52932,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Enhance Your Study Strategy",
       "links": [
         {
-          "label": "Active Recall Techniques",
-          "href": "https://www.cogniguide.app/flashcards/active-recall",
-          "description": "Learn how to use flashcards to test retrieval, not just recognition."
+          "label": "AI Alphabet Flash Cards",
+          "href": "https://www.cogniguide.app/flashcards/alphabet",
+          "description": "Generate free alphabet flash cards from any document for learning letters."
         },
         {
-          "label": "Science of Spaced Repetition",
-          "href": "https://www.cogniguide.app/flashcards/spaced-repetition",
-          "description": "Understand the cognitive science behind our scheduling algorithm."
+          "label": "AI Alphabet Learning",
+          "href": "https://www.cogniguide.app/flashcards/lowercase-letter",
+          "description": "Create AI flashcards for lowercase letters from any document or PDF."
         }
       ]
     },
@@ -53167,14 +53141,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Expand Your Smarter Study Toolkit",
       "links": [
         {
-          "label": "Algebra Flashcards Generation",
-          "href": "https://www.cogniguide.app/flashcards/algebra",
-          "description": "Convert complex algebra formulas and problem types from notes into active recall drills."
+          "label": "AI Division Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/division",
+          "description": "Create smart division flashcards from any PDF for mastering math facts."
         },
         {
-          "label": "Using AI for Science Notes Conversion",
-          "href": "https://www.cogniguide.app/flashcards/science",
-          "description": "See how easy it is to turn dense scientific reports and research papers into effective study aids."
+          "label": "AI Integer Math Practice",
+          "href": "https://www.cogniguide.app/flashcards/integer",
+          "description": "Generate integer flash cards instantly from your PDF notes for math concepts."
         }
       ]
     },
@@ -53373,14 +53347,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore Other Study Resources",
       "links": [
         {
-          "label": "Biology Flashcards Generator",
-          "href": "https://www.cogniguide.app/flashcards/biology",
-          "description": "Convert complex biological pathways and terminology into reviewable sets."
+          "label": "AI Math Flash Cards",
+          "href": "https://www.cogniguide.app/flashcards/math",
+          "description": "Create instant math flash cards from your study materials for any topic."
         },
         {
-          "label": "History Study Aids",
-          "href": "https://www.cogniguide.app/flashcards/history",
-          "description": "Quickly build timeline review cards from dense historical texts."
+          "label": "AI Number Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/counting",
+          "description": "Create counting flashcards directly from any PDF or document for math practice."
         }
       ]
     },
@@ -53582,14 +53556,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore Smarter Study Techniques",
       "links": [
         {
-          "label": "Active Recall Tools",
-          "href": "https://www.cogniguide.app/flashcards/active-recall",
-          "description": "Learn how active recall fundamentally changes studying compared to passive reading."
+          "label": "Create Your Own Quizlet AI",
+          "href": "https://www.cogniguide.app/flashcards/create-my-quizlet",
+          "description": "Instantly create your own Quizlet cards from any document using AI."
         },
         {
-          "label": "Study Planner Integration",
-          "href": "https://www.cogniguide.app/flashcards/study-planner",
-          "description": "Discover how to sync your study goals with specific deadlines for optimized learning paths."
+          "label": "Smarter Quizlet Set Builder",
+          "href": "https://www.cogniguide.app/flashcards/quizlet-make",
+          "description": "Bypass manual entry: make your own Quizlet flashcards the smarter way."
         }
       ]
     },
@@ -53791,14 +53765,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Advance Your Study Techniques",
       "links": [
         {
-          "label": "Active Recall Strategies",
-          "href": "https://www.cogniguide.app/flashcards/active-recall-strategies",
-          "description": "Learn how retrieval practice dramatically improves long-term memory retention."
+          "label": "Beginning Sound Picture Cards",
+          "href": "https://www.cogniguide.app/flashcards/beginning-sound-picture",
+          "description": "Transform documents into smart flashcards for learning beginning letter sounds."
         },
         {
-          "label": "Mastering Spaced Repetition",
-          "href": "https://www.cogniguide.app/flashcards/spaced-repetition",
-          "description": "Deep dive into the algorithm that optimizes when you should review difficult concepts."
+          "label": "AI Phonics Deck Creator",
+          "href": "https://www.cogniguide.app/flashcards/phonics-sound",
+          "description": "Create phonics sound cards from any document instantly for reading."
         }
       ]
     },
@@ -54001,14 +53975,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Continue Your Study Strategy",
       "links": [
         {
-          "label": "AI Grammar Flashcards",
-          "href": "https://www.cogniguide.app/flashcards/grammar",
-          "description": "Generate targeted flashcards to master complex English grammar rules and sentence structures."
+          "label": "ESL Flashcards from PDF",
+          "href": "https://www.cogniguide.app/flashcards/esl",
+          "description": "Create powerful ESL flashcards from PDFs instantly for language learners."
         },
         {
-          "label": "Active Recall Techniques",
-          "href": "https://www.cogniguide.app/study-guides/active-recall",
-          "description": "Learn more about the proven cognitive science behind active recall and how to maximize retention."
+          "label": "AI Climate Study Cards",
+          "href": "https://www.cogniguide.app/flashcards/weather",
+          "description": "Instantly generate weather flashcards from any PDF for meteorology or ESL."
         }
       ]
     },
@@ -54210,14 +54184,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore Study Workflow Resources",
       "links": [
         {
-          "label": "Master Active Recall Techniques",
-          "href": "https://www.cogniguide.app/flashcards/active-recall-techniques",
-          "description": "Learn the science behind testing yourself for stronger memory encoding."
+          "label": "AI Quiz Maker",
+          "href": "https://www.cogniguide.app/flashcards/quizlet-make-quiz",
+          "description": "Stop manually making quizzes; use our AI flashcard generator instead."
         },
         {
-          "label": "Optimal Spaced Repetition Guide",
-          "href": "https://www.cogniguide.app/flashcards/spaced-repetition-guide",
-          "description": "Discover the best scheduling intervals to maximize long-term knowledge retention."
+          "label": "Smarter than Quizlet",
+          "href": "https://www.cogniguide.app/flashcards/create-quiz-quizlet",
+          "description": "Instantly create quizzes and flashcards from any document with AI."
         }
       ]
     },
@@ -54420,14 +54394,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Continue Building Your Study Toolkit",
       "links": [
         {
-          "label": "General Study Guide Flashcards",
-          "href": "https://www.cogniguide.app/flashcards/study-guides",
-          "description": "Learn how to convert general academic notes into high-yield study material."
+          "label": "SAT Vocabulary Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/sat-vocabulary",
+          "description": "Generate SAT vocabulary flashcards from word lists to accelerate exam mastery."
         },
         {
-          "label": "Active Recall Techniques Guide",
-          "href": "https://www.cogniguide.app/guides/active-recall",
-          "description": "Deep dive into the cognitive science behind why flashcards are so effective."
+          "label": "AI Barron's SAT Prep",
+          "href": "https://www.cogniguide.app/flashcards/barrons-sat-vocabulary",
+          "description": "Stop manually making Barron's SAT vocabulary flashcards; use AI instead."
         }
       ]
     },
@@ -54629,14 +54603,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Expand Your Study Toolkit",
       "links": [
         {
-          "label": "AI Textbook Summarizer",
-          "href": "https://www.cogniguide.app/summarizer",
-          "description": "Generate concise summaries from lengthy academic texts to create focused study guides."
+          "label": "Phonics Sound Cards",
+          "href": "https://www.cogniguide.app/flashcards/phonics-sound",
+          "description": "Create phonics sound cards from any document instantly for reading."
         },
         {
-          "label": "Active Recall Techniques Guide",
-          "href": "https://www.cogniguide.app/guides/active-recall",
-          "description": "Learn how to maximize retention using active recall methods integrated into your study plan."
+          "label": "AI CVC Word Family Cards",
+          "href": "https://www.cogniguide.app/flashcards/cvc",
+          "description": "Convert any CVC PDF to smart flash cards for mastering phonics."
         }
       ]
     },
@@ -54840,14 +54814,13 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Expand Your Study Toolkit",
       "links": [
         {
-          "label": "AI Calculus Flashcards",
-          "href": "https://www.cogniguide.app/flashcards/calculus-concepts",
-          "description": "Transform complex calculus notes into manageable, scheduled review sessions."
+          "label": "AI Addition Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/addition",
+          "description": "Generate instant addition flashcards from any PDF for mastering math facts."
         },
         {
-          "label": "Document Study Guides",
-          "href": "https://www.cogniguide.app/study-guides/document-processing",
-          "description": "Learn more about how our tool parses various document types for concept extraction."
+          "label": "Subtraction",
+          "href": "https://www.cogniguide.app/flashcards/subtraction"
         }
       ]
     },
@@ -55048,14 +55021,13 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore Other Study Tools",
       "links": [
         {
-          "label": "AI Textbook Summarizer",
-          "href": "https://www.cogniguide.app/flashcards/summarizer",
-          "description": "Turn long textbook chapters into concise study summaries for quick review."
+          "label": "AI Pronouns Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/pronouns",
+          "description": "Create instant pronouns flashcards from your study materials for grammar."
         },
         {
-          "label": "Active Recall Techniques Guide",
-          "href": "https://www.cogniguide.app/flashcards/active-recall",
-          "description": "Learn the cognitive science behind why active recall beats passive reading."
+          "label": "Nouns",
+          "href": "https://www.cogniguide.app/flashcards/nouns"
         }
       ]
     },
@@ -55257,14 +55229,13 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Expand Your Study Toolkit",
       "links": [
         {
-          "label": "AI Flashcards for Science",
-          "href": "https://www.cogniguide.app/flashcards/science",
-          "description": "Convert complex scientific papers and formulas into reviewable study sets."
+          "label": "AI Alphabet Flash Cards",
+          "href": "https://www.cogniguide.app/flashcards/alphabet",
+          "description": "Generate free alphabet flash cards from any document for learning letters."
         },
         {
-          "label": "Mastering Language Concepts",
-          "href": "https://www.cogniguide.app/flashcards/language",
-          "description": "Create intelligent vocabulary and grammar decks from textbooks instantly."
+          "label": "Writing Practice",
+          "href": "https://www.cogniguide.app/flashcards/writing-practice"
         }
       ]
     },
@@ -55466,14 +55437,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Expand Your Study Toolkit",
       "links": [
         {
-          "label": "Geometry Flashcards Generator",
-          "href": "https://www.cogniguide.app/flashcards/geometry",
-          "description": "Generate visual and conceptual flashcards for geometric theorems and proofs from your geometry notes."
+          "label": "Addition & Subtraction Cards",
+          "href": "https://www.cogniguide.app/flashcards/addition-subtraction",
+          "description": "Generate addition and subtraction flash cards instantly for math practice."
         },
         {
-          "label": "Biology Study Guides",
-          "href": "https://www.cogniguide.app/guides/biology",
-          "description": "Discover tips on organizing complex biological concepts using AI for better retention."
+          "label": "Math Problem Generator",
+          "href": "https://www.cogniguide.app/flashcards/math",
+          "description": "Create instant math flash cards from your study materials for any topic."
         }
       ]
     },
@@ -55672,14 +55643,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Deepen Your Study Strategy",
       "links": [
         {
-          "label": "Active Recall Techniques",
-          "href": "https://www.cogniguide.app/flashcards/active-recall",
-          "description": "Learn how forcing retrieval improves long-term knowledge retention."
+          "label": "AI Flashcard Test Maker",
+          "href": "https://www.cogniguide.app/flashcards/test-maker",
+          "description": "The AI flashcard test maker that helps you prepare for any exam."
         },
         {
-          "label": "Understanding Spaced Repetition",
-          "href": "https://www.cogniguide.app/flashcards/spaced-repetition",
-          "description": "Discover the science behind optimal review timing schedules."
+          "label": "Smarter than Quizlet",
+          "href": "https://www.cogniguide.app/flashcards/create-quiz-quizlet",
+          "description": "Instantly create quizzes and flashcards from any document with AI."
         }
       ]
     },
@@ -55877,14 +55848,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Enhance Your Study Strategies",
       "links": [
         {
-          "label": "Active Recall Techniques",
-          "href": "https://www.cogniguide.app/flashcards/active-recall",
-          "description": "Learn how to structure your review sessions for maximum memory consolidation."
+          "label": "Jolly Phonics Group 1 Cards",
+          "href": "https://www.cogniguide.app/flashcards/jolly-phonics-group-1",
+          "description": "Create Jolly Phonics Group 1 flashcards from any file for early reading."
         },
         {
-          "label": "Spaced Repetition Science",
-          "href": "https://www.cogniguide.app/flashcards/spaced-repetition",
-          "description": "Understand the algorithms that power our scheduling engine for long-term knowledge retention."
+          "label": "AI Phonics Generator",
+          "href": "https://www.cogniguide.app/flashcards/letter-sound",
+          "description": "Create AI letter sound cards from any PDF for mastering phonics."
         }
       ]
     },
@@ -56087,14 +56058,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Optimize Your Entire Study Workflow",
       "links": [
         {
-          "label": "Active Recall Techniques",
-          "href": "https://www.cogniguide.app/flashcards/active-recall",
-          "description": "Learn how structured retrieval practice significantly boosts long-term memory encoding."
+          "label": "Flashcards for Study Notes",
+          "href": "https://www.cogniguide.app/flashcards/study-notes",
+          "description": "Generate smart flashcards from your study notes instantly for active recall."
         },
         {
-          "label": "Spaced Repetition Explained",
-          "href": "https://www.cogniguide.app/flashcards/spaced-repetition",
-          "description": "Discover the proven science behind optimal study timing and scheduling."
+          "label": "AI Note Converter",
+          "href": "https://www.cogniguide.app/flashcards/convert-notes",
+          "description": "Effortlessly convert your notes to flashcards using AI for active recall."
         }
       ]
     },
@@ -56297,14 +56268,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore More Study Techniques",
       "links": [
         {
-          "label": "Active Recall Strategies",
-          "href": "{base_url}/flashcards/active-recall-techniques",
-          "description": "Learn how testing yourself boosts long-term memory retention far beyond passive reading."
+          "label": "AI Flashcard Generator",
+          "href": "https://www.cogniguide.app/flashcards/generator",
+          "description": "The ultimate AI flashcard generator for mastering complex materials quickly."
         },
         {
-          "label": "Study Planning Tools",
-          "href": "{base_url}/flashcards/study-scheduling",
-          "description": "Discover advanced methods for mapping out study sessions leading up to a major deadline."
+          "label": "Docs to Study Cards",
+          "href": "https://www.cogniguide.app/flashcards/maker",
+          "description": "The ultimate AI flashcard maker for converting complex material into cards."
         }
       ]
     },
@@ -56501,14 +56472,13 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore More Study Tools",
       "links": [
         {
-          "label": "Active Recall Techniques Guide",
-          "href": "{base_url}/study-guides/active-recall",
-          "description": "Learn the cognitive science behind why flashcards work so well."
+          "label": "Directions Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/directions",
+          "description": "Instantly create directions flashcards from any file for spatial learning."
         },
         {
-          "label": "AI Document Summarizer",
-          "href": "{base_url}/tools/summarizer",
-          "description": "Condense lengthy regulations or manuals before generating cards."
+          "label": "Safety Signs",
+          "href": "https://www.cogniguide.app/flashcards/safety-signs"
         }
       ]
     },
@@ -56707,14 +56677,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore Smarter Study Techniques",
       "links": [
         {
-          "label": "Active Recall Strategies",
-          "href": "https://www.cogniguide.app/flashcards/active-recall",
-          "description": "Learn how challenging your memory boosts long-term retention compared to passive review."
+          "label": "Antonyms Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/antonyms",
+          "description": "Create powerful antonyms flashcards from your study materials for vocabulary."
         },
         {
-          "label": "Optimizing Study Schedules",
-          "href": "https://www.cogniguide.app/flashcards/scheduling",
-          "description": "Deeper dive into how spaced repetition algorithms are scientifically validated."
+          "label": "AI Vocabulary Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/synonyms-antonyms",
+          "description": "Create synonyms and antonyms flashcards from any document for vocab."
         }
       ]
     },
@@ -56915,14 +56885,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore Related Study Tools",
       "links": [
         {
-          "label": "AI Quiz Generator",
-          "href": "https://www.cogniguide.app/flashcards/quiz-generator",
-          "description": "Convert documents into interactive multiple-choice quizzes instantly."
+          "label": "Vowel Flashcards from PDF",
+          "href": "https://www.cogniguide.app/flashcards/vowel",
+          "description": "Transform study materials into smart vowel flashcards for mastering phonetic concepts."
         },
         {
-          "label": "Active Recall Techniques",
-          "href": "https://www.cogniguide.app/flashcards/active-recall",
-          "description": "Learn the science behind why flashcards are more effective than rereading."
+          "label": "AI Long Vowel Sound Cards",
+          "href": "https://www.cogniguide.app/flashcards/long-vowel",
+          "description": "Create long vowel flashcards from any document instantly for phonics."
         }
       ]
     },
@@ -57126,14 +57096,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore Related Study Tools",
       "links": [
         {
-          "label": "AI Chemistry Flashcards Generator",
-          "href": "https://www.cogniguide.app/flashcards/chemistry",
-          "description": "Generate concept cards optimized for scientific notation and complex formulas."
+          "label": "AI Colors Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/colors",
+          "description": "Instantly generate vibrant colors flashcards from documents to accelerate visual learning."
         },
         {
-          "label": "Study Guide Creation from Text",
-          "href": "https://www.cogniguide.app/guides/text-to-guide",
-          "description": "Learn how to convert long documents into structured, linear study guides."
+          "label": "AI Shapes Study Cards",
+          "href": "https://www.cogniguide.app/flashcards/shapes",
+          "description": "Instantly generate shapes flashcards from any file for mastering geometric concepts."
         }
       ]
     },
@@ -57336,14 +57306,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore Study Workflow Enhancements",
       "links": [
         {
-          "label": "AI for Organic Chemistry Study Aids",
-          "href": "https://www.cogniguide.app/flashcards/ai-organic-chemistry",
-          "description": "See how to automate the creation of structure-based recall cards."
+          "label": "AI Medical Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/anki-medical",
+          "description": "Ditch manual decks: AI flashcards for Anki medical prep are faster."
         },
         {
-          "label": "Optimizing Study Time with Spaced Repetition",
-          "href": "https://www.cogniguide.app/flashcards/spaced-repetition-benefits",
-          "description": "Learn the science behind how scheduling affects long-term memory."
+          "label": "AI Medical Anki Decks",
+          "href": "https://www.cogniguide.app/flashcards/medical-student-anki",
+          "description": "Create instant flashcards for medical student Anki prep, skipping manual entry."
         }
       ]
     },
@@ -57538,14 +57508,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore More Study Techniques",
       "links": [
         {
-          "label": "Master Active Recall Strategies",
-          "href": "https://www.cogniguide.app/flashcards/active-recall",
-          "description": "Deep dive into why testing yourself is the best path to memory encoding."
+          "label": "Action Verb Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/action-verb",
+          "description": "Create action verb flashcards from any document instantly for grammar."
         },
         {
-          "label": "Understanding Spaced Repetition",
-          "href": "https://www.cogniguide.app/flashcards/spaced-repetition",
-          "description": "Learn the science behind optimal study timing for long-term memory retention."
+          "label": "AI Picture Flashcard Generator",
+          "href": "https://www.cogniguide.app/flashcards/picture",
+          "description": "Create picture cards and flashcards from your PDF documents automatically."
         }
       ]
     },
@@ -57748,14 +57718,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Expand Your Study Toolkit",
       "links": [
         {
-          "label": "Master Active Recall Techniques",
-          "href": "https://www.cogniguide.app/study-techniques/active-recall",
-          "description": "Learn how our flashcards drive deeper memory encoding through retrieval practice."
+          "label": "Verbs Flash Cards PDF",
+          "href": "https://www.cogniguide.app/flashcards/verbs",
+          "description": "Generate flash cards for verbs from PDF content automatically."
         },
         {
-          "label": "Document Upload Guides",
-          "href": "https://www.cogniguide.app/guides/document-upload",
-          "description": "Tips for getting the best results when converting complex documents to study materials."
+          "label": "AI Action Verbs Cards",
+          "href": "https://www.cogniguide.app/flashcards/action",
+          "description": "Generate engaging action flash cards from any document to improve vocabulary."
         }
       ]
     },
@@ -57956,14 +57926,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Deepen Your Study Strategy",
       "links": [
         {
-          "label": "AI Flashcards for Concept Memorization",
-          "href": "https://www.cogniguide.app/flashcards/concept-memorization",
-          "description": "Learn how our AI excels at extracting core definitions and terms from complex material."
+          "label": "AI Flashcard Test Maker",
+          "href": "https://www.cogniguide.app/flashcards/test-maker",
+          "description": "The AI flashcard test maker that helps you prepare for any exam."
         },
         {
-          "label": "Optimize Active Recall Timing",
-          "href": "https://www.cogniguide.app/flashcards/optimize-recall",
-          "description": "Dive deeper into the benefits of spaced repetition scheduling for long-term knowledge retention."
+          "label": "Study Set Quiz Generator",
+          "href": "https://www.cogniguide.app/flashcards/quiz-maker",
+          "description": "The fastest AI flashcard quiz maker available for smarter studying."
         }
       ]
     },
@@ -58165,14 +58135,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore Related Study Tools",
       "links": [
         {
-          "label": "AI Exam Date Planner",
-          "href": "https://www.cogniguide.app/tools/exam-planner",
-          "description": "Automatically build a study schedule based on your upcoming test dates."
+          "label": "Flashcards for Study Notes",
+          "href": "https://www.cogniguide.app/flashcards/study-notes",
+          "description": "Generate smart flashcards from your study notes instantly for active recall."
         },
         {
-          "label": "Active Recall Techniques Guide",
-          "href": "https://www.cogniguide.app/guides/active-recall",
-          "description": "Learn the science behind effective memory retention strategies."
+          "label": "AI OCR for Notes",
+          "href": "https://www.cogniguide.app/flashcards/handwritten-revision",
+          "description": "Instantly create flash cards from handwritten revision notes with OCR."
         }
       ]
     },
@@ -58374,14 +58344,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Deepen Your Study Strategy",
       "links": [
         {
-          "label": "Active Recall Techniques",
-          "href": "https://www.cogniguide.app/flashcards/active-recall",
-          "description": "Learn how immediate knowledge retrieval supercharges long-term retention."
+          "label": "Flash Cards PDF Generator",
+          "href": "https://www.cogniguide.app/flashcards/flash-cards-pdf",
+          "description": "Turn any PDF into intelligent flash cards instantly for faster learning."
         },
         {
-          "label": "Optimized Study Scheduling",
-          "href": "https://www.cogniguide.app/flashcards/study-scheduling",
-          "description": "Explore advanced scheduling methods beyond simple daily reviews."
+          "label": "Create Cards from Docs",
+          "href": "https://www.cogniguide.app/flashcards/maker-from",
+          "description": "Instantly create flashcards from any PDF or document for deeper retention."
         }
       ]
     },
@@ -58584,14 +58554,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore Smarter Study Techniques",
       "links": [
         {
-          "label": "Active Recall Practice Guides",
-          "href": "https://www.cogniguide.app/flashcards/active-recall-strategies",
-          "description": "Learn how to maximize learning efficiency using self-testing methods."
+          "label": "PDF to Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/pdf-flashcards",
+          "description": "Convert any PDF to flashcards instantly with AI for content mastery."
         },
         {
-          "label": "The Science of Spaced Learning",
-          "href": "https://www.cogniguide.app/flashcards/learning-algorithms",
-          "description": "Dive deeper into the cognitive science behind efficient scheduling."
+          "label": "Docs to Study Cards",
+          "href": "https://www.cogniguide.app/flashcards/maker",
+          "description": "The ultimate AI flashcard maker for converting complex material into cards."
         }
       ]
     },
@@ -58793,14 +58763,13 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Deepen Your Study Strategy",
       "links": [
         {
-          "label": "Master Active Recall Techniques",
-          "href": "https://www.cogniguide.app/flashcards/active-recall",
-          "description": "Learn the cognitive science behind why testing yourself is more effective than rereading material."
+          "label": "AI NASM Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/nasm",
+          "description": "Create NASM flashcards from your PDF study guide instantly for certification."
         },
         {
-          "label": "Optimize Spaced Repetition Timing",
-          "href": "https://www.cogniguide.app/flashcards/scheduling",
-          "description": "Understand how optimizing review intervals locks in complex information for final exams."
+          "label": "Health Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/health-flashcards"
         }
       ]
     },
@@ -59001,14 +58970,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Optimize Your Study Technique",
       "links": [
         {
-          "label": "Active Recall Techniques",
-          "href": "https://www.cogniguide.app/flashcards/active-recall",
-          "description": "Learn how testing yourself is superior to passive reading."
+          "label": "Flashcard Maker Program",
+          "href": "https://www.cogniguide.app/flashcards/maker-program",
+          "description": "The ultimate AI flashcard maker program for students and professionals."
         },
         {
-          "label": "Understanding Spaced Repetition",
-          "href": "https://www.cogniguide.app/flashcards/spaced-repetition",
-          "description": "Dive deeper into the science behind long-term memory."
+          "label": "AI Study Program",
+          "href": "https://www.cogniguide.app/flashcards/maker-software",
+          "description": "The easiest AI flash card maker software available for instant studying."
         }
       ]
     },
@@ -59211,14 +59180,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Enhance Your Study Strategy",
       "links": [
         {
-          "label": "AI Science Textbook Converter",
-          "href": "https://www.cogniguide.app/flashcards/science-textbook",
-          "description": "Turn dense academic science texts into actionable flashcards instantly."
+          "label": "Fruits and Vegetables Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/fruits-vegetables",
+          "description": "Generate smart flashcards from your fruits and vegetables PDF for study."
         },
         {
-          "label": "Spaced Repetition Guide",
-          "href": "https://www.cogniguide.app/study-techniques/spaced-repetition",
-          "description": "Learn the science behind how optimizing review times boosts long-term recall."
+          "label": "AI Food Vocabulary Cards",
+          "href": "https://www.cogniguide.app/flashcards/food",
+          "description": "Instantly create food flashcards from your PDFs for culinary or language study."
         }
       ]
     },
@@ -59416,14 +59385,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore Other Study Resources",
       "links": [
         {
-          "label": "Biology Flashcards",
-          "href": "https://www.cogniguide.app/flashcards/biology",
-          "description": "Generate AI flashcards covering broader biological concepts and systems."
+          "label": "Fruit Flashcards from PDF",
+          "href": "https://www.cogniguide.app/flashcards/fruits",
+          "description": "Generate smart flashcards from fruit PDFs instantly for botanical learning."
         },
         {
-          "label": "Study Technique Guides",
-          "href": "https://www.cogniguide.app/guides/active-recall",
-          "description": "Learn advanced techniques like Active Recall to maximize your study efficiency."
+          "label": "AI Food Vocabulary Cards",
+          "href": "https://www.cogniguide.app/flashcards/food",
+          "description": "Instantly create food flashcards from your PDFs for culinary or language study."
         }
       ]
     },
@@ -59626,14 +59595,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Further Your Study Strategy",
       "links": [
         {
-          "label": "Active Recall Techniques",
-          "href": "https://www.cogniguide.app/flashcards/active-recall",
-          "description": "Deep dive into the methodology that powers effective memorization."
+          "label": "Phonogram Flash Cards",
+          "href": "https://www.cogniguide.app/flashcards/phonogram",
+          "description": "Create smart phonogram flash cards from any document for reading."
         },
         {
-          "label": "Best Practices for Document Uploads",
-          "href": "https://www.cogniguide.app/guides/upload-best-practices",
-          "description": "Tips for preparing your PDFs and DOCX files for optimal AI processing."
+          "label": "AI Phonics Deck Creator",
+          "href": "https://www.cogniguide.app/flashcards/phonics-sound",
+          "description": "Create phonics sound cards from any document instantly for reading."
         }
       ]
     },
@@ -59835,14 +59804,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore Other Study Methods",
       "links": [
         {
-          "label": "AI Biology Flashcards",
-          "href": "https://www.cogniguide.app/flashcards/biology",
-          "description": "See how complex scientific concepts are simplified into active recall questions."
+          "label": "Antonyms Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/antonyms",
+          "description": "Create powerful antonyms flashcards from your study materials for vocabulary."
         },
         {
-          "label": "Mastering Active Recall Techniques",
-          "href": "https://www.cogniguide.app/study-techniques/active-recall",
-          "description": "Learn the cognitive science behind why flashcards are superior to rereading notes."
+          "label": "AI Antonym Generator",
+          "href": "https://www.cogniguide.app/flashcards/opposite",
+          "description": "Create opposite flashcards from any PDF or document to expand vocabulary."
         }
       ]
     },
@@ -60045,14 +60014,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Expand Your Study Techniques",
       "links": [
         {
-          "label": "Best Practices for Active Recall",
-          "href": "https://www.cogniguide.app/flashcards/active-recall-techniques",
-          "description": "Learn proven methods to improve memory retrieval beyond just using flashcards."
+          "label": "AI Adjective Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/adjective",
+          "description": "Create instant adjective flashcards from your PDF documents for grammar mastery."
         },
         {
-          "label": "Mastering Spaced Repetition Systems",
-          "href": "https://www.cogniguide.app/flashcards/spaced-repetition-guide",
-          "description": "Understand the science behind scheduling reviews for maximum long-term retention."
+          "label": "AI Opposite Word Generator",
+          "href": "https://www.cogniguide.app/flashcards/antonyms",
+          "description": "Create powerful antonyms flashcards from your study materials for vocabulary."
         }
       ]
     },
@@ -60253,14 +60222,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore Other Study Resources",
       "links": [
         {
-          "label": "Scientific Study Methods",
-          "href": "https://www.cogniguide.app/flashcards/study-methods",
-          "description": "Learn how active recall and metacognition optimize any learning task."
+          "label": "ESL Flashcards for Adults",
+          "href": "https://www.cogniguide.app/flashcards/esl-adults",
+          "description": "Create instant ESL flashcards for adults from your documents for learning English."
         },
         {
-          "label": "Document Summarization Tools",
-          "href": "https://www.cogniguide.app/features/summarizer",
-          "description": "See how AI can distill long documents into key takeaways before generating cards."
+          "label": "AI ESL Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/english-learning",
+          "description": "Create AI English cards for learning from any PDF for vocabulary."
         }
       ]
     },
@@ -60459,14 +60428,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Deepen Your Study Strategy",
       "links": [
         {
-          "label": "Active Recall Techniques",
-          "href": "https://www.cogniguide.app/flashcards/active-recall-techniques",
-          "description": "Learn the cognitive science behind testing yourself versus passive reading."
+          "label": "Flash Cards for Animals",
+          "href": "https://www.cogniguide.app/flashcards/animals",
+          "description": "Create instant flash cards from your animals study materials with AI."
         },
         {
-          "label": "Mastering Spaced Repetition",
-          "href": "https://www.cogniguide.app/flashcards/spaced-repetition-scheduling",
-          "description": "Understand how optimized review schedules maximize memory retention."
+          "label": "AI Animal Study Decks",
+          "href": "https://www.cogniguide.app/flashcards/zoo-animals",
+          "description": "Create instant zoo animals flashcards from any document for biology."
         }
       ]
     },
@@ -60664,14 +60633,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Boost Your Study Strategy",
       "links": [
         {
-          "label": "Active Recall Techniques Guide",
-          "href": "https://www.cogniguide.app/study-techniques/active-recall",
-          "description": "Learn why testing yourself is superior to re-reading material."
+          "label": "70 Phonograms Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/70-phonograms",
+          "description": "Generate AI flashcards for mastering the 70 phonograms from any guide."
         },
         {
-          "label": "Understanding Spaced Repetition",
-          "href": "https://www.cogniguide.app/learning-science/spaced-repetition",
-          "description": "Deep dive into the science backing our scheduling algorithm."
+          "label": "AI Phonetic Cards",
+          "href": "https://www.cogniguide.app/flashcards/phoneme",
+          "description": "Create instant phoneme flashcards from your study material for linguistic practice."
         }
       ]
     },
@@ -60873,14 +60842,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore Other Study Resources",
       "links": [
         {
-          "label": "Active Recall Study Techniques",
-          "href": "https://www.cogniguide.app/flashcards/active-recall-techniques",
-          "description": "Learn the cognitive science behind why active recall beats passive reading."
+          "label": "Science Flashcards from PDF",
+          "href": "https://www.cogniguide.app/flashcards/science",
+          "description": "Convert your science PDFs into smart flashcards instantly for active recall."
         },
         {
-          "label": "Advanced Spaced Repetition Use Cases",
-          "href": "https://www.cogniguide.app/flashcards/spaced-repetition-advanced",
-          "description": "Deep dive into optimizing your review schedule for long-term retention."
+          "label": "PDF to Biology Study Guide",
+          "href": "https://www.cogniguide.app/flashcards/biology",
+          "description": "Create smart, free biology flashcards from any document for your class."
         }
       ]
     },
@@ -61078,14 +61047,12 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Expand Your Study Toolkit",
       "links": [
         {
-          "label": "AI Flashcards for Technical Manuals",
-          "href": "https://www.cogniguide.app/flashcards/technical-manuals",
-          "description": "Learn how to convert complex technical documentation into high-yield study aids."
+          "label": "Pmp Prep",
+          "href": "https://www.cogniguide.app/flashcards/pmp-prep"
         },
         {
-          "label": "Mastering Active Recall Techniques",
-          "href": "https://www.cogniguide.app/flashcards/active-recall",
-          "description": "Explore cognitive science strategies that maximize learning efficiency using flashcards."
+          "label": "Certification Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/certification-flashcards"
         }
       ]
     },
@@ -61282,14 +61249,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Enhance Your Study Toolkit",
       "links": [
         {
-          "label": "Spaced Repetition System Guide",
-          "href": "https://www.cogniguide.app/flashcards/spaced-repetition-guide",
-          "description": "Learn the cognitive science behind optimizing your study intervals."
+          "label": "Clothes Flashcards from PDFs",
+          "href": "https://www.cogniguide.app/flashcards/clothes",
+          "description": "Generate smart clothes flashcards from any PDF for mastering apparel terminology."
         },
         {
-          "label": "Active Recall Techniques",
-          "href": "https://www.cogniguide.app/flashcards/active-recall-techniques",
-          "description": "Discover how to turn passive reading into powerful memory retrieval practice."
+          "label": "AI Vocab from PDF",
+          "href": "https://www.cogniguide.app/flashcards/vocabulary",
+          "description": "Generate vocabulary flash cards from your PDF files for any subject."
         }
       ]
     },
@@ -61492,14 +61459,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Expand Your Study Toolkit",
       "links": [
         {
-          "label": "AI Syntax Flashcards",
-          "href": "https://www.cogniguide.app/flashcards/syntax",
-          "description": "Generate structural flashcards instantly from programming documentation or grammar guides."
+          "label": "Synonyms and Antonyms Cards",
+          "href": "https://www.cogniguide.app/flashcards/synonyms-antonyms",
+          "description": "Create synonyms and antonyms flashcards from any document for vocab."
         },
         {
-          "label": "Concept Definition Flashcards",
-          "href": "https://www.cogniguide.app/flashcards/definitions",
-          "description": "Convert dense textbook chapters into clear question/answer pairs for core definitions."
+          "label": "AI Antonym Generator",
+          "href": "https://www.cogniguide.app/flashcards/opposite",
+          "description": "Create opposite flashcards from any PDF or document to expand vocabulary."
         }
       ]
     },
@@ -61696,14 +61663,13 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Continue Optimizing Your Study Workflow",
       "links": [
         {
-          "label": "AI Vocabulary Flashcards",
-          "href": "https://www.cogniguide.app/flashcards/vocabulary",
-          "description": "Instantly turn vocabulary lists from documents into spaced repetition decks."
+          "label": "AI Adjective Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/adjective",
+          "description": "Create instant adjective flashcards from your PDF documents for grammar mastery."
         },
         {
-          "label": "Science Concept Flashcards",
-          "href": "https://www.cogniguide.app/flashcards/science",
-          "description": "Generate complex science concept cards from research papers or lecture notes."
+          "label": "Superlatives",
+          "href": "https://www.cogniguide.app/flashcards/superlatives"
         }
       ]
     },
@@ -61906,14 +61872,12 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Optimize Your Study Workflow",
       "links": [
         {
-          "label": "AI Study Guides Generator",
-          "href": "https://www.cogniguide.app/flashcards/study-guides",
-          "description": "Learn how to generate structured study guides from your entire course syllabus."
+          "label": "Bar Exam",
+          "href": "https://www.cogniguide.app/flashcards/bar-exam"
         },
         {
-          "label": "Understanding Active Recall",
-          "href": "https://www.cogniguide.app/flashcards/active-recall-benefits",
-          "description": "Dive deeper into the cognitive science behind why flashcards work so well."
+          "label": "Law School",
+          "href": "https://www.cogniguide.app/flashcards/law-school"
         }
       ]
     },
@@ -62115,14 +62079,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore More Study Techniques",
       "links": [
         {
-          "label": "Active Recall Strategies",
-          "href": "https://www.cogniguide.app/flashcards/active-recall",
-          "description": "Learn how to maximize memory retention using testing methods."
+          "label": "Flash Cards for Animals",
+          "href": "https://www.cogniguide.app/flashcards/animals",
+          "description": "Create instant flash cards from your animals study materials with AI."
         },
         {
-          "label": "Spaced Repetition Scheduling",
-          "href": "https://www.cogniguide.app/flashcards/spaced-repetition",
-          "description": "Understand the optimal timing for reviewing information to build long-term memory."
+          "label": "AI Animal Study Decks",
+          "href": "https://www.cogniguide.app/flashcards/zoo-animals",
+          "description": "Create instant zoo animals flashcards from any document for biology."
         }
       ]
     },
@@ -62325,14 +62289,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore Smarter Study Methods",
       "links": [
         {
-          "label": "Active Recall Techniques",
-          "href": "https://www.cogniguide.app/flashcards/active-recall",
-          "description": "Deep dive into why testing yourself is superior to passive review."
+          "label": "Feelings Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/feelings",
+          "description": "Instantly create feelings flashcards from any document for emotional vocabulary."
         },
         {
-          "label": "Mastering Spaced Repetition",
-          "href": "https://www.cogniguide.app/flashcards/spaced-repetition-guide",
-          "description": "Understand the science behind timing your reviews for maximum retention."
+          "label": "AI Feelings Study Cards",
+          "href": "https://www.cogniguide.app/flashcards/emotions",
+          "description": "Instantly create emotions flashcards from any document for social learning."
         }
       ]
     },
@@ -62534,14 +62498,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Continue Mastering Your Study Workflow",
       "links": [
         {
-          "label": "AI Flashcard Best Practices",
-          "href": "https://www.cogniguide.app/flashcards/best-practices",
-          "description": "Learn expert tips on how to structure prompts and materials for optimal AI output."
+          "label": "Goodnotes to Flash Cards",
+          "href": "https://www.cogniguide.app/flashcards/goodnotes",
+          "description": "Instantly turn Goodnotes material into smart AI-powered study flash cards."
         },
         {
-          "label": "Understanding Active Recall",
-          "href": "https://www.cogniguide.app/flashcards/active-recall-science",
-          "description": "Discover the cognitive science behind why flashcards outperform passive reading."
+          "label": "AI GoodNotes Converter",
+          "href": "https://www.cogniguide.app/flashcards/goodnotes-5",
+          "description": "Convert GoodNotes 5 notes into active recall flashcards instantly."
         }
       ]
     },
@@ -62744,14 +62708,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Deepen Your Study Strategy",
       "links": [
         {
-          "label": "AI Summary Generator",
-          "href": "https://www.cogniguide.app/flashcards/summarization",
-          "description": "Condense long texts into actionable summaries before turning them into flashcards."
+          "label": "English Learning Cards",
+          "href": "https://www.cogniguide.app/flashcards/english-learning",
+          "description": "Create AI English cards for learning from any PDF for vocabulary."
         },
         {
-          "label": "Custom Study Timelines",
-          "href": "https://www.cogniguide.app/flashcards/scheduling",
-          "description": "Learn how setting a goal date optimizes your spaced repetition plan."
+          "label": "Spanish Vocabulary Generator",
+          "href": "https://www.cogniguide.app/flashcards/spanish",
+          "description": "Create powerful Spanish vocabulary flash cards automatically from your documents."
         }
       ]
     },
@@ -62953,14 +62917,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Advance Your Study Methods",
       "links": [
         {
-          "label": "Active Recall Techniques",
-          "href": "https://www.cogniguide.app/flashcards/active-recall",
-          "description": "Learn how testing yourself improves long-term memory retention."
+          "label": "Tagalog Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/tagalog",
+          "description": "Create Tagalog flashcards from any document instantly to master the language."
         },
         {
-          "label": "Spaced Repetition Guides",
-          "href": "https://www.cogniguide.app/flashcards/spaced-repetition",
-          "description": "Deep dive into the optimal timing for review sessions."
+          "label": "AI Baybayin Study Cards",
+          "href": "https://www.cogniguide.app/flashcards/filipino-alphabet",
+          "description": "Create instant Filipino alphabet flash cards from any source for language learning."
         }
       ]
     },
@@ -63161,14 +63125,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore Related Study Tools",
       "links": [
         {
-          "label": "AI Quiz Generator",
-          "href": "https://www.cogniguide.app/quizzes",
-          "description": "Instantly create multiple-choice or short-answer quizzes from uploaded texts."
+          "label": "Power Up 1 Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/power-up-1",
+          "description": "Create AI Power Up 1 flashcards from any document for your coursework."
         },
         {
-          "label": "Active Recall Techniques Guide",
-          "href": "https://www.cogniguide.app/study-guides",
-          "description": "Learn expert strategies for maximizing memory retention beyond basic flashcards."
+          "label": "AI English as a Second Language",
+          "href": "https://www.cogniguide.app/flashcards/esl",
+          "description": "Create powerful ESL flashcards from PDFs instantly for language learners."
         }
       ]
     },
@@ -63370,14 +63334,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore Other Study Tools",
       "links": [
         {
-          "label": "AI Study Guide Generator",
-          "href": "https://www.cogniguide.app/flashcards/guides",
-          "description": "Turn lengthy readings into structured summaries and conceptual outlines."
+          "label": "Verb Cards from PDF",
+          "href": "https://www.cogniguide.app/flashcards/verb",
+          "description": "Instantly create verb cards from any document for mastering grammar concepts."
         },
         {
-          "label": "Concept Mapping Tools",
-          "href": "https://www.cogniguide.app/flashcards/concepts",
-          "description": "Visualize relationships between complex topics for deeper understanding."
+          "label": "AI Verb Study Cards",
+          "href": "https://www.cogniguide.app/flashcards/action-verb",
+          "description": "Create action verb flashcards from any document instantly for grammar."
         }
       ]
     },
@@ -63575,14 +63539,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore Related Study Strategies",
       "links": [
         {
-          "label": "Benefits of Active Recall",
-          "href": "https://www.cogniguide.app/flashcards/active-recall-benefits",
-          "description": "Learn why testing yourself is more effective than passive reading."
+          "label": "Action Verb Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/action-verb",
+          "description": "Create action verb flashcards from any document instantly for grammar."
         },
         {
-          "label": "Optimizing Study Schedules",
-          "href": "https://www.cogniguide.app/flashcards/study-scheduling",
-          "description": "Tips for using spaced repetition algorithms effectively for exams."
+          "label": "AI Verb Conjugation",
+          "href": "https://www.cogniguide.app/flashcards/verbs",
+          "description": "Generate flash cards for verbs from PDF content automatically."
         }
       ]
     },
@@ -63779,14 +63743,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Expand Your Study Toolkit",
       "links": [
         {
-          "label": "AI Study Planner",
-          "href": "https://www.cogniguide.app/flashcards/study-planner",
-          "description": "Learn how setting milestones and deadlines improves focus."
+          "label": "English Learning Cards",
+          "href": "https://www.cogniguide.app/flashcards/english-learning",
+          "description": "Create AI English cards for learning from any PDF for vocabulary."
         },
         {
-          "label": "Concept Mapping Tools",
-          "href": "https://www.cogniguide.app/flashcards/concept-mapping",
-          "description": "Discover methods for visualizing complex interconnected topics."
+          "label": "AI Digital Vocab Cards",
+          "href": "https://www.cogniguide.app/flashcards/online-vocabulary",
+          "description": "Create perfect online vocabulary flashcards with AI, beating manual creation."
         }
       ]
     },
@@ -63985,14 +63949,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Deepen Your Study Strategy",
       "links": [
         {
-          "label": "AI Flashcards for Chemistry",
-          "href": "https://www.cogniguide.app/flashcards/chemistry",
-          "description": "Convert complex chemical equations and concepts from textbooks into active recall prompts."
+          "label": "English Verbs Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/english-verbs",
+          "description": "Generate English verbs flashcards instantly for mastering grammar and conjugation."
         },
         {
-          "label": "Optimizing Study Schedules",
-          "href": "https://www.cogniguide.app/blog/spaced-repetition-guide",
-          "description": "Learn how spaced repetition algorithms schedule your reviews for maximum memory retention."
+          "label": "AI Verb Form Generator",
+          "href": "https://www.cogniguide.app/flashcards/irregular-verbs",
+          "description": "Generate smart flash cards from an irregular verbs PDF for grammar practice."
         }
       ]
     },
@@ -64195,14 +64159,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore More Study Techniques",
       "links": [
         {
-          "label": "Spaced Repetition Strategies",
-          "href": "https://www.cogniguide.app/flashcards/spaced-repetition",
-          "description": "Learn the science behind optimizing your review intervals for maximum long-term retention."
+          "label": "Science Flashcards from PDF",
+          "href": "https://www.cogniguide.app/flashcards/science",
+          "description": "Convert your science PDFs into smart flashcards instantly for active recall."
         },
         {
-          "label": "Active Recall Mastery",
-          "href": "https://www.cogniguide.app/flashcards/active-recall",
-          "description": "Deep dive into why testing yourself is superior to passive reading for difficult subjects like science."
+          "label": "AI Orgo Study Sets",
+          "href": "https://www.cogniguide.app/flashcards/organic-chemistry",
+          "description": "Create organic chemistry flashcards from any PDF instantly for your course."
         }
       ]
     },
@@ -64403,14 +64367,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Expand Your Study Toolkit",
       "links": [
         {
-          "label": "AI Medical Terminology Flashcards",
-          "href": "https://www.cogniguide.app/flashcards/medical-terminology",
-          "description": "Generate detailed anatomy and medical concept flashcards instantly from textbooks."
+          "label": "Emotions Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/emotions",
+          "description": "Instantly create emotions flashcards from any document for social learning."
         },
         {
-          "label": "History Study Guide Generator",
-          "href": "https://www.cogniguide.app/flashcards/history-dates",
-          "description": "Convert complex historical documents into chronological review sets for better date and event recall."
+          "label": "AI Emotions Vocabulary Cards",
+          "href": "https://www.cogniguide.app/flashcards/feelings",
+          "description": "Instantly create feelings flashcards from any document for emotional vocabulary."
         }
       ]
     },
@@ -64611,14 +64575,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Expand Your Study Toolkit",
       "links": [
         {
-          "label": "Study Planner Tools",
-          "href": "https://www.cogniguide.app/flashcards/study-planner",
-          "description": "Discover tools designed to manage your entire academic schedule around your study sessions."
+          "label": "ESL Flashcards from PDF",
+          "href": "https://www.cogniguide.app/flashcards/esl",
+          "description": "Create powerful ESL flashcards from PDFs instantly for language learners."
         },
         {
-          "label": "Active Recall Techniques",
-          "href": "https://www.cogniguide.app/flashcards/active-recall-benefits",
-          "description": "Learn the science behind why active recall leads to superior memory encoding compared to passive reading."
+          "label": "AI English Study Aids",
+          "href": "https://www.cogniguide.app/flashcards/learning-english",
+          "description": "Create smart flash cards for learning English from any file."
         }
       ]
     },
@@ -64817,14 +64781,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore More Study Techniques",
       "links": [
         {
-          "label": "Active Recall Strategies",
-          "href": "https://www.cogniguide.app/flashcards/active-recall",
-          "description": "Deep dive into how testing yourself improves memory retention."
+          "label": "Kindergarten Greetings Cards",
+          "href": "https://www.cogniguide.app/flashcards/greetings-kindergarten",
+          "description": "Generate AI greetings flashcards for kindergarten from any PDF."
         },
         {
-          "label": "Spaced Repetition Benefits",
-          "href": "https://www.cogniguide.app/flashcards/spaced-repetition",
-          "description": "Understand the optimal timing for reviewing information based on memory decay."
+          "label": "AI Dialogue Prompts",
+          "href": "https://www.cogniguide.app/flashcards/conversation",
+          "description": "Generate instant conversation flashcards from any document for language practice."
         }
       ]
     },
@@ -65027,14 +64991,13 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Related Study Tools",
       "links": [
         {
-          "label": "Science Vocabulary Flashcards",
-          "href": "https://www.cogniguide.app/flashcards/science-vocabulary",
-          "description": "Transform complex science notes into simple, retainable flashcards using our document upload tool."
+          "label": "Greeting Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/greeting",
+          "description": "Generate greeting flashcards instantly from your PDF files for social skills."
         },
         {
-          "label": "History Exam Study Guides",
-          "href": "https://www.cogniguide.app/flashcards/history-exam-prep",
-          "description": "Generate practice questions for historical dates and figures directly from lecture transcripts and textbooks."
+          "label": "Social Stories",
+          "href": "https://www.cogniguide.app/flashcards/social-stories"
         }
       ]
     },
@@ -65236,14 +65199,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Expand Your Study Toolkit",
       "links": [
         {
-          "label": "AI Legal Document Flashcards",
-          "href": "https://www.cogniguide.app/flashcards/legal",
-          "description": "Generate study aids from complex case laws and statutes efficiently."
+          "label": "Household Items Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/household-items",
+          "description": "Create instant household items flashcards from your documents for vocab."
         },
         {
-          "label": "Science Concept Flashcards",
-          "href": "https://www.cogniguide.app/flashcards/science",
-          "description": "Turn dense research papers or lab reports into reviewable question sets."
+          "label": "AI Household Item Cards",
+          "href": "https://www.cogniguide.app/flashcards/bedroom",
+          "description": "Instantly create flashcards of bedroom items from any PDF or document."
         }
       ]
     },
@@ -65446,14 +65409,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore Further Study Techniques",
       "links": [
         {
-          "label": "Mastering Active Recall",
-          "href": "https://www.cogniguide.app/flashcards/active-recall-techniques",
-          "description": "Learn why testing yourself is superior to passive re-reading."
+          "label": "AI Flashcard Maker",
+          "href": "https://www.cogniguide.app/flashcards/maker",
+          "description": "The ultimate AI flashcard maker for converting complex material into cards."
         },
         {
-          "label": "The Science of Spaced Repetition",
-          "href": "https://www.cogniguide.app/flashcards/spaced-repetition-science",
-          "description": "Deep dive into the cognitive algorithms that drive efficient memory encoding."
+          "label": "AI PDF Converter",
+          "href": "https://www.cogniguide.app/flashcards/pdf-flashcards",
+          "description": "Convert any PDF to flashcards instantly with AI for content mastery."
         }
       ]
     },
@@ -65654,14 +65617,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore Other Study Tools",
       "links": [
         {
-          "label": "AI Test Generator",
-          "href": "https://www.cogniguide.app/flashcards/test-generator",
-          "description": "Create full mock exams instantly from study guides instead of just flashcards."
+          "label": "Newborn Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/newborn",
+          "description": "Create instant newborn flashcards from any document for pediatric knowledge."
         },
         {
-          "label": "Active Recall Techniques",
-          "href": "https://www.cogniguide.app/flashcards/active-recall",
-          "description": "Learn the science behind why spaced repetition and active recall boost study efficiency."
+          "label": "Shichida Method Cards",
+          "href": "https://www.cogniguide.app/flashcards/shichida",
+          "description": "Generate AI Shichida flashcards from any document for early learning."
         }
       ]
     },
@@ -65858,14 +65821,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore More Study Resources",
       "links": [
         {
-          "label": "AI for Vocabulary Building",
-          "href": "https://www.cogniguide.app/flashcards/vocabulary-building",
-          "description": "Learn how to maximize vocabulary retention using AI-driven study techniques."
+          "label": "Greeting Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/greeting",
+          "description": "Generate greeting flashcards instantly from your PDF files for social skills."
         },
         {
-          "label": "Optimizing Study Schedules",
-          "href": "https://www.cogniguide.app/flashcards/study-scheduling",
-          "description": "Tips on using time-based tools to meet academic deadlines efficiently."
+          "label": "AI ESL Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/english-learning",
+          "description": "Create AI English cards for learning from any PDF for vocabulary."
         }
       ]
     },
@@ -66064,14 +66027,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Expand Your Study Toolkit",
       "links": [
         {
-          "label": "Advanced Spaced Repetition Techniques",
-          "href": "https://www.cogniguide.app/flashcards/study-techniques",
-          "description": "Learn how our scheduling algorithms maximize long-term memory retention."
+          "label": "Marathi Flashcards PDF",
+          "href": "https://www.cogniguide.app/flashcards/marathi",
+          "description": "Create custom Marathi flashcards instantly from any PDF for language study."
         },
         {
-          "label": "Document Upload Guides",
-          "href": "https://www.cogniguide.app/flashcards/document-conversion",
-          "description": "Tips for ensuring the best extraction quality from complex PDFs."
+          "label": "AI Urdu Letter Cards",
+          "href": "https://www.cogniguide.app/flashcards/urdu-alphabets",
+          "description": "Create AI Urdu alphabets flashcards from any document without manual creation."
         }
       ]
     },
@@ -66274,14 +66237,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Expand Your Study Toolkit",
       "links": [
         {
-          "label": "Advanced Anatomy Flashcards",
-          "href": "https://www.cogniguide.app/flashcards/anatomy-review",
-          "description": "See how AI handles the sheer volume of anatomical terminology and structures."
+          "label": "MedStudy Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/medstudy",
+          "description": "Create powerful MedStudy flashcards from any PDF or document instantly."
         },
         {
-          "label": "Generating Flashcards from Lecture Videos",
-          "href": "https://www.cogniguide.app/blog/video-to-flashcard-workflow",
-          "description": "Learn about workflow strategies for converting video content into structured study aids."
+          "label": "Anki Alternative for Medicine",
+          "href": "https://www.cogniguide.app/flashcards/anki-medical",
+          "description": "Ditch manual decks: AI flashcards for Anki medical prep are faster."
         }
       ]
     },
@@ -66484,14 +66447,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Optimize Your Study Resources",
       "links": [
         {
-          "label": "AI Lecture Note Summarization",
-          "href": "https://www.cogniguide.app/flashcards/lecture-notes",
-          "description": "Convert long, unstructured lecture transcripts into concise summaries before creating flashcards."
+          "label": "Flashcards for Study Notes",
+          "href": "https://www.cogniguide.app/flashcards/study-notes",
+          "description": "Generate smart flashcards from your study notes instantly for active recall."
         },
         {
-          "label": "Understanding Active Recall Techniques",
-          "href": "https://www.cogniguide.app/study-methods",
-          "description": "Learn the cognitive science behind why testing yourself works better than rereading material."
+          "label": "Notes to Study Sets",
+          "href": "https://www.cogniguide.app/flashcards/revision-note",
+          "description": "Transform any revision note into smart flashcards instantly for exam prep."
         }
       ]
     },
@@ -66693,14 +66656,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore More Study Strategies",
       "links": [
         {
-          "label": "AI Math Formula Extraction",
-          "href": "https://www.cogniguide.app/flashcards/math-formula-extraction",
-          "description": "See how AI turns complex mathematical equations into digital flashcards."
+          "label": "Jolly Phonics Group 1 Cards",
+          "href": "https://www.cogniguide.app/flashcards/jolly-phonics-group-1",
+          "description": "Create Jolly Phonics Group 1 flashcards from any file for early reading."
         },
         {
-          "label": "History Timeline Generation",
-          "href": "https://www.cogniguide.app/flashcards/history-timeline-generator",
-          "description": "Generate sequential study aids from dense historical texts and documents."
+          "label": "AI Phonics Deck Creator",
+          "href": "https://www.cogniguide.app/flashcards/phonics-sound",
+          "description": "Create phonics sound cards from any document instantly for reading."
         }
       ]
     },
@@ -66902,14 +66865,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Enhance Your Study Strategies",
       "links": [
         {
-          "label": "Active Recall Techniques",
-          "href": "{base_url}/flashcards/active-recall",
-          "description": "Learn how to maximize memory encoding through retrieval practice."
+          "label": "Family Flash Cards from PDF",
+          "href": "https://www.cogniguide.app/flashcards/family",
+          "description": "Create family flash cards from your PDFs and documents for social studies."
         },
         {
-          "label": "Study Schedule Optimization",
-          "href": "{base_url}/flashcards/study-scheduling",
-          "description": "Tips for planning your review sessions efficiently using calendars and deadlines."
+          "label": "AI Family Vocabulary Cards",
+          "href": "https://www.cogniguide.app/flashcards/family-members",
+          "description": "Generate family members flashcards from any document for vocabulary building."
         }
       ]
     },
@@ -67112,14 +67075,13 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Expand Your Study Toolkit",
       "links": [
         {
-          "label": "Microbiology Flashcards Generator",
-          "href": "https://www.cogniguide.app/flashcards/microbiology",
-          "description": "Transform dense microbiology notes and lab results into high-retention study sets."
+          "label": "Infant Stimulation Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/infant-stimulation",
+          "description": "Create infant stimulation flashcards from your study materials for development."
         },
         {
-          "label": "Pharmacology Study Tools",
-          "href": "https://www.cogniguide.app/flashcards/pharmacology",
-          "description": "Instantly convert drug monographs and dosage guidelines into spaced repetition schedules."
+          "label": "Pediatrics",
+          "href": "https://www.cogniguide.app/flashcards/pediatrics"
         }
       ]
     },
@@ -67322,14 +67284,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Enhance Your Study Workflow",
       "links": [
         {
-          "label": "Spaced Repetition Techniques",
-          "href": "https://www.cogniguide.app/flashcards/spaced-repetition-techniques",
-          "description": "Learn the science behind optimizing review schedules for maximum retention."
+          "label": "AI Quizlet Flashcard Creator",
+          "href": "https://www.cogniguide.app/flashcards/create-quizlet",
+          "description": "Ditch manual entry and create smarter Quizlet-style decks from documents instantly."
         },
         {
-          "label": "Active Recall Mastery",
-          "href": "https://www.cogniguide.app/flashcards/active-recall-mastery",
-          "description": "Discover how challenging your memory improves learning compared to passive reading."
+          "label": "Quizlet Game Alternative",
+          "href": "https://www.cogniguide.app/flashcards/quizlet-game-create",
+          "description": "Skip the Quizlet game creation grind; AI generates flashcards for study."
         }
       ]
     },
@@ -67531,14 +67493,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore Other Study Resources",
       "links": [
         {
-          "label": "How Spaced Repetition Boosts Recall",
-          "href": "https://www.cogniguide.app/blog/spaced-repetition-benefits",
-          "description": "Learn the cognitive science behind why our scheduling is more effective than traditional methods."
+          "label": "AI Histology Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/histology",
+          "description": "Generate histology flashcards from your PDF notes instantly for medical school."
         },
         {
-          "label": "Generating Flashcards from Videos",
-          "href": "https://www.cogniguide.app/features/video-to-flashcards",
-          "description": "Discover how to turn recorded lectures into actionable study content using direct uploads."
+          "label": "PDF to Biology Study Guide",
+          "href": "https://www.cogniguide.app/flashcards/biology",
+          "description": "Create smart, free biology flashcards from any document for your class."
         }
       ]
     },
@@ -67741,14 +67703,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore Related Study Tools",
       "links": [
         {
-          "label": "AI Biology Flashcards",
-          "href": "https://www.cogniguide.app/flashcards/biology-concepts",
-          "description": "Generate complex terminology flashcards optimized for deep biological recall."
+          "label": "AI Colors Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/colors",
+          "description": "Instantly generate vibrant colors flashcards from documents to accelerate visual learning."
         },
         {
-          "label": "PDF Study Guide Summarizer",
-          "href": "https://www.cogniguide.app/tools/summarizer",
-          "description": "Use our tool to condense long research papers or chapters into key takeaways before card creation."
+          "label": "AI Shapes Study Cards",
+          "href": "https://www.cogniguide.app/flashcards/shapes",
+          "description": "Instantly generate shapes flashcards from any file for mastering geometric concepts."
         }
       ]
     },
@@ -67945,14 +67907,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore Related Study Tools",
       "links": [
         {
-          "label": "AI Biology Flashcard Generator",
-          "href": "https://www.cogniguide.app/flashcards/biology-study-guides",
-          "description": "Generate cards from anatomy, genetics, and cellular processes content."
+          "label": "Lange Pathology Flash Cards",
+          "href": "https://www.cogniguide.app/flashcards/lange-pathology",
+          "description": "Instantly create Lange Pathology flash cards from any source material."
         },
         {
-          "label": "Active Recall Techniques Guide",
-          "href": "https://www.cogniguide.app/study-techniques/active-recall",
-          "description": "Learn more about the cognitive science behind effective studying."
+          "label": "AI MedStudy PDF Converter",
+          "href": "https://www.cogniguide.app/flashcards/medstudy",
+          "description": "Create powerful MedStudy flashcards from any PDF or document instantly."
         }
       ]
     },
@@ -68155,14 +68117,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Continue Optimizing Your Study Approach",
       "links": [
         {
-          "label": "Active Recall Strategies",
-          "href": "https://www.cogniguide.app/flashcards/active-recall-strategies",
-          "description": "Learn how to structure your study sessions for maximum memory encoding."
+          "label": "Adjectives Opposites Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/adjectives-opposites",
+          "description": "Instant adjectives opposites flashcards from any document for vocabulary."
         },
         {
-          "label": "Document Study Guides Generator",
-          "href": "https://www.cogniguide.app/flashcards/document-study-guides",
-          "description": "See how to convert any academic document into multiple learning formats."
+          "label": "AI Opposite Word Generator",
+          "href": "https://www.cogniguide.app/flashcards/antonyms",
+          "description": "Create powerful antonyms flashcards from your study materials for vocabulary."
         }
       ]
     },
@@ -68359,14 +68321,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Expand Your Study Toolkit",
       "links": [
         {
-          "label": "AI Flashcards for Terminology",
-          "href": "https://www.cogniguide.app/flashcards/terminology-mastery",
-          "description": "Learn how to quickly define and contextualize specialized vocabulary across any field."
+          "label": "Feelings Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/feelings",
+          "description": "Instantly create feelings flashcards from any document for emotional vocabulary."
         },
         {
-          "label": "Optimize Study Schedules",
-          "href": "https://www.cogniguide.app/study-optimization",
-          "description": "Discover advanced strategies for using AI to plan and structure your entire revision timeline."
+          "label": "AI Feelings Study Cards",
+          "href": "https://www.cogniguide.app/flashcards/emotions",
+          "description": "Instantly create emotions flashcards from any document for social learning."
         }
       ]
     },
@@ -68564,14 +68526,12 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Expand Your Learning Strategy",
       "links": [
         {
-          "label": "Generate Anatomy & Physiology Flashcards",
-          "href": "https://www.cogniguide.app/flashcards/anatomy-physiology-prep",
-          "description": "Learn how to convert dense biological textbooks into high-retention study sets."
+          "label": "Medical Terms",
+          "href": "https://www.cogniguide.app/flashcards/medical-terms"
         },
         {
-          "label": "Mastering Active Recall Techniques",
-          "href": "https://www.cogniguide.app/learning-strategies/active-recall",
-          "description": "Deep dive into the learning science behind effective studying, including free resources."
+          "label": "Anatomy",
+          "href": "https://www.cogniguide.app/flashcards/anatomy"
         }
       ]
     },
@@ -68773,14 +68733,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore Other Study Strategies",
       "links": [
         {
-          "label": "Active Recall Techniques Guide",
-          "href": "https://www.cogniguide.app/flashcards/active-recall",
-          "description": "Deep dive into techniques that boost memory retention beyond simple recognition."
+          "label": "Winter Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/winter",
+          "description": "Create powerful winter flashcards from any PDF for seasonal learning."
         },
         {
-          "label": "Mastering Spaced Repetition",
-          "href": "https://www.cogniguide.app/flashcards/spaced-repetition",
-          "description": "Understand the science behind why repeating information at increasing intervals works best."
+          "label": "AI Seasons Flashcard Maker",
+          "href": "https://www.cogniguide.app/flashcards/4-seasons",
+          "description": "Generate your custom 4 seasons flashcards instantly from any learning file."
         }
       ]
     },
@@ -68982,14 +68942,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Continue Exploring Study Techniques",
       "links": [
         {
-          "label": "Active Recall Strategies",
-          "href": "https://www.cogniguide.app/flashcards/active-recall",
-          "description": "Deep dive into how challenging your memory improves retention."
+          "label": "AI Shichida Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/shichida",
+          "description": "Generate AI Shichida flashcards from any document for early learning."
         },
         {
-          "label": "Optimizing Study Schedules",
-          "href": "https://www.cogniguide.app/flashcards/study-scheduling",
-          "description": "Learn how to use time management with learning algorithms."
+          "label": "AI Shichida Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/right-brain-education",
+          "description": "Instantly create right brain education flashcards from any document."
         }
       ]
     },
@@ -69192,14 +69152,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Expand Your Study Toolkit",
       "links": [
         {
-          "label": "Active Recall Techniques Guide",
-          "href": "https://www.cogniguide.app/study-techniques/active-recall",
-          "description": "Learn the cognitive science behind effective memory retrieval."
+          "label": "Summer Flashcards PDF",
+          "href": "https://www.cogniguide.app/flashcards/summer",
+          "description": "Generate custom summer flashcards from any document for themed learning."
         },
         {
-          "label": "Document Upload Workflow Tips",
-          "href": "https://www.cogniguide.app/guides/document-upload-optimization",
-          "description": "Tips for preparing your PDFs and DOCX files for optimal AI processing."
+          "label": "AI Vocab from PDF",
+          "href": "https://www.cogniguide.app/flashcards/vocabulary",
+          "description": "Generate vocabulary flash cards from your PDF files for any subject."
         }
       ]
     },
@@ -69402,14 +69362,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore More Study Tools",
       "links": [
         {
-          "label": "Create Flashcards from Class Notes",
-          "href": "https://www.cogniguide.app/flashcards/class-notes-to-study-guide",
-          "description": "Turn disorganized lecture slides and notes into structured study sets instantly."
+          "label": "Barron's SAT Vocabulary Cards",
+          "href": "https://www.cogniguide.app/flashcards/barrons-sat-vocabulary",
+          "description": "Stop manually making Barron's SAT vocabulary flashcards; use AI instead."
         },
         {
-          "label": "Master Concepts with Active Recall",
-          "href": "https://www.cogniguide.app/study-techniques/active-recall-benefits",
-          "description": "Learn the science behind why active recall beats passive reading for long-term knowledge retention."
+          "label": "AI SAT Vocab Builder",
+          "href": "https://www.cogniguide.app/flashcards/sat-vocabulary",
+          "description": "Generate SAT vocabulary flashcards from word lists to accelerate exam mastery."
         }
       ]
     },
@@ -69612,14 +69572,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore More Study Resources",
       "links": [
         {
-          "label": "AI Flashcards for Vocabulary Building",
-          "href": "https://www.cogniguide.app/flashcards/vocabulary",
-          "description": "Turn complex word lists and definitions from documents into powerful, rapidly retained vocabulary sets."
+          "label": "AI Pronouns Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/pronouns",
+          "description": "Create instant pronouns flashcards from your study materials for grammar."
         },
         {
-          "label": "Science Flashcards from Lecture Notes",
-          "href": "https://www.cogniguide.app/flashcards/science",
-          "description": "Generate science-specific Q&A pairs from detailed experimental procedures or theoretical texts."
+          "label": "AI Pronoun Study Sets",
+          "href": "https://www.cogniguide.app/flashcards/personal-pronouns",
+          "description": "Create personal pronouns flashcards instantly from any document."
         }
       ]
     },
@@ -69821,14 +69781,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore More Study Tools",
       "links": [
         {
-          "label": "Vocabulary Builder Flashcards",
-          "href": "https://www.cogniguide.app/flashcards/vocabulary",
-          "description": "Turn long word lists and definitions from PDFs into efficient, high-retention study sets."
+          "label": "Verbs Flash Cards PDF",
+          "href": "https://www.cogniguide.app/flashcards/verbs",
+          "description": "Generate flash cards for verbs from PDF content automatically."
         },
         {
-          "label": "Concept Mapping Tools",
-          "href": "https://www.cogniguide.app/features/concept-mapping",
-          "description": "See how visualizing connections between topics aids in deeper understanding beyond simple Q&A."
+          "label": "AI Irregular Verb Cards",
+          "href": "https://www.cogniguide.app/flashcards/past-simple-irregular-verbs",
+          "description": "Create past simple irregular verbs flashcards instantly for grammar practice."
         }
       ]
     },
@@ -70029,14 +69989,12 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Deepen Your Study Strategy",
       "links": [
         {
-          "label": "Active Recall Techniques",
-          "href": "https://www.cogniguide.app/flashcards/active-recall",
-          "description": "Learn how active recall maximizes learning efficiency."
+          "label": "Moral Stories",
+          "href": "https://www.cogniguide.app/flashcards/moral-stories"
         },
         {
-          "label": "Spaced Repetition Scheduling",
-          "href": "https://www.cogniguide.app/flashcards/spaced-repetition",
-          "description": "Understand the science behind optimal review timing."
+          "label": "Reading Comprehension",
+          "href": "https://www.cogniguide.app/flashcards/reading-comprehension"
         }
       ]
     },
@@ -70239,14 +70197,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore Other Study Methods",
       "links": [
         {
-          "label": "AI Physics Note Summarizer",
-          "href": "https://www.cogniguide.app/flashcards/physics",
-          "description": "Convert complex physics derivations and concepts into concise study materials."
+          "label": "Transport Flashcards from PDF",
+          "href": "https://www.cogniguide.app/flashcards/transport",
+          "description": "Create custom transport flashcards from your PDF uploads for vocabulary."
         },
         {
-          "label": "Guide to Active Recall Techniques",
-          "href": "https://www.cogniguide.app/guides/active-recall",
-          "description": "Learn the cognitive science behind why testing yourself is superior to re-reading."
+          "label": "AI Transportation Vocabulary",
+          "href": "https://www.cogniguide.app/flashcards/vehicle",
+          "description": "Create instant vehicle flashcards from any PDF or document for study."
         }
       ]
     },
@@ -70449,14 +70407,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore Other Study Methods",
       "links": [
         {
-          "label": "Biology Flashcards Generator",
-          "href": "https://www.cogniguide.app/flashcards/biology",
-          "description": "Instantly create study sets from complex biological texts and research papers."
+          "label": "5 Senses Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/5-senses",
+          "description": "Instantly create your 5 senses flashcards from any document."
         },
         {
-          "label": "Active Recall Techniques Guide",
-          "href": "https://www.cogniguide.app/blog/active-recall",
-          "description": "Learn the science behind why question-based retrieval beats simple rereading."
+          "label": "AI 5 Senses Cards",
+          "href": "https://www.cogniguide.app/flashcards/five-senses",
+          "description": "Create five senses flashcards instantly from your materials for sensory learning."
         }
       ]
     },
@@ -70659,14 +70617,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Advance Your Study Techniques",
       "links": [
         {
-          "label": "Master Active Recall Strategies",
-          "href": "https://www.cogniguide.app/flashcards/active-recall-techniques",
-          "description": "Learn the science behind recalling information and how to apply it effectively."
+          "label": "Sight Words Flash Cards",
+          "href": "https://www.cogniguide.app/flashcards/sight",
+          "description": "Generate smart sight words flash cards instantly from your learning materials."
         },
         {
-          "label": "Understanding Spaced Repetition Benefits",
-          "href": "https://www.cogniguide.app/flashcards/spaced-repetition-benefits",
-          "description": "Dive deeper into the proven learning algorithms that boost long-term memory."
+          "label": "AI Dolch Word Generator",
+          "href": "https://www.cogniguide.app/flashcards/dolch-sight",
+          "description": "Create instant AI Dolch sight word flash cards, beating static PDF lists."
         }
       ]
     },
@@ -70864,14 +70822,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore More Study Techniques",
       "links": [
         {
-          "label": "Active Recall Mastery",
-          "href": "https://www.cogniguide.app/flashcards/active-recall",
-          "description": "Learn how generating questions forces deeper encoding of information."
+          "label": "AI Digital Flashcard Maker",
+          "href": "https://www.cogniguide.app/flashcards/digital-maker",
+          "description": "Create intelligent digital flashcard decks from any file for modern studying."
         },
         {
-          "label": "Spaced Repetition Explained",
-          "href": "https://www.cogniguide.app/flashcards/spaced-repetition",
-          "description": "Understand the science behind optimal long-term memory scheduling."
+          "label": "Web-Based Flashcard Creator",
+          "href": "https://www.cogniguide.app/flashcards/online-maker",
+          "description": "Generate study decks with an AI online flashcard maker from any document."
         }
       ]
     },
@@ -71074,14 +71032,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Deepen Your Study Knowledge",
       "links": [
         {
-          "label": "Active Recall Techniques",
-          "href": "https://www.cogniguide.app/flashcards/active-recall",
-          "description": "Explore methods to boost memory retention beyond simple review."
+          "label": "Summer Flashcards PDF",
+          "href": "https://www.cogniguide.app/flashcards/summer",
+          "description": "Generate custom summer flashcards from any document for themed learning."
         },
         {
-          "label": "Optimizing Study Schedules",
-          "href": "https://www.cogniguide.app/flashcards/scheduling",
-          "description": "Learn how setting target dates transforms your study pacing."
+          "label": "AI Seasons Flashcard Maker",
+          "href": "https://www.cogniguide.app/flashcards/4-seasons",
+          "description": "Generate your custom 4 seasons flashcards instantly from any learning file."
         }
       ]
     },
@@ -71283,14 +71241,13 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Expand Your Study Tools",
       "links": [
         {
-          "label": "Grammar Rules Flashcards",
-          "href": "https://www.cogniguide.app/flashcards/grammar",
-          "description": "Convert entire grammar textbooks or style guides into effective study decks."
+          "label": "English Grammar for Adults",
+          "href": "https://www.cogniguide.app/flashcards/grammar-adults",
+          "description": "Instantly generate grammar flashcards for adults to master English."
         },
         {
-          "label": "Vocabulary Builder Tools",
-          "href": "https://www.cogniguide.app/vocabulary",
-          "description": "Use similar document-to-card technology for mastering new terminology."
+          "label": "Writing Rules",
+          "href": "https://www.cogniguide.app/flashcards/writing-rules"
         }
       ]
     },
@@ -71488,14 +71445,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Enhance Your Study Strategy",
       "links": [
         {
-          "label": "Active Recall Techniques",
-          "href": "https://www.cogniguide.app/flashcards/active-recall",
-          "description": "Learn how to test yourself effectively rather than passively rereading material."
+          "label": "1-10 Counting Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/1-10",
+          "description": "Generate counting flashcards from any PDF to master numbers 1 to 10."
         },
         {
-          "label": "Optimizing Study Time",
-          "href": "https://www.cogniguide.app/flashcards/study-workflow",
-          "description": "Tips on structuring your learning sessions for maximum retention across subjects."
+          "label": "AI Number Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/counting",
+          "description": "Create counting flashcards directly from any PDF or document for math practice."
         }
       ]
     },
@@ -71696,14 +71653,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "heading": "Explore Other High-Impact Study Tools",
       "links": [
         {
-          "label": "Anatomy Flashcards Generator",
-          "href": "https://www.cogniguide.app/flashcards/anatomy",
-          "description": "Transform complex anatomical diagrams and notes into effective recall prompts."
+          "label": "Senses Flashcards",
+          "href": "https://www.cogniguide.app/flashcards/senses",
+          "description": "Generate senses flashcards instantly from any document for biology."
         },
         {
-          "label": "Biology Flashcards Generator",
-          "href": "https://www.cogniguide.app/flashcards/biology",
-          "description": "Create comprehensive decks from microbiology labs or cellular processes documentation."
+          "label": "AI 5 Senses Cards",
+          "href": "https://www.cogniguide.app/flashcards/five-senses",
+          "description": "Create five senses flashcards instantly from your materials for sensory learning."
         }
       ]
     },
