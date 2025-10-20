@@ -24,9 +24,7 @@ export default function UseCasesIndexPage() {
             className="group flex flex-col rounded-xl border border-border bg-card p-6 shadow-sm transition-colors hover:border-primary/60 hover:bg-card/80"
           >
             <h2 className="text-xl font-semibold group-hover:text-primary">{hub.name}</h2>
-            <p className="mt-3 text-sm text-muted-foreground">
-              {hub.subhubs.map((subhub) => subhub.name).join(' • ')}
-            </p>
+            <p className="mt-3 text-sm text-muted-foreground">{hub.menuDescription}</p>
           </Link>
         ))}
       </div>

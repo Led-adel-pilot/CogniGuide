@@ -27,7 +27,7 @@ export function generateMetadata({ params }: { params: SubhubPageParams }): Meta
   return {
     ...useCasesMetadataBase,
     title: `${subhub.name} Use Cases | ${hub.name} | CogniGuide`,
-    description: `Discover flashcard topics and resources for the ${subhub.name} subhub within ${hub.name}.`,
+    description: subhub.metaDescription,
   };
 }
 
@@ -43,10 +43,7 @@ export default function UseCaseSubhubPage({ params }: { params: SubhubPageParams
       <header className="space-y-3 text-center">
         <p className="text-sm uppercase tracking-wider text-muted-foreground">{hub.name}</p>
         <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">{subhub.name}</h1>
-        <p className="text-muted-foreground">
-          Explore flashcard collections and learning experiences aligned to this subhub. Use the links below to jump directly to r
-elated study pages.
-        </p>
+        <p className="text-muted-foreground">{subhub.pageIntro}</p>
       </header>
       <div className="grid gap-4">
         {subhub.flashcards.map((flashcard) => (

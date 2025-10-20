@@ -197,17 +197,11 @@ export default function HomeLanding() {
                           onClick={() => setUseCasesOpen(false)}
                           className="group flex h-full flex-col rounded-xl border border-transparent bg-muted/30 p-4 transition hover:border-primary/60 hover:bg-muted/60 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
                         >
-                          <span className="text-base font-semibold group-hover:text-primary">{hub.name}</span>
-                          <span className="mt-2 text-sm text-muted-foreground">
-                            {hub.subhubs
-                              .map((subhub) => subhub.name)
-                              .slice(0, 3)
-                              .join(' • ')}
-                            {hub.subhubs.length > 3 ? ' • …' : ''}
-                          </span>
-                        </Link>
-                      ))}
-                    </div>
+                      <span className="text-base font-semibold group-hover:text-primary">{hub.name}</span>
+                      <span className="mt-2 text-sm text-muted-foreground">{hub.menuDescription}</span>
+                    </Link>
+                  ))}
+                </div>
                   </div>
                 ) : null}
               </div>

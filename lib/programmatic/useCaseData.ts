@@ -13,12 +13,18 @@ export type UseCaseLink = {
 export type UseCaseSubhub = {
   name: string;
   slug: string;
+  description: string;
+  pageIntro: string;
+  metaDescription: string;
   flashcards: UseCaseLink[];
 };
 
 export type UseCaseHub = {
   name: string;
   slug: string;
+  menuDescription: string;
+  pageIntro: string;
+  metaDescription: string;
   subhubs: UseCaseSubhub[];
 };
 
@@ -483,6 +489,391 @@ const rawHubData: Record<string, Record<string, string[]>> = {
   },
 };
 
+type HubCopy = {
+  menuDescription: string;
+  pageIntro: string;
+  metaDescription: string;
+};
+
+type SubhubCopy = {
+  description: string;
+  pageIntro: string;
+  metaDescription: string;
+};
+
+const hubCopy: Record<string, HubCopy> = {
+  'Exam & Certification Prep': {
+    menuDescription:
+      'Exam blueprints for SAT, GRE, medical boards, and industry certifications.',
+    pageIntro:
+      'Target your next exam with curated study hubs covering standardized tests, board reviews, and professional credentials.',
+    metaDescription:
+      'Find AI-generated flashcard workflows for standardized exams, medical board prep, and professional certifications.',
+  },
+  'Language & Culture': {
+    menuDescription:
+      'Immersive language practice across global dialects, ESL skills, and cultural topics.',
+    pageIntro:
+      'Level up language proficiency with hubs dedicated to world languages, ESL mastery, grammar, and everyday vocabulary.',
+    metaDescription:
+      'Discover AI flashcards for world languages, ESL practice, grammar, and cultural vocabulary sets.',
+  },
+  'Literacy & Phonics': {
+    menuDescription:
+      'Build foundational literacy with phonics rules, tricky words, and verb practice.',
+    pageIntro:
+      'Support early readers with hubs covering phonics patterns, classroom programs, sight words, and essential grammar.',
+    metaDescription:
+      'Explore phonics-based flashcard paths for decoding skills, sight words, and foundational literacy concepts.',
+  },
+  'Math, Science & Core K-5': {
+    menuDescription: 'Elementary math, science, and classroom themes for K-5 learners.',
+    pageIntro:
+      'Reinforce core K-5 subjects with hubs for math fluency, geometry visuals, early science, and classroom themes.',
+    metaDescription:
+      'Access AI flashcards for elementary math skills, science basics, and thematic classroom topics.',
+  },
+  'Nature, Geography & Time': {
+    menuDescription:
+      'Explore animals, earth science, seasons, and navigation vocabulary.',
+    pageIntro:
+      'Spark curiosity about the natural world with hubs on animals, the environment, seasons, and transportation.',
+    metaDescription:
+      'Browse flashcard journeys covering wildlife, geography, seasonal changes, and travel-related vocabulary.',
+  },
+  'App Integration & System Tools': {
+    menuDescription:
+      'Automate study workflows with Quizlet, Anki, and digital note integrations.',
+    pageIntro:
+      'Connect CogniGuide to your favorite study apps with hubs for Quizlet, Anki, and note conversion workflows.',
+    metaDescription:
+      'Learn how to generate Quizlet sets, build Anki decks, and convert notes with CogniGuide automations.',
+  },
+  'General Generator Features': {
+    menuDescription:
+      'Master the CogniGuide maker with creation workflows, formats, and exports.',
+    pageIntro:
+      'Unlock advanced generator capabilities with hubs focused on creation steps, file utilities, and output formats.',
+    metaDescription:
+      'See how to customize CogniGuide flashcard creation, convert files, and control export formats.',
+  },
+  'Vocabulary & Specialized Concepts': {
+    menuDescription:
+      'Deepen vocabulary knowledge and niche concept review with targeted templates.',
+    pageIntro:
+      'Customize vocabulary builders and specialized study sets with hubs for word lists, utilities, and numeric templates.',
+    metaDescription:
+      'Find vocabulary-focused flashcards, efficiency tips, and numeric study templates tailored to your goals.',
+  },
+};
+
+const makeSubhubKey = (hubSlug: string, subhubSlug: string) => `${hubSlug}::${subhubSlug}`;
+
+const subhubCopy: Record<string, SubhubCopy> = {
+  [makeSubhubKey('exam-certification-prep', 'standardized-tests')]: {
+    description:
+      'SAT, GRE, GMAT, and other test-prep flashcards tuned for vocabulary, math, and reasoning drills.',
+    pageIntro:
+      'Jump into curated SAT, GRE, GMAT, and related standardized test resources designed to streamline exam review.',
+    metaDescription:
+      'Browse AI flashcards for SAT vocabulary, GRE practice, GMAT review, and other standardized tests.',
+  },
+  [makeSubhubKey('exam-certification-prep', 'medical-specialties-prep')]: {
+    description:
+      'Board-style flashcards for MedStudy, pediatrics, phlebotomy, and other medical exam essentials.',
+    pageIntro:
+      'Review high-yield medical topics with flashcards spanning MedStudy systems, pediatrics, imaging, and clinical procedures.',
+    metaDescription:
+      'Discover medical specialty flashcards covering MedStudy, pediatrics, imaging, and certification prep topics.',
+  },
+  [makeSubhubKey('exam-certification-prep', 'professional-technical-certs')]: {
+    description:
+      'Industry certification decks for NASM, CompTIA, ServSafe, real estate, and more.',
+    pageIntro:
+      'Prepare for professional credentials with flashcard paths covering fitness, IT, safety, and technical certification outlines.',
+    metaDescription:
+      'Explore flashcards for NASM, CompTIA, ServSafe, real estate exams, and other professional certifications.',
+  },
+  [makeSubhubKey('exam-certification-prep', 'academic-prep-science')]: {
+    description:
+      'AP sciences, GED review, and classroom study guides for core academic success.',
+    pageIntro:
+      'Strengthen academic foundations with flashcards for AP courses, GED prep, NCERT studies, and classroom science topics.',
+    metaDescription:
+      'Access AP science, GED, NCERT, and classroom study flashcards for academic prep and science mastery.',
+  },
+  [makeSubhubKey('language-culture', 'global-languages')]: {
+    description:
+      'AI-supported vocabulary decks for Cantonese, Tagalog, Telugu, Tamil, French, and more world languages.',
+    pageIntro:
+      'Immerse in world languages with flashcards covering pronunciation, vocabulary, and script practice across Asian and European tongues.',
+    metaDescription:
+      'Study Cantonese, Tagalog, Telugu, Tamil, French, and other global languages with targeted flashcard sets.',
+  },
+  [makeSubhubKey('language-culture', 'esl-english-mastery')]: {
+    description:
+      'Boost ESL fluency with everyday English verbs, weather phrases, grammar refreshers, and TEFL prep.',
+    pageIntro:
+      'Build English confidence through ESL flashcards focused on verbs, weather, communication, and adult learner scenarios.',
+    metaDescription:
+      'Find ESL flashcards for adults covering verbs, weather, conversational English, and TEFL-oriented practice.',
+  },
+  [makeSubhubKey('language-culture', 'advanced-grammar-structure')]: {
+    description:
+      'Master idioms, punctuation, prefixes, and pronoun usage with focused grammar flashcards.',
+    pageIntro:
+      'Polish advanced grammar with flashcards that drill idioms, punctuation rules, word forms, and pronoun distinctions.',
+    metaDescription:
+      'Explore flashcards on idioms, punctuation, prefixes and suffixes, antonyms, and pronoun usage for advanced grammar study.',
+  },
+  [makeSubhubKey('language-culture', 'social-interaction-themes')]: {
+    description:
+      'Conversation-ready vocabulary for family, greetings, appearances, and everyday discussions.',
+    pageIntro:
+      'Practice social language with flashcards around family relationships, greetings, conversations, and descriptive vocabulary.',
+    metaDescription:
+      'Review flashcards covering family terms, greetings, conversations, and social themes for everyday English.',
+  },
+  [makeSubhubKey('language-culture', 'food-apparel-vocab')]: {
+    description:
+      'Learn food, drink, clothing, and produce vocabulary across themed flashcard sets.',
+    pageIntro:
+      'Develop essential food and clothing vocabulary with flashcards that cover ingredients, meals, and wardrobe basics.',
+    metaDescription:
+      'Browse flashcards for food vocabulary, fruits and vegetables, and clothing terms to expand daily language.',
+  },
+  [makeSubhubKey('literacy-phonics', 'phonics-components')]: {
+    description:
+      'Foundational phonics decks covering vowels, blends, digraphs, and phonograms.',
+    pageIntro:
+      'Build decoding confidence with flashcards on vowel sounds, consonant blends, digraphs, phonemes, and phonograms.',
+    metaDescription:
+      'Study vowel patterns, blends, digraphs, phonemes, and phonograms with targeted phonics flashcards.',
+  },
+  [makeSubhubKey('literacy-phonics', 'phonics-programs')]: {
+    description:
+      'Support classroom phonics programs like Jolly Phonics, Zoo-Phonics, and Fundations.',
+    pageIntro:
+      'Reinforce popular phonics curricula through flashcards aligned to Jolly Phonics, Zoo-Phonics, and Fundations lessons.',
+    metaDescription:
+      'Access flashcards tailored to Jolly Phonics, Zoo-Phonics, and Fundations activities to boost literacy instruction.',
+  },
+  [makeSubhubKey('literacy-phonics', 'sight-tricky-words')]: {
+    description:
+      'High-frequency and tricky word flashcards to accelerate sight word recognition.',
+    pageIntro:
+      'Help learners master Dolch and tricky sight words with flashcards that blend spelling, recognition, and context practice.',
+    metaDescription:
+      'Find flashcards for Dolch sight words, tricky word lists, and spelling practice to support rapid reading fluency.',
+  },
+  [makeSubhubKey('literacy-phonics', 'verbs-tenses')]: {
+    description:
+      'Action verb and tense practice to strengthen grammar and writing foundations.',
+    pageIntro:
+      'Guide students through verb usage with flashcards on action verbs, irregular tenses, and phrasal verb mastery.',
+    metaDescription:
+      'Explore flashcards on verbs, action words, irregular tenses, and phrasal verbs to improve grammar skills.',
+  },
+  [makeSubhubKey('literacy-phonics', 'foundational-skills')]: {
+    description:
+      'Alphabet, handwriting, and letter-sound flashcards for emerging readers.',
+    pageIntro:
+      'Support early literacy with flashcards that teach alphabet sequencing, handwriting, letter sounds, and IPA awareness.',
+    metaDescription:
+      'Browse flashcards for alphabet practice, lowercase/cursive letters, and letter-sound connections for foundational literacy.',
+  },
+  [makeSubhubKey('math-science-core-k-5', 'math-operations-counting')]: {
+    description:
+      'Arithmetic practice covering addition, multiplication, times tables, money, and counting strategies.',
+    pageIntro:
+      'Build number sense with flashcards focused on operations, multiplication tables, counting exercises, and math vocabulary.',
+    metaDescription:
+      'Find elementary math flashcards for addition, multiplication, division, counting, money, and math facts.',
+  },
+  [makeSubhubKey('math-science-core-k-5', 'geometry-visuals')]: {
+    description:
+      'Shape, color, and spatial vocabulary flashcards that make geometry visual and fun.',
+    pageIntro:
+      'Introduce geometric thinking with flashcards about shapes, colors, spatial prepositions, and picture-based prompts.',
+    metaDescription:
+      'Explore flashcards covering shapes, colors, spatial prepositions, and visual geometry terms for young learners.',
+  },
+  [makeSubhubKey('math-science-core-k-5', 'early-science-senses')]: {
+    description:
+      'Science starters on biology, chemistry, senses, emotions, and observation language.',
+    pageIntro:
+      'Spark STEM curiosity with flashcards that explain the senses, emotions, basic biology, and introductory science vocabulary.',
+    metaDescription:
+      'Access flashcards on the five senses, emotions, basic biology, and early science concepts for elementary students.',
+  },
+  [makeSubhubKey('math-science-core-k-5', 'early-topics-themes')]: {
+    description:
+      'Classroom themes, stories, and community topics tailored to early elementary learners.',
+    pageIntro:
+      'Enhance thematic units with flashcards on classic stories, community helpers, classroom routines, and home vocabulary.',
+    metaDescription:
+      'Browse flashcards for early elementary themes like community helpers, story characters, and classroom routines.',
+  },
+  [makeSubhubKey('nature-geography-time', 'animals-fauna')]: {
+    description:
+      'Wildlife flashcards featuring zoo animals, birds, insects, and flowering plants.',
+    pageIntro:
+      'Explore biodiversity with flashcards about animal habitats, bird species, insects, and plant life.',
+    metaDescription:
+      'Find flashcards on animals, birds, insects, and flowers to teach fauna vocabulary and science facts.',
+  },
+  [makeSubhubKey('nature-geography-time', 'environment-space')]: {
+    description:
+      'Earth science and space-themed decks covering countries, flags, planets, and sustainability.',
+    pageIntro:
+      'Teach global awareness with flashcards on world geography, environmental stewardship, space science, and active lifestyles.',
+    metaDescription:
+      'Explore flashcards about countries, flags, planets, recycling, exercise, and seasonal activities focused on the environment.',
+  },
+  [makeSubhubKey('nature-geography-time', 'seasons-calendar')]: {
+    description:
+      'Calendar vocabulary for days, months, time-telling, seasons, and holiday themes.',
+    pageIntro:
+      'Help learners read the calendar with flashcards on days of the week, months, time-telling, and seasonal celebrations.',
+    metaDescription:
+      'Access flashcards for days, months, telling time, seasons, and holidays to teach calendar skills.',
+  },
+  [makeSubhubKey('nature-geography-time', 'transportation-location')]: {
+    description:
+      'Travel and location vocabulary, from vehicles and directions to rooms of the house.',
+    pageIntro:
+      'Build navigation language with flashcards on transportation modes, giving directions, and household location words.',
+    metaDescription:
+      'Find flashcards covering transportation, vehicles, directions, and household locations for spatial vocabulary practice.',
+  },
+  [makeSubhubKey('app-integration-system-tools', 'quizlet-generation')]: {
+    description:
+      'Step-by-step flashcards for creating, importing, and downloading Quizlet study sets.',
+    pageIntro:
+      'Automate Quizlet workflows with guides that show how to create sets, import content, and generate collaborative games.',
+    metaDescription:
+      'Learn how to create Quizlet sets, import decks, and launch Quizlet live experiences with CogniGuide.',
+  },
+  [makeSubhubKey('app-integration-system-tools', 'quizlet-testing-quizzes')]: {
+    description:
+      'Assessment-focused tutorials for building quizzes, tests, and private study games in Quizlet.',
+    pageIntro:
+      'Design engaging assessments with flashcards explaining Quizlet test modes, quiz creation, and secure study sessions.',
+    metaDescription:
+      'Discover flashcards covering Quizlet test maker features, private quiz creation, and game-based assessments.',
+  },
+  [makeSubhubKey('app-integration-system-tools', 'anki-generation')]: {
+    description:
+      'Automations for building and exporting Anki decks from your study materials.',
+    pageIntro:
+      'Streamline spaced repetition with flashcards that teach how to create, customize, and accelerate Anki deck production.',
+    metaDescription:
+      'Explore flashcards for generating Anki decks, notes, and student-ready spaced repetition resources.',
+  },
+  [makeSubhubKey('app-integration-system-tools', 'note-conversion')]: {
+    description:
+      'Convert notes from GoodNotes, OneNote, Evernote, and handwritten sources into flashcards.',
+    pageIntro:
+      'Turn every note into a study asset with flashcards on importing from GoodNotes, OneNote, Evernote, and handwriting scans.',
+    metaDescription:
+      'Find flashcards that show how to convert GoodNotes, OneNote, Evernote, and handwritten notes into CogniGuide flashcards.',
+  },
+  [makeSubhubKey('general-generator-features', 'core-maker-tools')]: {
+    description:
+      'Learn the essential CogniGuide maker settings for fast, high-quality flashcards.',
+    pageIntro:
+      'Master the core generator by exploring flashcards on AI maker options, interactive modes, and study workflows.',
+    metaDescription:
+      'Access flashcards explaining CogniGuide\'s core maker, digital creator, and AI generator capabilities.',
+  },
+  [makeSubhubKey('general-generator-features', 'creation-process')]: {
+    description:
+      'Guided playbooks for writing prompts, uploading content, and producing online study sets.',
+    pageIntro:
+      'Follow step-by-step creation workflows with flashcards on drafting prompts, uploading files, and publishing study sets.',
+    metaDescription:
+      'Browse flashcards covering how to create, write, and publish study materials with CogniGuide.',
+  },
+  [makeSubhubKey('general-generator-features', 'file-conversion-utility')]: {
+    description:
+      'Convert PDFs, existing flashcards, and external resources into CogniGuide-ready formats.',
+    pageIntro:
+      'Unlock productivity with flashcards showing how to convert PDFs, download resources, and streamline flashcard imports.',
+    metaDescription:
+      'Learn to convert PDFs, download study files, and optimize external resources for CogniGuide flashcards.',
+  },
+  [makeSubhubKey('general-generator-features', 'outputs-formatting')]: {
+    description:
+      'Customize flashcard outputs with images, multiple-choice layouts, revision notes, and more.',
+    pageIntro:
+      'Control your deliverables using flashcards on adding images, multiple-choice formats, and printable note styles.',
+    metaDescription:
+      'Find flashcards for creating image-rich flashcards, multiple-choice sets, and formatted study notes.',
+  },
+  [makeSubhubKey('vocabulary-specialized-concepts', 'vocabulary-builders')]: {
+    description:
+      'Vocabulary expansion templates for English learners, test prep, and literacy programs.',
+    pageIntro:
+      'Grow word banks with flashcards dedicated to vocabulary creation, sight words, and Nelson-Denny style practice.',
+    metaDescription:
+      'Explore flashcards for building vocabulary lists, English vocabulary practice, and Nelson-Denny preparation.',
+  },
+  [makeSubhubKey('vocabulary-specialized-concepts', 'efficiency-utility')]: {
+    description:
+      'Productivity tips for choosing the best flashcard maker, numbering systems, and study shortcuts.',
+    pageIntro:
+      'Optimize your workflow with flashcards that compare study tools, cover numbering templates, and highlight exam rules.',
+    metaDescription:
+      'Discover flashcards about selecting the best flashcard makers, study utilities, and numbering templates.',
+  },
+  [makeSubhubKey('vocabulary-specialized-concepts', 'general-concepts')]: {
+    description:
+      'Versatile study sets that tackle grammar, home vocabulary, fitness, and lifestyle topics.',
+    pageIntro:
+      'Keep learners engaged with flashcards spanning opposites, household vocabulary, exercise themes, and everyday concepts.',
+    metaDescription:
+      'Browse flashcards covering opposites, household vocabulary, exercise topics, and other general study concepts.',
+  },
+  [makeSubhubKey('vocabulary-specialized-concepts', 'number-templates')]: {
+    description:
+      'Number-focused flashcards for counting, operations, telling time, and money skills.',
+    pageIntro:
+      'Develop numeracy with flashcards on counting sequences, operations, time-telling, and financial literacy basics.',
+    metaDescription:
+      'Access flashcards for counting, addition, division, time, money, and other numeric templates.',
+  },
+};
+
+const getHubCopy = (hubName: string): HubCopy => {
+  const copy = hubCopy[hubName];
+  if (copy) {
+    return copy;
+  }
+  return {
+    menuDescription: `Explore ${hubName} study resources crafted with CogniGuide.`,
+    pageIntro: `Discover flashcard workflows curated for ${hubName}.`,
+    metaDescription: `Explore ${hubName} flashcard workflows on CogniGuide.`,
+  };
+};
+
+const getSubhubCopy = (
+  hubName: string,
+  hubSlug: string,
+  subhubName: string,
+  subhubSlug: string
+): SubhubCopy => {
+  const key = makeSubhubKey(hubSlug, subhubSlug);
+  const copy = subhubCopy[key];
+  if (copy) {
+    return copy;
+  }
+  return {
+    description: `AI flashcards for ${subhubName} topics within ${hubName}.`,
+    pageIntro: `Dive into ${subhubName} resources curated for the ${hubName} hub.`,
+    metaDescription: `Explore ${subhubName} flashcards in the ${hubName} hub on CogniGuide.`,
+  };
+};
+
 const buildFlashcardLinks = (slugs: string[]): UseCaseLink[] =>
   slugs.map((slug) => {
     const entry = flashcardPageMap.get(slug);
@@ -506,15 +897,30 @@ const buildFlashcardLinks = (slugs: string[]): UseCaseLink[] =>
     };
   });
 
-export const useCaseHubs: UseCaseHub[] = Object.entries(rawHubData).map(([hubName, subhubMap]) => ({
-  name: hubName,
-  slug: slugify(hubName),
-  subhubs: Object.entries(subhubMap).map(([subhubName, slugs]) => ({
-    name: subhubName,
-    slug: slugify(subhubName),
-    flashcards: buildFlashcardLinks(slugs),
-  })),
-}));
+export const useCaseHubs: UseCaseHub[] = Object.entries(rawHubData).map(([hubName, subhubMap]) => {
+  const hubSlug = slugify(hubName);
+  const hubMetadata = getHubCopy(hubName);
+
+  return {
+    name: hubName,
+    slug: hubSlug,
+    menuDescription: hubMetadata.menuDescription,
+    pageIntro: hubMetadata.pageIntro,
+    metaDescription: hubMetadata.metaDescription,
+    subhubs: Object.entries(subhubMap).map(([subhubName, slugs]) => {
+      const subhubSlug = slugify(subhubName);
+      const subhubMetadata = getSubhubCopy(hubName, hubSlug, subhubName, subhubSlug);
+      return {
+        name: subhubName,
+        slug: subhubSlug,
+        description: subhubMetadata.description,
+        pageIntro: subhubMetadata.pageIntro,
+        metaDescription: subhubMetadata.metaDescription,
+        flashcards: buildFlashcardLinks(slugs),
+      };
+    }),
+  };
+});
 
 export const useCaseHubMap = new Map(useCaseHubs.map((hub) => [hub.slug, hub]));
 
