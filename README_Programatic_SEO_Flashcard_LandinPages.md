@@ -80,7 +80,22 @@ interface ProgrammaticFlashcardPage {
 - Canonical URL management
 - Meta descriptions optimized for click-through rates
 
-### 5. Page Management (`lib/programmatic/flashcardPages.ts`)
+### 5. Use-Case Taxonomy & Navigation (`lib/programmatic/useCaseData.ts`)
+
+**Purpose**: Curates hub and subhub groupings that surface relevant flashcard destinations across the site.
+
+**Key Capabilities**:
+- Converts hub and subhub labels from the master CSVs into URL-friendly slugs.
+- Pairs each subhub with the flashcard landing page metadata sourced from `generatedFlashcardPages`.
+- Powers the hierarchical navigation experiences listed below via a single data map.
+
+**Supporting Routes & UI**:
+- `components/HomeLanding.tsx`: Adds a "Use-cases" mega menu that links directly to every hub.
+- `app/use-cases/page.tsx`: Lists all hubs for quick discovery.
+- `app/use-cases/[hub]/page.tsx`: Displays subhubs that belong to a specific hub.
+- `app/use-cases/[hub]/[subhub]/page.tsx`: Surfaces the flashcard landing page links for a given subhub.
+
+### 6. Page Management (`lib/programmatic/flashcardPages.ts`)
 
 **Purpose**: Runtime page resolution and utility functions
 
@@ -92,7 +107,7 @@ interface ProgrammaticFlashcardPage {
 
 **Default Landing Page (Template)**: `/ai-flashcard-generator` serves as the main entry point with comprehensive content.
 
-### 6. Metadata System (`lib/programmatic/metadata.ts`)
+### 7. Metadata System (`lib/programmatic/metadata.ts`)
 
 **Purpose**: Next.js metadata generation for SEO
 
@@ -103,7 +118,7 @@ interface ProgrammaticFlashcardPage {
 - Keyword inheritance from site defaults
 - Absolute URL construction
 
-### 7. Dynamic Page Generation (`app/flashcards/[slug]/page.tsx`)
+### 8. Dynamic Page Generation (`app/flashcards/[slug]/page.tsx`)
 
 **Purpose**: Next.js dynamic route handling
 
@@ -115,7 +130,7 @@ interface ProgrammaticFlashcardPage {
 
 **Route Structure**: `/flashcards/{slug}`
 
-### 8. Sitemap Integration (`app/sitemap.ts`)
+### 9. Sitemap Integration (`app/sitemap.ts`)
 
 **Purpose**: Automatic sitemap generation for search engines
 
@@ -201,9 +216,20 @@ scripts/
 lib/programmatic/
 ├── flashcardPageSchema.ts             # Type definitions
 ├── flashcardPages.ts                  # Page management
+├── useCaseData.ts                     # Hub and subhub taxonomy with flashcard link mapping
 ├── generated/
 │   └── flashcardPages.ts              # Generated content
 └── metadata.ts                        # SEO metadata
+
+components/
+└── HomeLanding.tsx                    # Home page hero with "Use-cases" mega menu
+
+app/use-cases/
+├── page.tsx                           # Hub index page
+├── [hub]/
+│   └── page.tsx                       # Subhub listings for a hub
+└── [hub]/[subhub]/
+    └── page.tsx                       # Flashcard links for a subhub
 
 app/flashcards/[slug]/
 └── page.tsx                           # Dynamic page component
