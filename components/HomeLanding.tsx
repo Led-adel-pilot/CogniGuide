@@ -8,6 +8,7 @@ import { useRouter } from 'next/navigation';
 import CogniGuideLogo from '../CogniGuide_logo.png';
 import { supabase } from '@/lib/supabaseClient';
 import Generator from '@/components/Generator';
+import { useCaseHubs } from '@/lib/programmatic/useCaseData';
 
 const AuthModal = dynamic(() => import('@/components/AuthModal'), { ssr: false });
 
@@ -30,12 +31,14 @@ const InteractiveMindMap = () => {
 export default function HomeLanding() {
   const [showAuth, setShowAuth] = useState(false);
   const [isAuthed, setIsAuthed] = useState(false);
+  const [useCasesOpen, setUseCasesOpen] = useState(false);
 
   const [shouldRenderMindMap, setShouldRenderMindMap] = useState(false);
   const [shouldRenderFlashcards, setShouldRenderFlashcards] = useState(false);
   const router = useRouter();
   const mindMapSectionRef = useRef<HTMLDivElement | null>(null);
   const flashcardsSectionRef = useRef<HTMLDivElement | null>(null);
+  const useCaseMenuRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     try {
@@ -77,6 +80,38 @@ export default function HomeLanding() {
       syncAuthCookie(signedIn);
     });
     return () => { sub.subscription.unsubscribe(); };
+  }, []);
+
+
+  useEffect(() => {
+    if (!useCasesOpen) {
+      return undefined;
+    }
+
+    const handleClick = (event: MouseEvent) => {
+      const target = event.target as Node;
+      if (useCaseMenuRef.current && !useCaseMenuRef.current.contains(target)) {
+        setUseCasesOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClick);
+    return () => {
+      document.removeEventListener('mousedown', handleClick);
+    };
+  }, [useCasesOpen]);
+
+  useEffect(() => {
+    const handleKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setUseCasesOpen(false);
+      }
+    };
+
+    document.addEventListener('keydown', handleKey);
+    return () => {
+      document.removeEventListener('keydown', handleKey);
+    };
   }, []);
 
 
@@ -138,6 +173,38 @@ export default function HomeLanding() {
               <h1 className="text-2xl font-bold font-heading tracking-tighter">CogniGuide</h1>
             </div>
             <div className="flex items-center gap-4">
+              <div className="relative" ref={useCaseMenuRef}>
+                <button
+                  type="button"
+                  onClick={() => setUseCasesOpen((prev) => !prev)}
+                  className="flex items-center gap-1 rounded-full border border-transparent px-3 py-2 text-sm font-medium text-foreground transition hover:border-border hover:bg-muted/40 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                  aria-expanded={useCasesOpen}
+                  aria-haspopup="true"
+                >
+                  Use-cases
+                  <span aria-hidden="true" className="text-xs text-muted-foreground">
+                    {useCasesOpen ? '▴' : '▾'}
+                  </span>
+                </button>
+                {useCasesOpen ? (
+                  <div className="absolute right-0 z-50 mt-3 w-screen max-w-3xl rounded-2xl border border-border bg-background/95 p-4 shadow-xl backdrop-blur">
+                    <div className="mb-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Featured hubs</div>
+                    <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                      {useCaseHubs.map((hub) => (
+                        <Link
+                          key={hub.slug}
+                          href={`/use-cases/${hub.slug}`}
+                          onClick={() => setUseCasesOpen(false)}
+                          className="group flex h-full flex-col rounded-xl border border-transparent bg-muted/30 p-4 transition hover:border-primary/60 hover:bg-muted/60 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                        >
+                      <span className="text-base font-semibold group-hover:text-primary">{hub.name}</span>
+                      <span className="mt-2 text-sm text-muted-foreground">{hub.menuDescription}</span>
+                    </Link>
+                  ))}
+                </div>
+                  </div>
+                ) : null}
+              </div>
               <Link
                 href="/pricing"
                 className="hidden text-sm text-muted-foreground hover:underline sm:inline"

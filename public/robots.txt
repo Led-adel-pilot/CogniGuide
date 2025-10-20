@@ -1,16 +1,17 @@
+# robots.txt for cogniguide.app
 User-agent: *
-# Allow site publicly
+
+# Allow crawling of primary site content
 Allow: /
 
-# Block private/internal endpoints
+# Block authenticated or low-value endpoints
 Disallow: /dashboard
 Disallow: /api/
-Disallow: /_next/
-Allow: /manifest.json
-Disallow: /*.json$
+Disallow: /share/
 
-# (OPTIONAL) Avoid crawling query-string URLs — use only if intentional
-# Disallow: /*?*
+# Exclude tracking parameters from indexing
+Disallow: /*?utm_
+Disallow: /*&utm_
 
-# Ensure sitemap is discoverable
+# Point crawlers to the sitemap index
 Sitemap: https://www.cogniguide.app/sitemap.xml

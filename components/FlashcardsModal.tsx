@@ -117,6 +117,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
   const [hoveredGrade, setHoveredGrade] = React.useState<number | null>(null);
   const [finished, setFinished] = React.useState(false);
   const [userId, setUserId] = React.useState<string | null>(null);
+  const [isCurrentDeckExamReady, setIsCurrentDeckExamReady] = React.useState(!studyInterleaved);
   const [showAuthModal, setShowAuthModal] = React.useState(false);
   const [showLossAversionPopup, setShowLossAversionPopup] = React.useState(false);
   const [showSignupPopup, setShowSignupPopup] = React.useState(false);
@@ -280,10 +281,16 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
 
   React.useEffect(() => {
     setImmediateReviewIndices([]);
-    if (!cards || cards.length === 0) { setScheduledCards(null); return; }
-    // Try load stored schedule by deckId; fallback to fresh
-    if (deckId && !studyInterleaved) {
-      (async () => {
+    if (!cards || cards.length === 0) {
+      setScheduledCards(null);
+      return;
+    }
+
+    let cancelled = false;
+
+    const initializeSchedules = async () => {
+      // Try load stored schedule by deckId; fallback to fresh
+      if (deckId && !studyInterleaved) {
         let stored = (await loadDeckScheduleAsync(deckId)) || loadDeckSchedule(deckId);
         if (stored?.isCancelled) {
           const revived = { ...stored, isCancelled: false };
@@ -293,7 +300,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
           });
           stored = revived;
         }
-        if (stored && Array.isArray(stored.schedules) && stored.schedules.length === cards.length) {
+        if (!cancelled && stored && Array.isArray(stored.schedules) && stored.schedules.length === cards.length) {
           let finalExamDate = stored.examDate || '';
           if (finalExamDate) {
             let exam;
@@ -307,7 +314,13 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
 
           setDeckExamDate(finalExamDate);
           setExamDateInput(finalExamDate ? new Date(finalExamDate) : undefined);
-          setScheduledCards(cards.map((c, i) => ({ ...c, schedule: { ...(stored.schedules[i] || createInitialSchedule()), examDate: finalExamDate } })));
+          const schedules = stored.schedules ?? [];
+          setScheduledCards(
+            cards.map((c, i) => ({
+              ...c,
+              schedule: { ...(schedules[i] || createInitialSchedule()), examDate: finalExamDate },
+            })),
+          );
 
           if (typeof initialIndex === 'number' && Number.isFinite(initialIndex)) {
             setIndex(Math.max(0, Math.min(cards.length - 1, initialIndex)));
@@ -320,6 +333,70 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
           setOriginalDueCount(initialDueList.length);
           return;
         }
+      }
+
+      if (studyInterleaved) {
+        const typedCards = cards as CardWithSchedule[];
+        const uniqueDeckIds = Array.from(
+          new Set(
+            typedCards
+              .map((card) => card.deckId)
+              .filter((value): value is string => typeof value === 'string' && value.length > 0),
+          ),
+        );
+
+        const deckSchedules = new Map<string, ReturnType<typeof loadDeckSchedule> | Awaited<ReturnType<typeof loadDeckScheduleAsync>>>();
+
+        await Promise.all(
+          uniqueDeckIds.map(async (sourceDeckId) => {
+            if (cancelled) return;
+            let stored = loadDeckSchedule(sourceDeckId);
+            if (!stored) {
+              stored = await loadDeckScheduleAsync(sourceDeckId);
+            }
+            if (!cancelled && stored) {
+              deckSchedules.set(sourceDeckId, stored);
+            }
+          }),
+        );
+
+        if (cancelled) return;
+
+        const normalized = typedCards.map((card) => {
+          const sourceDeckId = card.deckId;
+          const sourceIndex = typeof card.cardIndex === 'number' ? card.cardIndex : undefined;
+          let schedule: FsrsScheduleState | undefined;
+          if (sourceDeckId && typeof sourceIndex === 'number') {
+            const stored = deckSchedules.get(sourceDeckId);
+            const storedSchedules = stored?.schedules ?? [];
+            if (storedSchedules[sourceIndex]) {
+              schedule = storedSchedules[sourceIndex] as FsrsScheduleState;
+            }
+          }
+          return {
+            ...card,
+            schedule: schedule ?? createInitialSchedule(),
+          };
+        });
+
+        if (cancelled) return;
+
+        setDeckExamDate('');
+        setExamDateInput(undefined);
+        setScheduledCards(normalized);
+        if (typeof initialIndex === 'number' && Number.isFinite(initialIndex)) {
+          setIndex(Math.max(0, Math.min(cards.length - 1, initialIndex)));
+          setShowAnswer(false);
+        }
+        const initialDueList = Array.isArray(dueIndices) ? dueIndices.slice() : [];
+        setDueList(initialDueList);
+        setOriginalDueList(initialDueList);
+        setOriginalDueCount(initialDueList.length);
+        return;
+      }
+
+      if (!cancelled) {
+        // For unsaved decks or when no stored schedule was found
         setScheduledCards(cards.map((c) => ({ ...c, schedule: createInitialSchedule() })));
         if (typeof initialIndex === 'number' && Number.isFinite(initialIndex)) {
           setIndex(Math.max(0, Math.min(cards.length - 1, initialIndex)));
@@ -329,19 +406,14 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
         setDueList(initialDueList);
         setOriginalDueList(initialDueList);
         setOriginalDueCount(initialDueList.length);
-      })();
-      return;
-    }
-    // For interleaved or unsaved decks, create initial schedules
-    setScheduledCards(cards.map((c) => ({ ...c, schedule: createInitialSchedule() })));
-    if (typeof initialIndex === 'number' && Number.isFinite(initialIndex)) {
-      setIndex(Math.max(0, Math.min(cards.length - 1, initialIndex)));
-      setShowAnswer(false);
-    }
-    const initialDueList = Array.isArray(dueIndices) ? dueIndices.slice() : [];
-    setDueList(initialDueList);
-    setOriginalDueList(initialDueList);
-    setOriginalDueCount(initialDueList.length);
+      }
+    };
+
+    void initializeSchedules();
+
+    return () => {
+      cancelled = true;
+    };
   }, [cards, deckId, initialIndex, dueIndices, title, studyInterleaved]);
 
   React.useEffect(() => {
@@ -393,20 +465,71 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
     predict();
   }, [showAnswer, current, deckExamDate, studyInterleaved]);
 
+  const currentDeckId = current?.deckId;
+  const currentScheduleExamDate = current?.schedule?.examDate;
+
   React.useEffect(() => {
-    if (studyInterleaved && current?.deckId) {
-      (async () => {
-        if (current.deckId) {
-          const stored = await loadDeckScheduleAsync(current.deckId);
-          if (stored?.examDate) {
-            setExamDateInput(new Date(stored.examDate));
-          } else {
-            setExamDateInput(undefined);
-          }
-        }
-      })();
+    if (!studyInterleaved) {
+      setIsCurrentDeckExamReady(true);
+      return;
     }
-  }, [studyInterleaved, current]);
+
+    let cancelled = false;
+    setIsCurrentDeckExamReady(false);
+
+    const applyExamDate = (value?: string) => {
+      if (cancelled) return;
+
+      if (value) {
+        const parsed = new Date(value);
+        if (!Number.isNaN(parsed.getTime())) {
+          setDeckExamDate((prev) => (prev === value ? prev : value));
+          setExamDateInput((prev) => {
+            if (prev && prev.getTime() === parsed.getTime()) {
+              return prev;
+            }
+            return parsed;
+          });
+          return;
+        }
+      }
+
+      setDeckExamDate((prev) => (prev === '' ? prev : ''));
+      setExamDateInput((prev) => (prev === undefined ? prev : undefined));
+    };
+
+    if (!currentDeckId) {
+      applyExamDate(undefined);
+      setIsCurrentDeckExamReady(true);
+      return () => {
+        cancelled = true;
+      };
+    }
+
+    const localStored = loadDeckSchedule(currentDeckId);
+    const initialExamDate = localStored?.examDate || currentScheduleExamDate;
+    applyExamDate(initialExamDate);
+    if (localStored || currentScheduleExamDate) {
+      setIsCurrentDeckExamReady(true);
+    }
+
+    (async () => {
+      try {
+        const stored = await loadDeckScheduleAsync(currentDeckId);
+        if (cancelled) return;
+        const resolvedExamDate = stored?.examDate || currentScheduleExamDate;
+        applyExamDate(resolvedExamDate);
+      } finally {
+        if (!cancelled) {
+          setIsCurrentDeckExamReady(true);
+        }
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [studyInterleaved, currentDeckId, currentScheduleExamDate]);
 
   React.useEffect(() => {
     if (!finished || !scheduledCards || scheduledCards.length === 0 || studyInterleaved) {
@@ -975,7 +1098,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
                   });
 
                   // Check if we should show exam date popup (skip for embedded mode)
-                  const shouldShowExamDatePopup = !isEmbedded && !deckExamDate && !hasExamDatePopupBeenShown(deckIdentifier);
+                  const shouldShowExamDatePopup = !isEmbedded && isCurrentDeckExamReady && !deckExamDate && !hasExamDatePopupBeenShown(deckIdentifier);
                   if (shouldShowExamDatePopup) {
                     setShowExamDatePopup(true);
                   } else {
