@@ -130,16 +130,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary function of spaced repetition in memory?",
-        "answer": "It systematically reviews information at increasing intervals to optimize long-term retention and combat the forgetting curve."
+        "question": "What are the three primary colors of light?",
+        "answer": "Red, Green, and Blue (RGB). Mixing them creates white light."
       },
       {
-        "question": "What file types can I upload to generate flashcards?",
-        "answer": "You can upload PDFs, DOCX files, and PowerPoint presentations directly for automated content extraction."
+        "question": "Define 'hue' in color theory.",
+        "answer": "Hue is the pure spectrum color, like red, yellow, or blue, that determines the family of the color."
       },
       {
-        "question": "How does active recall differ from passive reading of notes?",
-        "answer": "Active recall forces retrieval of information without cues, strengthening memory traces far more effectively than simply rereading material."
+        "question": "What color results from mixing blue and yellow?",
+        "answer": "The result of mixing blue and yellow pigment is green. This is a secondary color."
       }
     ],
     "path": "/flashcards/colors",
@@ -340,16 +340,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the difference between a long and short vowel sound?",
-        "answer": "A long vowel sounds like its name (e.g., 'a' in cake), while a short vowel sound is more clipped and distinct (e.g., 'a' in cat)."
+        "question": "Name the five main English vowel letters.",
+        "answer": "A, E, I, O, U. They represent sounds produced with an open vocal tract."
       },
       {
-        "question": "Identify a common word containing the 'oo' vowel team sound in 'book'.",
-        "answer": "Words like 'look', 'foot', or 'should' utilize the short /ʊ/ sound represented by the 'oo' digraph."
+        "question": "Give an example of a word with a long 'A' sound",
+        "answer": "Cake\" or \"Name.\" The long vowel sound typically says the letter's name."
       },
       {
-        "question": "How does the 'magic e' rule typically affect a preceding vowel?",
-        "answer": "The silent 'e' at the end of a CVCe word makes the preceding vowel say its long sound, as seen in 'bike' instead of 'bik'."
+        "question": "What sound does the short 'E' make?",
+        "answer": "The short 'E' makes the sound heard in words like \"bed\" or \"egg."
       }
     ],
     "structuredData": {
@@ -545,16 +545,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary benefit of converting PPTX files over manual entry?",
-        "answer": "Conversion drastically reduces setup time, allowing immediate focus on active recall rather than transcription. It ensures comprehensive coverage of presentation content."
+        "question": "Why do visuals boost memory retention?",
+        "answer": "The Picture Superiority Effect states that images are recalled better than words. Visuals aid active recall."
       },
       {
-        "question": "How does the system ensure visual context is captured from uploaded images?",
-        "answer": "It analyzes surrounding text and metadata; for complex images, users should review and manually augment AI prompts for perfect visual linking."
+        "question": "What is a 'visual study set'?",
+        "answer": "A study set where each card includes relevant images or diagrams alongside the text prompt."
       },
       {
-        "question": "What function does setting a target exam date serve?",
-        "answer": "It tailors the spaced repetition intervals to concentrate reviews closer to the deadline, optimizing memory consolidation precisely when needed."
+        "question": "How can AI generate relevant pictures for complex terms?",
+        "answer": "AI searches for contextually relevant images based on the definition or term provided in the flashcard text."
       }
     ],
     "path": "/flashcards/maker-pictures",
@@ -755,16 +755,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the main inefficiency of manual flashcard creation?",
-        "answer": "Manual creation focuses significant time on data transcription rather than active learning or concept engagement."
+        "question": "What is the main benefit of using AI for flashcard creation?",
+        "answer": "It dramatically reduces the time spent on manual data entry, letting you focus on studying and active recall."
       },
       {
-        "question": "What file formats does the AI accept for conversion?",
-        "answer": "The tool accepts PDFs, DOCX, PowerPoint files, and various image formats for immediate processing."
+        "question": "Name one drawback of traditional manual flashcard creation.",
+        "answer": "It is time-consuming and often involves tedious retyping or copy-pasting from notes."
       },
       {
-        "question": "How does spaced repetition optimize study time?",
-        "answer": "It schedules reviews just before memory decay, ensuring efficient use of time by focusing on challenging material."
+        "question": "How does AI ensure accuracy when creating study sets?",
+        "answer": "AI extracts key terms and definitions directly from the provided source document or PDF."
       }
     ],
     "path": "/flashcards/create-quizlet",
@@ -965,16 +965,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary function of spaced repetition in memory?",
-        "answer": "It schedules reviews at increasing intervals to transfer knowledge from short-term to long-term memory efficiently."
+        "question": "What defines a 'digital flashcard maker'?",
+        "answer": "A tool that generates, stores, and organizes study material electronically, usually accessible via web or app."
       },
       {
-        "question": "Name three input file types the AI converter supports.",
-        "answer": "PDF, DOCX (Word documents), and PowerPoint presentations (PPTX) are fully supported for content extraction."
+        "question": "What is Active Recall?",
+        "answer": "A study technique where you stimulate memory retrieval by asking questions instead of passively reading notes."
       },
       {
-        "question": "How does active recall differ from passive review?",
-        "answer": "Active recall requires self-generation of the answer, whereas passive review involves recognizing or rereading the information."
+        "question": "How does AI improve the digital study experience?",
+        "answer": "AI automates deck creation, formats material, and often incorporates spacing and review schedules."
       }
     ],
     "path": "/flashcards/digital-maker",
@@ -1175,16 +1175,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary benefit of spaced repetition in vocabulary learning?",
-        "answer": "It optimizes review timing by scheduling repetitions just before forgetting occurs, strengthening long-term memory retention."
+        "question": "What is the function of the 'Morpheme' in vocabulary?",
+        "answer": "A morpheme is the smallest unit of language that carries meaning (e.g., prefixes, root words)."
       },
       {
-        "question": "Name three file types accepted for AI flashcard generation.",
-        "answer": "Accepted formats include PDF, DOCX, and PowerPoint files. Images containing text are also processed."
+        "question": "Define the term 'collocation.'",
+        "answer": "A natural combination of two or more words, like \"heavy rain\" instead of \"strong rain."
       },
       {
-        "question": "What learning mechanism do digital flashcards promote?",
-        "answer": "They primarily promote active recall, forcing the brain to retrieve information rather than passively recognizing it."
+        "question": "In Anki",
+        "answer": "what principle governs card review frequency?,Spaced Repetition System (SRS). This algorithm shows you cards right before you are about to forget them."
       }
     ],
     "path": "/flashcards/anki-english",
@@ -1385,16 +1385,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the core benefit of using AI extraction vs. manual note-taking?",
-        "answer": "AI extraction significantly reduces setup time by automating question creation, allowing immediate focus on active recall practice."
+        "question": "How many fingers are typically on two human hands?",
+        "answer": "Ten."
       },
       {
-        "question": "What scheduling method optimizes long-term knowledge retention?",
-        "answer": "Spaced repetition scheduling systematically reviews material at increasing intervals, maximizing memory consolidation."
+        "question": "Write the number seven as a word.",
+        "answer": "Seven."
       },
       {
-        "question": "Name three supported file types for flashcard input.",
-        "answer": "PDF, DOCX (Word), and image files (JPG/PNG) are all accepted formats for content ingestion."
+        "question": "If you have 4 apples and I give you 3 more",
+        "answer": "how many do you have?,You have 7 apples (4 + 3 = 7)."
       }
     ],
     "path": "/flashcards/1-10",
@@ -1590,16 +1590,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary benefit of spaced repetition over massed practice?",
-        "answer": "Spaced repetition leverages the forgetting curve to strengthen long-term memory retention with optimized review intervals."
+        "question": "What is the purpose of a notecard in studying?",
+        "answer": "Notecards are tools used for summarizing key information, often using a question/answer format for review."
       },
       {
-        "question": "Name three file types usable for automatic card generation.",
-        "answer": "PDF, DOCX, and PowerPoint (.pptx) files are directly supported for material ingestion."
+        "question": "How does AI generation save time for students?",
+        "answer": "AI instantly extracts definitions and concepts from documents, eliminating the need for manual transcription."
       },
       {
-        "question": "How does sharing a study set differ in the paid plan?",
-        "answer": "Sharing is done via a public link, though paid plans offer more credits to generate a larger volume of material to share."
+        "question": "What is the difference between a note and a flashcard?",
+        "answer": "Notes capture information passively; flashcards present information actively for testing and recall."
       }
     ],
     "path": "/flashcards/free-notecards",
@@ -1799,16 +1799,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "Define the SAT vocabulary word 'Pernicious'?",
-        "answer": "Having a harmful effect, especially in a gradual or subtle way. It implies slow, creeping damage rather than immediate obvious harm."
+        "question": "Define the word 'ubiquitous.'",
+        "answer": "Existing or being everywhere at the same time; constantly encountered."
       },
       {
-        "question": "How does Spaced Repetition improve memory retention?",
-        "answer": "It schedules reviews at increasing intervals right before you are likely to forget, consolidating knowledge into long-term memory via active recall."
+        "question": "What does the term 'sycophant' mean?",
+        "answer": "A person who acts excessively obedient toward someone important in order to gain advantage; a flatterer."
       },
       {
-        "question": "What is the primary function of active recall in studying?",
-        "answer": "Active recall forces your brain to retrieve information without cues, strengthening the neural pathways associated with that knowledge."
+        "question": "Use the SAT word 'prosaic' in a short sentence.",
+        "answer": "The film critic described the plot as predictable and prosaic."
       }
     ],
     "path": "/flashcards/sat-vocabulary",
@@ -2010,16 +2010,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What does the term 'sight word' primarily refer to?",
-        "answer": "Words taught by rote memorization because they do not follow typical phonetic rules or appear frequently."
+        "question": "Why are sight words important for beginning readers?",
+        "answer": "They are high-frequency words that often cannot be sounded out using basic phonetic rules."
       },
       {
-        "question": "Name one file format supported for inputting study material.",
-        "answer": "Supported formats include PDF, DOCX, and various image files suitable for text extraction."
+        "question": "Give three examples of common sight words.",
+        "answer": "The, and, is, was, said (Any three common, non-phonetic words)."
       },
       {
-        "question": "How is the review interval determined in spaced repetition?",
-        "answer": "The interval expands for correctly recalled items and shortens for items answered incorrectly or with difficulty."
+        "question": "What is the goal of teaching sight words?",
+        "answer": "To enable children to recognize words instantly and automatically, increasing reading fluency."
       }
     ],
     "path": "/flashcards/sight",
@@ -2219,16 +2219,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What cognitive technique optimizes long-term memory retention?",
-        "answer": "Spaced repetition scheduling, which schedules reviews at increasing intervals just before forgetting occurs."
+        "question": "How does creating flashcards actively aid learning?",
+        "answer": "It forces you to synthesize and condense complex information into concise, retrievable chunks."
       },
       {
-        "question": "What primary benefit does document conversion offer study workflow?",
-        "answer": "It eliminates manual note-taking and question formulation, saving significant time for actual studying."
+        "question": "What type of material is best converted into flashcards?",
+        "answer": "Definitions, formulas, dates, vocabulary, and specific facts that require rote memorization."
       },
       {
-        "question": "If I set an exam date, how does the app adapt study?",
-        "answer": "It structures the spaced repetition schedule to ensure the material is mastered and reinforced shortly before your target test date."
+        "question": "What is the main advantage of using an AI app to create cards?",
+        "answer": "Speed and volume. You can convert hours of reading material into study sets in minutes."
       }
     ],
     "path": "/flashcards/create",
@@ -2429,16 +2429,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary function of the RCDD's pathway design documentation?",
-        "answer": "It documents the physical routes and spaces required for all intra-building and campus cabling infrastructure according to recognized standards."
+        "question": "What does RCDD stand for in the context of BICSI certification?",
+        "answer": "Registered Communications Distribution Designer."
       },
       {
-        "question": "When selecting media, what determines the maximum distance for an optical fiber link?",
-        "answer": "Maximum distance is determined by the specific mode (e.g., OM3, OS2) and the required data transmission speed or bandwidth."
+        "question": "Name a key standard used in telecommunications design.",
+        "answer": "TIA/EIA standards, such as TIA-568 (Commercial Building Telecommunications Cabling Standard)."
       },
       {
-        "question": "What does BICSI mandate regarding grounding and bonding in distribution systems?",
-        "answer": "It requires all metallic pathways, enclosures, and equipment to be connected to a common grounding reference point for safety and performance."
+        "question": "What is the primary purpose of a Telecommunications Closet (TC)?",
+        "answer": "To house the distribution frames, horizontal cross-connects, and equipment for a specific area of the building."
       }
     ],
     "path": "/flashcards/bicsi-rcdd",
@@ -2638,16 +2638,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What defines a polygon with exactly six sides?",
-        "answer": "A polygon with six sides is called a hexagon. It also has six vertices and six interior angles."
+        "question": "How many sides does a hexagon have?",
+        "answer": "A hexagon has six sides and six vertices."
       },
       {
-        "question": "Identify the 2D shape that has four equal sides and four right angles.",
-        "answer": "This shape is a square. If all angles are not right angles, it would be a rhombus."
+        "question": "Define the geometric term 'radius.'",
+        "answer": "The distance from the center point of a circle or sphere to any point on its boundary."
       },
       {
-        "question": "What is the primary benefit of spaced repetition for shape identification?",
-        "answer": "Spaced repetition optimizes review timing, ensuring you recall complex or rarely seen shapes just before forgetting them, solidifying long-term memory."
+        "question": "What is a polygon?",
+        "answer": "A closed two-dimensional shape made up of straight line segments joined end-to-end."
       }
     ],
     "structuredData": {
@@ -2843,16 +2843,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What day follows Wednesday in the standard sequence?",
-        "answer": "Thursday follows Wednesday. This is a fundamental sequence in calendar systems and general knowledge."
+        "question": "Which day of the week follows Thursday?",
+        "answer": "Friday."
       },
       {
-        "question": "Name the first day of the standard work week.",
-        "answer": "Monday is typically considered the first day of the standard work week in many regions."
+        "question": "How many days are there in a standard week?",
+        "answer": "There are seven days in a standard week."
       },
       {
-        "question": "What is the day immediately preceding Sunday?",
-        "answer": "Saturday is the day that immediately precedes Sunday in the seven-day cycle."
+        "question": "Name the first day of the working week in many Western cultures.",
+        "answer": "Monday."
       }
     ],
     "structuredData": {
@@ -3047,16 +3047,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary behavioral difference between grizzly and coastal brown bears?",
-        "answer": "Coastal brown bears are typically larger due to richer salmon diets, while interior grizzly bears have broader home ranges and omnivorous habits."
+        "question": "What is the scientific name for the brown bear species?",
+        "answer": "Ursus arctos."
       },
       {
-        "question": "What scientific genus do brown bears belong to?",
-        "answer": "Brown bears belong to the genus Ursus. Their specific epithet is Ursus arctos."
+        "question": "Where are brown bears predominantly found?",
+        "answer": "North America, Europe, and Asia. Alaskan and Russian populations are significant."
       },
       {
-        "question": "What environmental factor primarily dictates brown bear hibernation length?",
-        "answer": "Hibernation duration is mainly determined by local food availability and the onset/severity of winter conditions."
+        "question": "What is the typical diet of a brown bear?",
+        "answer": "They are omnivores, eating berries, roots, insects, fish (especially salmon), and large mammals."
       }
     ],
     "structuredData": {
@@ -3252,16 +3252,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary cognitive benefit of spaced repetition?",
-        "answer": "It leverages the spacing effect, ensuring information is encoded into long-term memory by reviewing it just as it begins to fade."
+        "question": "What feature makes a flashcard maker \"easy\"?",
+        "answer": "Minimal manual input, intuitive interface, and rapid conversion from source material (like PDF) to cards."
       },
       {
-        "question": "Name three file types convertible by this AI maker.",
-        "answer": "You can upload PDFs, DOCX files, and PowerPoint presentations (PPTX) for immediate conversion into study sets."
+        "question": "Why is converting documents fast essential for busy students?",
+        "answer": "It maximizes study time by eliminating the labor-intensive process of manual note extraction and typing."
       },
       {
-        "question": "What method does the app use to avoid manual data entry?",
-        "answer": "It uses proprietary AI processing to extract key concepts and definitions directly from your uploaded source material."
+        "question": "What is a 'study set'?",
+        "answer": "A collection of related flashcards, notes, or quiz questions grouped by topic or unit."
       }
     ],
     "structuredData": {
@@ -3458,16 +3458,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What core cognitive mechanism is optimized by spaced repetition?",
-        "answer": "It optimizes long-term retention by strategically spacing review intervals, forcing the brain to retrieve information after forgetting begins."
+        "question": "What is the primary function of a flip card?",
+        "answer": "To facilitate active recall by requiring the user to recall information before flipping to reveal the answer."
       },
       {
-        "question": "Name three file formats supported for AI content ingestion.",
-        "answer": "PDF, DOCX, and Powerpoint (PPTX) files are fully supported inputs for instant card creation."
+        "question": "How do digital flip cards differ from paper ones?",
+        "answer": "Digital cards allow for instant sorting, searching, and integration with Spaced Repetition Systems (SRS)."
       },
       {
-        "question": "What feature replaces manual card entry in the study workflow?",
-        "answer": "Automated concept extraction from uploaded source material converts notes directly into question-and-answer flashcards."
+        "question": "What information should be placed on the front side of a flip card?",
+        "answer": "A specific question, key term, or image prompt."
       }
     ],
     "structuredData": {
@@ -3663,16 +3663,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "¿Cuál es el pretérito perfecto simple de 'comer' para 'yo'?",
-        "answer": "El pretérito perfecto simple (pasado) para 'yo' es 'comí'. Indica una acción completada en el pasado."
+        "question": "What is the Spanish word for \"hello\"?",
+        "answer": "Hola."
       },
       {
-        "question": "¿Qué significa 'estar' en el contexto de ubicación temporal?",
-        "answer": "'Estar' se usa para indicar ubicación física o estado temporal (ej. 'Estoy cansado'). No se usa para ubicación permanente."
+        "question": "Conjugate the verb \"hablar\" (to speak) in the present tense for \"I.",
+        "answer": "Yo hablo."
       },
       {
-        "question": "¿Cuándo se utiliza el subjuntivo en español?",
-        "answer": "El subjuntivo se usa para expresar duda, deseo, emoción, necesidad, o acciones no realizadas. A menudo sigue frases como 'Es importante que...'"
+        "question": "What Spanish term is used for \"thank you\"?",
+        "answer": "Gracias."
       }
     ],
     "structuredData": {
@@ -3867,16 +3867,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What fundamental principle explains how memories are consolidated during sleep?",
-        "answer": "Synaptic consolidation, where new neural connections formed during learning are stabilized and strengthened through reactivation."
+        "question": "What is the definition of a hypothesis?",
+        "answer": "A proposed explanation or educated guess based on limited evidence, meant for further investigation."
       },
       {
-        "question": "Define the role of the central dogma in molecular biology.",
-        "answer": "It describes the flow of genetic information: DNA is transcribed into RNA, which is then translated into protein."
+        "question": "Name the three primary states of matter.",
+        "answer": "Solid, liquid, and gas."
       },
       {
-        "question": "What is the primary difference between Newtonian and Relativistic mass?",
-        "answer": "Newtonian mass is constant, whereas relativistic mass increases as an object's velocity approaches the speed of light."
+        "question": "What is Newton's First Law of Motion (Law of Inertia)?",
+        "answer": "An object in motion stays in motion, and an object at rest stays at rest, unless acted upon by an outside force."
       }
     ],
     "structuredData": {
@@ -4072,16 +4072,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary mechanism of acquired cellular injury in pathology?",
-        "answer": "The primary mechanism is often cellular adaptation failure leading to reversible or irreversible cell injury, frequently involving disruptions in oxygen supply or energy production."
+        "question": "Define the medical term 'etiology.'",
+        "answer": "The cause or set of causes for a disease or condition."
       },
       {
-        "question": "Define hypertrophy versus hyperplasia in the context of pathology.",
-        "answer": "Hypertrophy is an increase in cell size, while hyperplasia is an increase in cell number, both representing adaptive responses to increased functional demand."
+        "question": "What is necrosis?",
+        "answer": "The pathological death of cells or tissues, often due to injury, infection, or lack of blood supply."
       },
       {
-        "question": "How does liquefactive necrosis differ structurally from coagulative necrosis?",
-        "answer": "Liquefactive necrosis results in the formation of a viscous liquid mass due to enzyme digestion, whereas coagulative necrosis involves denaturation of proteins leaving a tissue architecture ghost."
+        "question": "What is the main difference between acute and chronic inflammation?",
+        "answer": "Acute inflammation is immediate and short-term; chronic inflammation is prolonged and involves persistent tissue destruction."
       }
     ],
     "structuredData": {
@@ -4277,16 +4277,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the core benefit of AI card generation?",
-        "answer": "It automates content extraction, allowing students to spend more time on active recall and less on manual note transcription."
+        "question": "Provide three examples of common action verbs.",
+        "answer": "Run, jump, eat, think, write (any three valid verbs)."
       },
       {
-        "question": "How does the system handle file diversity?",
-        "answer": "It intelligently parses text from uploaded PDFs, DOCX files, and images into consistent question-answer formats."
+        "question": "What role do action flashcards play in language learning?",
+        "answer": "They help visually connect a verb (the word) with the activity it describes, aiding comprehension."
       },
       {
-        "question": "What memory technique guides the review process?",
-        "answer": "The system uses spaced repetition scheduling to optimize review timing for long-term memory consolidation."
+        "question": "How does an action verb function in a sentence?",
+        "answer": "It describes an action performed by the subject of the sentence."
       }
     ],
     "path": "/flashcards/action",
@@ -4486,16 +4486,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What astronomical event typically marks the transition into Autumn?",
-        "answer": "The Autumnal Equinox marks the point where the sun crosses the celestial equator moving southward, leading to shorter days."
+        "question": "Name the four seasons in order",
+        "answer": "starting with Spring."
       },
       {
-        "question": "Name one defining characteristic of the Winter season in temperate zones.",
-        "answer": "Winter is defined by shorter daylight hours, lower average temperatures, and often, precipitation in the form of snow or ice."
+        "question": "Spring",
+        "answer": "Summer, Autumn (or Fall), Winter."
       },
       {
-        "question": "What is the primary biological process occurring in plants during Spring?",
-        "answer": "Photosynthesis ramps up significantly as sunlight increases, leading to germination and the emergence of new foliage and flowers."
+        "question": "What causes the change in seasons on Earth?",
+        "answer": "The tilt of the Earth's axis (axial tilt) relative to its orbit around the Sun.,Which season is characterized by the shortest days in the Northern Hemisphere?,Winter."
       }
     ],
     "path": "/flashcards/4-seasons",
@@ -4695,16 +4695,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary function of the cell membrane in active transport?",
-        "answer": "The membrane utilizes integral proteins to move substances against their concentration gradient, requiring metabolic energy (ATP)."
+        "question": "What is the primary function of the mitochondria?",
+        "answer": "Cellular respiration: generating the majority of the cell's supply of ATP (energy)."
       },
       {
-        "question": "Define negative feedback loop in the context of homeostasis.",
-        "answer": "A regulatory mechanism where the output of a process reduces the stimulus, maintaining a stable internal condition."
+        "question": "Define 'osmosis.'",
+        "answer": "The passive movement of water molecules across a selectively permeable membrane toward a higher solute concentration."
       },
       {
-        "question": "What principle explains the inheritance pattern where two separate genes sort independently?",
-        "answer": "This is explained by Mendel's Law of Independent Assortment, assuming the genes are not linked."
+        "question": "What does PCR stand for in molecular biology?",
+        "answer": "Polymerase Chain Reaction. It is used to amplify DNA sequences."
       }
     ],
     "path": "/flashcards/ap-biology",
@@ -4899,16 +4899,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary function of an adjective in a sentence?",
-        "answer": "Adjectives modify or describe nouns or pronouns, providing essential descriptive detail about quality, quantity, or extent."
+        "question": "What part of speech does an adjective modify?",
+        "answer": "Nouns and pronouns."
       },
       {
-        "question": "How are comparative and superlative forms typically created?",
-        "answer": "Comparatives usually add '-er' or use 'more'; superlatives add '-est' or use 'most' to show degree relative to other items."
+        "question": "Give an example of an adjective of quantity.",
+        "answer": "Many, few, several, or numerous."
       },
       {
-        "question": "Name three types of adjectives based on their source/function.",
-        "answer": "Examples include descriptive adjectives (color, size), proper adjectives (derived from proper nouns, e.g., American), and limiting adjectives (articles)."
+        "question": "Write a short sentence using a comparative adjective.",
+        "answer": "My house is larger than yours."
       }
     ],
     "path": "/flashcards/adjective",
@@ -5108,16 +5108,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What principle dictates reviewing challenging vocabulary right before forgetting?",
-        "answer": "This is the core function of Spaced Repetition Scheduling (SRS), optimizing memory consolidation."
+        "question": "What is the term for a long",
+        "answer": "heavy coat worn in cold weather?"
       },
       {
-        "question": "Name one supported file format for importing study materials.",
-        "answer": "Supported formats include PDF, DOCX, and PowerPoint files, allowing flexibility with source notes."
+        "question": "An overcoat or parka.",
+        "answer": "Name three items of clothing worn on the upper body."
       },
       {
-        "question": "What cognitive benefit does active recall offer over passive reading?",
-        "answer": "Active recall forces retrieval practice, which strengthens memory traces far more effectively than simple rereading."
+        "question": "Shirt",
+        "answer": "jacket, sweater, blouse, t-shirt (any three).,What are 'accessories' in the context of clothes?,Items worn or carried to complete an outfit, such as jewelry, hats, scarves, or belts."
       }
     ],
     "path": "/flashcards/clothes",
@@ -5317,16 +5317,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary input supported for AI flashcard creation?",
-        "answer": "The primary input supports PDFs, DOCX, PowerPoint files, and images containing text content."
+        "question": "Why should students use online tools for study prep?",
+        "answer": "Online tools offer flexibility, organization, and automated features like AI generation and review tracking."
       },
       {
-        "question": "What learning science principle governs the review timing?",
-        "answer": "The tool uses Spaced Repetition Scheduling, which optimizes review intervals based on cognitive decay curves."
+        "question": "What is the typical process for converting a PDF to online flashcards?",
+        "answer": "Upload the document, allow the AI to extract material, and then review/edit the generated study set."
       },
       {
-        "question": "What is the main benefit of automated card generation?",
-        "answer": "It drastically reduces the time spent manually creating study materials, shifting focus to active learning."
+        "question": "What is the key advantage of digital study organization?",
+        "answer": "All study materials are centrally located, searchable, and accessible across multiple devices."
       }
     ],
     "path": "/flashcards/create-study-online",
@@ -5527,16 +5527,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the key difference between an active recall prompt and a recognition task?",
-        "answer": "Active recall requires you to generate the answer from memory, while recognition only requires you to identify the correct answer from options."
+        "question": "What is \"thank you\" in Cantonese (for a service)?",
+        "answer": "M̀h'gōi (唔該)."
       },
       {
-        "question": "How does setting a target exam date influence card presentation frequency?",
-        "answer": "The system increases the density of reviews as the target date approaches, prioritizing material needing reinforcement for peak performance."
+        "question": "How do you say \"good morning\" in Cantonese?",
+        "answer": "Jóu-sahn (早晨)."
       },
       {
-        "question": "What is the core benefit of utilizing spaced repetition algorithms?",
-        "answer": "It ensures that you review challenging information precisely when memory retention starts to decline, maximizing long-term memory consolidation."
+        "question": "In Cantonese",
+        "answer": "what is the meaning of the tone marker '6' (low falling)?,It denotes a low-pitch contour that falls slightly or remains low (e.g., in a six-tone system)."
       }
     ],
     "path": "/flashcards/cantonese",
@@ -5736,16 +5736,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary function of Active Recall?",
-        "answer": "To strengthen memory retrieval paths by forcing the brain to pull information out, rather than passively reviewing it."
+        "question": "Name three common pieces of furniture found in a bedroom.",
+        "answer": "Bed, dresser, nightstand, closet (any three)."
       },
       {
-        "question": "How does Spaced Repetition optimize study time?",
-        "answer": "It schedules reviews at increasing intervals, targeting the point just before forgetting occurs for maximum efficiency."
+        "question": "What is a 'comforter'?",
+        "answer": "A thick, quilted blanket used on a bed for warmth."
       },
       {
-        "question": "Name one file type supported for AI conversion.",
-        "answer": "PDF documents are fully supported, allowing direct import of lecture notes or book chapters into flashcard decks."
+        "question": "What word describes the small table next to a bed?",
+        "answer": "Nightstand or bedside table."
       }
     ],
     "path": "/flashcards/bedroom",
@@ -5941,16 +5941,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What core benefit does AI generation offer over manual card creation?",
-        "answer": "AI generation drastically reduces the time spent transcribing and formatting, allowing users to immediately engage in active recall practice."
+        "question": "Why is speed crucial when creating Anki decks?",
+        "answer": "Faster creation maximizes the time available for actual studying and active recall testing."
       },
       {
-        "question": "What document types can be uploaded to generate study materials?",
-        "answer": "You can upload PDFs, DOCX files, or images containing your lecture notes or textbook excerpts."
+        "question": "What format does Anki use to organize its study material?",
+        "answer": "It uses 'Notes' which contain 'Fields"
       },
       {
-        "question": "How does a spaced repetition schedule improve learning?",
-        "answer": "It strategically times reviews based on forgetting curves, ensuring concepts move from short-term to long-term memory efficiently."
+        "question": "' which are then rendered into 'Cards.'",
+        "answer": "How can AI minimize formatting errors in Anki cards?,AI handles the initial text cleanup and proper field separation before export."
       }
     ],
     "path": "/flashcards/create-anki-quickly",
@@ -6151,16 +6151,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What cognitive principle optimizes long-term memory retention?",
-        "answer": "Spaced repetition, which schedules reviews just before the memory trace fades, reinforcing the connection efficiently."
+        "question": "If you count from 1 to 10",
+        "answer": "what number comes after 8?"
       },
       {
-        "question": "What is the key benefit of using AI for flashcard creation?",
-        "answer": "It automates the creation of atomic, recall-based questions directly from source material, saving significant manual study time."
+        "question": "Nine.",
+        "answer": "What is the result of 5 plus 2?"
       },
       {
-        "question": "How do you share generated flashcards with a study group?",
-        "answer": "You can share them instantly with others using a secure, public link generated directly within the application interface."
+        "question": "Seven (7).",
+        "answer": "What number represents having nothing?,Zero (0)."
       }
     ],
     "path": "/flashcards/counting",
@@ -6360,16 +6360,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What primary role does a firefighter fulfill in the community?",
-        "answer": "Their main role is suppressing fires and responding to emergency medical situations or rescues."
+        "question": "Name a community helper whose job involves putting out fires.",
+        "answer": "Firefighter."
       },
       {
-        "question": "How do sanitation workers benefit community health?",
-        "answer": "They collect waste and recycling, preventing disease spread and maintaining a clean, safe public environment."
+        "question": "What is the primary job of a police officer?",
+        "answer": "To enforce laws, protect citizens, and respond to emergencies."
       },
       {
-        "question": "Describe the function of a community mail carrier.",
-        "answer": "Mail carriers deliver letters and packages, ensuring consistent and secure communication across the neighborhood."
+        "question": "Who works at a school to educate children?",
+        "answer": "Teacher."
       }
     ],
     "path": "/flashcards/community-helpers",
@@ -6569,16 +6569,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary cognitive benefit of active recall over passive review?",
-        "answer": "Active recall forces retrieval from memory, strengthening neural pathways and leading to significantly better long-term retention."
+        "question": "Name three common outdoor activities.",
+        "answer": "Running, hiking, cycling, playing sports (any three)."
       },
       {
-        "question": "How should an ideal flashcard question be structured?",
-        "answer": "Questions should be atomic, focusing on one single concept or fact to prevent confusion during retrieval practice."
+        "question": "What activity involves quiet reading and research?",
+        "answer": "Studying."
       },
       {
-        "question": "If I set an exam date, how does the AI adjust card presentation?",
-        "answer": "The system calculates the necessary review frequency backwards from the deadline, prioritizing concepts that need more study time."
+        "question": "What is the term for the activity of moving your body to music?",
+        "answer": "Dancing."
       }
     ],
     "path": "/flashcards/activities",
@@ -6779,16 +6779,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the main difference between a digraph and a blend?",
-        "answer": "A digraph involves two letters making one sound (like 'sh'); a blend involves two letters making two distinct, though blended, sounds (like 'fl')."
+        "question": "Define a consonant blend (or cluster).",
+        "answer": "A group of two or three consonants where each sound is still distinct and audible (e.g., 'bl' in black)."
       },
       {
-        "question": "Provide an example of an initial consonant blend.",
-        "answer": "Examples include 'st' (as in stop), 'gr' (as in great), or 'pl' (as in play)."
+        "question": "Give an example of a word starting with the blend 'st.'",
+        "answer": "Stop, star, stamp (Any valid word)."
       },
       {
-        "question": "Why is active recall for blends more effective than rereading?",
-        "answer": "Active recall forces the brain to retrieve the sound pattern, strengthening neural pathways necessary for automatic recognition during reading."
+        "question": "What is the difference between a blend and a digraph?",
+        "answer": "In a blend, you hear both sounds (s-t); in a digraph, two letters make one new sound (sh, ch)."
       }
     ],
     "path": "/flashcards/consonant-blends",
@@ -6989,16 +6989,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary mechanism for long-term memory retention?",
-        "answer": "The primary mechanism is spaced repetition, which schedules reviews at increasing intervals to combat the forgetting curve."
+        "question": "What is the formula for calculating kinetic energy?",
+        "answer": "KE = ½mv² (mass times velocity squared)."
       },
       {
-        "question": "Why is active recall superior to passive review?",
-        "answer": "Active recall forces retrieval effort, strengthening neural pathways, whereas passive review often creates a false sense of mastery."
+        "question": "Name the process where plants convert light energy into chemical energy.",
+        "answer": "Photosynthesis."
       },
       {
-        "question": "How does an AI tool use an uploaded PDF for studying?",
-        "answer": "The AI parses text structure to identify key terms, definitions, and relationships, converting them into atomic Q&A pairs."
+        "question": "What is the SI unit of electric current?",
+        "answer": "The Ampere (A)."
       }
     ],
     "path": "/flashcards/class-10",
@@ -7198,16 +7198,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the null hypothesis (H₀) in formal inference testing?",
-        "answer": "The null hypothesis states there is no effect or no difference. It is the position assumed true until evidence suggests otherwise."
+        "question": "What is the p-value used for in hypothesis testing?",
+        "answer": "It measures the probability of observing data as extreme as or more extreme than the null hypothesis."
       },
       {
-        "question": "Name two conditions required to use the Z-interval for proportions.",
-        "answer": "Conditions include Random sample, Independence (10% condition), and Large Counts (normality via sample size)."
+        "question": "Define a Type I error.",
+        "answer": "Rejecting the null hypothesis when it is, in fact, true (False Positive)."
       },
       {
-        "question": "What does a P-value of 0.01 mean in context?",
-        "answer": "If the null hypothesis were true, there would be only a 1% chance of observing data as extreme or more extreme than what was collected."
+        "question": "What does the acronym 'DOGS' stand for when describing quantitative data?",
+        "answer": "Direction, Outliers, Gaps, and Shape."
       }
     ],
     "path": "/flashcards/barrons-ap-statistics",
@@ -7406,16 +7406,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "Which European country is landlocked and borders only one nation?",
-        "answer": "Liechtenstein is bordered only by Austria and Switzerland, making it unique in its small number of direct neighbors."
+        "question": "Name the continent where Brazil is located.",
+        "answer": "South America."
       },
       {
-        "question": "What is the primary geographic feature defining the border between Chile and Argentina?",
-        "answer": "The Andes mountain range forms the natural boundary separating these two South American nations along their lengthy border."
+        "question": "What is the capital city of France?",
+        "answer": "Paris."
       },
       {
-        "question": "Name two landlocked African countries that rely on neighboring ports?",
-        "answer": "Ethiopia and Uganda are examples; they rely on access routes through Djibouti and Kenya/Tanzania, respectively."
+        "question": "Which country is known for the Great Wall?",
+        "answer": "China."
       }
     ],
     "structuredData": {
@@ -7611,16 +7611,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary function of the hippocampus in memory?",
-        "answer": "It is crucial for forming new long-term explicit memories, especially semantic and episodic memories."
+        "question": "What is the definition of classical conditioning?",
+        "answer": "Learning through association, where a neutral stimulus becomes associated with an unconditioned stimulus."
       },
       {
-        "question": "Define the concept of 'confirmation bias' in research.",
-        "answer": "It is the tendency to search for, interpret, favor, and recall information that confirms or supports one's prior beliefs or values."
+        "question": "Name the \"Big Five\" personality traits.",
+        "answer": "Openness, Conscientiousness, Extraversion, Agreeableness, Neuroticism (OCEAN)."
       },
       {
-        "question": "How does classical conditioning differ from operant conditioning?",
-        "answer": "Classical conditioning involves involuntary responses associated with stimuli, while operant conditioning involves voluntary behaviors shaped by consequences."
+        "question": "What is the function of the amygdala?",
+        "answer": "It plays a primary role in processing memory, decision-making, and emotional responses (fear and pleasure)."
       }
     ],
     "structuredData": {
@@ -7812,16 +7812,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What does CVC stand for in phonics?",
-        "answer": "CVC stands for Consonant-Vowel-Consonant. It represents the most basic syllable structure in English words."
+        "question": "What does the acronym CVC stand for in phonics?",
+        "answer": "Consonant-Vowel-Consonant."
       },
       {
-        "question": "How should one practice blending the word 'M-A-P'?",
-        "answer": "Practice segmenting the sounds (/m/, /a/, /p/) and then smoothly blending them together to form the whole word: 'map'."
+        "question": "Give an example of a CVC word.",
+        "answer": "Cat, dog, sun, hop (Any valid three-letter word with this pattern)."
       },
       {
-        "question": "Why is active recall better than rereading notes?",
-        "answer": "Active recall forces the brain to retrieve information, strengthening neural pathways, unlike passive rereading which creates an illusion of knowledge."
+        "question": "When blending \"h-a-t",
+        "answer": " what sound does the middle letter make?,The short 'a' sound (like the sound in \"apple\")."
       }
     ],
     "path": "/flashcards/cvc-blending",
@@ -8021,16 +8021,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What day immediately follows Wednesday?",
-        "answer": "Thursday immediately follows Wednesday. This tests sequencing knowledge."
+        "question": "What day do you usually start school after the weekend?",
+        "answer": "Monday."
       },
       {
-        "question": "Name the first two days of the standard school week.",
-        "answer": "Monday and Tuesday are typically the first two days when learning the cycle."
+        "question": "Say the days of the week out loud.",
+        "answer": "Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday."
       },
       {
-        "question": "Which day comes before Sunday?",
-        "answer": "Saturday comes before Sunday. This is often an endpoint in weekly review sets."
+        "question": "Which day comes right before Saturday?",
+        "answer": "Friday."
       }
     ],
     "structuredData": {
@@ -8226,16 +8226,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is 'active recall' in language learning?",
-        "answer": "Active recall is the process of retrieving information from memory without cues, which strengthens neural pathways far better than rereading notes."
+        "question": "What is a modal verb? Give an example.",
+        "answer": "A helping verb (like can, could, might) used to express necessity, possibility, or obligation."
       },
       {
-        "question": "Why are flashcards effective for adult ESL learners?",
-        "answer": "They break down complex grammar or vocabulary into atomic units, facilitating faster memorization through focused repetition."
+        "question": "Form the Past Simple tense of the verb \"go.",
+        "answer": "Went."
       },
       {
-        "question": "How does spaced repetition scheduling improve retention?",
-        "answer": "It schedules reviews just before you are likely to forget the information, minimizing wasted time on already mastered concepts."
+        "question": "What is the difference between \"affect\" and \"effect\"?",
+        "answer": "Affect\" is usually a verb (to influence); \"effect\" is usually a noun (a result)."
       }
     ],
     "path": "/flashcards/esl-adults",
@@ -8435,16 +8435,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "Define 'Ubiquitous' based on contextual learning?",
-        "answer": "Present everywhere or seemingly everywhere at the same time; pervasive in the current environment."
+        "question": "Define 'ephemeral.'",
+        "answer": "Lasting for a very short time; transient."
       },
       {
-        "question": "What is the primary goal of Spaced Repetition?",
-        "answer": "To maximize long-term retention by spacing review intervals just before the point of forgetting."
+        "question": "What does the root word 'bene' mean?",
+        "answer": "Good or well."
       },
       {
-        "question": "How does Active Recall differ from Recognition?",
-        "answer": "Active Recall forces retrieval of information without cues, whereas Recognition only requires identifying correct information among choices."
+        "question": "Give a synonym for the word 'proficient.'",
+        "answer": "Skilled, expert, or competent."
       }
     ],
     "path": "/flashcards/english-vocabulary",
@@ -8643,16 +8643,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary advantage of spaced repetition over massed practice?",
-        "answer": "Spaced repetition schedules reviews at increasing intervals, optimizing long-term retention by challenging recall just before forgetting occurs."
+        "question": "If you are facing North and turn right",
+        "answer": "which direction are you facing?"
       },
       {
-        "question": "If I upload a map image, what concepts might the AI extract?",
-        "answer": "The AI focuses on labels, legends, scale indicators, and accompanying text describing directional reference points like bearings or grids."
+        "question": "East.",
+        "answer": "What direction is the opposite of West?"
       },
       {
-        "question": "How does setting an exam date influence my flashcard schedule?",
-        "answer": "Setting a date causes the algorithm to compress the review intervals closer together as the date approaches, ensuring maximal readiness at the test time."
+        "question": "East.",
+        "answer": "What word do you use to ask for location instructions?,Directions."
       }
     ],
     "path": "/flashcards/directions",
@@ -8852,16 +8852,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary adaptation for desert-dwelling camels?",
-        "answer": "They possess specialized physiological mechanisms allowing them to tolerate large fluctuations in body temperature and conserve water efficiently."
+        "question": "Name three major classes of vertebrates.",
+        "answer": "Mammals, birds, reptiles, amphibians, and fish (any three)."
       },
       {
-        "question": "Define 'Aposematism' in the context of animal defense.",
-        "answer": "Aposematism is when an animal displays conspicuous warning coloration or patterns to advertise its toxicity or unpalatability to predators."
+        "question": "What is a mammal known for its pouch?",
+        "answer": "Marsupial (e.g., kangaroo, opossum)."
       },
       {
-        "question": "What distinguishes a Monocot from a Dicot plant structure?",
-        "answer": "Monocots have one cotyledon, parallel leaf venation, and fibrous roots; Dicots have two cotyledons, net-like venation, and a taproot system."
+        "question": "What characteristic distinguishes birds from other animals?",
+        "answer": "They have feathers and lay hard-shelled eggs."
       }
     ],
     "path": "/flashcards/animals",
@@ -9061,16 +9061,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary cognitive benefit of flashcards?",
-        "answer": "The primary benefit is engaging active recall, forcing the brain to retrieve information rather than passively recognizing it."
+        "question": "What is the typical issue with transferring data from platforms like Quizlet?",
+        "answer": "It often requires manual copy-pasting or dealing with inconsistent export formats, which is time-consuming."
       },
       {
-        "question": "How does spaced repetition improve memory consolidation?",
-        "answer": "It schedules retrieval practice at optimal intervals just before forgetting occurs, strengthening memory traces over time."
+        "question": "How does AI simplify the process of importing study material?",
+        "answer": "AI can extract and structure data from raw text or PDFs, bypassing platform-specific export issues."
       },
       {
-        "question": "What file types can be uploaded for instant card creation?",
-        "answer": "Users can upload PDFs, DOCX, PPTX files, or images containing the study content for processing."
+        "question": "Why is manual data entry inefficient for large study decks?",
+        "answer": "It is highly prone to errors and takes away valuable time that could be used for active study."
       }
     ],
     "path": "/flashcards/download-from-quizlet",
@@ -9266,16 +9266,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the simple past tense of 'to set'?",
-        "answer": "The simple past tense of 'to set' is 'set.' It remains unchanged, distinguishing it from many irregular verbs."
+        "question": "Give the Past Simple and Past Participle forms of the verb 'sing.'",
+        "answer": "Sang, Sung."
       },
       {
-        "question": "Conjugate the verb 'to seek' (Present, Past, Past Participle)?",
-        "answer": "The forms are: seek (Present), sought (Past), sought (Past Participle)."
+        "question": "What are the three main forms of an irregular verb?",
+        "answer": "Base form (infinitive), Past Simple, and Past Participle."
       },
       {
-        "question": "What is the past participle of the verb 'to drive'?",
-        "answer": "The past participle of 'to drive' is 'driven.' This form requires an auxiliary verb (e.g., 'has driven')."
+        "question": "Form a sentence using the irregular verb 'drive' in the Past Simple tense.",
+        "answer": "Yesterday, I drove to the store."
       }
     ],
     "path": "/flashcards/irregular-verbs",
@@ -9474,16 +9474,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "How many days are typically in the month of February?",
-        "answer": "February usually has 28 days, except during a leap year when it has 29 days."
+        "question": "How many months are in one year?",
+        "answer": "Twelve (12)."
       },
       {
-        "question": "Which month immediately follows the month with 30 days that starts with 'S'?",
-        "answer": "September has 30 days. The month following it is October, which has 31 days."
+        "question": "Which month is the last month of the year?",
+        "answer": "December."
       },
       {
-        "question": "What is the primary benefit of using spaced repetition for calendar facts?",
-        "answer": "It optimizes review timing by scheduling difficult cards more frequently, ensuring long-term memory consolidation."
+        "question": "What are the names of the two major time periods we use to measure time?",
+        "answer": "Days and Months."
       }
     ],
     "path": "/flashcards/days-months",
@@ -9682,16 +9682,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What term describes the social unit formed by parents and children?",
-        "answer": "The Nuclear Family. This usually refers to two parents and their children living in the same household."
+        "question": "What is your mother's brother called?",
+        "answer": "Uncle."
       },
       {
-        "question": "What is the difference between consanguineal and affinal kinship?",
-        "answer": "Consanguineal kinship is based on blood ties, while affinal kinship is established through marriage."
+        "question": "What do you call the daughter of your sibling?",
+        "answer": "Niece."
       },
       {
-        "question": "In genealogy, what does 'paternal' refer to?",
-        "answer": "Paternal refers to the side of the family line tracing descent through the father's ancestry."
+        "question": "What is the term for a grandparent's parent?",
+        "answer": "Great-grandparent."
       }
     ],
     "path": "/flashcards/family-members",
@@ -9891,16 +9891,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the traditional name for the pre-Hispanic Filipino script?",
-        "answer": "The traditional script is called Baybayin. It is an abugida system previously used in areas of the Philippines."
+        "question": "How many letters are in the modern Filipino Alphabet (Abakada)?",
+        "answer": "Twenty-eight (28) letters."
       },
       {
-        "question": "How many letters are in the modern official Filipino alphabet?",
-        "answer": "The modern Filipino alphabet currently contains 28 letters, including the five standard vowels and 23 consonants."
+        "question": "Name two letters unique to the Filipino Alphabet.",
+        "answer": "Ñ (enye) and Ng (nga)."
       },
       {
-        "question": "What is the primary benefit of setting an exam date in the scheduling system?",
-        "answer": "Setting a deadline ensures the spaced repetition algorithm prioritizes frequent reviews leading up to that specific date for peak preparedness."
+        "question": "What is the term for the entire set of letters in the Filipino language?",
+        "answer": "Abakada."
       }
     ],
     "path": "/flashcards/filipino-alphabet",
@@ -10100,16 +10100,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the definition of the action verb 'Delineate'?",
-        "answer": "To describe or portray (something) precisely; to mark the outline or form of something."
+        "question": "What is the action verb in the sentence: \"The cat quickly jumped.",
+        "answer": "Jumped."
       },
       {
-        "question": "Provide a sentence using the action verb 'Corroborate'.",
-        "answer": "Witness testimony helped corroborate the suspect's alibi during questioning."
+        "question": "Give an example of an action verb related to movement.",
+        "answer": "Walk, run, hop, skip, crawl (any one)."
       },
       {
-        "question": "What is the primary difference between 'Convey' and 'Transmit'?",
-        "answer": "Both mean to pass along, but 'Convey' often implies transferring meaning or feeling, whereas 'Transmit' focuses on sending data or signals."
+        "question": "What category of verbs describes mental actions?",
+        "answer": "Cognitive verbs, such as think, imagine, or remember."
       }
     ],
     "path": "/flashcards/esl-action-verbs",
@@ -10309,16 +10309,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the past participle of the verb 'to set'?",
-        "answer": "The past participle is 'set.' Note that 'set' is an irregular verb where the simple past and past participle forms are identical."
+        "question": "What is the base form of the verb 'was'?",
+        "answer": "Be."
       },
       {
-        "question": "Formulate a sentence using the verb 'to lie' (to recline) in the present progressive tense.",
-        "answer": "I am lying on the couch right now. This refers to reclining, which is distinct from 'to lay' (to place something)."
+        "question": "What are the two main types of verbs in English grammar?",
+        "answer": "Action verbs and Linking verbs."
       },
       {
-        "question": "How do you conjugate the verb 'to run' in the third-person singular present tense?",
-        "answer": "The conjugation is 'runs' (e.g., She runs every morning). Remember the addition of 's' for he/she/it."
+        "question": "What is a phrasal verb?",
+        "answer": "A verb combined with an adverb or preposition to create a new meaning (e.g., 'look up')."
       }
     ],
     "structuredData": {
@@ -10513,16 +10513,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary benefit of active recall over passive review?",
-        "answer": "Active recall forces retrieval from memory, which strengthens neural pathways, leading to superior long-term retention compared to simple rereading."
+        "question": "Define the term 'nuclear family.'",
+        "answer": "A unit consisting of two parents and their children (immediate family)."
       },
       {
-        "question": "Define the principle behind Spaced Repetition Scheduling.",
-        "answer": "It involves reviewing information at increasing intervals. This targets the forgetting curve, ensuring concepts are reinforced just before they fade."
+        "question": "What term describes a relative who is not immediate (e.g.",
+        "answer": "uncle, cousin)?"
       },
       {
-        "question": "What information must be provided for optimal AI card generation?",
-        "answer": "Provide clear, well-structured source documents (PDFs, PPTX). The better the source quality, the more accurate the derived Q&A pairs will be."
+        "question": "Extended family member.",
+        "answer": "What is 'foster care'?,A system where a child is placed in a government-certified family for temporary care."
       }
     ],
     "structuredData": {
@@ -10718,16 +10718,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary difference between the flag of Chile and the flag of the US?",
-        "answer": "The flag of Chile features a white and red horizontal band with a blue canton containing a single white star. The US flag has thirteen alternating red and white stripes and a blue canton with fifty stars."
+        "question": "Which country's flag is known as the \"Stars and Stripes\"?",
+        "answer": "The United States of America."
       },
       {
-        "question": "Which country’s flag consists only of two colors and features a central circular symbol?",
-        "answer": "Japan's national flag, often called Nisshōki, is white with a large red circle (representing the sun) in the center."
+        "question": "What is the color combination on the flag of Italy?",
+        "answer": "Green, white, and red (vertical stripes)."
       },
       {
-        "question": "What specific feature distinguishes the flag of the Czech Republic from the flag of Monaco?",
-        "answer": "Both use horizontal white and red fields. The Czech flag includes a blue triangle extending from the hoist side towards the center."
+        "question": "Which country features a large red circle on a white background?",
+        "answer": "Japan."
       }
     ],
     "path": "/flashcards/flags-world",
@@ -10928,16 +10928,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary benefit of spaced repetition?",
-        "answer": "It optimizes review timing by scheduling cards just before they are forgotten, maximizing long-term memory consolidation."
+        "question": "What is an 'adverb'?",
+        "answer": "A word that modifies a verb, an adjective, or another adverb."
       },
       {
-        "question": "Name three file types that support AI card generation.",
-        "answer": "PDF, DOCX, and image files (like JPG/PNG) are fully supported for content extraction."
+        "question": "How do you form the plural of most English nouns?",
+        "answer": "By adding -s or -es to the singular form."
       },
       {
-        "question": "What study concept does converting notes to Q&A promote?",
-        "answer": "It strongly promotes active recall, which is retrieving information without cues, strengthening neural pathways."
+        "question": "What is 'comprehension' in the context of learning English?",
+        "answer": "The ability to understand the meaning or importance of something that is read or heard."
       }
     ],
     "path": "/flashcards/learning-english",
@@ -11137,16 +11137,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary benefit of Spaced Repetition?",
-        "answer": "It optimizes review timing to push information from short-term to long-term memory effectively."
+        "question": "Name three basic human feelings.",
+        "answer": "Joy, sadness, anger, fear, surprise (any three)."
       },
       {
-        "question": "What cognitive principle do flashcards rely on?",
-        "answer": "They primarily utilize active recall, forcing the brain to retrieve information rather than passively recognizing it."
+        "question": "What feeling is the opposite of sadness?",
+        "answer": "Happiness or joy."
       },
       {
-        "question": "What is an example of a subtle feeling distinction?",
-        "answer": "Differentiating between 'anxiety' (anticipation of future threat) and 'fear' (response to immediate danger)."
+        "question": "What emotion is associated with anticipating danger?",
+        "answer": "Fear."
       }
     ],
     "structuredData": {
@@ -11342,16 +11342,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary function of active recall in learning?",
-        "answer": "It forces the brain to retrieve information without external cues, strengthening memory traces significantly more than passive review."
+        "question": "What is the primary function of a PDF in an academic setting?",
+        "answer": "To maintain the fixed formatting of a document across different operating systems and viewers."
       },
       {
-        "question": "How does spaced repetition scheduling adapt review timing?",
-        "answer": "It increases the interval between successful reviews, prioritizing cards that are difficult or have been frequently forgotten."
+        "question": "How does AI convert a PDF's content into flashcards?",
+        "answer": "It uses Optical Character Recognition (OCR) to read the text and then extracts key information."
       },
       {
-        "question": "Why use AI generation over manual flashcard creation?",
-        "answer": "AI rapidly converts dense source material into atomic questions, saving hours of manual extraction time for complex documents."
+        "question": "Why is a PDF often referred to as static content?",
+        "answer": "Because the content (text, layout, images) is typically fixed and not easily editable."
       }
     ],
     "path": "/flashcards/download",
@@ -11552,16 +11552,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the key benefit of converting GoodNotes files to flashcards?",
-        "answer": "It transforms static review material into dynamic questions that force active recall, improving memory encoding efficiency."
+        "question": "What is GoodNotes 5 primarily used for?",
+        "answer": "Digital note-taking, sketching, and PDF annotation on devices like the iPad."
       },
       {
-        "question": "What learning algorithm drives optimal review timing?",
-        "answer": "Spaced repetition scheduling, which strategically times reviews just before the point of forgetting."
+        "question": "Why is converting GoodNotes PDFs to flashcards beneficial?",
+        "answer": "It transforms passive notes into an active recall system, which is crucial for exam prep."
       },
       {
-        "question": "What file types are supported for conversion besides PDF?",
-        "answer": "The tool supports DOCX, PowerPoint exports, and various image file formats derived from study notes."
+        "question": "What feature in GoodNotes helps students organize their notes?",
+        "answer": "Notebooks, folders, and tags."
       }
     ],
     "path": "/flashcards/goodnotes-5",
@@ -11762,16 +11762,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What cognitive principle links scheduled review intervals to memory consolidation?",
-        "answer": "Spaced Repetition: It leverages the forgetting curve by scheduling reviews right before recall fails, cementing long-term memory."
+        "question": "What is the primary goal of GRE vocabulary preparation?",
+        "answer": "To build a strong foundation of high-frequency words that appear on the GRE exam."
       },
       {
-        "question": "When uploading a GRE study PDF, what must the AI prioritize extracting?",
-        "answer": "Atomic concepts: Definitions, formulas, and clear examples, transforming dense paragraphs into discrete, testable active recall items."
+        "question": "Define the Magoosh vocabulary word 'placid.'",
+        "answer": "Calm and peaceful; not easily upset or excited."
       },
       {
-        "question": "What is the primary benefit of using AI to create flashcards versus manual transcription?",
-        "answer": "Time efficiency and consistency: AI processes material faster and ensures uniform quality across all extracted learning points."
+        "question": "How does an AI generator use GRE Magoosh materials?",
+        "answer": "It extracts the vocabulary word, definition, and context examples for instant card creation."
       }
     ],
     "structuredData": {
@@ -11968,16 +11968,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary benefit of spaced repetition?",
-        "answer": "It schedules reviews just before you are likely to forget, maximizing long-term memory consolidation efficiently."
+        "question": "What celebration is Halloween traditionally linked to?",
+        "answer": "All Hallows' Eve, the night before All Saints' Day."
       },
       {
-        "question": "Name three source file types supported for card creation.",
-        "answer": "PDFs, DOCX files, and image files are fully supported for instant content extraction."
+        "question": "Name three common Halloween costumes.",
+        "answer": "Witch, ghost, vampire, superhero (any three)."
       },
       {
-        "question": "What crucial study principle do flashcards enforce?",
-        "answer": "They enforce active recall, forcing retrieval of information rather than passive re-reading of notes."
+        "question": "What is \"trick-or-treating\"?",
+        "answer": "A customary practice for children to visit houses for treats on Halloween."
       }
     ],
     "path": "/flashcards/halloween",
@@ -12173,16 +12173,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary role of the Golgi apparatus in cell metabolism?",
-        "answer": "It modifies, sorts, and packages proteins and lipids synthesized in the ER for delivery to target destinations inside or outside the cell."
+        "question": "Name two types of protein-rich food.",
+        "answer": "Meat, fish, eggs, beans, nuts (any two)."
       },
       {
-        "question": "Define the Maillard reaction in the context of food chemistry.",
-        "answer": "It is a chemical reaction between amino acids and reducing sugars that gives browned food its distinctive flavor, often occurring during baking or frying."
+        "question": "What is the scientific term for sugar found in fruit?",
+        "answer": "Fructose."
       },
       {
-        "question": "What is the primary indicator of protein denaturation via heat?",
-        "answer": "The unfolding of the tertiary and secondary structure of the protein, leading to changes in texture and solubility."
+        "question": "What type of food is bread classified as?",
+        "answer": "A carbohydrate."
       }
     ],
     "path": "/flashcards/food",
@@ -12384,16 +12384,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary advantage of AI-generated flashcards over manual note-taking?",
-        "answer": "AI generation eliminates hours spent formatting, allowing immediate focus on retrieval practice and applying spaced repetition."
+        "question": "What is the main advantage of using AI for Class 10 study materials?",
+        "answer": "It quickly extracts complex concepts, formulas, and definitions from textbooks into study sets."
       },
       {
-        "question": "Name one file type that supports direct input for Class 10 study deck creation.",
-        "answer": "PDF files are fully supported. Upload your textbook chapter scans or lecture slides directly for processing."
+        "question": "Why is active recall better than passive reading for Class 10 exams?",
+        "answer": "Active recall forces memory retrieval, leading to better retention of facts and formulas."
       },
       {
-        "question": "How does setting an exam date influence the study process?",
-        "answer": "It allows the system to schedule review intervals backwards, ensuring the most critical material is practiced just before your specific assessment date."
+        "question": "Name one subject typically studied in Class 10.",
+        "answer": "Math, Science, Social Science, or English."
       }
     ],
     "path": "/flashcards/class-10-download",
@@ -12592,16 +12592,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary cognitive benefit of spaced repetition?",
-        "answer": "It leverages the 'spacing effect' by reviewing information right before forgetting, maximizing long-term memory consolidation."
+        "question": "Is a tomato botanically a fruit or a vegetable?",
+        "answer": "A tomato is botanically a fruit because it develops from the flower's ovary and contains seeds."
       },
       {
-        "question": "Name three document formats our AI accepts for card creation.",
-        "answer": "The system accepts PDF, DOCX (Word documents), and image files containing readable text."
+        "question": "Name a common root vegetable.",
+        "answer": "Carrot, potato, radish, turnip (any one)."
       },
       {
-        "question": "What function does setting an exam date serve?",
-        "answer": "It allows the scheduling algorithm to compress review sessions near the deadline, ensuring peak readiness for your specific test date."
+        "question": "What is the main source of Vitamin C in many fruits and vegetables?",
+        "answer": "Citrus fruits and bell peppers."
       }
     ],
     "structuredData": {
@@ -12797,16 +12797,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary function of simple cuboidal epithelium?",
-        "answer": "It primarily handles secretion and absorption. It is often found lining kidney tubules and the ducts of small glands."
+        "question": "What is histology the study of?",
+        "answer": "The microscopic structure of tissues."
       },
       {
-        "question": "Identify the key characteristic structure of cardiac muscle tissue.",
-        "answer": "Cardiac muscle features striations and specialized intercellular junctions called intercalated discs for rapid electrical connection."
+        "question": "Define 'epithelium.'",
+        "answer": "A layer of cells that lines surfaces and cavities, acting as a protective barrier."
       },
       {
-        "question": "Describe the main histological feature distinguishing loose connective tissue.",
-        "answer": "It contains an abundance of various cell types (like fibroblasts) and a loose arrangement of extracellular matrix fibers, allowing space for fluid movement."
+        "question": "What are the four basic types of human tissue?",
+        "answer": "Epithelial, connective, muscular, and nervous tissue."
       }
     ],
     "path": "/flashcards/histology",
@@ -13007,16 +13007,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary function of an idiom in language acquisition?",
-        "answer": "Idioms are phrases whose meaning cannot be deduced from the individual words. They convey cultural context and nuanced expression."
+        "question": "Define the idiom \"break a leg.",
+        "answer": "A phrase used to wish someone good luck, especially before a performance."
       },
       {
-        "question": "How does spaced repetition aid in retaining complex idioms?",
-        "answer": "It schedules reviews at increasing intervals based on recall difficulty, moving knowledge from short-term to long-term memory efficiently."
+        "question": "What does the idiom \"bite the bullet\" mean?",
+        "answer": "To face a difficult or unpleasant situation with courage and fortitude."
       },
       {
-        "question": "If a PDF mentions 'break a leg,' what process extracts this for study?",
-        "answer": "The AI uses context analysis to identify the phrase as a fixed expression needing specific memorization, rather than literal translation."
+        "question": "Write a sentence using the idiom \"to kill two birds with one stone.",
+        "answer": "I went to the store and picked up my dry cleaning, killing two birds with one stone."
       }
     ],
     "path": "/flashcards/idioms",
@@ -13218,16 +13218,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What cognitive principle is key to long-term retention?",
-        "answer": "Active recall, the process of retrieving information from memory without cues, significantly boosts long-term retention."
+        "question": "What is the first letter of the English alphabet?",
+        "answer": "A."
       },
       {
-        "question": "What is the purpose of setting an exam date in the app?",
-        "answer": "Setting a date initiates backward scheduling using spaced repetition to ensure peak readiness precisely when required."
+        "question": "How many letters are in the English alphabet?",
+        "answer": "Twenty-six (26)."
       },
       {
-        "question": "How does this tool address manual flashcard creation?",
-        "answer": "It automates the extraction of key concepts from uploaded documents (PDF, DOCX) into ready-to-use question-answer pairs."
+        "question": "What are the two main categories of letters in the alphabet?",
+        "answer": "Vowels and Consonants."
       }
     ],
     "path": "/flashcards/abc",
@@ -13427,16 +13427,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary benefit of AI card generation over manual creation?",
-        "answer": "It drastically reduces time spent on formatting and extraction, allowing focus on active recall and concept mastery."
+        "question": "What makes AI flashcards superior to static PDF notes?",
+        "answer": "AI converts static text into an interactive Q&A format, enabling active recall."
       },
       {
-        "question": "What file types does the platform support for source material?",
-        "answer": "The platform supports common document formats like PDF, DOCX, and presentation slides, as well as image files."
+        "question": "What is a primary benefit of using a free AI study tool?",
+        "answer": "It democratizes access to efficient study methods and saves students money."
       },
       {
-        "question": "How does the system ensure long-term memory retention?",
-        "answer": "It employs spaced repetition scheduling, analyzing your recall success to prompt reviews at optimal intervals."
+        "question": "How is a flashcard different from a summary sheet?",
+        "answer": "A flashcard is designed for quick, targeted recall, while a summary sheet provides broad topic overviews."
       }
     ],
     "path": "/flashcards/flash-cards-pdf-free",
@@ -13637,16 +13637,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary cognitive benefit of spaced repetition?",
-        "answer": "It strengthens memory traces by forcing retrieval just as the memory is about to fade, leading to long-term retention."
+        "question": "Why do modern study tools prefer online generators over downloads?",
+        "answer": "Online generators are instantly accessible, always updated, and require no installation or local storage."
       },
       {
-        "question": "Name three file types compatible for instant card creation.",
-        "answer": "PDF, DOCX (Word documents), and image files are supported for content ingestion."
+        "question": "What is the primary function of a flashcard maker?",
+        "answer": "To convert existing study material (notes, PDFs) into structured flashcard sets."
       },
       {
-        "question": "What capability does setting an exam date activate?",
-        "answer": "It customizes the review schedule backward from that date, optimizing card frequency for peak performance on the test day."
+        "question": "What does \"Smarter Studying\" typically refer to?",
+        "answer": "Using evidence-based techniques like active recall and spaced repetition, often aided by technology."
       }
     ],
     "structuredData": {
@@ -13841,16 +13841,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What family does the common apple (Malus domestica) belong to?",
-        "answer": "The apple belongs to the Rosaceae family, which also includes pears and roses."
+        "question": "Name three common tropical fruits.",
+        "answer": "Banana, mango, pineapple, kiwi (any three)."
       },
       {
-        "question": "Define the term 'Drupe' in fruit classification.",
-        "answer": "A drupe is a fleshy fruit with a hard pit or stone that encloses the seed, like peaches or olives."
+        "question": "What fruit is known for its high potassium content?",
+        "answer": "Banana."
       },
       {
-        "question": "What is the primary role of anthocyanins in fruit coloring?",
-        "answer": "Anthocyanins are pigments responsible for red, purple, and blue colors in many fruits, often acting as antioxidants."
+        "question": "What is the protective outer layer of a fruit called?",
+        "answer": "The peel or rind."
       }
     ],
     "path": "/flashcards/fruits",
@@ -14052,16 +14052,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary cognitive benefit of using flashcards?",
-        "answer": "Flashcards enforce active recall, forcing the brain to retrieve information rather than passively recognizing it, which strengthens memory pathways."
+        "question": "What is the result of 5 multiplied by 4?",
+        "answer": "Twenty (20)."
       },
       {
-        "question": "How does spaced repetition optimize review sessions?",
-        "answer": "It schedules reviews at increasing intervals based on performance, targeting the 'forgetting curve' just before material fades from memory."
+        "question": "Write the multiplication equation for \"three groups of seven.",
+        "answer": "3 x 7 = 21."
       },
       {
-        "question": "Why is importing from a PDF faster than manual creation?",
-        "answer": "The AI handles the identification, extraction, and formatting of Q&A pairs automatically, saving significant time spent on manual transcription."
+        "question": "If a box holds 6 pencils",
+        "answer": "how many pencils are in 3 boxes?,18 pencils (3 x 6 = 18)."
       }
     ],
     "structuredData": {
@@ -14257,16 +14257,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What feature of the IPA represents the primary articulation point?",
-        "answer": "The place of articulation describes where the airflow is obstructed in the vocal tract (e.g., bilabial, alveolar, velar)."
+        "question": "What does IPA stand for in linguistics?",
+        "answer": "International Phonetic Alphabet."
       },
       {
-        "question": "What does the diacritic mark [◌̃] typically indicate?",
-        "answer": "This symbol indicates nasalization, meaning the sound is produced with air escaping through both the mouth and the nose simultaneously."
+        "question": "What is the purpose of the IPA?",
+        "answer": "To provide a standardized and universal system for transcribing all sounds of human speech."
       },
       {
-        "question": "How does the concept of voice affect stop consonant transcription?",
-        "answer": "Voicing differentiates pairs like /p/ (voiceless) and /b/ (voiced); the vibration of the vocal cords is the key difference."
+        "question": "How does the IPA represent different vowel sounds?",
+        "answer": "With specific symbols that denote tongue position and lip rounding (e.g., /i/ vs. /u/)."
       }
     ],
     "path": "/flashcards/ipa",
@@ -14466,16 +14466,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What property governs the equation a + b = b + a?",
-        "answer": "This is the Commutative Property of Addition. It shows that the order of operands does not change the sum."
+        "question": "What is an integer?",
+        "answer": "A whole number (not a fraction or decimal) that can be positive, negative, or zero."
       },
       {
-        "question": "How is multiplication defined for a negative integer and a positive integer?",
-        "answer": "The product of a negative integer and a positive integer is always a negative integer."
+        "question": "Is -5 an integer? Why or why not?",
+        "answer": "Yes, -5 is a negative whole number, which falls within the definition of an integer."
       },
       {
-        "question": "Define the additive inverse of a number 'x' in integer arithmetic.",
-        "answer": "The additive inverse of x is the number that, when added to x, results in zero. For any integer n, the inverse is -n."
+        "question": "What is the absolute value of -10?",
+        "answer": "10."
       }
     ],
     "structuredData": {
@@ -14671,16 +14671,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the core difference between 'put up with' and 'put off'?",
-        "answer": "'Put up with' means to tolerate something undesirable, whereas 'put off' means to postpone an action or event."
+        "question": "What is the meaning of the phrasal verb \"look up\"?",
+        "answer": "To search for information, typically in a book or online."
       },
       {
-        "question": "Explain the meaning and typical usage of 'run into' in conversation.",
-        "answer": "'Run into' means to unexpectedly meet someone or to collide with an object. It emphasizes chance encounter."
+        "question": "Break down the phrasal verb \"turn off.",
+        "answer": "The verb is \"turn"
       },
       {
-        "question": "How do you use the phrasal verb 'take after' correctly?",
-        "answer": "Use 'take after' to indicate resemblance, usually in character or appearance, to an older family member."
+        "question": " and the particle is \"off.\" It means to stop a device.",
+        "answer": "Write a sentence using the phrasal verb \"put off.\",I had to put off my appointment until next week."
       }
     ],
     "path": "/flashcards/phrasal-verbs",
@@ -14880,16 +14880,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary sound introduced by the letter 's' in Group 1?",
-        "answer": "The primary sound for 's' is /s/, as in 'snake' or 'sun'. This is the first sound typically taught."
+        "question": "What five letter sounds are introduced in Jolly Phonics Group 1?",
+        "answer": "S, A, T, I, P, N (All six are usually introduced in Group 1)."
       },
       {
-        "question": "Name two common words that use the Group 1 letter 'a'.",
-        "answer": "The letter 'a' makes the short /a/ sound, found in words like 'ant' and 'cat' (when combined with 't' or 'c')."
+        "question": "What action is associated with the sound /s/?",
+        "answer": "Waving your hand like a snake\" or making an 'S' shape."
       },
       {
-        "question": "How does Spaced Repetition (SRS) improve recall of phonics patterns?",
-        "answer": "SRS schedules reviews based on your forgetting curve, ensuring you actively recall the tricky letter-sound links just before you might forget them."
+        "question": "In Jolly Phonics",
+        "answer": "what is the 'blending' technique?,Running the sounds in a word together to read the whole word (e.g., c-a-t)."
       }
     ],
     "structuredData": {
@@ -15082,16 +15082,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary cognitive benefit of using flashcards over passive reading?",
-        "answer": "Flashcards force active recall, retrieving information from memory, which strengthens neural pathways far more effectively than rereading."
+        "question": "Define the vocabulary word 'erudite.'",
+        "answer": "Having or showing great knowledge or learning."
       },
       {
-        "question": "Define the concept of 'Spaced Repetition' in learning algorithms.",
-        "answer": "It is a technique where review intervals gradually increase over time, timing the review right before memory decay occurs."
+        "question": "What does the word 'ephemeral' mean?",
+        "answer": "Lasting for a very short time; transient."
       },
       {
-        "question": "If I upload a Magoosh PDF, what data does the AI prioritize for card creation?",
-        "answer": "The AI prioritizes terms, definitions, key concepts, and potentially difficult phrases that are strongly represented in the source text."
+        "question": "Give a synonym for the Magoosh word 'garrulous.'",
+        "answer": "Talkative or excessively wordy."
       }
     ],
     "structuredData": {
@@ -15288,16 +15288,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary benefit of AI over manual flashcard creation?",
-        "answer": "AI eliminates transcription time and structures questions optimized for active recall directly from source material."
+        "question": "Why should students stop manually entering study content?",
+        "answer": "It is slow, repetitive, and often leads to errors that disrupt the learning process."
       },
       {
-        "question": "What core cognitive concept dictates review timing in this tool?",
-        "answer": "The tool uses Spaced Repetition Scheduling to target the forgetting curve for maximum long-term retention."
+        "question": "What is the benefit of AI-generated Quizlet-style flashcards?",
+        "answer": "Instant generation of structured Q&A pairs from existing study documents."
       },
       {
-        "question": "What is required to share a study set with classmates?",
-        "answer": "You can share your generated flashcards instantly using the unique public link provided after creation."
+        "question": "How does AI ensure the quality of generated study sets?",
+        "answer": "By analyzing the density of concepts and extracting only the most relevant definitions and terms."
       }
     ],
     "structuredData": {
@@ -15493,16 +15493,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary principle behind spaced repetition scheduling?",
-        "answer": "It involves reviewing learned material at intervals that gradually increase as recall becomes easier, fighting the forgetting curve."
+        "question": "What is \"Namaskar\" (नमस्कार) in Marathi?",
+        "answer": "A common greeting, meaning \"hello\" or \"greetings."
       },
       {
-        "question": "Name three file types directly supported for flashcard generation.",
-        "answer": "PDF, DOCX (Word documents), and PowerPoint presentations are supported for direct upload and parsing."
+        "question": "What script is the Marathi language written in?",
+        "answer": "Devanagari script."
       },
       {
-        "question": "What study mechanism replaces manual question creation?",
-        "answer": "Active recall, where the system forces retrieval of information rather than passive review of notes."
+        "question": "How do you say \"thank you\" in Marathi?",
+        "answer": "Dhanyawad (धन्यवाद)."
       }
     ],
     "path": "/flashcards/marathi",
@@ -15698,16 +15698,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary goal of the Optimum Performance Training (OPT) model?",
-        "answer": "The primary goal is to improve movement quality and stability before progressing to strength and power development."
+        "question": "What does NASM stand for in fitness certification?",
+        "answer": "National Academy of Sports Medicine."
       },
       {
-        "question": "Define eccentric muscle action.",
-        "answer": "Eccentric contraction occurs when a muscle lengthens while under tension, usually while resisting an external load."
+        "question": "What is the NASM's primary training model?",
+        "answer": "The Optimum Performance Training (OPT™) model."
       },
       {
-        "question": "What are the three phases of the stabilization level in the OPT model?",
-        "answer": "The stabilization level includes phases I: Stabilization Endurance Training, focusing on muscular endurance and stability."
+        "question": "What is the purpose of the overhead squat assessment (OHSA)?",
+        "answer": "To dynamically assess a client's posture, movement patterns, and muscle imbalances."
       }
     ],
     "path": "/flashcards/nasm",
@@ -15904,16 +15904,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary benefit of document upload vs. manual entry?",
-        "answer": "Uploading drastically reduces preparation time by instantly converting source material into structured Q&A pairs."
+        "question": "What is the key difference between manually making Anki cards and using AI?",
+        "answer": "AI processes the entire document in seconds; manual creation is a slow, card-by-card effort."
       },
       {
-        "question": "What must be provided for optimal spaced repetition scheduling?",
-        "answer": "The system requires your target exam or review completion date to calculate the best study cadence."
+        "question": "How does AI ensure the speed of Anki card creation?",
+        "answer": "It instantly structures the extracted data into Anki's specific field requirements."
       },
       {
-        "question": "If I upload a PPTX, what key information is extracted?",
-        "answer": "The AI extracts main headings, bullet points, and core textual content to formulate atomic question-and-answer pairs."
+        "question": "What are 'Cloze Deletions' in Anki?",
+        "answer": "A note type that allows you to hide specific words within a sentence for testing recall."
       }
     ],
     "structuredData": {
@@ -16110,16 +16110,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What cognitive benefit is emphasized when moving from passive reading to active recall?",
-        "answer": "Active recall forces retrieval from memory, strengthening neural pathways far more effectively than passive review or highlighting."
+        "question": "What is the main function of the 'Lasso Tool' in GoodNotes?",
+        "answer": "To select, move, resize, or delete handwritten notes and images."
       },
       {
-        "question": "If I set an exam date, how does the system adjust my review schedule?",
-        "answer": "The scheduler prioritizes concepts you struggle with, compressing review intervals as the target date approaches to ensure peak performance."
+        "question": "Why is converting GoodNotes notes to AI flashcards smart?",
+        "answer": "It automates the transformation of passive notes into an active study system."
       },
       {
-        "question": "What is the core output difference between manual flash cards and AI-generated ones?",
-        "answer": "AI focuses on atomic Q&A pairs derived from document context, ensuring questions prompt deep retrieval rather than simple recognition."
+        "question": "How does GoodNotes facilitate digital organization?",
+        "answer": "By allowing users to create custom digital notebooks and folders."
       }
     ],
     "structuredData": {
@@ -16316,16 +16316,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary function of spaced repetition in learning?",
-        "answer": "It schedules review intervals to coincide with the point just before forgetting occurs, maximizing long-term retention efficiently."
+        "question": "Define the vocabulary word 'alacrity.'",
+        "answer": "Brisk and cheerful readiness; eagerness."
       },
       {
-        "question": "How does document input aid vocabulary learning?",
-        "answer": "It allows rapid conversion of context-specific word lists (like Nelson Denny sets) into ready-to-use active recall material."
+        "question": "What does the word 'perfidious' mean?",
+        "answer": "Deceitful and untrustworthy."
       },
       {
-        "question": "What benefit does setting an exam date provide the study tool?",
-        "answer": "It dynamically adjusts the review frequency downward, ensuring challenging terms receive maximum exposure right before the critical test date."
+        "question": "Give a synonym for the Nelson Denny word 'esoteric.'",
+        "answer": "Obscure, cryptic, or known only to a specialized few."
       }
     ],
     "path": "/flashcards/nelson-denny-vocabulary",
@@ -16525,16 +16525,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary mechanism for long-term memory consolidation?",
-        "answer": "Long-term consolidation is best supported by retrieval practice (active recall) combined with scientifically optimized scheduling like spaced repetition."
+        "question": "What is the standard treatment for uncomplicated community-acquired pneumonia (CAP)?",
+        "answer": "Usually amoxicillin or doxycycline, depending on local resistance patterns and patient factors."
       },
       {
-        "question": "Why is active recall superior to passive rereading of notes?",
-        "answer": "Active recall forces the brain to work harder to retrieve information, strengthening neural pathways far more effectively than simply recognizing previously seen material."
+        "question": "What common lab test is used to assess kidney function?",
+        "answer": "Creatinine and BUN (Blood Urea Nitrogen)."
       },
       {
-        "question": "What critical step happens before starting a Spaced Repetition schedule?",
-        "answer": "The critical first step is encoding the information effectively, often achieved by converting dense material into atomic, challenging flashcard questions."
+        "question": "Define the term 'ascites.'",
+        "answer": "The accumulation of fluid in the peritoneal cavity, often associated with liver failure."
       }
     ],
     "path": "/flashcards/medstudy-internal-medicine",
@@ -16736,16 +16736,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary benefit of spaced repetition in language learning?",
-        "answer": "It schedules reviews just before the point of forgetting, maximizing long-term memory retention with minimal redundant study time."
+        "question": "Define 'pensive.'",
+        "answer": "Engaged in or reflecting deep or serious thought."
       },
       {
-        "question": "Name one file format supported for uploading vocabulary documents.",
-        "answer": "Supported formats include PDF, DOCX, and various image files like JPG or PNG."
+        "question": "What does the prefix 'anti-' usually mean?",
+        "answer": "Against or opposite."
       },
       {
-        "question": "What process replaces manual term entry for new vocabulary decks?",
-        "answer": "The AI analyzes the uploaded document content and automatically constructs precise, atomic flashcards for active recall."
+        "question": "Write a sentence using the word 'meticulous.'",
+        "answer": "The scientist was meticulous in recording the data."
       }
     ],
     "path": "/flashcards/vocabulary-english",
@@ -16945,16 +16945,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary purpose of Spaced Repetition in studying?",
-        "answer": "It optimizes review timing by showing you cards just as you are about to forget them, maximizing long-term retention."
+        "question": "What is the name of the phonetic script used for Japanese words of foreign origin?",
+        "answer": "Katakana."
       },
       {
-        "question": "How does active recall improve Japanese learning efficiency?",
-        "answer": "Active recall forces the brain to retrieve information, strengthening memory pathways far more effectively than passive reading."
+        "question": "What is a 'kanji' character?",
+        "answer": "A Japanese writing system symbol borrowed from Chinese, representing entire words or concepts."
       },
       {
-        "question": "If I upload a PDF, what content does the AI prioritize for cards?",
-        "answer": "The AI identifies key terms, proper nouns, new vocabulary, and main grammar points as high-priority content for card creation."
+        "question": "What is the purpose of the particle 'wa' (は) in a Japanese sentence?",
+        "answer": "It marks the topic of the sentence."
       }
     ],
     "path": "/flashcards/nihongo-notion",
@@ -17154,16 +17154,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the core benefit of using spaced repetition?",
-        "answer": "It strategically schedules reviews to combat the forgetting curve, optimizing long-term memory retention with minimal effort."
+        "question": "How does AI benefit students using Magoosh study materials?",
+        "answer": "It rapidly converts long-form text or video transcripts into concise, reviewable flashcards."
       },
       {
-        "question": "Name one file type you can upload to generate custom cards.",
-        "answer": "You can upload PDF, DOCX, or PowerPoint files to automatically generate your learning sets."
+        "question": "What is the key to mastering high-stakes exams like the GRE or GMAT?",
+        "answer": "Consistent practice and effective use of active recall and spaced repetition."
       },
       {
-        "question": "What is 'active recall' in the context of study habits?",
-        "answer": "Active recall is the process of intentionally retrieving information from memory without external cues, like answering a flashcard question."
+        "question": "What are Magoosh's primary offerings?",
+        "answer": "Online test prep courses and practice questions for standardized exams."
       }
     ],
     "structuredData": {
@@ -17359,16 +17359,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the core mechanism of Spaced Repetition?",
-        "answer": "It optimizes review intervals, showing difficult items sooner and easy items later, maximizing memory consolidation."
+        "question": "Why do medical students rely heavily on Anki?",
+        "answer": "Its Spaced Repetition System (SRS) is highly effective for memorizing the vast amount of information required."
       },
       {
-        "question": "Define Active Recall in the context of study methods.",
-        "answer": "Active recall is the process of deliberately retrieving information from memory without cues, like answering a question from a flashcard."
+        "question": "What is the primary challenge for medical students using Anki?",
+        "answer": "The time required for manual card creation and maintaining a large card volume."
       },
       {
-        "question": "If I upload a 100-page lecture PDF, what is the output?",
-        "answer": "The output is a set of atomic question-and-answer pairs covering the high-yield concepts present in that document."
+        "question": "What is the \"Zanki\" or \"AnKing\" deck?",
+        "answer": "Large, pre-made Anki decks containing thousands of cards covering the medical school curriculum."
       }
     ],
     "path": "/flashcards/medical-student-anki",
@@ -17568,16 +17568,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary cognitive benefit of flashcards?",
-        "answer": "The primary benefit is facilitating active recall, which strengthens memory traces far more effectively than passive rereading."
+        "question": "What is the main purpose of an online note card?",
+        "answer": "To serve as a digital tool for reviewing key facts using the active recall method."
       },
       {
-        "question": "How does spaced repetition improve long-term memory?",
-        "answer": "It schedules reviews at increasing intervals, testing memory just as it begins to fade, thus optimizing the consolidation process."
+        "question": "How does AI assist in the creation of online note cards?",
+        "answer": "It automatically extracts structured content from uploaded study documents."
       },
       {
-        "question": "What formats are accepted for AI content extraction?",
-        "answer": "The AI accepts PDF, DOCX, and PowerPoint files to create study prompts quickly and accurately."
+        "question": "Why is reviewing note cards online often more efficient than using paper cards?",
+        "answer": "Online systems provide searchability, organization, and often include built-in SRS algorithms."
       }
     ],
     "structuredData": {
@@ -17773,16 +17773,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the core mechanism of Spaced Repetition scheduling?",
-        "answer": "It strategically spaces review sessions based on forgetting curves, prioritizing difficult items for maximum long-term memory encoding."
+        "question": "What is the primary audience for MedStudy materials?",
+        "answer": "Physicians, residents, and medical students preparing for internal medicine or pediatrics board exams."
       },
       {
-        "question": "What key benefit does AI offer over manually creating study cards?",
-        "answer": "The AI drastically reduces the time spent on transcription and structuring, allowing students to focus immediately on the active recall process."
+        "question": "Why are flashcards crucial for MedStudy content review?",
+        "answer": "The sheer volume of material necessitates efficient, high-yield review using active recall."
       },
       {
-        "question": "If I upload a multi-chapter PDF, how are cards separated?",
-        "answer": "The AI analyzes document structure to create distinct decks or logically grouped sets of cards based on section headings and content continuity."
+        "question": "What is a common feature of MedStudy materials?",
+        "answer": "They summarize complex medical topics into focused, board-relevant learning points."
       }
     ],
     "path": "/flashcards/medstudy",
@@ -17982,16 +17982,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "Define the term 'emulsification' in a culinary context.",
-        "answer": "The process of combining two immiscible liquids, like oil and water, into a stable mixture, often using an emulsifying agent."
+        "question": "What is the vocabulary term for the act of chewing food?",
+        "answer": "Mastication."
       },
       {
-        "question": "What is the primary function of amylase in digestion?",
-        "answer": "Amylase is an enzyme that begins the chemical breakdown of complex carbohydrates (starches) into simpler sugars."
+        "question": "What word describes food that tastes sharp",
+        "answer": "sour, or acidic?"
       },
       {
-        "question": "What does the term 'umami' describe regarding taste profiles?",
-        "answer": "Umami describes the savory, meaty taste often associated with glutamates, found naturally in aged cheeses and cured meats."
+        "question": "Tangy or tart.",
+        "answer": "Name a food item that is an excellent source of fiber.,Oats, beans, whole grains, or most vegetables."
       }
     ],
     "path": "/flashcards/food-vocabulary",
@@ -18187,16 +18187,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary input requirement for the AI generator?",
-        "answer": "The primary input required is a readable digital source file, such as a PDF, DOCX, or presentation slide."
+        "question": "What is the primary advantage of making flashcards online versus offline?",
+        "answer": "Accessibility: they can be studied anywhere on any device with an internet connection."
       },
       {
-        "question": "What cognitive principle optimizes the review schedule?",
-        "answer": "The optimized review schedule relies on the Spaced Repetition System (SRS) to schedule reviews based on memory decay."
+        "question": "How does AI ensure speed when making online flashcards?",
+        "answer": "It automates the text extraction and formatting steps, bypassing manual typing."
       },
       {
-        "question": "What sharing method is available for collaboration?",
-        "answer": "Flashcard sets can be shared securely with others using a generated public link for easy distribution."
+        "question": "What is the definition of a 'digital study deck'?",
+        "answer": "A collection of electronically created and managed flashcards used for online learning."
       }
     ],
     "path": "/flashcards/make-online",
@@ -18397,16 +18397,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary purpose of the agency disclosure in a real estate transaction?",
-        "answer": "The primary purpose is to inform all parties in writing about the relationships that exist or may exist between the parties, such as seller's agent or buyer's agent."
+        "question": "What is 'agency' in real estate?",
+        "answer": "The fiduciary relationship between a principal (client) and an agent (broker)."
       },
       {
-        "question": "Define 'adverse material fact' in the context of property disclosure.",
-        "answer": "An adverse material fact is any fact that significantly affects the value or desirability of the property and is known or should be known by the seller or agent."
+        "question": "Define the term 'encumbrance.'",
+        "answer": "A claim, charge, or liability that affects or limits the title to property."
       },
       {
-        "question": "What is the key difference between joint tenancy and tenancy in common ownership?",
-        "answer": "Joint tenancy includes the right of survivorship, meaning the deceased owner's share passes to the surviving owners. Tenancy in common does not."
+        "question": "What is the purpose of a deed?",
+        "answer": "A legal document that officially transfers ownership of real property from one party to another."
       }
     ],
     "structuredData": {
@@ -18602,16 +18602,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What principle dictates when an AI schedules a review?",
-        "answer": "The principle is Spaced Repetition, timing reviews just before memory decay occurs."
+        "question": "What is the primary benefit of creating your own flashcards?",
+        "answer": "The cognitive process of summarizing and phrasing the material reinforces learning."
       },
       {
-        "question": "Which file formats are compatible for direct input?",
-        "answer": "PDF, DOCX, and PPTX files are fully supported for automated content parsing."
+        "question": "How does an AI app assist in making your own flashcards?",
+        "answer": "It uses your uploaded content to instantly suggest questions and answers, speeding up the process."
       },
       {
-        "question": "What benefit does setting an exam date provide users?",
-        "answer": "It dynamically tailors the review cadence to ensure maximal readiness by the target assessment date."
+        "question": "What is the definition of a 'study guide'?",
+        "answer": "A document or tool designed to help organize and review information for an exam or topic."
       }
     ],
     "structuredData": {
@@ -18807,16 +18807,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the Past Simple form of 'to break'?",
-        "answer": "The Past Simple form is 'broke'. The Past Participle is 'broken'."
+        "question": "Give the Past Simple form of the verb 'run.'",
+        "answer": "Ran."
       },
       {
-        "question": "Provide the three forms for the verb 'to fight'.",
-        "answer": "Infinitive: fight. Past Simple: fought. Past Participle: fought."
+        "question": "What are the Past Simple and Past Participle forms of 'begin'?",
+        "answer": "Began, Begun."
       },
       {
-        "question": "What is the Past Simple form of 'to hide'?",
-        "answer": "The Past Simple form is 'hid'. The Past Participle is 'hidden'."
+        "question": "Form a question using an irregular verb in the Past Simple tense.",
+        "answer": "Did you see that movie yesterday?"
       }
     ],
     "path": "/flashcards/past-simple-irregular-verbs",
@@ -19016,16 +19016,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the possessive pronoun form of 'they'?",
-        "answer": "The possessive pronoun form is 'theirs.' This word stands alone and indicates ownership without needing a following noun."
+        "question": "Give three examples of possessive pronouns.",
+        "answer": "Mine, yours, his, hers, ours, theirs (any three)."
       },
       {
-        "question": "When is 'its' used instead of 'it's'?",
-        "answer": "'Its' is the possessive form (e.g., The dog chased its tail). 'It's' is a contraction for 'it is' or 'it has'."
+        "question": "What question does a possessive pronoun answer?",
+        "answer": "Whose is it?"
       },
       {
-        "question": "Identify the possessive pronoun: 'That laptop is mine, not yours.'",
-        "answer": "The possessive pronouns are 'mine' and 'yours.' They stand in place of 'my laptop' and 'your laptop'."
+        "question": "Write a short sentence using the possessive pronoun 'theirs.'",
+        "answer": "That car is theirs."
       }
     ],
     "path": "/flashcards/possessive-pronouns",
@@ -19226,16 +19226,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary goal of spaced repetition scheduling?",
-        "answer": "The goal is to review information right before you are about to forget it, optimizing long-term memory consolidation."
+        "question": "What is the benefit of generating flashcards from a PDF using AI?",
+        "answer": "It instantly converts structured text into Quizlet-ready study sets, saving manual input time."
       },
       {
-        "question": "How does active recall differ from passive review?",
-        "answer": "Active recall forces retrieval of information from memory without cues, while passive review involves rereading or recognition."
+        "question": "Why do students often need to create private study sets?",
+        "answer": "To review copyrighted or specific class materials without sharing them publicly."
       },
       {
-        "question": "What is the key benefit of AI flashcard generation?",
-        "answer": "It eliminates manual note transcription time, allowing focus to shift immediately to quality study sessions."
+        "question": "How does AI ensure accurate information extraction from a document?",
+        "answer": "It uses advanced text recognition to identify headers, terms, and definitions."
       }
     ],
     "path": "/flashcards/quizlet-make-private",
@@ -19436,16 +19436,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the subject personal pronoun for 'the computer'?",
-        "answer": "The subject personal pronoun is 'it'. Subject pronouns replace the noun acting as the sentence subject."
+        "question": "Name the three cases of personal pronouns.",
+        "answer": "Nominative (subject), Objective (object), and Possessive."
       },
       {
-        "question": "What is the object form of the pronoun 'she'?",
-        "answer": "The object form is 'her'. Object pronouns are used when receiving the action of the verb."
+        "question": "Give two examples of first-person plural pronouns.",
+        "answer": "We, us, ours."
       },
       {
-        "question": "How does a possessive pronoun differ from a possessive adjective?",
-        "answer": "Possessive pronouns stand alone (e.g., 'That book is hers'). Possessive adjectives modify a noun (e.g., 'That is her book')."
+        "question": "What is the function of an objective personal pronoun?",
+        "answer": "It receives the action of the verb (e.g., \"Give the book to me\")."
       }
     ],
     "path": "/flashcards/personal-pronouns",
@@ -19645,16 +19645,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary function of spaced repetition scheduling?",
-        "answer": "It optimizes long-term memory by scheduling review intervals just before the user is likely to forget the information."
+        "question": "What is the likely subject matter of \"Power Up 1\" flashcards?",
+        "answer": "It often refers to foundational or introductory material in a specific curriculum (e.g., language or math basics)."
       },
       {
-        "question": "What input file formats does the AI generator support?",
-        "answer": "The system supports PDF, DOCX, and various image files for document processing."
+        "question": "Why are flashcards effective for Power Up 1 content?",
+        "answer": "They target the rapid memorization of foundational vocabulary or basic skills."
       },
       {
-        "question": "How does setting an exam date influence card review?",
-        "answer": "It recalibrates the spaced repetition algorithm to ensure high readiness precisely on the specified target date."
+        "question": "What is the typical age group for a \"Power Up 1\" level curriculum?",
+        "answer": "Often early elementary or beginner language learners."
       }
     ],
     "path": "/flashcards/power-up-1",
@@ -19855,16 +19855,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary mechanism for long-term memory encoding?",
-        "answer": "Active recall, which forces the brain to retrieve information rather than passively re-reading it."
+        "question": "Name two common beverages that contain caffeine.",
+        "answer": "Coffee, tea, and soda (any two)."
       },
       {
-        "question": "Why is spaced repetition superior to cramming?",
-        "answer": "It leverages the 'spacing effect,' reviewing material at optimal intervals just before forgetting occurs."
+        "question": "What is the primary difference between a fruit juice and a smoothie?",
+        "answer": "Juice is extracted liquid; a smoothie is blended whole fruit/vegetables."
       },
       {
-        "question": "What input formats does the AI handle besides PDF?",
-        "answer": "The system also accepts DOCX files, PowerPoint presentations, and image files for text extraction."
+        "question": "What drink is made from fermented grapes?",
+        "answer": "Wine."
       }
     ],
     "path": "/flashcards/food-drinks",
@@ -20064,16 +20064,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the difference between a 30-day month and a 31-day month?",
-        "answer": "February usually has 28 days (29 in a leap year), while months like January and March have 31 days."
+        "question": "How many months have exactly 30 days?",
+        "answer": "Four (April, June, September, November)."
       },
       {
-        "question": "Which month typically marks the start of Q3 in a fiscal year?",
-        "answer": "Quarter 3 (Q3) typically begins in July and includes July, August, and September."
+        "question": "Which month comes before October?",
+        "answer": "September."
       },
       {
-        "question": "What is the primary purpose of knowing sequential month data?",
-        "answer": "It aids in scheduling, historical context, understanding quarterly reporting, and managing timelines efficiently."
+        "question": "Which month is the shortest in terms of days?",
+        "answer": "February."
       }
     ],
     "path": "/flashcards/months",
@@ -20273,16 +20273,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary benefit of converting material via AI vs. manual entry?",
-        "answer": "AI conversion saves significant time by instantly extracting key concepts, allowing more focus on deep learning and spaced review schedules."
+        "question": "Why is using AI a \"smarter\" alternative to manually making Quizlet sets?",
+        "answer": "AI automates the creation of cards, ensuring better quality and much faster setup time."
       },
       {
-        "question": "How does spaced repetition algorithm optimize study time?",
-        "answer": "It schedules reviews based on forgetting curves, ensuring you revisit difficult material precisely when retention is lowest but still recoverable."
+        "question": "What is the main task AI bypasses when creating Quizlet sets?",
+        "answer": "The manual typing and formatting of question/answer pairs from notes."
       },
       {
-        "question": "What file types can the AI successfully process for card creation?",
-        "answer": "The generator handles PDF, DOCX, and PowerPoint files, extracting text content from all these formats for immediate study use."
+        "question": "What is a \"study mode\" on a flashcard platform?",
+        "answer": "A specific way to interact with the cards, such as \"Learn,\" \"Match,\" or \"Test."
       }
     ],
     "path": "/flashcards/quizlet-make",
@@ -20482,16 +20482,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary goal of source material conversion?",
-        "answer": "To efficiently transform static documents into dynamic, actionable learning content suitable for spaced review."
+        "question": "What are the three R's of waste management?",
+        "answer": "Reduce, Reuse, Recycle."
       },
       {
-        "question": "Name one key advantage of AI-generated flashcards over manual ones.",
-        "answer": "AI ensures cards are atomic and optimized for active recall, saving study time lost in manual creation and question formulation."
+        "question": "Name one common material that can be recycled.",
+        "answer": "Paper, plastic, glass, or aluminum."
       },
       {
-        "question": "What cognitive principle drives the scheduling feature?",
-        "answer": "The scheduling uses spaced repetition, which optimizes review intervals to combat the forgetting curve effectively."
+        "question": "What does the recycling symbol (mobius loop) indicate?",
+        "answer": "That the material is capable of being recycled, but not necessarily that it will be."
       }
     ],
     "path": "/flashcards/recycling",
@@ -20692,16 +20692,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary purpose of spaced repetition scheduling?",
-        "answer": "It optimizes review timing by revisiting information just before you are likely to forget it, cementing long-term memory."
+        "question": "What is a 'Picture Card' primarily used for?",
+        "answer": "To connect a visual image with a vocabulary word, concept, or term, aiding non-verbal memory."
       },
       {
-        "question": "What document types are supported for initial input?",
-        "answer": "The tool accepts PDF, DOCX, PowerPoint files, and standard image formats like JPG or PNG for content processing."
+        "question": "How does AI help generate Picture Cards from PDFs?",
+        "answer": "AI extracts the text and uses it to find contextually relevant images or diagrams."
       },
       {
-        "question": "How does sharing study sets work?",
-        "answer": "You can generate a public link that allows anyone to access and use the AI-created flashcard deck instantly."
+        "question": "Why are visual aids essential for early childhood education?",
+        "answer": "They provide concrete examples for abstract concepts and aid in language acquisition."
       }
     ],
     "path": "/flashcards/picture",
@@ -20901,16 +20901,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the spatial relationship described by 'juxtaposed'?",
-        "answer": "Juxtaposed means placed close together or side by side, often for comparison or contrast."
+        "question": "What is a preposition?",
+        "answer": "A word governing a noun or pronoun, expressing a relation to another word (e.g., \"in"
       },
       {
-        "question": "If an object is 'beneath' another, what is its location?",
-        "answer": "Beneath means directly under or lower than the reference object. This contrasts with 'above'."
+        "question": " \"on",
+        "answer": " \"under\")."
       },
       {
-        "question": "How do you visually distinguish between 'among' and 'between'?",
-        "answer": "Between is used for two distinct items, while among is used when relating to three or more items in a group."
+        "question": "Give an example of a common preposition of location.",
+        "answer": "Under, above, beside, or next to.,How do picture cards help teach prepositions?,They visually demonstrate the spatial relationship described by the preposition (e.g., \"the ball is *under* the box\")."
       }
     ],
     "path": "/flashcards/preposition-picture",
@@ -21112,15 +21112,15 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     "embeddedFlashcards": [
       {
         "question": "What is a digraph in phonics?",
-        "answer": "A digraph is a pairing of two letters that represent a single sound, such as 'ph' making the /f/ sound."
+        "answer": "Two letters that combine to make a single sound (e.g., 'sh', 'ch', 'th')."
       },
       {
-        "question": "Name one common consonant digraph and its sound.",
-        "answer": "The digraph 'sh' represents the sound /ʃ/, as heard in the word 'ship'."
+        "question": "Give an example of a word with the 'sh' digraph sound.",
+        "answer": "Ship, wish, brush (Any valid word)."
       },
       {
-        "question": "How does active recall benefit learning digraphs?",
-        "answer": "Active recall forces the brain to retrieve the sound from memory rather than recognizing it passively, cementing the association."
+        "question": "What is the purpose of Fundations sound cards?",
+        "answer": "To provide consistent, structured practice for phoneme-grapheme correspondences in early literacy."
       }
     ],
     "path": "/flashcards/fundations-digraph-sound",
@@ -21321,16 +21321,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What primary distinction separates a phoneme from an allophone?",
-        "answer": "A phoneme is a unit that changes word meaning when substituted, while an allophone is a variation in pronunciation that does not change meaning."
+        "question": "What is a phoneme?",
+        "answer": "The smallest unit of sound that can distinguish one word from another (e.g., /p/ in 'pat')."
       },
       {
-        "question": "What symbol represents the voiceless alveolar lateral approximant in IPA?",
-        "answer": "This sound is represented by the symbol /l/. It is the standard English 'l' sound found in words like 'light'."
+        "question": "How many phonemes are generally recognized in the English language?",
+        "answer": "Around 44, though this varies by dialect."
       },
       {
-        "question": "How does assimilation affect consonant production in connected speech?",
-        "answer": "Assimilation occurs when one sound becomes more like a neighboring sound in terms of place, manner, or voicing."
+        "question": "Give an example of two words that differ by only one phoneme.",
+        "answer": "Cat and Bat (differ by the initial phoneme)."
       }
     ],
     "path": "/flashcards/phoneme",
@@ -21530,16 +21530,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary challenge in analyzing human physical appearance?",
-        "answer": "The challenge lies in distinguishing objective measurable traits from subjective cultural interpretations and biases."
+        "question": "What term describes a person who is short and heavy?",
+        "answer": "Stocky or stout."
       },
       {
-        "question": "Define phenotypic variation in relation to a study set?",
-        "answer": "Phenotypic variation refers to the diversity in observable characteristics within a population, crucial for comparative studies."
+        "question": "Name three characteristics used to describe hair.",
+        "answer": "Color, length, and texture (e.g., straight, curly, wavy)."
       },
       {
-        "question": "Why is context critical when defining physical traits?",
-        "answer": "Context determines the relevance; a trait relevant in genetics may differ significantly from one important in social anthropology."
+        "question": "What is the opposite of 'slender'?",
+        "answer": "Heavy, stout, or plump."
       }
     ],
     "structuredData": {
@@ -21735,16 +21735,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary purpose of Python's 'if __name__ == \"__main__\"'?",
-        "answer": "It ensures that the enclosed code block only executes when the script is run directly, not when imported as a module into another file."
+        "question": "What is the primary use of Python in the tech industry?",
+        "answer": "Web development, data science, automation, and machine learning."
       },
       {
-        "question": "Define the concept of list comprehension in Python.",
-        "answer": "A concise way to create a list based on an existing iterable. It simplifies loop structures used for list creation."
+        "question": "What does 'indentation' signify in Python code?",
+        "answer": "It defines a block of code (like a loop or function body)."
       },
       {
-        "question": "What differentiates a shallow copy from a deep copy in Python?",
-        "answer": "A shallow copy duplicates the object but embeds references to nested objects, whereas a deep copy creates fully independent copies of all nested objects."
+        "question": "What is a 'list' in Python?",
+        "answer": "A mutable, ordered sequence of elements."
       }
     ],
     "structuredData": {
@@ -21941,16 +21941,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary component of Jupiter's atmosphere?",
-        "answer": "Jupiter's atmosphere is primarily composed of hydrogen (about 90%) and helium (about 10%), similar to the Sun."
+        "question": "Name the largest planet in our solar system.",
+        "answer": "Jupiter."
       },
       {
-        "question": "Which terrestrial planet lacks a substantial atmosphere?",
-        "answer": "Mercury is the terrestrial planet with the thinnest atmosphere, often called an exosphere due to its near-vacuum conditions."
+        "question": "Which planet is known as the \"Red Planet\"?",
+        "answer": "Mars."
       },
       {
-        "question": "Define the 'Frost Line' in solar system formation.",
-        "answer": "The frost line is the boundary beyond which volatile compounds like water freeze into solid ice, influencing planet composition."
+        "question": "What is the closest planet to the Sun?",
+        "answer": "Mercury."
       }
     ],
     "structuredData": {
@@ -22146,16 +22146,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary goal of active recall during study?",
-        "answer": "To deliberately retrieve information from memory, strengthening neural pathways related to that knowledge."
+        "question": "How does AI streamline the creation of study games?",
+        "answer": "It instantly generates the foundational question/answer pairs needed for any game mode."
       },
       {
-        "question": "What mechanism optimizes review timing based on forgetting curves?",
-        "answer": "Spaced repetition scheduling uses algorithms to predict when a concept requires review before forgetting occurs."
+        "question": "Why do students prefer game-based study over simple flashcards?",
+        "answer": "Games add an element of fun, competition, and time pressure, enhancing engagement."
       },
       {
-        "question": "How does AI improve flashcard creation efficiency?",
-        "answer": "It automatically converts large source documents into atomic question-answer pairs, eliminating manual transcription time."
+        "question": "What is the function of a 'Quizlet Game Create' feature?",
+        "answer": "It allows users to quickly format their study sets into interactive game formats."
       }
     ],
     "structuredData": {
@@ -22352,16 +22352,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary goal of 'right brain education' theory?",
-        "answer": "The goal is to nurture holistic thinking, creativity, and intuitive learning processes often sidelined by purely rote memorization."
+        "question": "What is the focus of Right Brain Education methods?",
+        "answer": "To stimulate the brain's visual, intuitive, and holistic processing capabilities, often for early learning."
       },
       {
-        "question": "How does active recall benefit complex concept study?",
-        "answer": "It strengthens memory traces by requiring effortful retrieval, which is superior to passively recognizing information from notes."
+        "question": "What type of learning material is commonly used in Right Brain Education?",
+        "answer": "High-speed flashcards (flashing), memory grids, and visual imagery exercises."
       },
       {
-        "question": "What defines a 'spaced repetition interval'?",
-        "answer": "It is the optimized time delay between review sessions calculated to combat the forgetting curve just before recall fails."
+        "question": "Why is high-speed flashing used in this method?",
+        "answer": "To train the brain to absorb information quickly without conscious filtering."
       }
     ],
     "path": "/flashcards/right-brain-education",
@@ -22561,16 +22561,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "Ano ang tawag sa 'Thank you' sa Tagalog?",
-        "answer": "Ang pinakakaraniwang salin ay 'Salamat.' Para sa mas pormal na pagpapahayag, maaari ring gamitin ang 'Maraming salamat.'"
+        "question": "What is the Tagalog word for \"yes\"?",
+        "answer": "Oo."
       },
       {
-        "question": "Ipaliwanag ang konsepto ng 'Asignatura' sa pag-aaral.",
-        "answer": "Ang 'Asignatura' ay tumutukoy sa isang partikular na paksa o asignatura na itinuturo sa paaralan. Ito ay katumbas ng 'Subject' sa Ingles."
+        "question": "How do you say \"good morning\" in Tagalog?",
+        "answer": "Magandang umaga."
       },
       {
-        "question": "Kailan ginagamit ang 'po' at 'opo' sa Tagalog?",
-        "answer": "Ginagamit ang 'po' at 'opo' upang magpakita ng paggalang, lalo na kapag nakikipag-usap sa nakatatanda o may awtoridad."
+        "question": "What is the official name of the Filipino language?",
+        "answer": "Filipino (based on Tagalog)."
       }
     ],
     "path": "/flashcards/tagalog",
@@ -22765,16 +22765,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary temperature danger zone for perishable food?",
-        "answer": "The temperature danger zone is between 41°F and 135°F (5°C and 57°C). Bacteria multiply most rapidly within this range."
+        "question": "What is SmartServe certification for?",
+        "answer": "It is mandatory training in Ontario, Canada, for serving or selling alcohol responsibly."
       },
       {
-        "question": "What is the minimum internal cooking temperature for poultry?",
-        "answer": "Poultry must reach a minimum internal temperature of 165°F (74°C) to ensure all harmful pathogens are destroyed."
+        "question": "Why is using AI flashcards superior to generic SmartServe Quizlet searches?",
+        "answer": "AI ensures the material is high-quality, up-to-date, and specifically focused on the key regulatory concepts."
       },
       {
-        "question": "Define cross-contamination in a food service setting.",
-        "answer": "Cross-contamination occurs when pathogens are transferred from one surface or food item (like raw meat) to ready-to-eat food."
+        "question": "What is a key concept covered in SmartServe training?",
+        "answer": "Recognizing signs of intoxication and understanding legal liabilities."
       }
     ],
     "path": "/flashcards/smartserve-quizlet",
@@ -22975,16 +22975,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary cognitive benefit of spaced repetition?",
-        "answer": "It schedules reviews at increasing intervals, optimizing long-term memory consolidation just before forgetting occurs."
+        "question": "Name three common forms of public transport.",
+        "answer": "Bus, train, subway/metro, taxi (any three)."
       },
       {
-        "question": "How does active recall differ from passive review?",
-        "answer": "Active recall requires the learner to retrieve information without prompts, strengthening neural pathways more than simple rereading."
+        "question": "What is the definition of 'commute'?",
+        "answer": "To travel some distance between one's home and place of work or study on a regular basis."
       },
       {
-        "question": "What key elements should a good AI-generated flashcard target?",
-        "answer": "It should target atomic facts, definitions, or short procedural steps extracted directly from source material."
+        "question": "What method of transport relies on sails or an engine on water?",
+        "answer": "Boat or ship."
       }
     ],
     "path": "/flashcards/transport",
@@ -23186,16 +23186,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary cognitive benefit of flashcards over rereading?",
-        "answer": "Flashcards enforce active recall, forcing the brain to retrieve information, which strengthens memory traces significantly more than passive review."
+        "question": "What makes a word a \"Tricky Word\" in phonics instruction?",
+        "answer": "It contains spelling patterns that do not follow standard phonetic rules (i.e., irregular spellings)."
       },
       {
-        "question": "How does spaced repetition optimize study time?",
-        "answer": "It schedules reviews just before forgetting occurs, minimizing wasted time reviewing already mastered material and focusing effort where it is needed most."
+        "question": "Give an example of a common tricky word.",
+        "answer": "Said, was, the, have (Any word with an irregular sound-spelling link)."
       },
       {
-        "question": "If I upload a complex PDF, what do the AI cards isolate?",
-        "answer": "The AI isolates key definitions, relationships, dates, and complex terminology, structuring them into atomic question/answer pairs suitable for rapid testing."
+        "question": "Why do students need targeted flashcards for tricky words?",
+        "answer": "To practice instant recognition, as decoding them phonetically is difficult or impossible."
       }
     ],
     "path": "/flashcards/tricky",
@@ -23395,16 +23395,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary function of the Urdu letter 'ب' (Be)?",
-        "answer": "The letter 'ب' (Be) generally represents the 'b' sound in English. It is a foundational letter in the Urdu alphabet."
+        "question": "How many letters are typically in the Urdu alphabet (Abjad)?",
+        "answer": "39 letters."
       },
       {
-        "question": "How does active recall aid in memorizing the Urdu script?",
-        "answer": "Active recall forces the brain to retrieve information without prompts, solidifying the connection between the visual form of the Urdu character and its sound/meaning."
+        "question": "What is the main script used to write Urdu?",
+        "answer": "The Perso-Arabic script (Nastaʿlīq style)."
       },
       {
-        "question": "What is the advantage of setting a target date for Urdu review?",
-        "answer": "Setting a date allows the spaced repetition scheduler to work backward, front-loading reviews of difficult characters to ensure mastery precisely by the exam day."
+        "question": "Which direction is Urdu script written?",
+        "answer": "From right to left."
       }
     ],
     "structuredData": {
@@ -23600,16 +23600,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary function of a differential gear in a vehicle drivetrain?",
-        "answer": "It allows the driving wheels to rotate at different speeds while cornering, preventing tire scrub."
+        "question": "Name three types of land vehicles.",
+        "answer": "Car, truck, bicycle, bus, motorcycle (any three)."
       },
       {
-        "question": "Define 'Compression Ratio' in an internal combustion engine.",
-        "answer": "It is the ratio of the volume inside the cylinder with the piston at its lowest point to the volume with the piston at its highest point."
+        "question": "What is the part of a vehicle that holds the fuel?",
+        "answer": "The fuel tank."
       },
       {
-        "question": "What is the function of the ABS modulator in braking systems?",
-        "answer": "It rapidly modulates hydraulic pressure to individual wheel cylinders to prevent wheel lock-up during hard braking."
+        "question": "What term is used for a vehicle used to transport goods?",
+        "answer": "Lorry or truck."
       }
     ],
     "structuredData": {
@@ -23806,16 +23806,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the third-person singular present tense form of 'to run'?",
-        "answer": "The form is 'runs.' This rule applies when the subject is singular (he, she, it) in the simple present tense."
+        "question": "What is the main function of a verb in a sentence?",
+        "answer": "To express an action, occurrence, or state of being."
       },
       {
-        "question": "What is the simple past tense of the irregular verb 'to see'?",
-        "answer": "The simple past tense is 'saw.' This form must be memorized as it does not follow standard '-ed' conjugation rules."
+        "question": "What are the three main types of verbs?",
+        "answer": "Action, Linking, and Helping (Auxiliary) verbs."
       },
       {
-        "question": "How does active recall aid in mastering verb conjugation?",
-        "answer": "Active recall forces retrieval practice, strengthening neural pathways associated with the correct verb form far better than passive review."
+        "question": "Give an example of a linking verb.",
+        "answer": "Be, seem, become, feel (any one)."
       }
     ],
     "structuredData": {
@@ -24011,16 +24011,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What defines the adiabatic lapse rate?",
-        "answer": "It is the rate at which the temperature of an air parcel changes when it moves vertically without exchanging heat with its surroundings."
+        "question": "Name three common types of precipitation.",
+        "answer": "Rain, snow, sleet, hail (any three)."
       },
       {
-        "question": "What atmospheric layer contains the majority of Earth's weather phenomena?",
-        "answer": "The troposphere. This lowest layer experiences convection and is where virtually all clouds and precipitation form."
+        "question": "What instrument is used to measure air temperature?",
+        "answer": "Thermometer."
       },
       {
-        "question": "How does Coriolis effect influence cyclone formation?",
-        "answer": "The Coriolis effect deflects moving air masses, causing them to rotate around low-pressure centers, which is essential for cyclonic structure."
+        "question": "What is a swift",
+        "answer": "localized, violently rotating column of air?,Tornado."
       }
     ],
     "path": "/flashcards/weather",
@@ -24219,16 +24219,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary difference between Alpine and Nordic skiing?",
-        "answer": "Alpine skiing uses fixed-heel bindings and primarily relies on gravity descent, while Nordic skiing uses free-heel bindings for propulsion over flatter terrain."
+        "question": "Name three popular winter sports.",
+        "answer": "Skiing, snowboarding, ice hockey, figure skating (any three)."
       },
       {
-        "question": "Define 'Axel' in the context of figure skating.",
-        "answer": "The Axel is the only major jump initiated with a forward takeoff. It involves 3.5 rotations in the air for a triple Axel."
+        "question": "What piece of equipment is essential for ice skating?",
+        "answer": "Skates."
       },
       {
-        "question": "What is the function of the parabolic sidecut on modern skis?",
-        "answer": "The parabolic shape allows the ski to carve turns at high speeds by naturally banking the ski onto its edge when pressured."
+        "question": "What is the winter sport that involves sliding down a track feet-first on a small sled?",
+        "answer": "Luge or Skeleton."
       }
     ],
     "path": "/flashcards/winter-sports",
@@ -24427,16 +24427,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary function of spaced repetition?",
-        "answer": "It schedules reviews at increasing intervals to strengthen memory traces just before they decay, enhancing long-term retention."
+        "question": "How many seconds are in one minute?",
+        "answer": "Sixty (60)."
       },
       {
-        "question": "What file types are optimized for AI extraction?",
-        "answer": "Text-based formats like PDF and DOCX generally provide the highest fidelity for concept extraction."
+        "question": "What are the two common formats for telling time?",
+        "answer": "12-hour clock (AM/PM) and 24-hour clock (Military time)."
       },
       {
-        "question": "How does setting a deadline influence studying?",
-        "answer": "It allows the learning algorithm to calculate the optimal frequency for card review leading up to that specific date."
+        "question": "What unit of time is equivalent to 60 minutes?",
+        "answer": "One hour."
       }
     ],
     "path": "/flashcards/time",
@@ -24635,16 +24635,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary benefit of spaced repetition scheduling?",
-        "answer": "It optimizes memory retention by increasing review intervals for well-learned information and focusing efforts on weaker concepts."
+        "question": "Why does AI creation of study sets beat manual 'Quizlet Create A Set'?",
+        "answer": "AI performs the extraction, formatting, and typing instantly, maximizing study time."
       },
       {
-        "question": "Name three file types that can be uploaded for instant card generation.",
-        "answer": "PDF, DOCX, and PowerPoint files are supported. Images containing text are also processed effectively."
+        "question": "What is the first step in creating an AI flashcard set?",
+        "answer": "Uploading your source document (PDF, notes, or text)."
       },
       {
-        "question": "How is the paid plan differentiated from the free offering?",
-        "answer": "The paid plan provides access to a more advanced AI model and significantly increases the monthly generation credit allowance."
+        "question": "How does AI improve the quality of a generated study set?",
+        "answer": "It ensures consistent formatting and extracts only the most salient information."
       }
     ],
     "structuredData": {
@@ -24837,16 +24837,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary benefit of active recall over passive reading?",
-        "answer": "Active recall forces retrieval from memory, strengthening neural pathways, whereas passive reading only creates familiarity."
+        "question": "Define the vocabulary word 'malleable.'",
+        "answer": "Capable of being shaped or extended; easily influenced."
       },
       {
-        "question": "How does the Spaced Repetition System (SRS) determine review timing?",
-        "answer": "SRS uses performance data to schedule reviews just before you are likely to forget an item, optimizing long-term memory encoding."
+        "question": "What does the SAT word 'perfunctory' mean?",
+        "answer": "Carried out with a minimum of effort or reflection; superficial."
       },
       {
-        "question": "What is an example of a difficult SAT vocabulary word type?",
-        "answer": "Words requiring nuance, such as 'ephemeral' (lasting for a very short time), often require targeted flashcard practice."
+        "question": "Why is online study often preferred for SAT vocabulary?",
+        "answer": "Online tools allow for instant self-testing and often integrate spaced repetition systems."
       }
     ],
     "path": "/flashcards/sat-vocabulary-online",
@@ -25046,16 +25046,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary benefit of spaced repetition scheduling?",
-        "answer": "It optimizes review timing by presenting material just before it is forgotten, significantly improving long-term memory consolidation."
+        "question": "What is a \"Good Note\" in the context of studying?",
+        "answer": "A high-quality, organized, and thorough set of revision notes."
       },
       {
-        "question": "What key task does the AI automate from source documents?",
-        "answer": "The AI automates the extraction of core concepts and the creation of atomic question-and-answer pairs for studying."
+        "question": "How does AI transform good notes into active study tools?",
+        "answer": "It identifies key terms and converts them into question-answer format."
       },
       {
-        "question": "If I set an exam date, how does the tool adapt?",
-        "answer": "It adjusts the flashcard review frequency to ensure critical topics are reinforced heavily leading up to that specific target date."
+        "question": "Why is note review crucial for exam preparation?",
+        "answer": "It solidifies understanding and transfers information from short-term to long-term memory."
       }
     ],
     "path": "/flashcards/good-notes",
@@ -25255,16 +25255,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary function of Spaced Repetition in learning?",
-        "answer": "It optimizes review timing by presenting material just before forgetting occurs, strengthening long-term memory consolidation."
+        "question": "What is the script used to write the Telugu language?",
+        "answer": "The Telugu script (an Abugida)."
       },
       {
-        "question": "What method optimizes information retrieval from memory?",
-        "answer": "Active recall, which requires effortful retrieval of information without external cues, is superior to passive recognition."
+        "question": "How do you say \"hello\" in Telugu (informal greeting)?",
+        "answer": "Namaskaram or Namaste."
       },
       {
-        "question": "What is a key benefit of AI-generated study materials?",
-        "answer": "It saves significant time by instantly converting static notes into structured, actionable question-answer formats."
+        "question": "What is the name of the most widely spoken language family that Telugu belongs to?",
+        "answer": "Dravidian languages."
       }
     ],
     "path": "/flashcards/telugu",
@@ -25465,16 +25465,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary benefit of spaced repetition scheduling?",
-        "answer": "It optimizes review timing by increasing intervals between successful recall attempts to boost long-term memory consolidation."
+        "question": "What is the main benefit of using a \"Good Note\" for flashcard generation?",
+        "answer": "The content is already structured and well-written, leading to higher-quality AI extraction."
       },
       {
-        "question": "How does AI convert a DOCX file into study material?",
-        "answer": "The AI parses the text structure to identify key concepts, transforming them into atomic question-and-answer pairs suitable for flashcards."
+        "question": "How can a student ensure their notes are \"flashcard-ready\"?",
+        "answer": "By using clear headings, bolding key terms, and writing concise definitions."
       },
       {
-        "question": "What is the core function of active recall in studying?",
-        "answer": "It requires retrieving information from memory without cues, which strengthens neural pathways far more effectively than simple rereading."
+        "question": "What is the ultimate goal when converting notes to flashcards?",
+        "answer": "To transition from passive reading to active, tested recall."
       }
     ],
     "path": "/flashcards/good-note",
@@ -25671,16 +25671,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the core limitation of manually making study sets?",
-        "answer": "The main limitation is the significant time spent on transcription and formatting rather than deep cognitive engagement with the material."
+        "question": "How does AI eliminate the hassle of manually building a Quizlet set?",
+        "answer": "It reads the source document and automatically creates all the individual flashcards."
       },
       {
-        "question": "What cognitive principle optimizes long-term retention in studying?",
-        "answer": "Spaced repetition scheduling, which strategically spaces out review periods to challenge memory retrieval just before forgetting occurs."
+        "question": "What is the main downside of manual set creation?",
+        "answer": "It is time-consuming and tedious, often leading to procrastination."
       },
       {
-        "question": "Name two supported document types for AI generation.",
-        "answer": "PDFs and DOCX files are fully supported. Images containing text (like slides) can also be uploaded for processing."
+        "question": "What study technique does AI-generated material support best?",
+        "answer": "Active Recall and Spaced Repetition."
       }
     ],
     "path": "/flashcards/quizlet-make-set",
@@ -25881,16 +25881,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary benefit of active recall over passive review?",
-        "answer": "Active recall forces retrieval, strengthening memory traces, whereas passive review often leads to familiarity without true mastery."
+        "question": "What is UWorld primarily used for by students?",
+        "answer": "As a high-quality question bank (QBank) for medical licensing exams (USMLE, COMLEX) and other standardized tests."
       },
       {
-        "question": "What mechanism schedules reviews based on forgetting curves?",
-        "answer": "The Spaced Repetition System (SRS) utilizes algorithms that optimize recall by presenting information just before it is likely to be forgotten."
+        "question": "Why are flashcards generated from UWorld text useful?",
+        "answer": "They isolate the high-yield concepts and explanations found within the QBank rationales."
       },
       {
-        "question": "What documents can be uploaded to create study sets?",
-        "answer": "You can upload PDFs, DOCX files, PowerPoints, and various image formats containing your source material for AI processing."
+        "question": "What does 'QBank' stand for?",
+        "answer": "Question Bank."
       }
     ],
     "path": "/flashcards/uworld",
@@ -26091,16 +26091,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary goal of retrieval practice in learning?",
-        "answer": "To strengthen memory traces by actively recalling information from memory, rather than passively rereading material."
+        "question": "What is the main function of a vocab flashcard maker?",
+        "answer": "To quickly and accurately convert a list of words and definitions into a study deck."
       },
       {
-        "question": "How does spaced repetition improve vocabulary retention?",
-        "answer": "It schedules reviews just before knowledge decay, forcing memory retrieval and moving concepts into long-term storage efficiently."
+        "question": "How does AI speed up vocabulary acquisition?",
+        "answer": "By generating study material instantly, allowing more time for actual memorization practice."
       },
       {
-        "question": "What cognitive advantage does 'active recall' offer?",
-        "answer": "It forces the brain to work harder to find the answer, making the resulting memory connection significantly stronger and more durable."
+        "question": "What feature makes an AI vocab maker 'smart'?",
+        "answer": "Its ability to automatically extract definitions from context or link to online dictionaries."
       }
     ],
     "structuredData": {
@@ -26298,16 +26298,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary benefit of converting notes to Q&A format?",
-        "answer": "It forces active recall, which is significantly more effective for long-term memory than passive rereading."
+        "question": "What is the AI alternative to manually creating your own Quizlet flashcards?",
+        "answer": "Uploading a document and letting the AI extract the Q&A pairs instantly."
       },
       {
-        "question": "How does inputting an exam date optimize studying?",
-        "answer": "It allows the spaced repetition algorithm to calculate the ideal review interval to ensure peak performance on that specific day."
+        "question": "Why is it better to use AI for creation than the standard Quizlet tools?",
+        "answer": "AI handles large volumes of text much faster, minimizing manual labor."
       },
       {
-        "question": "What types of source files are compatible with the generator?",
-        "answer": "The tool accepts PDFs, DOCX files, and image formats containing your study material."
+        "question": "What is the benefit of making your own study material",
+        "answer": "even with AI?,It ensures the content is precisely tailored to your specific course or exam."
       }
     ],
     "path": "/flashcards/quizlet-create",
@@ -26508,16 +26508,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary cognitive benefit of active recall?",
-        "answer": "It strengthens memory traces by forcing retrieval effort, improving the ability to recall information later under pressure."
+        "question": "How do you initiate the process of making vocabulary flashcards with AI?",
+        "answer": "Upload a document (PDF, notes) containing the words you need to learn."
       },
       {
-        "question": "Define Spaced Repetition scheduling in memory science.",
-        "answer": "It is a technique that schedules reviews at increasing intervals, targeting the moment just before forgetting occurs for optimal retention."
+        "question": "Why is context important when making vocabulary cards?",
+        "answer": "Context helps you understand *how* to use the word, not just its definition."
       },
       {
-        "question": "Why is manual flashcard creation inefficient?",
-        "answer": "It consumes significant time that could be spent on higher-level comprehension or utilizing spaced review cycles."
+        "question": "What is the key metric for effective vocabulary study?",
+        "answer": "Retention rate, measured by successful recall during testing."
       }
     ],
     "path": "/flashcards/make-vocabulary",
@@ -26717,16 +26717,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What key benefit does active recall provide over passive reading?",
-        "answer": "Active recall forces retrieval effort, strengthening neural pathways, whereas passive reading creates only the illusion of competence."
+        "question": "What is the primary benefit of an AI Online Flashcard Maker?",
+        "answer": "It is accessible from any device, anytime, with no software installation required."
       },
       {
-        "question": "How does the AI integrate spaced repetition scheduling?",
-        "answer": "It schedules reviews based on how well you answer, prompting review just before you are likely to forget the material for optimal encoding."
+        "question": "How does AI generate study decks from raw material?",
+        "answer": "It identifies text structure, separates terms from definitions, and formats them into cards."
       },
       {
-        "question": "What common source documents are supported for card generation?",
-        "answer": "The tool supports PDF, DOCX, and image files, digitizing content from lectures, textbooks, and presentation slides."
+        "question": "What is a \"study deck\" in this context?",
+        "answer": "A digital collection of flashcards focused on a single topic or exam."
       }
     ],
     "path": "/flashcards/online-maker",
@@ -26926,16 +26926,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary vessel for the portal vein system?",
-        "answer": "The superior mesenteric vein (SMV) and splenic vein commonly unite behind the pancreas to form the portal vein."
+        "question": "What does ARDMS stand for in medical imaging?",
+        "answer": "American Registry for Diagnostic Medical Sonography."
       },
       {
-        "question": "What sonographic findings define a classic Gallstone Ileus?",
-        "answer": "It involves signs of mechanical obstruction plus visualization of air in the biliary tree (pneumobilia) and the stone in the bowel lumen."
+        "question": "What is the key to passing the ARDMS Abdomen exam?",
+        "answer": "Mastering the anatomy, physiology, and pathology of the abdominal organs."
       },
       {
-        "question": "Name the two layers of the renal capsule.",
-        "answer": "The renal capsule consists of a tough outer fibrous layer and a thinner, smoother inner layer."
+        "question": "Name one organ typically imaged during an ARDMS Abdomen exam.",
+        "answer": "Liver, gallbladder, kidneys, spleen, pancreas (any one)."
       }
     ],
     "path": "/flashcards/ardms-abdomen-quizlet",
@@ -27135,16 +27135,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary benefit of using AI for flashcard creation?",
-        "answer": "It eliminates the time-consuming manual transcription of notes, allowing immediate focus on active recall and study scheduling."
+        "question": "What is the main advantage of an AI online flashcard creator?",
+        "answer": "The speed of converting dense documents into structured, reviewable study material."
       },
       {
-        "question": "Name two file types accepted by this flashcard generator.",
-        "answer": "The tool accepts PDF documents and Microsoft Word (DOCX) files for automated content extraction."
+        "question": "What is 'Active Recall'?",
+        "answer": "A study method where you force your memory to retrieve information rather than passively reviewing it."
       },
       {
-        "question": "How does setting an exam date improve study efficacy?",
-        "answer": "The system adjusts the spaced repetition schedule to ensure critical topics are reviewed just before your designated examination date."
+        "question": "How does the creator help serious students?",
+        "answer": "It maximizes study efficiency by automating the most time-consuming step: card creation."
       }
     ],
     "path": "/flashcards/online-creator",
@@ -27340,16 +27340,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What key cognitive benefit is active recall over passive reading?",
-        "answer": "Active recall strengthens neural pathways by forcing retrieval, leading to better memory consolidation than simple recognition."
+        "question": "What input formats can a modern AI flashcard maker process?",
+        "answer": "PDF, DOCX, simple text, or handwritten notes (via OCR)."
       },
       {
-        "question": "What is the function of a spaced repetition algorithm?",
-        "answer": "It optimizes study sessions by scheduling reviews at increasing intervals, targeting the 'forgetting curve' precisely."
+        "question": "What is the 'Ultimate' benefit of an AI maker for complex material?",
+        "answer": "It identifies and isolates the most critical terms and concepts from dense, long documents."
       },
       {
-        "question": "Name three file types directly convertible into study cards.",
-        "answer": "PDFs, DOCX documents, and Microsoft PowerPoint (PPTX) files are all supported for automated content extraction."
+        "question": "What is the goal of converting documents to study cards?",
+        "answer": "To transform passive reading material into an active testing tool."
       }
     ],
     "structuredData": {
@@ -27546,16 +27546,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the core benefit of using AI for card creation?",
-        "answer": "It drastically reduces the time spent transcribing and formatting study material, allowing more time for actual retrieval practice."
+        "question": "How does the AI Flashcard Creator save students time?",
+        "answer": "By instantly reading and structuring notes into question-answer format."
       },
       {
-        "question": "Which file formats does the creator efficiently process?",
-        "answer": "It handles PDF, DOCX, and PowerPoint files, converting static content into dynamic, actionable study prompts."
+        "question": "What makes an AI Creator the \"fastest\" option?",
+        "answer": "Its ability to process hundreds of pages in seconds."
       },
       {
-        "question": "How does scheduling help long-term memory retention?",
-        "answer": "It strategically spaces out reviews so you revisit challenging concepts right before forgetting them, strengthening the neural trace."
+        "question": "What is the primary output of the AI Creator?",
+        "answer": "A digital study deck ready for immediate active recall practice."
       }
     ],
     "structuredData": {
@@ -27750,16 +27750,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary goal of implementing spaced repetition?",
-        "answer": "The primary goal is to schedule reviews just before the information is likely to be forgotten, maximizing long-term retention efficiency."
+        "question": "What criterion makes an AI tool the 'Best Flashcard Maker App'?",
+        "answer": "Accuracy of extraction, speed of generation, and integration with effective study techniques (SRS)."
       },
       {
-        "question": "What document formats can be uploaded for card creation?",
-        "answer": "You can upload PDFs, DOCX files, PowerPoint presentations, and various image formats containing your study material."
+        "question": "How does AI enhance the study process beyond just creation?",
+        "answer": "By organizing the material and often suggesting review schedules based on Spaced Repetition."
       },
       {
-        "question": "How does the AI enhance the study workflow?",
-        "answer": "It automates the manual, time-consuming task of converting source text into atomic Q&A pairs for practice."
+        "question": "Why is an app better than a website for some students?",
+        "answer": "An app often provides better offline access and native mobile features."
       }
     ],
     "path": "/flashcards/best-maker",
@@ -27960,16 +27960,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What learning principle leverages timing intervals for memory?",
-        "answer": "Spaced repetition scheduling, which strategically reviews information just before forgetting occurs to strengthen memory traces."
+        "question": "What is the fundamental role of an AI Flashcard Generator?",
+        "answer": "To use machine learning to extract and format key information from source documents."
       },
       {
-        "question": "What is the benefit of inputting an exam date?",
-        "answer": "It allows the system to pace your review load backward from the deadline, ensuring all critical material is covered adequately."
+        "question": "What type of input is ideal for a fast AI generator?",
+        "answer": "Structured text like notes or textbooks with clear headings and definitions."
       },
       {
-        "question": "What is the primary goal of active recall in studying?",
-        "answer": "To force the brain to retrieve information without cues, which builds stronger, more accessible neural pathways than passive rereading."
+        "question": "How does an intelligent generator handle complex materials?",
+        "answer": "It focuses on definitional sentences and bolded terms to create concise Q&A pairs."
       }
     ],
     "path": "/flashcards/generator",
@@ -28170,16 +28170,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What cognitive principle leverages timed re-exposure to information?",
-        "answer": "This is known as Spaced Repetition Scheduling (SRS). It strategically schedules reviews right before you are likely to forget the material."
+        "question": "Name the 12 months of the year in order.",
+        "answer": "January, February, March, April, May, June, July, August, September, October, November, December."
       },
       {
-        "question": "What is the primary benefit of active recall over rereading notes?",
-        "answer": "Active recall forces brain retrieval, strengthening neural pathways, which leads to better long-term retention than passive recognition."
+        "question": "How many days does the month of June have?",
+        "answer": "Thirty (30)."
       },
       {
-        "question": "If an exam is in 30 days, how might the AI adjust review frequency?",
-        "answer": "The AI will increase the review frequency significantly for challenging cards as the 30-day deadline approaches to ensure mastery."
+        "question": "Which month is the mid-point of the calendar year?",
+        "answer": "July."
       }
     ],
     "path": "/flashcards/months-year",
@@ -28380,16 +28380,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary benefit of converting notes to Q&A format?",
-        "answer": "It forces active recall, which strengthens memory traces far more effectively than passive review of original notes."
+        "question": "What is the difference between study notes and flashcards?",
+        "answer": "Notes are comprehensive summaries; flashcards are atomic, testable units of information."
       },
       {
-        "question": "Which file formats can the AI process for card generation?",
-        "answer": "The system handles PDF, DOCX, PPTX, and standard image files containing readable text."
+        "question": "How does AI transform study notes into effective learning tools?",
+        "answer": "By segmenting the notes and reformulating the content into questions and answers."
       },
       {
-        "question": "How does setting an exam date impact study strategy?",
-        "answer": "It calibrates the spaced repetition algorithm to intensify reviews as the deadline approaches, ensuring optimal readiness."
+        "question": "What is the benefit of generating flashcards instantly from notes?",
+        "answer": "It allows immediate testing of the material while the concepts are still fresh."
       }
     ],
     "path": "/flashcards/study-notes",
@@ -28589,16 +28589,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary purpose of the Incident Command System (ICS)?",
-        "answer": "To provide a standardized management framework for organizing, placing, and directing resources during incidents."
+        "question": "What does ICS stand for in FEMA training?",
+        "answer": "Incident Command System."
       },
       {
-        "question": "What five management functions must ICS include?",
-        "answer": "Command, Operations, Planning, Logistics, and Finance/Administration."
+        "question": "What is the purpose of ICS 200?",
+        "answer": "To provide training for personnel who may be required to function in a supervisory role within the ICS structure."
       },
       {
-        "question": "In ICS structure, who reports directly to the Incident Commander?",
-        "answer": "Section Chiefs (Operations, Planning, Logistics, Finance/Admin) and the Command Staff (Safety, Liaison, Information Officers)."
+        "question": "Name one key component of the ICS organizational structure.",
+        "answer": "Command Staff, General Staff, or Incident Commander."
       }
     ],
     "path": "/flashcards/fema-ics-200-quizlet",
@@ -28799,16 +28799,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary cognitive benefit of spaced repetition?",
-        "answer": "It leverages the spacing effect to move information from short-term to long-term memory optimally, countering the natural forgetting curve."
+        "question": "What is the 'beginning sound' of a word?",
+        "answer": "The first phoneme or sound heard when saying the word (e.g., /b/ in 'ball')."
       },
       {
-        "question": "Name three file types usable for AI flashcard generation.",
-        "answer": "PDFs, DOCX files (Word), and PowerPoint files (PPTX) are all supported for automated content extraction."
+        "question": "How do picture flashcards aid in learning beginning sounds?",
+        "answer": "The picture provides a concrete visual cue for the word, isolating the initial sound."
       },
       {
-        "question": "What is the goal of 'active recall' during study?",
-        "answer": "The goal is to force the brain to retrieve information without prompts, strengthening neural pathways associated with that knowledge."
+        "question": "Give a word that begins with the sound /m/.",
+        "answer": "Mouse, map, milk (Any valid word)."
       }
     ],
     "path": "/flashcards/beginning-sound-picture",
@@ -29008,16 +29008,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the definition of 'in-service inspection' under API 570?",
-        "answer": "In-service inspection refers to inspections, tests, and examinations conducted on equipment while it is in active operational service."
+        "question": "What is the scope of API 570 in the petrochemical industry?",
+        "answer": "Inspection, repair, alteration, and re-rating of in-service piping systems."
       },
       {
-        "question": "What is the primary function of the API 570 code?",
-        "answer": "It provides minimum requirements for the in-service inspection, repair, alteration, and rerating activities for hydrocarbon processing piping systems."
+        "question": "What qualification is required to perform API 570 inspections?",
+        "answer": "Certified Piping Inspector."
       },
       {
-        "question": "How does API 570 relate to ASME B31.3?",
-        "answer": "API 570 sets inspection requirements for piping designed per the ASME B31.3 Process Piping Code, supplementing its requirements."
+        "question": "What is the primary concern addressed by API 570 inspections?",
+        "answer": "Ensuring the mechanical integrity and continued safe operation of the piping."
       }
     ],
     "path": "/flashcards/api-570",
@@ -29218,16 +29218,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What biological classification level comes directly after 'Order'?",
-        "answer": "The classification level immediately following Order is Family. This hierarchical system aids in systematic study."
+        "question": "Name three animals commonly found in a zoo.",
+        "answer": "Lion, tiger, elephant, giraffe (any three)."
       },
       {
-        "question": "Name one key adaptation that separates placental mammals from marsupials.",
-        "answer": "The primary difference is gestation: placental mammals develop internally via a placenta, while marsupials have a brief gestation followed by pouch development."
+        "question": "What is a zoo?",
+        "answer": "An establishment that maintains a collection of wild animals, typically in a park or gardens, for study, conservation, or public exhibition."
       },
       {
-        "question": "What defines an endemic species in a zoological context?",
-        "answer": "An endemic species is one that is naturally and exclusively found within a specific, restricted geographic area or habitat."
+        "question": "What is the term for a baby kangaroo?",
+        "answer": "Joey."
       }
     ],
     "structuredData": {
@@ -29423,16 +29423,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the maximum safe holding temperature for hot TCS food?",
-        "answer": "TCS (Time/Temperature Control for Safety) food must be held hot at 135°F (57°C) or higher. This prevents pathogenic bacteria from growing rapidly in the Danger Zone."
+        "question": "What is the 'Danger Zone' temperature range for food safety?",
+        "answer": "41°F to 135°F (5°C to 57°C)."
       },
       {
-        "question": "Define the primary danger zone for bacterial growth in food?",
-        "answer": "The food safety danger zone ranges from 41°F (5°C) to 135°F (57°C). Time spent in this range must be minimized to prevent illness."
+        "question": "What is the primary purpose of ServSafe certification?",
+        "answer": "To train food handlers and managers on safe food practices to prevent foodborne illness."
       },
       {
-        "question": "What is the correct handwashing procedure for food handlers?",
-        "answer": "Wash hands for at least 20 seconds with warm water and soap, scrub thoroughly, rinse, and dry with a single-use paper towel or air dryer."
+        "question": "What does 'TCS food' stand for?",
+        "answer": "Time/Temperature Control for Safety food."
       }
     ],
     "path": "/flashcards/servsafe-7th-edition-quizlet",
@@ -29633,16 +29633,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary goal of the ServiceNow Incident Management process?",
-        "answer": "To restore normal service operation as quickly as possible and minimize adverse impacts on business operations."
+        "question": "What does ITSM stand for in the context of ServiceNow?",
+        "answer": "IT Service Management."
       },
       {
-        "question": "In ITSM, what is the relationship between a Problem and an Incident?",
-        "answer": "A Problem is the underlying cause of one or more Incidents. Identifying and resolving the Problem prevents future related Incidents."
+        "question": "What is the core function of ServiceNow?",
+        "answer": "A cloud-based platform for managing IT infrastructure and business processes via digital workflows."
       },
       {
-        "question": "What activity is central to Change Management success in ServiceNow?",
-        "answer": "Assessing the risk and impact of a proposed change before authorization to minimize service disruption."
+        "question": "Name one key process within ITSM.",
+        "answer": "Incident Management, Problem Management, or Change Management."
       }
     ],
     "path": "/flashcards/servicenow-cis-itsm-quizlet",
@@ -29839,16 +29839,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary goal of spaced repetition scheduling?",
-        "answer": "The primary goal is to maximize long-term memory retention by reviewing information just as you are about to forget it."
+        "question": "What is the script used to write the Tamil language?",
+        "answer": "Tamil script."
       },
       {
-        "question": "Why is active recall preferred over passive review?",
-        "answer": "Active recall forces the brain to retrieve information, strengthening neural pathways far more effectively than simply re-reading notes."
+        "question": "How do you say \"hello\" in Tamil?",
+        "answer": "Vanakkam (வணக்கம்)."
       },
       {
-        "question": "What formats can be uploaded to generate study aids?",
-        "answer": "The tool supports PDF, DOCX, PowerPoint files, and various image formats containing text content."
+        "question": "What is the term for the vast literary tradition of the Tamil language?",
+        "answer": "Sangam literature."
       }
     ],
     "path": "/flashcards/tamil",
@@ -30044,16 +30044,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary role of a teacher in a communicative classroom?",
-        "answer": "The teacher acts primarily as a facilitator, setting up tasks and guiding interaction rather than dominating speech time."
+        "question": "What does TEFL stand for?",
+        "answer": "Teaching English as a Foreign Language."
       },
       {
-        "question": "Differentiate between form and meaning in language teaching.",
-        "answer": "Form refers to the structure (grammar, syntax), while meaning refers to the semantic content conveyed by the language used."
+        "question": "What is the main difference between TEFL and TESOL?",
+        "answer": "TEFL focuses on teaching non-native speakers in non-English speaking countries; TESOL is broader."
       },
       {
-        "question": "Name two common phonetic symbols for the English /th/ sounds.",
-        "answer": "The voiced sound is /ð/ (as in 'this') and the unvoiced sound is /θ/ (as in 'thing')."
+        "question": "What is 'TPR' (Total Physical Response) in language teaching?",
+        "answer": "A method where students respond physically to verbal commands to aid comprehension."
       }
     ],
     "path": "/flashcards/tefl",
@@ -30253,16 +30253,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary benefit of converting PDFs to flashcards?",
-        "answer": "It transforms passive reading material into an active recall exercise, forcing your brain to retrieve information rather than just recognizing it."
+        "question": "How does AI help users who previously relied on manual Quizlet creation?",
+        "answer": "It automates the process of turning PDFs into ready-to-study flashcards."
       },
       {
-        "question": "What learning science principle optimizes flashcard review timing?",
-        "answer": "Spaced repetition scheduling optimizes review intervals, showing difficult items more often to solidify memory encoding."
+        "question": "Why is manual flashcard making from PDFs inefficient?",
+        "answer": "It requires tedious copying, pasting, and formatting of text."
       },
       {
-        "question": "How can I share my AI-generated study deck?",
-        "answer": "You can share your complete deck with collaborators by generating and distributing a unique, public link."
+        "question": "What is the benefit of generating study sets directly from course materials?",
+        "answer": "The flashcards are guaranteed to be relevant to the specific exam or curriculum."
       }
     ],
     "path": "/flashcards/quizlet",
@@ -30463,16 +30463,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary benefit of AI card generation over manual creation?",
-        "answer": "It saves immense time and ensures higher fidelity between source material and review prompts, enabling pure focus on active recall."
+        "question": "What common feature do flashcard sites like Quizlet share?",
+        "answer": "They offer digital tools for creating, studying, and sharing user-generated flashcard sets."
       },
       {
-        "question": "What memory technique is central to optimized study schedules?",
-        "answer": "Spaced repetition scheduling prompts review intervals just as memory begins to fade, maximizing long-term retention."
+        "question": "Why are AI flashcard sites considered an upgrade from traditional platforms?",
+        "answer": "They automate the card creation process, saving significant time over manual entry."
       },
       {
-        "question": "If I upload a PDF, what is the resulting study unit?",
-        "answer": "The AI extracts key concepts and generates atomic Question/Answer flashcards ready for immediate spaced repetition review sessions."
+        "question": "What is the main disadvantage of relying solely on user-generated content (like on Quizlet)?_?",
+        "answer": "The content quality and accuracy can be highly inconsistent."
       }
     ],
     "path": "/flashcards/sites-like-quizlet",
@@ -30672,16 +30672,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary benefit of converting documents to flashcards?",
-        "answer": "It automates the shift from passive reading to active recall practice, significantly enhancing long-term memory retention."
+        "question": "What is Canva primarily used for?",
+        "answer": "Graphic design, creating visual content, and document layout."
       },
       {
-        "question": "What input formats does the AI ingestion process support?",
-        "answer": "The system supports common formats like PDF, DOCX, and PowerPoint presentations (PPTX) for material extraction."
+        "question": "How does an AI Canva Flashcards Maker function?",
+        "answer": "It extracts content from a document and uses Canva's design tools to create visually appealing flashcards."
       },
       {
-        "question": "How does an exam date selection aid studying?",
-        "answer": "It customizes the spaced repetition schedule backwards from your exam date, ensuring peak readiness at the time of testing."
+        "question": "Why would a student use Canva for flashcards?",
+        "answer": "To make the study material more engaging and visually memorable."
       }
     ],
     "structuredData": {
@@ -30877,16 +30877,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary benefit of converting notes using AI?",
-        "answer": "It drastically reduces manual formatting time, allowing immediate engagement with active recall practice."
+        "question": "What is Evernote primarily used for?",
+        "answer": "Digital note-taking, clipping web pages, and organizing research materials across devices."
       },
       {
-        "question": "How do you ensure long-term retention of material?",
-        "answer": "Through automatically applied spaced repetition scheduling based on personalized recall performance."
+        "question": "How can AI convert Evernote notes into flashcards?",
+        "answer": "It analyzes the note's structure, extracts key points, and reformats them into Q&A pairs."
       },
       {
-        "question": "What must a user do to start studying from uploaded material?",
-        "answer": "Upload the source document (like a PDF or image) and let the AI analyze it to build the initial flashcard deck."
+        "question": "What is the benefit of synchronizing study sets with Evernote?",
+        "answer": "It keeps study materials organized alongside original research notes."
       }
     ],
     "structuredData": {
@@ -31083,16 +31083,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the core process for vocabulary acquisition?",
-        "answer": "Vocabulary acquisition involves encoding new words into long-term memory through repeated exposure and meaningful context."
+        "question": "What is a vocabulary flash card?",
+        "answer": "A card with a word on one side and its definition, usage, or translation on the other."
       },
       {
-        "question": "Why use AI instead of manual flashcard creation?",
-        "answer": "AI saves significant preparation time by instantly extracting and formatting terms, allowing immediate focus on active recall practice."
+        "question": "Why is the use of flash cards effective for vocabulary mastery?",
+        "answer": "They facilitate rapid testing and active recall of definitions."
       },
       {
-        "question": "What is the benefit of scheduling reviews by exam date?",
-        "answer": "Scheduling ensures review intensity peaks just before the deadline, optimizing learning effort for high-stakes performance when it matters most."
+        "question": "What is a synonym for 'ambiguous'?",
+        "answer": "Vague, unclear, or open to multiple interpretations."
       }
     ],
     "structuredData": {
@@ -31289,16 +31289,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary benefit of document-based flashcard creation?",
-        "answer": "It eliminates manual data entry, saving significant study preparation time while ensuring high material relevance directly from source content."
+        "question": "What is the primary function of an AI Flashcard Test Maker?",
+        "answer": "To generate questions and answer options directly from study materials, often including multiple-choice."
       },
       {
-        "question": "How does spacing affect memory retention?",
-        "answer": "Spacing reviews at increasing intervals exploits the testing effect, moving knowledge from short-term to durable, long-term memory stores."
+        "question": "How does the AI Test Maker 'learn' with the student?",
+        "answer": "It tracks performance and focuses review on frequently missed or difficult concepts."
       },
       {
-        "question": "What input formats does the AI recognize?",
-        "answer": "The system accepts PDFs, DOCX, PowerPoint presentations, and various image file types for source material ingestion."
+        "question": "What is the benefit of generating a multiple-choice test from flashcards?",
+        "answer": "It simulates exam conditions, testing recognition as well as recall."
       }
     ],
     "path": "/flashcards/test-maker",
@@ -31498,16 +31498,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary benefit of using AI for flashcard creation?",
-        "answer": "The primary benefit is saving preparation time by automatically extracting and structuring key concepts from source documents."
+        "question": "Why is AI faster than manually using \"Quizlet Create Study Set\"?",
+        "answer": "AI automatically extracts and formats the data from the source document (PDF, notes)."
       },
       {
-        "question": "What cognitive principle optimizes review timing?",
-        "answer": "Spaced repetition scheduling, which strategically spaces out review sessions based on memory decay curves."
+        "question": "What is a \"Study Set\"?",
+        "answer": "A collection of related flashcards, often used interchangeably with \"deck."
       },
       {
-        "question": "Name two file types compatible with the document uploader.",
-        "answer": "PDF and DOCX files are fully supported inputs for immediate flashcard generation."
+        "question": "How does AI help students master material more efficiently?",
+        "answer": "By shifting their time investment from manual creation to active testing and review."
       }
     ],
     "path": "/flashcards/create-study-set-quizlet",
@@ -31707,16 +31707,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary function of a circuit breaker in residential wiring?",
-        "answer": "It automatically interrupts electrical flow when an overload or short circuit occurs, preventing wiring damage and fire hazards."
+        "question": "Name three common items found in a kitchen.",
+        "answer": "Refrigerator, stove, microwave, dishes, utensils (any three)."
       },
       {
-        "question": "What is the typical purpose of bleach (sodium hypochlorite) in cleaning?",
-        "answer": "It acts as a strong disinfectant and oxidizing agent to kill bacteria and remove stubborn stains."
+        "question": "What household item is used to clean floors by sucking up dirt?",
+        "answer": "Vacuum cleaner."
       },
       {
-        "question": "What type of substance is baking soda commonly used for (chemical identity)?",
-        "answer": "Baking soda is chemically sodium bicarbonate (NaHCO3), often used as a mild alkali or leavening agent."
+        "question": "What is the term for the large container used for washing clothes?",
+        "answer": "Washing machine."
       }
     ],
     "structuredData": {
@@ -31912,16 +31912,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary benefit of AI vs manual flashcard creation?",
-        "answer": "AI saves significant time by automating content extraction, allowing immediate focus on active recall practice."
+        "question": "What core process does AI automate when answering \"Quizlet how to make flashcards\"?",
+        "answer": "The manual transcription of notes into individual card prompts and definitions."
       },
       {
-        "question": "What cognitive principle optimizes long-term retention?",
-        "answer": "Spaced repetition scheduling ensures you review information just before you are likely to forget it, strengthening memory traces."
+        "question": "Why do students seek methods to make flashcards faster?",
+        "answer": "To reduce the setup time for large, content-heavy exams."
       },
       {
-        "question": "How does setting an exam date influence the study schedule?",
-        "answer": "The system reverse-paces reviews, compressing the frequency of less mastered items as the target date approaches."
+        "question": "What is a benefit of having endless study sets instantly?",
+        "answer": "It allows for targeted practice on every single topic within a document."
       }
     ],
     "path": "/flashcards/quizlet-how-make",
@@ -32122,16 +32122,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary benefit of AI-generated flashcards?",
-        "answer": "The primary benefit is eliminating manual creation time, allowing focus on comprehension and spaced repetition scheduling."
+        "question": "Why are AI flashcards considered essential for modern students?",
+        "answer": "They align with active recall and spaced repetition, the most effective study methods."
       },
       {
-        "question": "Which document formats can students upload for processing?",
-        "answer": "Students can upload PDFs, DOCX files, and various image formats containing lecture notes or textbook content."
+        "question": "What is the main goal of using a flashcard app for students?",
+        "answer": "To maximize learning efficiency and achieve mastery of complex subjects."
       },
       {
-        "question": "How does the app support exam preparation deadlines?",
-        "answer": "By setting a specific exam date, the system tailors the review cadence to ensure crucial topics are mastered right before the test."
+        "question": "How does AI help students manage vast amounts of material?",
+        "answer": "By breaking down large documents into manageable, bite-sized study units."
       }
     ],
     "structuredData": {
@@ -32328,16 +32328,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the core benefit of spaced repetition scheduling?",
-        "answer": "It optimizes review timing by revisiting information just as you are about to forget it, cementing long-term memory."
+        "question": "Define the Magoosh GRE word 'gregarious.'",
+        "answer": "Sociable, fond of company."
       },
       {
-        "question": "How does AI improve GRE vocabulary study efficiency?",
-        "answer": "It automates the tedious conversion of static material (like PDFs) into active, adaptive learning tools."
+        "question": "What does the GRE word 'voluminous' mean?",
+        "answer": "Occupying or containing much space; large in volume."
       },
       {
-        "question": "What is 'active recall' in the context of flashcards?",
-        "answer": "It requires retrieving information from memory without cues, which is superior to passive rereading for knowledge retention."
+        "question": "Why is active recall vital for GRE vocabulary success?",
+        "answer": "It ensures the student can instantly retrieve the definition, which is necessary for the exam's rapid pace."
       }
     ],
     "path": "/flashcards/magoosh-gre-vocabulary",
@@ -32537,16 +32537,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary benefit of AI over manual flashcard creation?",
-        "answer": "The primary benefit is the instantaneous conversion of entire documents, saving significant time otherwise spent on manual transcription and formulation."
+        "question": "What is the primary function of a flashcards generator 'by Chegg' or similar platforms?",
+        "answer": "To provide automated study tools that simplify the conversion of class material into review sets."
       },
       {
-        "question": "How does the app use spaced repetition scheduling?",
-        "answer": "It automatically tracks your performance on each card and strategically revisits difficult material just before you are likely to forget it."
+        "question": "How does AI improve the quality of generated flashcards?",
+        "answer": "It uses natural language processing to create clear, concise question/answer pairings."
       },
       {
-        "question": "What information is used to set the review schedule priority?",
-        "answer": "Priorities are set based on your self-reported performance and any target exam date you input into the system."
+        "question": "What is the main benefit of using a generator over manual note-taking?",
+        "answer": "It shifts the focus from passively recording information to actively mastering it."
       }
     ],
     "path": "/flashcards/by-chegg",
@@ -32744,16 +32744,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What cognitive benefit does active recall offer over passive review?",
-        "answer": "Active recall forces retrieval practice, strengthening neural pathways far more effectively than simply rereading notes, leading to superior long-term retention."
+        "question": "What is AI Note Recognition?",
+        "answer": "The technology used to read and process text, including handwritten or poorly formatted notes, for digital use."
       },
       {
-        "question": "What is the core purpose of spaced repetition scheduling?",
-        "answer": "It strategically spaces out review sessions just before memory decay occurs, maximizing memory consolidation with minimal total study time."
+        "question": "How does AI Note Recognition help create flashcards?",
+        "answer": "It converts the raw, unstructured text of notes into structured Q&A pairs."
       },
       {
-        "question": "Why is using an AI for card generation beneficial?",
-        "answer": "AI eliminates the manual overhead of extracting key concepts, ensuring rapid setup for study while maintaining consistency across large volumes of material."
+        "question": "Why is it difficult for computers to process handwritten notes?",
+        "answer": "Handwriting varies greatly in style, spacing, and neatness, requiring sophisticated algorithms (OCR)."
       }
     ],
     "path": "/flashcards/note-recognition",
@@ -32953,16 +32953,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What key advantage does AI parsing offer over manual card creation?",
-        "answer": "AI parsing saves significant time by instantly converting lengthy source documents into ready-to-use Q&A formats."
+        "question": "What is a 'digital flashcard'?",
+        "answer": "An electronic representation of a physical flashcard, stored and studied on a computer or mobile device."
       },
       {
-        "question": "How do I synchronize my study pace to a specific exam date?",
-        "answer": "Input the exam date into the settings; the spaced repetition algorithm will adjust the review schedule leading up to that target date."
+        "question": "What is the advantage of a digital flashcard over a paper one?",
+        "answer": "Digital cards offer portability, searchability, and integration with SRS algorithms."
       },
       {
-        "question": "What common file types support instant flashcard conversion?",
-        "answer": "The system supports uploads of PDF, DOCX, and PowerPoint files, simplifying preparation from lecture materials."
+        "question": "How does AI make the creation of digital flashcards effortless?",
+        "answer": "By extracting text from existing documents and automatically formatting the cards."
       }
     ],
     "path": "/flashcards/create-digital",
@@ -33162,16 +33162,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is a consonant digraph in phonics?",
-        "answer": "A consonant digraph is a combination of two letters that produce a single, unique sound, such as 'ph' making the /f/ sound."
+        "question": "Give an example of a digraph that represents a consonant sound.",
+        "answer": "Sh, ch, th, ph, wh (any one)."
       },
       {
-        "question": "In mathematics, what purpose does a digraph often serve?",
-        "answer": "In graph theory, a digraph (directed graph) represents relationships between objects where the direction of the connection between nodes is significant."
+        "question": "What is the key rule for a digraph?",
+        "answer": "The two letters must produce only one sound."
       },
       {
-        "question": "Name a common example of a vowel digraph.",
-        "answer": "Vowel digraphs combine two vowels to make one sound, like 'ea' in 'bread' or 'ai' in 'rain'."
+        "question": "What is the 'wh' digraph's sound (in most dialects)?",
+        "answer": "The /w/ sound (as in \"when\")."
       }
     ],
     "path": "/flashcards/digraph",
@@ -33371,16 +33371,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the core benefit of active recall over passive review?",
-        "answer": "Active recall forces the brain to retrieve information, strengthening neural pathways far more effectively than passive re-reading or highlighting."
+        "question": "What is an 'Anki Deck'?",
+        "answer": "A collection of related flashcards within the Anki application."
       },
       {
-        "question": "How does spaced repetition optimize study timing?",
-        "answer": "It schedules reviews just as you are about to forget a concept, maximizing memory consolidation with minimal time spent reviewing known material."
+        "question": "How does an AI Anki Deck Generator save time?",
+        "answer": "It skips the need to manually import, format, and tag thousands of cards for the SRS system."
       },
       {
-        "question": "What key data element must an AI extract from a PDF for good flashcards?",
-        "answer": "The AI must identify core concepts and relationships, transforming dense paragraphs into atomic, testable question-and-answer pairs."
+        "question": "What is the most complex material AI generators handle best for Anki?",
+        "answer": "Dense, text-heavy PDFs and textbook chapters."
       }
     ],
     "path": "/flashcards/anki-deck-generator",
@@ -33580,16 +33580,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the main benefit of AI card generation over manual input?",
-        "answer": "It eliminates the high-effort, time-consuming task of manual transcription, allowing immediate focus on retrieval practice."
+        "question": "What is the primary purpose of an AI Anki Flashcards Maker?",
+        "answer": "To automate the conversion of large study materials into structured Anki notes and cards."
       },
       {
-        "question": "What learning principle uses optimal review intervals?",
-        "answer": "Spaced repetition scheduling leverages forgetting curves to maximize long-term memory consolidation efficiently."
+        "question": "What makes the AI Anki Maker 'smart'?",
+        "answer": "It optimizes the card content and formatting for Anki's specific review algorithm."
       },
       {
-        "question": "What study formats are accepted for automatic processing?",
-        "answer": "The system accepts uploads of PDFs, DOCX files, PowerPoint presentations, and various image formats."
+        "question": "Why is the AI maker considered 'free' for study sets?",
+        "answer": "It leverages AI to generate the basic material, requiring no payment for the core conversion process."
       }
     ],
     "path": "/flashcards/anki-maker",
@@ -33788,16 +33788,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What cognitive process improves retention by testing memory retrieval?",
-        "answer": "Active recall is the process where you actively pull information from memory rather than passively rereading material."
+        "question": "What is Microsoft OneNote primarily used for?",
+        "answer": "Digital note-taking, organization, and information gathering across different devices."
       },
       {
-        "question": "What is the primary input for the AI card generator?",
-        "answer": "The primary inputs are study documents like PDFs, DOCX, or images containing the source knowledge you need to learn."
+        "question": "How does AI transform OneNote content into flashcards?",
+        "answer": "It extracts organized sections, bullet points, or definitions and formats them as testable Q&A."
       },
       {
-        "question": "What benefit does scheduling reviews before forgetting offer?",
-        "answer": "Scheduling at optimal intervals maximizes long-term memory consolidation using spaced repetition algorithms."
+        "question": "What is the benefit of integrating flashcards with a note-taking app like OneNote?",
+        "answer": "It streamlines the workflow from initial note-taking to final revision."
       }
     ],
     "structuredData": {
@@ -33993,16 +33993,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary goal of active recall during studying?",
-        "answer": "To force the brain to retrieve information without cues, strengthening the memory trace and improving long-term retention."
+        "question": "What are the two components needed to create an effective Anki card?",
+        "answer": "A question/prompt on the front and the corresponding answer/explanation on the back."
       },
       {
-        "question": "What study benefit does scheduling reviews based on an exam date provide?",
-        "answer": "It ensures that the most critical knowledge points are reinforced immediately before the assessment, maximizing preparedness."
+        "question": "Why is manual Anki card creation tedious?",
+        "answer": "It involves repetitive text entry, tagging, and formatting for each individual card."
       },
       {
-        "question": "How does an AI improve card creation efficiency over manual input?",
-        "answer": "It instantly analyzes source text to generate atomic Q&A pairs, eliminating the time spent on transcription and formatting."
+        "question": "How does AI solve the problem of manual Anki creation?",
+        "answer": "By instantly converting document text into ready-to-import Anki Note files."
       }
     ],
     "path": "/flashcards/create-anki",
@@ -34204,16 +34204,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary benefit of active recall during SAT prep?",
-        "answer": "It strengthens memory traces by forcing retrieval, leading to better long-term retention than passive review methods."
+        "question": "What is Barron's known for in test preparation?",
+        "answer": "Providing comprehensive review books and practice materials for standardized tests like the SAT."
       },
       {
-        "question": "How does spaced repetition optimize study timing?",
-        "answer": "It schedules reviews at increasing intervals, presenting material right before you forget it, which maximizes memory consolidation."
+        "question": "What section of the SAT benefits most from flashcard review?",
+        "answer": "The Critical Reading and Vocabulary sections."
       },
       {
-        "question": "What foundational concept underpins optimizing review frequency?",
-        "answer": "The Ebbinghaus Forgetting Curve dictates that frequent, spaced encounters slow down the rate at which information is lost."
+        "question": "How does AI assist with Barron's SAT materials?",
+        "answer": "It extracts key concepts and vocabulary from the review book text for active recall practice."
       }
     ],
     "path": "/flashcards/barrons-sat",
@@ -34413,16 +34413,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What principle optimizes long-term memory retention?",
-        "answer": "Spaced repetition scheduling, which strategically times reviews to reinforce weak memories right before forgetting occurs."
+        "question": "What is the central function of the AI tool in making Anki cards?",
+        "answer": "To perform rapid extraction and structuring of content from source documents."
       },
       {
-        "question": "What is the primary benefit of active recall over passive review?",
-        "answer": "Active recall forces the brain to retrieve information, strengthening neural pathways far more effectively than simply rereading notes."
+        "question": "Why is Anki's spaced repetition effective?",
+        "answer": "It schedules reviews based on memory retention, ensuring you study the right cards at the optimal time."
       },
       {
-        "question": "If I upload a PowerPoint, what does the AI prioritize extracting?",
-        "answer": "The AI prioritizes extracting text from slides and speaker notes to create factual, concept-based question-answer pairs."
+        "question": "What output format is typically required for importing cards into Anki?",
+        "answer": "A CSV or TSV (tab-separated value) file."
       }
     ],
     "structuredData": {
@@ -34620,16 +34620,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What cognitive benefit drives spaced repetition timing?",
-        "answer": "It leverages the 'spacing effect,' ensuring review occurs just before the memory trace decays, maximizing long-term consolidation."
+        "question": "Why should a student choose AI over manually using \"Quizlet Create Study Set\"?",
+        "answer": "To eliminate the time spent on manual transcription and focus entirely on studying."
       },
       {
-        "question": "Why is active recall superior to passive review?",
-        "answer": "Active recall forces retrieval from memory, strengthening neural pathways far more effectively than simply re-reading or recognizing text."
+        "question": "What does the AI generator prioritize when creating study sets?",
+        "answer": "Extracting specific terms, definitions, and concise facts from the source material."
       },
       {
-        "question": "What key information do you extract from lecture slides?",
-        "answer": "The AI extracts main headings, bullet points, and critical definitions to create atomic, high-utility question-and-answer pairs."
+        "question": "What is the benefit of automating Active Recall preparation?",
+        "answer": "It allows students to tackle much larger volumes of material more effectively."
       }
     ],
     "path": "/flashcards/quizlet-create-study-set",
@@ -34829,16 +34829,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary benefit of active recall?",
-        "answer": "Active recall forces the brain to retrieve information without cues, significantly strengthening memory traces compared to passive review."
+        "question": "What is the advantage of using AI to make online flashcards for study?",
+        "answer": "Instant conversion means students can immediately begin testing their knowledge."
       },
       {
-        "question": "How is spaced repetition scheduling determined?",
-        "answer": "Review intervals are dynamically adjusted based on how well you recall the information, prioritizing material you are close to forgetting."
+        "question": "How does an AI tool help you make online flashcards effectively?",
+        "answer": "It ensures the cards are well-formed, concise, and focused on high-yield information."
       },
       {
-        "question": "What document formats can the AI process?",
-        "answer": "The generator accepts common formats like PDF, DOCX, and various image files containing educational content for conversion."
+        "question": "What is the main goal of making flashcards to study smarter?",
+        "answer": "To maximize long-term retention through active engagement with the material."
       }
     ],
     "path": "/flashcards/make-online-study",
@@ -35038,16 +35038,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary function of a vessel restricted in her ability to manoeuvre (Rule 27(a))?",
-        "answer": "Its primary function is restricted due to the nature of its work, such as dredging or underwater operations, limiting its ability to deviate."
+        "question": "What does COLREGs stand for?",
+        "answer": "International Regulations for Preventing Collisions at Sea."
       },
       {
-        "question": "Define the necessary action for a vessel overtaking another vessel (Rule 13)?",
-        "answer": "The overtaking vessel must keep out of the way of the vessel being overtaken, passing on either side, maintaining a clear course."
+        "question": "What is the purpose of COLREGs?",
+        "answer": "To establish rules for all vessels on the high seas and in connecting waters to prevent collisions."
       },
       {
-        "question": "What sound signal indicates a vessel is making headway through the water but has no headway?",
-        "answer": "The signal is two prolonged sounds at intervals of about two minutes. This is typically a vessel adrift or at anchor in restricted visibility."
+        "question": "What is a 'vessel restricted in her ability to maneuver' (RAM)?",
+        "answer": "A vessel that, due to the nature of her work, is unable to keep out of the way of another vessel."
       }
     ],
     "structuredData": {
@@ -35243,16 +35243,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the core benefit of 'active recall' in studying?",
-        "answer": "Active recall forces the brain to retrieve information without cues, strengthening memory traces compared to passive review methods."
+        "question": "What is an 'Anki Note'?",
+        "answer": "The source information (containing fields like question, answer, source) from which Anki generates one or more cards."
       },
       {
-        "question": "How does spaced repetition scheduling optimize review timing?",
-        "answer": "It schedules reviews at increasing intervals just before you are likely to forget the material, maximizing consolidation efficiency."
+        "question": "How does AI prevent the manual tedium of creating Anki Notes?",
+        "answer": "It automatically populates the required fields (Front, Back) from the source document."
       },
       {
-        "question": "What source files support AI flashcard generation?",
-        "answer": "You can upload PDFs, DOCX, PowerPoints, and images containing your study material directly into the generator."
+        "question": "What is the key difference between an Anki Note and an Anki Card?",
+        "answer": "A Note is the underlying data; a Card is the visual manifestation used for review."
       }
     ],
     "path": "/flashcards/anki-note",
@@ -35452,16 +35452,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary role of the Lewis acid in a Friedel-Crafts acylation?",
-        "answer": "The Lewis acid (e.g., AlCl3) coordinates with the acyl halide, generating a highly reactive acylium ion electrophile."
+        "question": "What is a functional group?",
+        "answer": "A specific group of atoms within a molecule that determines the molecule's characteristic chemical reactions."
       },
       {
-        "question": "Define enantiomers and give a common synthesis challenge they present.",
-        "answer": "Enantiomers are non-superimposable mirror images. Synthesis often struggles to produce only one enantiomer (a racemic mixture)."
+        "question": "Define 'isomerism.'",
+        "answer": "The phenomenon where two or more compounds have the same formula but different structures."
       },
       {
-        "question": "What determines the regioselectivity in electrophilic aromatic substitution?",
-        "answer": "Regioselectivity is determined by the electronic and steric effects of existing substituents on the aromatic ring."
+        "question": "What is the general term for a carbon-hydrogen chain structure?",
+        "answer": "Hydrocarbon."
       }
     ],
     "path": "/flashcards/organic-chemistry",
@@ -35658,16 +35658,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary function of the androecium in a flower?",
-        "answer": "The androecium represents the male reproductive part, consisting of stamens which produce pollen."
+        "question": "Name three common types of flowers.",
+        "answer": "Rose, tulip, sunflower, daisy, lily (any three)."
       },
       {
-        "question": "Name the process where pollen moves from anther to stigma.",
-        "answer": "This process is called pollination. It can occur via wind, water, or animal vectors."
+        "question": "What is the female reproductive part of a flower called?",
+        "answer": "Pistil or carpel."
       },
       {
-        "question": "What distinguishes complete flowers from incomplete flowers?",
-        "answer": "Complete flowers possess all four main whorls: sepals, petals, stamens, and carpels; incomplete flowers lack one or more."
+        "question": "What is the primary function of a flower's petals?",
+        "answer": "To attract pollinators (e.g., insects, birds)."
       }
     ],
     "structuredData": {
@@ -35863,16 +35863,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary cognitive benefit of Active Recall?",
-        "answer": "Active recall forces the brain to retrieve information, which strengthens neural pathways far more effectively than passive review."
+        "question": "Why is an AI alternative better than relying on generic SAT Words Quizlet sets?",
+        "answer": "AI allows you to generate flashcards tailored specifically to your chosen study guide or textbook."
       },
       {
-        "question": "What specific input formats support AI generation?",
-        "answer": "The app supports uploading PDFs, DOCX files, and PowerPoint presentations to extract study material."
+        "question": "Define the SAT word 'capricious.'",
+        "answer": "Given to sudden and unaccountable changes of mood or behavior."
       },
       {
-        "question": "What is the core feature of Spaced Repetition?",
-        "answer": "It schedules review sessions at increasing intervals based on memory decay to maximize retention with minimal study time."
+        "question": "What is the benefit of generating SAT flashcards instantly?",
+        "answer": "It maximizes the time available for practicing the vocabulary under timed conditions."
       }
     ],
     "path": "/flashcards/sat-quizlet",
@@ -36073,16 +36073,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary cognitive benefit of spaced repetition?",
-        "answer": "It strategically spaces study sessions over time, leveraging the 'testing effect' to move information into long-term memory."
+        "question": "What is the key benefit of converting existing Anki Notes into AI flashcards?",
+        "answer": "It allows for rapid reorganization or format changes outside of the native Anki interface."
       },
       {
-        "question": "Why is active recall superior to passive reading?",
-        "answer": "Active recall forces your brain to retrieve information without cues, strengthening neural pathways far more effectively than simple recognition."
+        "question": "Why would a student want to create new flashcards from their old Anki Notes?",
+        "answer": "To synthesize or condense information for a final exam or board review."
       },
       {
-        "question": "What is the function of setting an exam date in a study app?",
-        "answer": "It allows the scheduling algorithm to adjust review frequency, ensuring high-priority, near-term concept review just before the actual test date."
+        "question": "How does AI assist in reviewing Anki Notes?",
+        "answer": "It can extract the core content and present it in new, testable ways."
       }
     ],
     "structuredData": {
@@ -36277,16 +36277,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary purpose of the SIE exam?",
-        "answer": "The primary purpose is to test foundational knowledge required of individuals entering the securities industry before they pursue specific top-off exams."
+        "question": "What does SIE stand for in the finance industry?",
+        "answer": "Securities Industry Essentials."
       },
       {
-        "question": "Define 'Spaced Repetition' in context of learning?",
-        "answer": "It is a learning technique where review intervals increase over time, reinforcing memory just as forgetting begins to occur."
+        "question": "What organization administers the SIE exam?",
+        "answer": "FINRA (Financial Industry Regulatory Authority)."
       },
       {
-        "question": "What is the main benefit of converting PDFs versus manual creation?",
-        "answer": "It drastically saves time and eliminates human error in transcription, ensuring higher fidelity between source material and study cards."
+        "question": "What is the SIE exam designed to assess?",
+        "answer": "A candidate's knowledge of fundamental securities industry concepts."
       }
     ],
     "path": "/flashcards/sie",
@@ -36486,16 +36486,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary cognitive benefit of flashcards over rereading?",
-        "answer": "Flashcards enforce active recall, which strengthens memory pathways far more effectively than passive recognition like rereading."
+        "question": "Spell the word for a small",
+        "answer": "four-legged household pet."
       },
       {
-        "question": "Define 'Spaced Repetition' in learning algorithms.",
-        "answer": "It is a scheduling technique that presents information at increasing intervals, timed just before the learner is likely to forget the material."
+        "question": "Cat (or dog",
+        "answer": "pet, etc.)."
       },
       {
-        "question": "Why use spaced repetition for mastering spelling?",
-        "answer": "It targets known weaknesses efficiently, ensuring difficult or misspelled words are prioritized until retention is solidified."
+        "question": "What is the term for a word that sounds the same but has a different spelling and meaning (e.g.",
+        "answer": "to, too, two)?,Homophone.,How does AI help master spelling vocabulary?,It generates flashcards that test the visual memory of the correct spelling."
       }
     ],
     "path": "/flashcards/spelling",
@@ -36695,16 +36695,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the minimum safe internal temperature for cooked poultry?",
-        "answer": "Cook all poultry (chicken, turkey, duck) to an internal temperature of 165°F (74°C) for at least 15 seconds."
+        "question": "What is the typical passing score for the ServSafe Manager Exam?",
+        "answer": "75% (60 correct out of 80 questions)."
       },
       {
-        "question": "Define the Temperature Danger Zone (TDZ) for perishable foods.",
-        "answer": "The TDZ is the range between 41°F (5°C) and 135°F (57°C), where pathogens grow most rapidly."
+        "question": "Why should students use AI instead of relying on a diagnostic test Quizlet?",
+        "answer": "AI generates practice questions and flashcards directly aligned with the official ServSafe content domains."
       },
       {
-        "question": "What is the purpose of a Critical Control Point (CCP) in HACCP?",
-        "answer": "A CCP is a step in the food process where control can be applied to prevent, eliminate, or reduce a food safety hazard to an acceptable level."
+        "question": "What is the purpose of a diagnostic test?",
+        "answer": "To assess a student's current knowledge level before beginning formal study."
       }
     ],
     "path": "/flashcards/servsafe-diagnostic-test-quizlet",
@@ -36904,16 +36904,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary cognitive benefit of spaced repetition?",
-        "answer": "It leverages the forgetting curve by scheduling reviews at increasing intervals, significantly enhancing long-term memory consolidation."
+        "question": "What is a 'Note Name' in the context of music theory?",
+        "answer": "The letter or term used to identify a specific pitch (e.g., C, D, E)."
       },
       {
-        "question": "What is 'active recall' in the context of studying?",
-        "answer": "Active recall means retrieving information from memory without cues, which is scientifically proven to be more effective than passive review."
+        "question": "How do AI flashcards help in mastering note names?",
+        "answer": "They automate the testing of note identification, often using images of sheet music or keys."
       },
       {
-        "question": "How does document conversion aid study efficiency?",
-        "answer": "It automates the extraction of core concepts, eliminating manual transcription time so you focus immediately on testing knowledge."
+        "question": "What is the purpose of transforming documents into flashcards?",
+        "answer": "To make information active and testable for memory retention."
       }
     ],
     "path": "/flashcards/note-name",
@@ -37114,16 +37114,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary benefit of active recall in language learning?",
-        "answer": "Active recall forces retrieval from memory, significantly strengthening neural pathways compared to passive rereading."
+        "question": "What is the primary function of an AI Language Flashcard Maker?",
+        "answer": "To rapidly generate vocabulary, grammar, and conjugation cards from text or dictionaries."
       },
       {
-        "question": "Name three file types accepted by the AI flashcard generator.",
-        "answer": "Accepted types include PDF, DOCX, and various image formats like JPG or PNG."
+        "question": "How does AI accelerate language learning?",
+        "answer": "It focuses on high-frequency words and grammatical structures for efficient memorization."
       },
       {
-        "question": "How does spaced repetition improve long-term retention?",
-        "answer": "It strategically spaces review sessions just before you are about to forget the material, optimizing memory consolidation."
+        "question": "Name two components of language study where flashcards are highly effective.",
+        "answer": "Vocabulary acquisition and verb conjugation."
       }
     ],
     "path": "/flashcards/language-maker",
@@ -37323,16 +37323,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary function of a keystone species?",
-        "answer": "A keystone species significantly affects its environment relative to its abundance. Its removal causes major structural changes in the ecosystem."
+        "question": "Name three examples of wild animals.",
+        "answer": "Lion, bear, deer, wolf, tiger (any three)."
       },
       {
-        "question": "Define obligate versus facultative symbiosis.",
-        "answer": "Obligate symbiosis means one or both organisms cannot survive without the relationship. Facultative symbiosis is beneficial but not essential for survival."
+        "question": "What is a habitat?",
+        "answer": "The natural home or environment of an animal, plant, or other organism."
       },
       {
-        "question": "What biological concept describes animals that migrate seasonally?",
-        "answer": "This behavior is known as migration, typically driven by resource availability or breeding cycles linked to seasonal changes."
+        "question": "What is the primary characteristic of a carnivore?",
+        "answer": "An animal that feeds chiefly on other animals (meat)."
       }
     ],
     "path": "/flashcards/wild-animals",
@@ -37532,16 +37532,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What mathematical operation is the inverse of multiplication?",
-        "answer": "Division is the inverse operation of multiplication. It determines how many times one number (the divisor) is contained within another (the dividend)."
+        "question": "What is the result of 10 divided by 2?",
+        "answer": "Five (5)."
       },
       {
-        "question": "Define the term 'remainder' in a division problem.",
-        "answer": "The remainder is the amount left over when one integer is divided by another and complete division is not possible."
+        "question": "In the equation 12 ÷ 3 = 4",
+        "answer": "what is the number 12 called?"
       },
       {
-        "question": "How does the AI align study reviews for complex division concepts?",
-        "answer": "The system uses spaced repetition to schedule reviews based on perceived difficulty, ensuring complex procedural steps are revisited optimally before forgetting occurs."
+        "question": "The dividend.",
+        "answer": "If you have 15 cookies and divide them equally among 5 friends, how many does each friend get?,3 cookies (15 ÷ 5 = 3)."
       }
     ],
     "structuredData": {
@@ -37738,16 +37738,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary benefit of converting documents via AI?",
-        "answer": "It automates the extraction of core concepts, saving significant manual creation time and immediately enabling active recall practice."
+        "question": "What is a 'virtual flashcard'?",
+        "answer": "A digital, interactive study card existing solely in an electronic environment."
       },
       {
-        "question": "How does setting an exam date improve card review?",
-        "answer": "It allows the spaced repetition system to calculate an optimal review frequency that ensures material is fresh precisely before the deadline."
+        "question": "Why is it important to create virtual flashcards that 'stick'?",
+        "answer": "They should be concise, visually clear, and integrated with SRS to maximize long-term retention."
       },
       {
-        "question": "Which file types are accepted for flashcard generation?",
-        "answer": "The generator accepts PDFs, DOCX files, and various image formats that contain legible textual information."
+        "question": "How does AI facilitate the creation of virtual flashcards?",
+        "answer": "It converts complex text into a clean, digital Q&A format, optimized for online platforms."
       }
     ],
     "path": "/flashcards/create-virtual",
@@ -37947,16 +37947,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What does the letter sequence 'ough' commonly represent in Fundations?",
-        "answer": "The sequence 'ough' is irregular and can represent multiple sounds, such as in 'though' (long o) or 'through' (oo sound)."
+        "question": "What is the focus of Fundations Trick Words instruction?",
+        "answer": "Instant recognition of high-frequency words with irregular spellings."
       },
       {
-        "question": "Define the concept of a 'sight word' in phonics instruction.",
-        "answer": "Sight words are common words that do not follow standard phonetic rules and must be memorized instantly through repeated exposure."
+        "question": "Give two examples of Fundations Trick Words.",
+        "answer": "Said, was, have, from, one (any two)."
       },
       {
-        "question": "Why are trick words challenging for early readers?",
-        "answer": "Trick words challenge readers because they contain tricky letter combinations that don't align with the regular phonics rules they are currently learning."
+        "question": "What is the primary difference between Trick Words and regular words in Fundations?",
+        "answer": "Trick Words cannot be sounded out using taught phonetic rules."
       }
     ],
     "path": "/flashcards/fundations-trick",
@@ -38157,16 +38157,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the core benefit of converting notes to flashcards?",
-        "answer": "It facilitates active recall by forcing retrieval practice, which strengthens memory traces far better than passive rereading."
+        "question": "What is Knowt primarily known for in the study market?",
+        "answer": "Its ability to convert notes and documents into flashcards and quizzes."
       },
       {
-        "question": "How does spaced repetition scheduling work fundamentally?",
-        "answer": "It prompts review intervals that increase as you master a concept, targeting material just before you are likely to forget it."
+        "question": "How does the AI in Knowt assist students?",
+        "answer": "It extracts key terms and generates study materials automatically."
       },
       {
-        "question": "What is an example of a source document for AI card generation?",
-        "answer": "Lecture slides from a PowerPoint, detailed PDF readings, or organized text notes exported from a tool like Knowt."
+        "question": "What is the core feature that Knowt users leverage?",
+        "answer": "The rapid conversion of text into testable study assets."
       }
     ],
     "path": "/flashcards/knowt",
@@ -38368,16 +38368,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What core memory technique leverages time intervals between review?",
-        "answer": "Spaced Repetition Scheduling is the algorithm that optimizes review timing based on forgetting curves."
+        "question": "What technology enables the conversion of handwritten notes to flashcards?",
+        "answer": "Optical Character Recognition (OCR)."
       },
       {
-        "question": "What are the supported upload formats for source material?",
-        "answer": "You can upload PDFs, DOCX, PowerPoint files, and various image formats for processing."
+        "question": "Why is converting handwritten notes beneficial for revision?",
+        "answer": "It cleans up the notes, makes them searchable, and formats them for active recall systems."
       },
       {
-        "question": "Why is active recall superior to passive review?",
-        "answer": "Active recall forces effortful retrieval, strengthening neural pathways and leading to superior long-term memory encoding."
+        "question": "What type of flashcard is best suited for handwritten revision notes?",
+        "answer": "Cards that directly test the key facts summarized in the notes."
       }
     ],
     "path": "/flashcards/handwritten-revision",
@@ -38577,16 +38577,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary cognitive benefit of flashcards?",
-        "answer": "The primary benefit is enforcing active recall, which strengthens memory pathways far better than passive review."
+        "question": "What is the benefit of using AI to \"Create My Own Quizlet Cards\"?",
+        "answer": "It bypasses the time-intensive typing required for manual card creation."
       },
       {
-        "question": "How does spaced repetition optimize study time?",
-        "answer": "It schedules reviews right before material is likely to be forgotten, maximizing retention efficiency."
+        "question": "How does AI ensure the custom nature of the generated Quizlet cards?",
+        "answer": "It uses *your* uploaded notes and documents as the sole source of content."
       },
       {
-        "question": "What key information is extracted from an uploaded PDF?",
-        "answer": "The AI identifies and converts core concepts, definitions, and factual data points into atomic Q&A pairs."
+        "question": "What is the main goal of using AI in this process?",
+        "answer": "To shift the student's energy from data entry to actual study and review."
       }
     ],
     "path": "/flashcards/create-my-quizlet",
@@ -38786,16 +38786,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary benefit of spaced repetition over massed practice?",
-        "answer": "Spaced repetition introduces strategic forgetting intervals, forcing stronger memory consolidation upon re-exposure, leading to superior long-term recall."
+        "question": "What is the GMAT exam designed to assess?",
+        "answer": "Analytical writing, quantitative reasoning, verbal reasoning, and integrated reasoning skills for business school."
       },
       {
-        "question": "In GMAT Critical Reasoning, what is a 'Strengthen' question asking?",
-        "answer": "It requires identifying the option that provides new evidence which makes the conclusion of the argument more likely to be true."
+        "question": "What type of flashcards are crucial for GMAT Verbal preparation?",
+        "answer": "Vocabulary and Critical Reasoning concept cards."
       },
       {
-        "question": "What type of uploaded document works best for high-quality flashcard generation?",
-        "answer": "Digitally generated PDFs or native text documents (DOCX) usually yield the highest accuracy for concept extraction over scanned images."
+        "question": "Name one section of the GMAT exam.",
+        "answer": "Quantitative, Verbal, Integrated Reasoning, or Analytical Writing Assessment (AWA)."
       }
     ],
     "path": "/flashcards/gmat",
@@ -38995,16 +38995,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary benefit of active recall over recognition?",
-        "answer": "Active recall forces the brain to retrieve information, strengthening neural pathways far more than passively recognizing answers."
+        "question": "What makes an app the \"Best App to Make Your Own Flashcards\"?",
+        "answer": "Its ability to automate the entire process from input (notes) to output (testable cards)."
       },
       {
-        "question": "How does spaced repetition optimize study time?",
-        "answer": "It schedules reviews just as you are about to forget, maximizing retention efficiency while minimizing redundant study sessions."
+        "question": "How does AI technology enhance the utility of a flashcard app?",
+        "answer": "It provides instant extraction, smart formatting, and often integrates SRS."
       },
       {
-        "question": "What document types can be converted into flashcards?",
-        "answer": "PDFs, DOCX files, PowerPoint presentations, and image files containing readable text are supported for AI processing."
+        "question": "What is the key criterion for a flashcard app's success?",
+        "answer": "Its effectiveness in improving long-term memory retention and recall speed."
       }
     ],
     "structuredData": {
@@ -39196,16 +39196,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What cognitive benefit does active recall provide?",
-        "answer": "Active recall forces retrieval practice, strengthening memory pathways significantly more than passive review alone."
+        "question": "Why is AI critical for the 'Best App for Making Flashcards'?",
+        "answer": "It provides the speed and accuracy necessary to manage the large study loads of serious students."
       },
       {
-        "question": "What is the primary goal of spaced repetition scheduling?",
-        "answer": "The primary goal is to reintroduce information just as the memory begins to fade, optimizing long-term retention."
+        "question": "How does the app minimize friction in the flashcard creation process?",
+        "answer": "By allowing direct upload of notes and automatic content generation."
       },
       {
-        "question": "How does AI speed up flashcard preparation?",
-        "answer": "AI instantly parses dense documents, eliminating manual transcription and ensuring comprehensive concept coverage."
+        "question": "What is the primary benefit of making flashcards from your *own* notes?",
+        "answer": "The content is tailored and more contextually relevant to your learning."
       }
     ],
     "path": "/flashcards/best-making",
@@ -39406,16 +39406,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What cognitive benefit does 'active recall' provide over passive review?",
-        "answer": "Active recall strengthens memory retrieval paths by forcing the brain to generate an answer, leading to better long-term retention."
+        "question": "Why is manual creation an outdated way to \"Make Your Own Study Flashcards\"?",
+        "answer": "It is highly time-consuming, diverting attention from the actual process of active learning."
       },
       {
-        "question": "How does a spaced repetition schedule optimize memory?",
-        "answer": "It schedules reviews at increasing intervals, ensuring material is revisited just before forgetting occurs, which efficiently transfers knowledge to long-term memory."
+        "question": "How does AI embody the \"Future of Efficient Studying\"?",
+        "answer": "By automating the tedious data prep, it allows students to focus solely on memory mastery."
       },
       {
-        "question": "What is the primary advantage of AI flashcard generation?",
-        "answer": "It drastically reduces the manual time spent synthesizing notes into atomic questions, allowing immediate focus on practice."
+        "question": "What is the first step when using an AI tool to create study flashcards?",
+        "answer": "Uploading or pasting the source material you need to learn."
       }
     ],
     "structuredData": {
@@ -39612,16 +39612,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary purpose of Spaced Repetition?",
-        "answer": "To optimize long-term memory retention by scheduling reviews at increasing intervals based on recall performance."
+        "question": "What is the formula for the area of a rectangle?",
+        "answer": "Area = Length × Width."
       },
       {
-        "question": "In calculus, what does the Fundamental Theorem relate?",
-        "answer": "It connects the concepts of differentiating a function and integrating a function, showing they are inverse operations."
+        "question": "What is the square root of 25?",
+        "answer": "Five (5)."
       },
       {
-        "question": "What does active recall demand from the learner?",
-        "answer": "It requires the learner to actively retrieve information from memory rather than passively re-reading material."
+        "question": "Define a prime number.",
+        "answer": "A whole number greater than 1 whose only two positive divisors are 1 and itself."
       }
     ],
     "path": "/flashcards/math",
@@ -39822,16 +39822,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the core cognitive benefit of using flashcards?",
-        "answer": "Flashcards force active recall, which strengthens memory retrieval pathways far more effectively than passive reading."
+        "question": "What is the purpose of a revision note card?",
+        "answer": "To provide a high-yield, condensed summary for final review before an exam."
       },
       {
-        "question": "How does a spaced repetition system function?",
-        "answer": "It schedules reviews based on how well you know a concept, showing difficult items sooner and easy items later to maximize retention efficiency."
+        "question": "How does AI convert revision notes into flashcards?",
+        "answer": "It identifies the core facts and converts them into a testable Q&A format."
       },
       {
-        "question": "What is the primary input required for this AI generator?",
-        "answer": "You must upload existing study material like PDFs, PPTs, or Word documents containing the information you need to learn."
+        "question": "Why is instant generation of revision note cards beneficial?",
+        "answer": "It allows for rapid, last-minute testing and identification of weak areas."
       }
     ],
     "structuredData": {
@@ -40024,16 +40024,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What learning principle drives optimal card review timing?",
-        "answer": "Spaced repetition, which schedules reviews at increasing intervals just before forgetting occurs, optimizing long-term memory."
+        "question": "What is the main benefit of creating SAT flashcards online?",
+        "answer": "Instant access, easy sharing, and integration with online testing and tracking features."
       },
       {
-        "question": "What is the immediate benefit of using generated cards over manual ones?",
-        "answer": "It saves significant creation time and ensures consistency based on active recall principles applied directly from source text."
+        "question": "How does AI help achieve a target SAT score?",
+        "answer": "By ensuring comprehensive coverage of vocabulary and key concepts through efficient study sets."
       },
       {
-        "question": "Why is uploading source documents better than typing concepts manually?",
-        "answer": "Uploading ensures comprehensive coverage of the source material and leverages AI to identify critical concepts you might otherwise overlook."
+        "question": "What sections of the SAT are typically covered by flashcards?",
+        "answer": "Vocabulary, grammar rules, and math formulas."
       }
     ],
     "path": "/flashcards/sat-online",
@@ -40234,16 +40234,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary goal of using Spaced Repetition?",
-        "answer": "To maximize long-term memory retention by reviewing information at increasing intervals just before forgetting occurs."
+        "question": "Why is an AI Flashcard Generator superior to manually creating a quiz on Quizlet?",
+        "answer": "The AI instantly builds the core content (questions and answers), which can then be formatted into a quiz."
       },
       {
-        "question": "How does AI improve the study material creation process?",
-        "answer": "It automates concept identification and card structuring from large documents, saving time and ensuring conceptual accuracy."
+        "question": "What is the benefit of using flashcards as a foundation for a quiz?",
+        "answer": "It ensures the quiz questions are atomic and test specific, high-yield facts."
       },
       {
-        "question": "What does 'Active Recall' require the learner to do?",
-        "answer": "It requires retrieving information from memory without external cues, solidifying the memory trace more effectively than passive review."
+        "question": "How does AI help students \"study smarter\" with quizzes?",
+        "answer": "By rapidly producing randomized, customizable test materials."
       }
     ],
     "path": "/flashcards/quizlet-make-quiz",
@@ -40442,16 +40442,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary goal of active recall during study?",
-        "answer": "The primary goal is to force retrieval of information from memory, strengthening neural pathways for better long-term retention."
+        "question": "What does ASL stand for?",
+        "answer": "American Sign Language."
       },
       {
-        "question": "How does spaced repetition benefit long-term memory?",
-        "answer": "It strategically spaces review periods, interleaving forgetting and relearning to maximize memory durability."
+        "question": "What is the primary method of communication in ASL?",
+        "answer": "Handshapes, movement, location, and non-manual markers (facial expressions)."
       },
       {
-        "question": "What types of ASL concepts benefit most from flashcards?",
-        "answer": "Vocabulary (signs), grammatical structures, and non-manual markers are ideal for atomic question-answer memorization."
+        "question": "What are 'non-manual markers' in ASL?",
+        "answer": "Facial expressions, head tilts, or body postures that convey grammatical information."
       }
     ],
     "path": "/flashcards/asl",
@@ -40651,16 +40651,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the main benefit of spaced repetition scheduling?",
-        "answer": "It strategically times reviews based on memory decay to maximize long-term retention with minimal study effort."
+        "question": "What is the key feature of a 'Smartest AI Study Flashcard Maker'?",
+        "answer": "Its ability to accurately parse complex academic PDFs and extract relevant Q&A pairs."
       },
       {
-        "question": "What type of content can be converted into flashcards?",
-        "answer": "Documents like PDFs, DOCX files, and static images containing study material are fully supported for conversion."
+        "question": "Why should a student use an AI maker over manual methods?",
+        "answer": "To save hundreds of hours of manual text entry and formatting."
       },
       {
-        "question": "How does setting an exam date affect card review?",
-        "answer": "The schedule dynamically adjusts the frequency of review sessions to ensure peak recall performance on your specified date."
+        "question": "What is the primary goal of the study maker?",
+        "answer": "To transform passive study materials into active learning tools."
       }
     ],
     "path": "/flashcards/study-maker",
@@ -40861,16 +40861,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary benefit of spaced repetition?",
-        "answer": "It maximizes long-term retention by strategically increasing the time between review sessions as memory strengthens."
+        "question": "What does ESL stand for in education?",
+        "answer": "English as a Second Language."
       },
       {
-        "question": "Define 'active recall' in the context of studying.",
-        "answer": "Active recall is the process of deliberately retrieving information from memory without cues, like answering a flashcard question."
+        "question": "Name a grammatical concept that ESL flashcards often focus on.",
+        "answer": "Verb tenses, prepositions, or articles."
       },
       {
-        "question": "When uploading a PDF, what content does the AI prioritize?",
-        "answer": "The AI focuses on extracting key definitions, vocabulary terms, and structured rule sets relevant to language learning."
+        "question": "How does using AI flashcards benefit ESL learners?",
+        "answer": "It provides structured, rapid review of vocabulary and core grammar rules."
       }
     ],
     "path": "/flashcards/esl",
@@ -41071,16 +41071,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary benefit of using AI over manual flashcard creation?",
-        "answer": "AI generation drastically reduces the time spent on creating testable questions, allowing more study time dedicated to active recall."
+        "question": "What defines the 'Best Website to Make Flashcards'?",
+        "answer": "Ease of use, compatibility with various file types (PDF, DOCX), and powerful AI automation."
       },
       {
-        "question": "Name two non-text document types supported for flashcard generation.",
-        "answer": "You can upload PowerPoint presentations (PPTX) or image files (JPG/PNG) containing study material."
+        "question": "How does an AI website improve study effectiveness?",
+        "answer": "By implementing active recall principles directly into the card creation and review process."
       },
       {
-        "question": "What study mechanism improves recall intervals using adaptive scheduling?",
-        "answer": "Spaced repetition scheduling dynamically adjusts review timing based on demonstrated mastery for optimal long-term memory."
+        "question": "What is the main advantage of using a website instead of a local program?",
+        "answer": "No installation is required, and all data is saved securely in the cloud."
       }
     ],
     "structuredData": {
@@ -41276,16 +41276,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What primary cognitive benefit does active recall offer?",
-        "answer": "Active recall strengthens neural pathways by forcing retrieval, leading to better long-term memory retention than passive rereading."
+        "question": "What defines an 'Interactive Flashcard Maker'?",
+        "answer": "A tool that allows the user to manipulate, test, and engage with the study cards beyond simple viewing."
       },
       {
-        "question": "How does spaced repetition optimize study time?",
-        "answer": "It schedules reviews just before the point of forgetting, maximizing memory consolidation efficiency and reducing wasted study time."
+        "question": "How does AI make flashcards interactive?",
+        "answer": "By generating customizable quizzes, fill-in-the-blanks, or matching games from the core data."
       },
       {
-        "question": "What is the core requirement for an effective flashcard question?",
-        "answer": "Questions must be atomic (focusing on one concept) and prompt retrieval rather than simple recognition."
+        "question": "What is the benefit of an interactive study experience?",
+        "answer": "It increases engagement, motivation, and deepens memory encoding."
       }
     ],
     "path": "/flashcards/interactive-maker",
@@ -41486,16 +41486,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary input required for AI flashcard generation?",
-        "answer": "The primary input is a source document such as a PDF, DOCX, or image containing the study material."
+        "question": "What makes an app the \"Best App to Create Flashcards\"?",
+        "answer": "Its ability to convert any document format into high-quality, concise study sets instantly."
       },
       {
-        "question": "What learning method is integrated into the card review process?",
-        "answer": "The system utilizes integrated spaced repetition scheduling to optimize long-term memory consolidation."
+        "question": "Why are AI flashcards superior to manually created cards?",
+        "answer": "They eliminate human error in transcription and are generated much faster."
       },
       {
-        "question": "How do users influence their study schedule timing?",
-        "answer": "Users can input a specific target exam date, and the scheduler adjusts review intervals accordingly."
+        "question": "What is the core function of a flashcard creation app?",
+        "answer": "To streamline the conversion of raw information into testable, recall-based units."
       }
     ],
     "path": "/flashcards/best-create",
@@ -41695,16 +41695,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What process strengthens memory retention most effectively?",
-        "answer": "Active recall—retrieving information from memory without cues—is significantly more effective than passive review techniques."
+        "question": "What is the primary service offered by an 'AI Notecards Website'?",
+        "answer": "Automated generation of digital study sets from user-uploaded documents."
       },
       {
-        "question": "How does spaced repetition improve learning efficiency?",
-        "answer": "It schedules reviews just as you are about to forget, forcing retrieval practice and maximizing long-term retention with minimal wasted study time."
+        "question": "How does AI revolutionize the creation of study sets on a website?",
+        "answer": "It uses algorithms to identify key concepts and structure them for active recall."
       },
       {
-        "question": "What is a key input document for AI card generation?",
-        "answer": "PDFs of lecture slides or textbook chapters are excellent inputs because they contain dense, factual information ready for extraction."
+        "question": "What is the benefit of using a website for note card generation?",
+        "answer": "Accessibility, cloud storage, and no software download required."
       }
     ],
     "path": "/flashcards/website",
@@ -41903,16 +41903,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary role of a recovery device under EPA 608?",
-        "answer": "The primary role is to safely remove refrigerant from equipment before servicing or disposal, minimizing atmospheric release."
+        "question": "What does EPA 608 certification cover?",
+        "answer": "Regulations regarding refrigerants, including handling, safety, and recovery practices."
       },
       {
-        "question": "What substance requires recovery prior to opening an appliance system?",
-        "answer": "All regulated refrigerants, including CFCs, HCFCs, and HFCs, must be recovered according to EPA guidelines."
+        "question": "What is the primary goal of the EPA 608 program?",
+        "answer": "To ensure technicians safely and legally manage refrigerants to protect the ozone layer."
       },
       {
-        "question": "When must a technician performing maintenance use a leak detector?",
-        "answer": "Leak detection checks are required after any service or repair that involves opening the system for appliances over 50 lbs of regulated refrigerant."
+        "question": "Name one EPA 608 certification type.",
+        "answer": "Type I (Small Appliances), Type II (High-Pressure), Type III (Low-Pressure), or Universal."
       }
     ],
     "structuredData": {
@@ -42109,16 +42109,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary benefit of AI-generated flashcards over manual creation?",
-        "answer": "AI saves significant time by automating extraction and formatting, allowing learners to focus instantly on active recall rather than transcription."
+        "question": "What is an 'Online Study Note Card'?",
+        "answer": "A digital card derived from study notes, optimized for viewing and testing online."
       },
       {
-        "question": "How does a spaced repetition schedule optimize memory?",
-        "answer": "It schedules reviews at scientifically optimized intervals, challenging memory right before forgetting occurs, strengthening long-term recall."
+        "question": "How does AI create powerful online study note cards?",
+        "answer": "By condensing verbose notes into concise, testable bullet points."
       },
       {
-        "question": "What cognitive principle do digital note cards leverage for retention?",
-        "answer": "They facilitate active recall, which is the demanding process of retrieving information without cues, strengthening neural pathways."
+        "question": "What is the benefit of reviewing online study note cards?",
+        "answer": "They are available immediately after creation and can be tracked by a study platform."
       }
     ],
     "path": "/flashcards/online-study-note",
@@ -42319,16 +42319,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the result of 7 multiplied by 8?",
-        "answer": "The result of 7 multiplied by 8 is 56. This requires accurate, immediate recall for efficient problem-solving."
+        "question": "What is the result of 7 times 8?",
+        "answer": "Fifty-six (56)."
       },
       {
-        "question": "Why is active recall vital for times table mastery?",
-        "answer": "Active recall forces retrieval practice, strengthening neural pathways far more effectively than passive review of the answers."
+        "question": "What is the purpose of memorizing the multiplication table?",
+        "answer": "To perform mental math calculations quickly and accurately."
       },
       {
-        "question": "What mathematical property does 4 x 5 = 5 x 4 demonstrate?",
-        "answer": "This demonstrates the Commutative Property of Multiplication. The order of factors does not change the product."
+        "question": "If you multiply any number by 1",
+        "answer": "what is the result?,The number itself (Identity Property)."
       }
     ],
     "path": "/flashcards/multiplication-table",
@@ -42528,16 +42528,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary function of the *Passé Composé* tense?",
-        "answer": "It primarily describes completed actions or events in the past, equivalent to the English simple past or present perfect."
+        "question": "What is the French word for \"house\"?",
+        "answer": "Maison."
       },
       {
-        "question": "How do you correctly use the subjunctive mood in French?",
-        "answer": "It expresses subjective states like doubt, desire, necessity, or emotion, often following conjunctions like 'que'."
+        "question": "How do you say \"goodbye\" in French?",
+        "answer": "Au revoir."
       },
       {
-        "question": "Translate the common phrase: 'Il faut que tu fasses tes devoirs.'",
-        "answer": "It translates to: 'It is necessary that you do your homework' (expressing obligation or necessity)."
+        "question": "Conjugate the verb \"être\" (to be) for \"I am.",
+        "answer": "Je suis."
       }
     ],
     "path": "/flashcards/french",
@@ -42736,16 +42736,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the structure of a CVC word?",
-        "answer": "CVC stands for Consonant-Vowel-Consonant. This structure forms the simplest phonetic units in English, like 'cat' or 'dog'."
+        "question": "What sound does the 'V' stand for in CVC?",
+        "answer": "Vowel sound."
       },
       {
-        "question": "Why is active recall important for learning CVCs?",
-        "answer": "Active recall forces the brain to retrieve the word sound or meaning, strengthening neural pathways far more effectively than passive reading."
+        "question": "What is the purpose of CVC blending flashcards?",
+        "answer": "To teach children how to combine individual letter sounds into a whole word."
       },
       {
-        "question": "How does spaced repetition help CVC retention?",
-        "answer": "It systematically reintroduces words right before you are likely to forget them, moving the CVC pattern from short-term to long-term memory."
+        "question": "Give a rhyming word for \"map.",
+        "answer": "Cap, lap, tap (Any valid word)."
       }
     ],
     "structuredData": {
@@ -42942,16 +42942,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "Which sense relies primarily on chemoreceptors in the nasal cavity?",
-        "answer": "The sense of smell (olfaction) relies on chemoreceptors that detect airborne chemical molecules entering the nasal passages."
+        "question": "Name the five basic human senses.",
+        "answer": "Sight, hearing, smell, taste, and touch."
       },
       {
-        "question": "What structure in the eye converts light into neural signals?",
-        "answer": "The retina contains photoreceptor cells (rods and cones) which transduce light energy into electrical signals the brain interprets."
+        "question": "Which sense is processed by the eyes?",
+        "answer": "Sight or vision."
       },
       {
-        "question": "How do mechanoreceptors contribute to the sense of touch?",
-        "answer": "Mechanoreceptors detect physical pressure, vibration, and texture by deforming in response to mechanical stimuli applied to the skin."
+        "question": "What organ is primarily responsible for the sense of smell?",
+        "answer": "The nose (specifically, the olfactory receptors)."
       }
     ],
     "path": "/flashcards/five-senses",
@@ -43150,16 +43150,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the core purpose of spaced repetition scheduling?",
-        "answer": "Its purpose is to schedule reviews at increasing intervals to move knowledge from short-term to long-term memory effectively."
+        "question": "What defines an AI Flashcard Maker Program?",
+        "answer": "A dedicated software that uses artificial intelligence to convert documents into study decks."
       },
       {
-        "question": "Why is active recall superior to passive review?",
-        "answer": "Active recall forces the brain to actively retrieve information, strengthening neural pathways far more than simple re-reading."
+        "question": "How does the program ensure efficient study workflow?",
+        "answer": "By automating the tedious setup and allowing immediate focus on active recall."
       },
       {
-        "question": "What AI advantage does uploading a document offer?",
-        "answer": "It automates the labor-intensive step of manually formulating precise, atomic question-and-answer pairs from lengthy text."
+        "question": "Why is AI essential for a modern flashcard maker program?",
+        "answer": "It provides the speed and accuracy needed to handle large academic files."
       }
     ],
     "path": "/flashcards/maker-program",
@@ -43359,16 +43359,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary function of fiber in human digestion?",
-        "answer": "Fiber promotes regularity by adding bulk to stool. It is generally indigestible by human enzymes, supporting gut health."
+        "question": "Name three examples of healthy foods.",
+        "answer": "Fruits, vegetables, lean protein, whole grains (any three)."
       },
       {
-        "question": "Name the three macronutrients required for energy production.",
-        "answer": "The three macronutrients are Carbohydrates, Proteins, and Fats (Lipids). They provide the body with necessary calories."
+        "question": "What is a primary benefit of eating healthy food?",
+        "answer": "Improved energy levels, better immune function, and reduced risk of chronic diseases."
       },
       {
-        "question": "Why are Omega-3 fatty acids considered essential?",
-        "answer": "They are essential because the human body cannot synthesize them adequately on its own. They are critical for brain and heart health."
+        "question": "What nutrient is the body's main source of energy?",
+        "answer": "Carbohydrates."
       }
     ],
     "path": "/flashcards/healthy-food",
@@ -43570,16 +43570,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary goal of active recall during studying?",
-        "answer": "The goal is to retrieve information from memory rather than passively rereading it, which strengthens neural pathways."
+        "question": "How does AI transform a general study note into a powerful flashcard?",
+        "answer": "It extracts the core concept and formats it as a specific, recallable question."
       },
       {
-        "question": "What cognitive benefit does automated scheduling provide?",
-        "answer": "It optimizes review timing based on the forgetting curve, ensuring efficient use of study time before material is lost."
+        "question": "What is the main function of a study note card?",
+        "answer": "To serve as a prompt for memory retrieval and self-testing."
       },
       {
-        "question": "Name three input formats supported for card generation.",
-        "answer": "PDF, DOCX, and image files are supported for immediate conversion into study note cards."
+        "question": "Why is instant generation of study note cards effective?",
+        "answer": "It allows students to test themselves immediately after writing or reading the source material."
       }
     ],
     "path": "/flashcards/study-note",
@@ -43781,16 +43781,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary cognitive benefit of active recall?",
-        "answer": "It strengthens memory retrieval pathways by forcing the brain to retrieve information without cues, improving long-term retention significantly."
+        "question": "What is the main disadvantage of using physical flash cards stationery?",
+        "answer": "They are difficult to organize, not easily searchable, and lack automated review systems."
       },
       {
-        "question": "What files types does the AI process into flashcards?",
-        "answer": "The generator supports common formats including PDF, DOCX, PowerPoint (.ppt/.pptx), and various image formats."
+        "question": "What type of student typically uses flash card stationery?",
+        "answer": "Students who prefer tactile learning and manual writing."
       },
       {
-        "question": "How does scheduling align with a fixed exam date?",
-        "answer": "The algorithm adjusts review density, increasing frequency as the set exam date approaches to ensure peak preparedness on that day."
+        "question": "How does AI replace flash cards stationery for serious students?",
+        "answer": "It offers digital, scalable, and systematic study tools without the manual labor."
       }
     ],
     "path": "/flashcards/stationery",
@@ -43985,16 +43985,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the main benefit of spaced repetition for math facts?",
-        "answer": "It optimizes review timing to maximize long-term retention, making recall automatic."
+        "question": "What is the result of 9 times 6?",
+        "answer": "Fifty-four (54)."
       },
       {
-        "question": "If I upload a PDF, what does the AI convert the content into?",
-        "answer": "It converts structured text and key concepts into atomic question-and-answer pairs for active recall."
+        "question": "If you multiply 10 by any number",
+        "answer": "what will the resulting number always end in?"
       },
       {
-        "question": "How does setting an exam date impact my study plan?",
-        "answer": "It helps the learning algorithm prioritize difficult topics and pace reviews efficiently toward that deadline."
+        "question": "Zero (0).",
+        "answer": "What is the product of 11 x 11?,121."
       }
     ],
     "path": "/flashcards/times-table",
@@ -44194,16 +44194,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the core goal of the Shichida Method's flashcard use?",
-        "answer": "The goal is to stimulate right-brain development through rapid exposure to visual or auditory information patterns."
+        "question": "What is the primary method used in Shichida Education?",
+        "answer": "High-speed flashcard (flashing) presentation and visual memory training."
       },
       {
-        "question": "What learning principle underlies efficient flashcard review?",
-        "answer": "Spaced Repetition Scheduling (SRS) ensures optimal timing between study sessions for memory consolidation."
+        "question": "What is the supposed goal of Shichida's method?",
+        "answer": "To maximize a child's brain potential, particularly the right brain's photographic memory."
       },
       {
-        "question": "Why convert dense PDFs into atomic Q&A formats?",
-        "answer": "Atomic Q&A forces active recall, which is significantly more effective than passive reading for concept mastery."
+        "question": "What age group is typically targeted by Shichida flashcards?",
+        "answer": "Infants and very young children (early childhood education)."
       }
     ],
     "path": "/flashcards/shichida",
@@ -44403,16 +44403,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What cognitive principle governs optimal review timing?",
-        "answer": "Spaced repetition scheduling, which dictates reviewing information just before forgetting occurs for maximum memory retention."
+        "question": "Why is AI considered the 'Best App for Creating Flashcards'?",
+        "answer": "It offers unparalleled speed and accuracy in converting notes to testable study sets."
       },
       {
-        "question": "What is the benefit of active recall over passive review?",
-        "answer": "Active recall forces the brain to retrieve information, strengthening neural pathways much more effectively than simply rereading notes."
+        "question": "How does the app improve upon manual creation methods?",
+        "answer": "By eliminating the need to type out questions, answers, and formatting."
       },
       {
-        "question": "What task does the AI automate when processing documents?",
-        "answer": "The AI automates concept identification and the conversion of complex material into atomic question-and-answer flashcard pairs."
+        "question": "What is the key benefit of creating flashcards from your own study materials?",
+        "answer": "The relevance and context of the cards are perfectly matched to your exam requirements."
       }
     ],
     "path": "/flashcards/best-creating",
@@ -44612,16 +44612,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What time is shown on an analog clock with the short hand on 4 and long hand on 12?",
-        "answer": "The time shown is exactly 4:00, or four o'clock. The hour hand points directly at the 4, indicating the hour."
+        "question": "How many minutes are in \"half past\" the hour?",
+        "answer": "Thirty (30) minutes."
       },
       {
-        "question": "How do you write 3:30 PM using 24-hour format notation?",
-        "answer": "3:30 PM is written as 15:30 in 24-hour format. You add 12 to the hour since it is PM and not between 1:00 and 12:59 PM."
+        "question": "If it is 3:00 PM",
+        "answer": "what time will it be in one hour?"
       },
       {
-        "question": "What is the significance of the long hand pointing at the 6 on an analog clock?",
-        "answer": "When the long (minute) hand points at the 6, it signifies 30 minutes past the hour, or half past the hour."
+        "question": "4:00 PM.",
+        "answer": "What is the term for 15 minutes past the hour?,Quarter past (or quarter after)."
       }
     ],
     "path": "/flashcards/telling-time",
@@ -44822,16 +44822,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary cognitive benefit of using flashcards?",
-        "answer": "The primary benefit is enforcing active recall, forcing the brain to retrieve information rather than passively recognizing it."
+        "question": "What is the key technology used to extract text from a PDF for flashcards?",
+        "answer": "Optical Character Recognition (OCR)."
       },
       {
-        "question": "How does spaced repetition improve long-term memory?",
-        "answer": "It strategically schedules reviews at increasing intervals, targeting the precise moment memory decay begins to occur."
+        "question": "How does the AI Flash Cards PDF Generator help with concept mastery?",
+        "answer": "It converts dense, passive text into active, testable questions."
       },
       {
-        "question": "What file types does the AI support for card generation?",
-        "answer": "The AI supports PDF, DOCX, and image files for immediate conversion into study materials."
+        "question": "Why is the instant conversion of a PDF to flash cards valuable?",
+        "answer": "It saves immense time over manually transcribing the PDF content."
       }
     ],
     "structuredData": {
@@ -45027,16 +45027,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the core benefit of using Spaced Repetition Scheduling?",
-        "answer": "It maximizes long-term retention by scheduling reviews at optimal intervals just before forgetting occurs."
+        "question": "What does NCERT stand for in the Indian education system?",
+        "answer": "National Council of Educational Research and Training."
       },
       {
-        "question": "Name three supported file types for inputting study notes.",
-        "answer": "PDF, DOCX, and PowerPoint files are fully supported for direct content processing."
+        "question": "What is the primary role of NCERT textbooks?",
+        "answer": "To provide the standard curriculum and resources for schools affiliated with the CBSE board."
       },
       {
-        "question": "What action should follow content extraction in the study workflow?",
-        "answer": "The generated cards should be used immediately for active recall practice based on a defined schedule."
+        "question": "How does AI help master NCERT concepts?",
+        "answer": "By instantly generating flashcards from the text, aiding active recall of syllabus facts."
       }
     ],
     "path": "/flashcards/ncert",
@@ -45235,16 +45235,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is a key behavioral trait of migratory passerine birds?",
-        "answer": "Many exhibit nocturnal migration, navigating using magnetic fields and stellar patterns to conserve energy during daytime heat."
+        "question": "Name three characteristics that most birds share.",
+        "answer": "Feathers, wings, lay eggs, warm-blooded (any three)."
       },
       {
-        "question": "Define the term 'niche partitioning' in avian ecology.",
-        "answer": "It describes how competing bird species utilize different limiting resources to coexist within the same community structure."
+        "question": "What is the term for a bird's feathers used for flight?",
+        "answer": "Flight feathers (or remiges)."
       },
       {
-        "question": "How does the structure of a bird's sternum aid flight efficiency?",
-        "answer": "The enlarged keel (or carina) provides a large surface area for the powerful attachment of the primary flight muscles."
+        "question": "What type of bird cannot fly and is native to Antarctica?",
+        "answer": "Penguin."
       }
     ],
     "path": "/flashcards/birds",
@@ -45444,16 +45444,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the mechanism of action for Metformin?",
-        "answer": "It decreases hepatic glucose production and increases insulin sensitivity in peripheral tissues."
+        "question": "Why is AI better than manual decks for Anki Medical preparation?",
+        "answer": "It handles the massive volume of medical content quickly and accurately."
       },
       {
-        "question": "Define a Type I error in statistical hypothesis testing.",
-        "answer": "Rejecting the null hypothesis when it is actually true; often called a 'false positive'."
+        "question": "What is the primary challenge in studying medical knowledge?",
+        "answer": "The sheer volume of complex information that requires long-term memorization."
       },
       {
-        "question": "Name the primary function of the Hippocampus in the brain.",
-        "answer": "Crucial role in the consolidation of information from short-term memory to long-term memory."
+        "question": "How does automated recall training benefit medical students?",
+        "answer": "It ensures high-yield facts are systematically reviewed using the spaced repetition curve."
       }
     ],
     "path": "/flashcards/anki-medical",
@@ -45654,16 +45654,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary benefit of AI summarizing documents for study?",
-        "answer": "It instantly synthesizes long texts into focused Q&A pairs, saving preparation time and improving concept retention via active recall."
+        "question": "What is the definition of a letter blend?",
+        "answer": "A cluster of two or three consonants in a word where the individual sound of each letter is still heard."
       },
       {
-        "question": "How should an exam date influence my review process?",
-        "answer": "Set the date so the spaced repetition algorithm can prioritize weaker topics for timely review just before the test."
+        "question": "Give an example of a word with the 'fr' blend.",
+        "answer": "Frog, free, frame (Any valid word)."
       },
       {
-        "question": "What learning principle relies on timed, strategic retrieval practice?",
-        "answer": "Active recall, which strengthens neural pathways by forcing the brain to retrieve information without cues, supported by spaced scheduling."
+        "question": "How do AI flashcards assist in mastering letter blends?",
+        "answer": "They provide targeted practice on the phonetic combination of the letters."
       }
     ],
     "path": "/flashcards/blend",
@@ -45864,16 +45864,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the definition of the sight word 'the'?",
-        "answer": "This is a definite article used to specify a particular noun. It is one of the most frequent words in English text."
+        "question": "What are Pre-Primer Sight Words?",
+        "answer": "The set of the easiest, most basic high-frequency words that children should learn to recognize instantly."
       },
       {
-        "question": "Spell the pre-primer word 'and'.",
-        "answer": "The letters are A, N, D. This conjunction connects two words or phrases."
+        "question": "Give two examples of Pre-Primer Sight Words.",
+        "answer": "A, and, away, big, blue, can, come (any two)."
       },
       {
-        "question": "Which word is typically learned immediately after 'see'?",
-        "answer": "Often 'come' or 'red' follows. Focus on recalling its position relative to similar difficulty words."
+        "question": "Why are these words taught before formal phonics rules?",
+        "answer": "Because they are common and often do not follow simple phonetic patterns."
       }
     ],
     "path": "/flashcards/pre-primer-sight",
@@ -46073,16 +46073,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary function of spaced repetition scheduling?",
-        "answer": "It optimizes review timing by showing you information just as you are about to forget it, maximizing long-term memory retention."
+        "question": "How does an AI tool create perfect online vocabulary flashcards?",
+        "answer": "It ensures the extracted definition is concise and provides relevant example sentences."
       },
       {
-        "question": "How does the AI improve on standard flashcard creation?",
-        "answer": "The AI rapidly extracts atomic concepts from lengthy source documents, ensuring consistency and saving significant manual creation time."
+        "question": "Why is manual creation difficult for online vocabulary flashcards?",
+        "answer": "It requires looking up each word, typing the definition, and ensuring consistent formatting."
       },
       {
-        "question": "What cognitive principle do flashcards rely upon for effective study?",
-        "answer": "Flashcards primarily enforce active recall, which is the effortful retrieval of information from memory, strengthening neural pathways."
+        "question": "What is the benefit of using AI for online vocabulary review?",
+        "answer": "It accelerates exposure to new words and integrates them into a systematic review cycle."
       }
     ],
     "structuredData": {
@@ -46279,16 +46279,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary advantage of AI over manual flashcard creation?",
-        "answer": "The primary advantage is the elimination of manual data entry, allowing users to focus time on active recall practice rather than preparation overhead."
+        "question": "How does AI simplify the process of creating a quiz from study material?",
+        "answer": "It automatically extracts the Q&A data, which can then be formatted into a quiz instantly."
       },
       {
-        "question": "Which scheduling principle optimizes long-term retention?",
-        "answer": "Spaced repetition scheduling is proven to boost long-term memory by introducing reviews at scientifically determined intervals."
+        "question": "What is the main advantage of using AI over manual Quizlet creation?",
+        "answer": "It saves the effort of typing and formatting questions, allowing immediate focus on testing."
       },
       {
-        "question": "What document types can be converted into Q&A pairs?",
-        "answer": "The system processes PDFs, DOCX, and PowerPoint files directly into study materials ready for review."
+        "question": "What kind of questions are best suited for flashcard-based quizzes?",
+        "answer": "Recall questions testing specific facts, definitions, or dates."
       }
     ],
     "path": "/flashcards/create-quiz-quizlet",
@@ -46488,16 +46488,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary benefit of active recall over passive review?",
-        "answer": "Active recall strengthens memory traces by forcing information retrieval, leading to superior long-term retention compared to simple rereading."
+        "question": "What is the advantage of creating flashcards online for free with AI?",
+        "answer": "Zero cost and instant access to sophisticated automation features."
       },
       {
-        "question": "What learning component does the app use for scheduling reviews?",
-        "answer": "The app integrates a spaced repetition system (SRS) to determine the optimal time to revisit specific flashcards based on prior success."
+        "question": "How does AI ensure the quality of free online flashcards?",
+        "answer": "It uses advanced text analysis to generate accurate and relevant questions."
       },
       {
-        "question": "What types of input files can the AI process?",
-        "answer": "The AI can convert content from PDF, DOCX, PowerPoint files, and embedded images into structured question-and-answer formats."
+        "question": "Why is Active Recall essential for effective learning?",
+        "answer": "It forces the brain to retrieve information, strengthening neural pathways for memory."
       }
     ],
     "path": "/flashcards/create-online",
@@ -46696,16 +46696,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What term describes the process of water movement through plants?",
-        "answer": "Transpiration. This process drives the ascent of water and dissolved minerals through the xylem."
+        "question": "What is photosynthesis?",
+        "answer": "The process by which plants use sunlight, water, and carbon dioxide to create food (glucose) and oxygen."
       },
       {
-        "question": "What is the primary function of the stomata in a leaf?",
-        "answer": "Stomata regulate gas exchange, allowing CO2 intake for photosynthesis and releasing O2 and water vapor."
+        "question": "Name the two main parts of a plant's reproductive system.",
+        "answer": "Stamen (male) and Pistil/Carpel (female)."
       },
       {
-        "question": "What is required for phototropism to occur in a plant shoot?",
-        "answer": "Phototropism requires the plant hormone auxin, which redistributes toward the shaded side, causing differential cell elongation."
+        "question": "What is the purpose of a plant's roots?",
+        "answer": "To anchor the plant and absorb water and nutrients from the soil."
       }
     ],
     "path": "/flashcards/plants",
@@ -46906,16 +46906,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary distinction between orders Hymenoptera and Coleoptera?",
-        "answer": "Hymenoptera (bees, ants) typically have membranous wings and a narrow 'wasp waist,' while Coleoptera (beetles) possess hardened forewings (elytra)."
+        "question": "Name three characteristics common to most insects.",
+        "answer": "Three body sections (head, thorax, abdomen), six legs, and usually two pairs of wings."
       },
       {
-        "question": "Define metamorphosis in the context of insect life cycles.",
-        "answer": "Metamorphosis is the process of post-embryonic development involving distinct morphological changes, categorized as complete (holometabolous) or incomplete (hemimetabolous)."
+        "question": "What are the three body sections of an insect?",
+        "answer": "Head, Thorax, and Abdomen."
       },
       {
-        "question": "What physiological role does the insect trachea serve?",
-        "answer": "The tracheal system is an external network of tubes that delivers oxygen directly to tissues and cells throughout the insect's body, facilitating respiration."
+        "question": "What is the protective outer layer of an insect called?",
+        "answer": "Exoskeleton."
       }
     ],
     "path": "/flashcards/insect",
@@ -47116,16 +47116,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary benefit of AI over manual card creation?",
-        "answer": "AI automates content extraction and ensures cards promote active recall, saving study time and improving material coverage."
+        "question": "What is a lowercase letter?",
+        "answer": "The small form of a letter, used for general text (e.g., 'a', 'b', 'c')."
       },
       {
-        "question": "How does setting an exam date affect card review frequency?",
-        "answer": "The system calibrates the spaced repetition schedule to target peak knowledge right before your specified examination deadline."
+        "question": "How does learning lowercase letters differ from uppercase?",
+        "answer": "Lowercase letters are used more frequently in text and require different visual recognition."
       },
       {
-        "question": "What learning principle do optimized flashcards reinforce?",
-        "answer": "They strongly reinforce active recall by forcing the user to retrieve information without external cues from the source document."
+        "question": "Give an example of a lowercase letter.",
+        "answer": "a, b, c, d, e (any one)."
       }
     ],
     "structuredData": {
@@ -47322,16 +47322,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What cognitive principle does AI card generation support best?",
-        "answer": "It strongly supports active recall by forcing information retrieval rather than passive rereading of notes."
+        "question": "How does an AI Quizlet Test Maker alternative benefit students?",
+        "answer": "It rapidly generates testable content from source documents without the need for manual Quizlet data entry."
       },
       {
-        "question": "How should an exam date impact my study schedule?",
-        "answer": "Setting an exam date allows the system to reverse-engineer the review frequency using spaced repetition for optimal final retention."
+        "question": "What is the primary function of a test maker?",
+        "answer": "To produce practice questions in various formats (multiple-choice, fill-in-the-blank) for self-assessment."
       },
       {
-        "question": "What benefit does document upload offer over manual entry?",
-        "answer": "It drastically cuts time spent formatting, allowing the user to focus immediately on comprehension and testing learned material."
+        "question": "Why is active recall testing superior to passive review?",
+        "answer": "Testing forces memory retrieval, which solidifies long-term retention."
       }
     ],
     "path": "/flashcards/quizlet-test-maker",
@@ -47532,16 +47532,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the function of the prefix 'mal-'?",
-        "answer": "The prefix 'mal-' originates from Latin and typically means 'bad' or 'ill'. Examples include 'malfunction' or 'malnourished'."
+        "question": "What is a prefix?",
+        "answer": "A letter or group of letters added to the beginning of a word to change its meaning (e.g., 'un-')."
       },
       {
-        "question": "Define the suffix '-logy' in technical terms.",
-        "answer": "The suffix '-logy' refers to 'the study of' or 'a branch of science'. It converts a subject into a field of study, like 'biology'."
+        "question": "What is a suffix?",
+        "answer": "A letter or group of letters added to the end of a word to change its meaning or function (e.g., '-ing')."
       },
       {
-        "question": "How does the suffix '-able' modify a word?",
-        "answer": "The suffix '-able' indicates capability or fitness, meaning 'capable of being' or 'worthy of'. For example, 'readable' means capable of being read."
+        "question": "What does the prefix 'pre-' mean?",
+        "answer": "Before."
       }
     ],
     "path": "/flashcards/prefixes-suffixes",
@@ -47742,16 +47742,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary cognitive benefit of active recall?",
-        "answer": "Active recall forces retrieval from memory, strengthening neural pathways faster than passive rereading of material."
+        "question": "How many letters are in the English alphabet?",
+        "answer": "26."
       },
       {
-        "question": "How does Spaced Repetition improve long-term memory?",
-        "answer": "It schedules reviews just before you are likely to forget, optimizing memory consolidation and reducing study burnout."
+        "question": "What is the term for a letter that is not a vowel?",
+        "answer": "Consonant."
       },
       {
-        "question": "Why is immediate feedback crucial in study sessions?",
-        "answer": "Immediate feedback corrects misconceptions right away, preventing the reinforcement of incorrect knowledge into long-term memory structures."
+        "question": "How does AI create Alphabet Flash Cards from images or PDFs?",
+        "answer": "It uses OCR to recognize the letters and structures them into individual cards for practice."
       }
     ],
     "path": "/flashcards/alphabet",
@@ -47951,16 +47951,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary function of a relative pronoun?",
-        "answer": "A relative pronoun introduces a subordinate clause that modifies a noun or pronoun mentioned earlier in the sentence."
+        "question": "What is a pronoun?",
+        "answer": "A word that takes the place of a noun (e.g., he, she, it, they)."
       },
       {
-        "question": "When should you use the subjective pronoun 'who'?",
-        "answer": "'Who' is used when the pronoun functions as the subject of a verb within its clause, similar to 'he' or 'she'."
+        "question": "Give an example of a subject pronoun.",
+        "answer": "I, you, he, she, it, we, they (any one)."
       },
       {
-        "question": "Define antecedent agreement in pronoun usage.",
-        "answer": "Antecedent agreement requires that a pronoun must match its antecedent (the noun it replaces) in number and gender."
+        "question": "What type of pronoun refers back to the subject (e.g.",
+        "answer": "myself\")?,Reflexive pronoun."
       }
     ],
     "structuredData": {
@@ -48157,16 +48157,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What cognitive benefit does active recall provide?",
-        "answer": "Active recall forces the brain to retrieve information, strengthening memory pathways far better than passive review."
+        "question": "Why is manually making \"blank flash cards from PDFs\" inefficient?",
+        "answer": "It requires tedious copying and pasting of text onto a template or blank digital card."
       },
       {
-        "question": "Define the core concept of Spaced Repetition.",
-        "answer": "It involves reviewing learned material at increasing intervals to counteract the forgetting curve effectively."
+        "question": "How does AI eliminate the need for blank flash cards?",
+        "answer": "It automatically populates the question and answer fields from the source document."
       },
       {
-        "question": "What is the primary utility of processing a DOCX file?",
-        "answer": "It allows study material authored in word processors to be converted into dynamic, testable flashcard formats."
+        "question": "What is the main benefit of eliminating manual effort in flashcard creation?",
+        "answer": "Students gain more time for active studying and revision."
       }
     ],
     "path": "/flashcards/blank",
@@ -48365,16 +48365,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary phonetic rule for the vowel team 'oa'?",
-        "answer": "The 'oa' team typically represents the long 'o' sound, as in the word 'boat'. It usually appears in the middle of a word."
+        "question": "What is a 'long vowel' sound?",
+        "answer": "A vowel sound that sounds like the letter's name (e.g., the 'a' in 'cake')."
       },
       {
-        "question": "How do silent 'e' rules typically affect a CVCe word?",
-        "answer": "The final silent 'e' signals that the preceding vowel makes its long sound, as seen in words like 'make' or 'theme'."
+        "question": "Give an example of a word with a long 'I' sound.",
+        "answer": "Bike, time, light (Any valid word)."
       },
       {
-        "question": "What sound do the letters 'ee' usually produce?",
-        "answer": "The 'ee' digraph consistently creates the long 'e' sound, often found in words like 'see' or 'green'."
+        "question": "What spelling rule often indicates a long vowel sound in CVCe words?",
+        "answer": "The silent 'e' at the end of the word."
       }
     ],
     "path": "/flashcards/long-vowel",
@@ -48576,16 +48576,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary goal of spaced repetition scheduling?",
-        "answer": "The primary goal is to maximize long-term retention by scheduling reviews just before the information is forgotten, optimizing study time."
+        "question": "What are High Frequency Words?",
+        "answer": "Words that appear very often in written text (e.g., \"the"
       },
       {
-        "question": "What input documents are required for flashcard generation?",
-        "answer": "You can upload PDFs, DOCX files, or even images containing the source text you wish to study from."
+        "question": " \"is",
+        "answer": " \"was\")."
       },
       {
-        "question": "How does collaboration work for shared flashcard sets?",
-        "answer": "Generated flashcards can be shared with others via a unique, publicly accessible link for collaborative group study."
+        "question": "Why is instant recognition of high frequency words important?",
+        "answer": "It increases reading speed and fluency, as the reader doesn't need to decode them.,Give two examples of high frequency words.,The, is, and, was, said (any two)."
       }
     ],
     "path": "/flashcards/high-frequency",
@@ -48785,16 +48785,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What cognitive mechanism does spaced repetition target?",
-        "answer": "It targets long-term memory consolidation by optimizing review intervals, minimizing forgetting."
+        "question": "How does using AI change the way students \"write flashcards\"?",
+        "answer": "Instead of physically writing, they upload notes and the AI instantly generates the content."
       },
       {
-        "question": "What primary study output does AI generate from uploaded docs?",
-        "answer": "The AI generates structured flashcards ready for immediate active recall practice based on the source text."
+        "question": "What is the benefit of AI precision when writing flashcards?",
+        "answer": "It ensures conciseness and accurate extraction of key facts."
       },
       {
-        "question": "If I set an exam date, what happens to my review schedule?",
-        "answer": "The schedule dynamically adjusts to prioritize reinforcement of concepts leading up to that specific target date."
+        "question": "Why is the traditional method of writing flashcards sometimes slow?",
+        "answer": "It involves the time-consuming physical act of writing or typing each card manually."
       }
     ],
     "path": "/flashcards/write",
@@ -48994,16 +48994,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "In Zoo Phonics, which letter is typically associated with the 'Alligator' sound?",
-        "answer": "The letter 'A' is associated with the short /a/ sound, represented by the Alligator."
+        "question": "What is the primary teaching method of Zoo Phonics?",
+        "answer": "Using animal names and corresponding body movements to teach letter sounds and shapes."
       },
       {
-        "question": "What is the primary benefit of active recall over passive review?",
-        "answer": "Active recall forces retrieval effort, strengthening neural pathways far more effectively than simply reading or recognizing information."
+        "question": "What is the sound associated with the animal 'Alligator' in Zoo Phonics?",
+        "answer": "The short 'a' sound /a/."
       },
       {
-        "question": "How does the spaced repetition schedule adapt based on performance?",
-        "answer": "If a card is answered incorrectly, the interval shortens to prompt earlier review; correct answers lead to progressively longer review intervals."
+        "question": "How do AI flash cards assist with Zoo Phonics learning?",
+        "answer": "They provide rapid, visual testing of the animal-sound-letter associations."
       }
     ],
     "path": "/flashcards/zoo-phonics",
@@ -49204,16 +49204,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary benefit of using an AI maker over manual creation?",
-        "answer": "The primary benefit is massive time savings, allowing you to focus effort on active recall practice rather than tedious content transcription."
+        "question": "What is the defining characteristic of an Automatic Flashcard Maker?",
+        "answer": "It converts raw input (documents, text) into structured study aids without manual intervention."
       },
       {
-        "question": "What foundational study principle does the app's scheduler use?",
-        "answer": "The app uses Spaced Repetition Scheduling, an algorithm based on cognitive science principles for long-term memory retention."
+        "question": "What does automation allow students to focus on?",
+        "answer": "Active recall, practice, and comprehension, rather than preparation."
       },
       {
-        "question": "If I set an exam date, how does the AI adjust my studying?",
-        "answer": "The AI paces your reviews backward from the deadline, ensuring more frequent exposure to difficult material as the test approaches."
+        "question": "How does the automatic maker handle different document structures?",
+        "answer": "It uses NLP to identify terms, definitions, and headers, regardless of formatting complexity."
       }
     ],
     "path": "/flashcards/automatic-maker",
@@ -49413,16 +49413,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary mechanism for long-term vocabulary retention?",
-        "answer": "The primary mechanism is Spaced Repetition Scheduling, which optimizes review timing based on when memory recall begins to fade."
+        "question": "Define the Kaplan GRE word 'alacrity.'",
+        "answer": "Brisk and cheerful readiness; eagerness."
       },
       {
-        "question": "Define 'Ephemeral' often found in GRE vocabulary lists.",
-        "answer": "Ephemeral means lasting for a very short time. Use this word to describe fleeting moments or short-lived trends."
+        "question": "What does the vocabulary word 'delineate' mean?",
+        "answer": "To describe or portray something precisely."
       },
       {
-        "question": "How does uploading a DOCX differ from uploading a PDF?",
-        "answer": "Both formats are processed via OCR/parsing, but DOCX files often provide cleaner, text-based extraction than scanned or image-heavy PDFs."
+        "question": "Why are AI-generated flashcards better than traditional GRE study methods?",
+        "answer": "They instantly structure the high-volume Kaplan content into a testable format."
       }
     ],
     "path": "/flashcards/kaplan-gre-vocabulary",
@@ -49621,16 +49621,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the critical intervention for suspected bacterial meningitis in neonates?",
-        "answer": "Immediate administration of empiric broad-spectrum antibiotics (often ampicillin plus a third-generation cephalosporin or gentamicin) is crucial due to rapid progression."
+        "question": "What is the typical use for MedStudy Pediatrics PDFs?",
+        "answer": "Board preparation and maintenance of certification for pediatric specialists."
       },
       {
-        "question": "Define the primary diagnostic feature differentiating Bronchiolitis from Croup.",
-        "answer": "Bronchiolitis typically presents with wheezing and rhinitis, whereas Croup is characterized by a characteristic barking cough and inspiratory stridor."
+        "question": "Why is Active Recall superior for pediatrics content?",
+        "answer": "Pediatrics requires memorization of vast amounts of differential diagnoses and clinical guidelines."
       },
       {
-        "question": "What characterizes the mechanism of action for developmental dysplasia of the hip (DDH) screening?",
-        "answer": "Screening involves the Ortolani maneuver (reduction of a dislocated hip) and the Barlow maneuver (dislocation of a stable hip) performed during infancy."
+        "question": "What is the focus of MedStudy Pediatrics material?",
+        "answer": "High-yield clinical information relevant to practice and exams."
       }
     ],
     "path": "/flashcards/medstudy-pediatrics-download",
@@ -49825,16 +49825,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What concept governs the required revision interval?",
-        "answer": "The concept is Spaced Repetition, which optimizes recall by reviewing information just before it is forgotten."
+        "question": "What is stoichiometry?",
+        "answer": "The relationship between the relative quantities of substances taking part in a reaction."
       },
       {
-        "question": "What is required for maximal memory consolidation?",
-        "answer": "Active recall, which means forcing retrieval of information without cues, is essential for long-term memory consolidation."
+        "question": "Define 'enthalpy.'",
+        "answer": "A thermodynamic property of a system equivalent to the system's internal energy plus the product of pressure and volume."
       },
       {
-        "question": "Name three supported file types for upload?",
-        "answer": "PDF, DOCX (Word documents), and various image formats are supported for instant conversion."
+        "question": "What does the acronym 'VSEPR' stand for?",
+        "answer": "Valence Shell Electron Pair Repulsion theory."
       }
     ],
     "path": "/flashcards/ap-chemistry",
@@ -50034,16 +50034,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the core benefit of using AI for card creation?",
-        "answer": "It eliminates the manual, time-consuming step of transcribing and formatting terms, ensuring speed and consistency in preparation."
+        "question": "What is the first step when using AI to create vocabulary flashcards?",
+        "answer": "Providing the AI with the source list of words or a document containing them."
       },
       {
-        "question": "What cognitive principle drives the review schedule?",
-        "answer": "The review schedule is driven by spaced repetition, which leverages the forgetting curve to maximize long-term retention."
+        "question": "How does AI ensure effective vocabulary acquisition?",
+        "answer": "It pairs the word with a concise definition and often context sentences for better retention."
       },
       {
-        "question": "How does sharing decks benefit group study?",
-        "answer": "You can generate a public link to share perfectly formatted, AI-verified decks instantly with classmates or study partners."
+        "question": "Why is AI essential for modern vocabulary creation?",
+        "answer": "It eliminates the need to manually search for and type definitions for every word."
       }
     ],
     "structuredData": {
@@ -50239,16 +50239,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary learning benefit of spaced repetition?",
-        "answer": "It maximizes long-term retention by scheduling reviews right before the point of forgetting, making study time more efficient."
+        "question": "Define the Barron's SAT word 'laconic.'",
+        "answer": "Using very few words; concise."
       },
       {
-        "question": "Define 'Active Recall' in the context of flashcards.",
-        "answer": "Active recall is retrieving information from memory without cues, which strengthens memory traces far more than passive reading."
+        "question": "What does the term 'mendacious' mean?",
+        "answer": "Not telling the truth; lying."
       },
       {
-        "question": "How does an AI system benefit from a scheduled exam date?",
-        "answer": "The schedule prioritizes difficult vocabulary reviews, compressing the learning curve so complex words are mastered by the target date."
+        "question": "How does AI aid in mastering Barron's SAT Vocabulary?",
+        "answer": "It quickly extracts and formats the extensive word lists into testable flashcard sets."
       }
     ],
     "path": "/flashcards/barrons-sat-vocabulary",
@@ -50449,16 +50449,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary benefit of AI over manual flashcard creation?",
-        "answer": "The primary benefit is massive time savings. AI instantly synthesizes content, removing the hours spent typing notes into Q&A format."
+        "question": "How does an AI Flashcard Creator with Images function?",
+        "answer": "It extracts text from notes, creates the flashcard text, and then finds a relevant image to attach."
       },
       {
-        "question": "What does 'active recall' demand from the student?",
-        "answer": "Active recall demands retrieval of information from memory without cues, directly testing knowledge rather than just recognition."
+        "question": "Why are images important in flashcards?",
+        "answer": "They engage visual memory, creating a stronger, dual-encoded memory trace."
       },
       {
-        "question": "How does inputting an exam date optimize study time?",
-        "answer": "It allows the spaced repetition algorithm to compress the review schedule, ensuring high-frequency review closer to the target date."
+        "question": "What type of content benefits most from image inclusion?",
+        "answer": "Anatomy, history, vocabulary, and scientific concepts."
       }
     ],
     "path": "/flashcards/creator-images",
@@ -50658,16 +50658,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary function of the DHCP service in a network?",
-        "answer": "DHCP automatically assigns dynamic IP addresses, subnet masks, and gateway information to devices connecting to the network."
+        "question": "What does CompTIA stand for?",
+        "answer": "Computing Technology Industry Association."
       },
       {
-        "question": "Differentiate between RAID 0 and RAID 1 configurations.",
-        "answer": "RAID 0 stripes data across drives for speed but offers no redundancy. RAID 1 mirrors data identically across drives for fault tolerance."
+        "question": "What is the purpose of the CompTIA A+ certification?",
+        "answer": "To validate foundation-level knowledge of computer hardware and software, and troubleshooting skills."
       },
       {
-        "question": "What is the typical command to check the status of running processes in Linux?",
-        "answer": "The standard command used to view current system processes and their resource consumption is 'ps' or 'top'."
+        "question": "Name one domain covered in the CompTIA A+ exam.",
+        "answer": "Hardware, Networking, Operating Systems, or Security."
       }
     ],
     "path": "/flashcards/comptia",
@@ -50867,16 +50867,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What operation does moving the lower beads towards the beam represent?",
-        "answer": "Moving lower beads toward the beam signifies adding positive units (1-4). Moving them away signifies removing those units."
+        "question": "What is an abacus used for?",
+        "answer": "Performing arithmetic calculations by sliding counters along rods or wires."
       },
       {
-        "question": "How is the value 7 represented on a standard abacus rod?",
-        "answer": "It is represented by one upper bead (value 5) and two lower beads (value 2) moved toward the beam."
+        "question": "What is the name for the beads in the upper deck of a typical abacus?",
+        "answer": "Heaven beads or upper beads."
       },
       {
-        "question": "What is the first step when clearing an abacus for a new calculation?",
-        "answer": "The first step is to return all beads (upper and lower) away from the beam, representing a value of zero."
+        "question": "What is the name for the beads in the lower deck of a typical abacus?",
+        "answer": "Earth beads or lower beads."
       }
     ],
     "structuredData": {
@@ -51072,16 +51072,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary purpose of the root opening measurement in pipe fitting?",
-        "answer": "The root opening is the gap left between the pipe ends to allow for full penetration of the weld metal at the root."
+        "question": "What does NCCER stand for?",
+        "answer": "National Center for Construction Education and Research."
       },
       {
-        "question": "What common formula calculates the required circumference for a full roll or circle?",
-        "answer": "The circumference (C) is calculated using the formula C = πd, where 'd' is the diameter of the pipe."
+        "question": "What is the primary function of a pipefitter?",
+        "answer": "To install, assemble, fabricate, maintain, and repair mechanical piping systems."
       },
       {
-        "question": "Why is the proper handling and storage of oxygen cylinders critical on site?",
-        "answer": "Oxygen must be separated from flammable materials and stored upright to prevent ignition hazards, as it is a powerful oxidizer."
+        "question": "What is the purpose of the NCCER Pipefitter certification?",
+        "answer": "To verify core knowledge and skills in the trade."
       }
     ],
     "structuredData": {
@@ -51277,16 +51277,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary cognitive benefit of flashcards over rereading notes?",
-        "answer": "Flashcards promote active recall, forcing retrieval practice which significantly strengthens memory traces compared to passive recognition."
+        "question": "What does GED stand for?",
+        "answer": "General Educational Development."
       },
       {
-        "question": "Name one critical factor in effective spaced repetition scheduling.",
-        "answer": "The crucial factor is scheduling the next review interval just as you are about to forget the material, optimizing long-term retention."
+        "question": "What is the purpose of the GED test?",
+        "answer": "To certify that an individual has high school-level academic skills."
       },
       {
-        "question": "If you upload a DOCX file, what AI function is performed first?",
-        "answer": "The AI first parses the text structure to segment information into question-answer pairs based on concept density and relevance indicators."
+        "question": "Name one subject covered by the GED exam.",
+        "answer": "Reasoning Through Language Arts, Mathematical Reasoning, Social Studies, or Science."
       }
     ],
     "path": "/flashcards/ged",
@@ -51487,16 +51487,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary benefit of using AI for flashcard generation?",
-        "answer": "It drastically reduces manual input time by instantly converting lengthy documents into study-ready active recall prompts."
+        "question": "What makes an AI tool the 'Best Flashcard Maker for Studying'?",
+        "answer": "Its focus on efficient creation coupled with features that support active review (like SRS)."
       },
       {
-        "question": "How does a fixed exam date influence the study schedule?",
-        "answer": "The schedule works backward from the exam date, calculating the optimal frequency for reviewing difficult material to ensure peak recall then."
+        "question": "How does AI benefit the studying process beyond simple card creation?",
+        "answer": "It organizes, categorizes, and provides tools for testing the generated content."
       },
       {
-        "question": "What learning principle drives intelligent flashcard review timing?",
-        "answer": "Spaced repetition scheduling, which presents cards at increasing intervals based on demonstrated mastery."
+        "question": "Why is active recall emphasized when using a flashcard maker?",
+        "answer": "It shifts the mental effort to retrieval, which greatly improves long-term memory."
       }
     ],
     "structuredData": {
@@ -51693,16 +51693,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary benefit of using AI for flashcard creation?",
-        "answer": "It automates content synthesis, eliminating manual transcription time so students can immediately focus on active recall practice."
+        "question": "What is the primary benefit of using Free Notecards Online?",
+        "answer": "Accessibility from anywhere and the elimination of physical material costs."
       },
       {
-        "question": "What is the role of spaced repetition in study retention?",
-        "answer": "It schedules reviews based on forgetting curves, presenting information just as memory begins to fade to strengthen long-term consolidation."
+        "question": "How does AI enhance the efficiency of free online notecards?",
+        "answer": "By instantly converting complex documents into usable study aids."
       },
       {
-        "question": "What core document types can be converted into study sets?",
-        "answer": "You can upload PDFs, DOCX files, and various image formats directly from your existing study library."
+        "question": "What is the main goal of leveraging AI for high-efficiency learning?",
+        "answer": "To maximize the time spent on effective review rather than preparation."
       }
     ],
     "path": "/flashcards/online",
@@ -51902,16 +51902,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary cognitive benefit of spaced repetition?",
-        "answer": "It optimizes memory encoding by spacing review intervals, forcing retrieval when forgetting is about to occur."
+        "question": "How does AI allow a student to 'Effortlessly Make Your Own Flashcards'?",
+        "answer": "By automating the text extraction and formatting from any uploaded document."
       },
       {
-        "question": "What file format is best for maximizing AI extraction quality?",
-        "answer": "Digitally created PDFs or DOCX files generally yield higher quality extraction than scanned images."
+        "question": "What is the core benefit of AI over manual flashcard creation?",
+        "answer": "Speed and reduction of error-prone, repetitive tasks."
       },
       {
-        "question": "How do you define an atomic flashcard question?",
-        "answer": "An atomic question targets only one core concept or fact, preventing confusion during rapid recall testing."
+        "question": "Why is it important to go beyond manual creation with AI?",
+        "answer": "To efficiently handle the large volumes of study material common in higher education."
       }
     ],
     "path": "/flashcards/make-my",
@@ -52112,16 +52112,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the definition of a regular polygon?",
-        "answer": "A polygon that is both equilateral (all sides equal) and equiangular (all interior angles equal)."
+        "question": "Name the three primary dimensions of geometric shapes.",
+        "answer": "Length, width, and height (or depth)."
       },
       {
-        "question": "What is the sum of interior angles for an n-sided convex polygon?",
-        "answer": "The sum is calculated using the formula (n-2) * 180 degrees, where n is the number of sides."
+        "question": "What is a two-dimensional shape?",
+        "answer": "A shape that has length and width but no depth (e.g., a square, triangle)."
       },
       {
-        "question": "How do you calculate the volume of a right cylinder?",
-        "answer": "Volume equals the area of the circular base (πr²) multiplied by the height (h) of the cylinder."
+        "question": "What is the sum of the angles in any triangle?",
+        "answer": "180 degrees."
       }
     ],
     "path": "/flashcards/shape",
@@ -52318,16 +52318,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary benefit of AI-generated flashcards?",
-        "answer": "The primary benefit is automation, converting dense source material into reviewable cards without manual transcription or formatting effort."
+        "question": "What is the main advantage of using AI Flash Card Maker Software?",
+        "answer": "It provides advanced features like OCR, NLP, and SRS integration in a dedicated application."
       },
       {
-        "question": "How does spaced repetition improve memory retention?",
-        "answer": "It optimizes review timing by prompting recall just before forgetting occurs, strengthening neural pathways for long-term storage."
+        "question": "How does the software improve mastery of study workflow?",
+        "answer": "By seamlessly moving from document input to structured, scheduled review."
       },
       {
-        "question": "What document types are supported for input?",
-        "answer": "The tool supports common academic files like PDF, DOCX, and PPTX formats for reliable concept extraction."
+        "question": "Why use AI software over simple manual entry?",
+        "answer": "For high-volume academic material, the automation saves hundreds of hours of labor."
       }
     ],
     "path": "/flashcards/maker-software",
@@ -52528,16 +52528,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary psychological function of the emotion 'fear'?",
-        "answer": "Fear is an essential survival mechanism designed to trigger a rapid response to immediate perceived threat or danger."
+        "question": "Define the emotion 'anxiety.'",
+        "answer": "A feeling of worry, nervousness, or unease, typically about an imminent event or something with an uncertain outcome."
       },
       {
-        "question": "How does 'active recall' differ from passive review?",
-        "answer": "Active recall requires retrieving information from memory without cues, contrasting with passive review like rereading notes."
+        "question": "What is the opposite emotion of 'fear'?",
+        "answer": "Courage or confidence."
       },
       {
-        "question": "Define 'Spaced Repetition' in the context of learning algorithms.",
-        "answer": "It is a learning technique where intervals between subsequent reviews of previously learned material increase as recall improves."
+        "question": "Name three common facial expressions associated with emotions.",
+        "answer": "Smiling (joy), frowning (sadness), wide eyes (surprise)."
       }
     ],
     "path": "/flashcards/emotions",
@@ -52736,16 +52736,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary goal of mastering Dolch Sight Words?",
-        "answer": "The primary goal is to achieve instant word recognition to build reading fluency and comprehension."
+        "question": "What is the Dolch Sight Word List?",
+        "answer": "A list of 220 high-frequency words that should be recognized instantly by early readers."
       },
       {
-        "question": "How does active recall differ from passive reading lists?",
-        "answer": "Active recall forces you to retrieve the answer from memory, strengthening neural pathways compared to passively scanning a list."
+        "question": "What is the main purpose of the Dolch list?",
+        "answer": "To provide a foundation of words necessary for reading fluency in early education."
       },
       {
-        "question": "Name one benefit of scheduling reviews based on an exam date.",
-        "answer": "It ensures that your review intensity peaks just before the assessment, maximizing retention when it matters most."
+        "question": "Give two examples of words from the Dolch list.",
+        "answer": "The, a, is, was, said (any two)."
       }
     ],
     "path": "/flashcards/dolch-sight",
@@ -52945,16 +52945,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What cognitive benefit does 'active recall' offer?",
-        "answer": "Active recall forces the brain to retrieve information, strengthening memory traces far more effectively than passive review."
+        "question": "What is the difference between an alphabet letter and a phoneme?",
+        "answer": "A letter is the written symbol; a phoneme is the sound it represents."
       },
       {
-        "question": "How does spaced repetition optimize study time?",
-        "answer": "It schedules reviews at increasing intervals based on performance, ensuring you focus time only on difficult concepts right before forgetting."
+        "question": "How many vowels are represented by alphabet letters in English?",
+        "answer": "Five (A, E, I, O, U)."
       },
       {
-        "question": "What is the core difference between flashcard input methods?",
-        "answer": "Manual entry is time-consuming; AI extraction from PDFs and documents automates creation while maintaining structure."
+        "question": "How does AI assist in creating Alphabet Letter Cards?",
+        "answer": "It extracts and isolates individual letters for targeted recognition practice."
       }
     ],
     "path": "/flashcards/alphabet-letter",
@@ -53154,16 +53154,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the mathematical term for dividing a whole into equal parts?",
-        "answer": "The term is a fraction. It represents a division operation where the numerator is divided by the denominator."
+        "question": "What are the two parts of a fraction called?",
+        "answer": "Numerator (top number) and Denominator (bottom number)."
       },
       {
-        "question": "How do you convert the mixed number 3 1/4 to an improper fraction?",
-        "answer": "Multiply the whole number by the denominator (3 * 4 = 12) and add the original numerator (12 + 1 = 13). The result is 13/4."
+        "question": "What does the denominator represent?",
+        "answer": "The total number of equal parts the whole is divided into."
       },
       {
-        "question": "When adding fractions, what is the crucial first step if denominators differ?",
-        "answer": "You must find a common denominator, often the Least Common Multiple (LCM), to ensure you are adding equivalent parts."
+        "question": "Convert the fraction 1/2 into a decimal.",
+        "answer": "0.5."
       }
     ],
     "structuredData": {
@@ -53360,16 +53360,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the core difference between M1 and M2 money supply measures?",
-        "answer": "M1 includes the most liquid assets like currency and checkable deposits. M2 includes M1 plus less liquid assets like savings deposits and money market funds."
+        "question": "What is the basic unit of currency in the United States?",
+        "answer": "Dollar."
       },
       {
-        "question": "How does the central bank influence the money supply?",
-        "answer": "The central bank uses tools like open market operations and adjusting the reserve requirement to control the amount of credit available."
+        "question": "Name three common coins used in the US.",
+        "answer": "Penny, nickel, dime, quarter (any three)."
       },
       {
-        "question": "Define 'Inflation' in the context of monetary policy.",
-        "answer": "Inflation is the rate at which the general level of prices for goods and services is rising, eroding purchasing power."
+        "question": "What is the term for the paper form of money?",
+        "answer": "Banknote or bill."
       }
     ],
     "path": "/flashcards/money",
@@ -53569,16 +53569,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary benefit of AI card generation over manual entry?",
-        "answer": "The primary benefit is massive time savings, shifting effort from transcription to active engagement with the material."
+        "question": "How does AI speed up the process to \"Make Your Own Quizlet Faster\"?",
+        "answer": "By automatically structuring the Q&A from notes into the required Quizlet format."
       },
       {
-        "question": "What cognitive principle underlies optimized review scheduling?",
-        "answer": "The underlying principle is spaced repetition, which uses forgetting curves to prompt recall at optimal intervals."
+        "question": "What is the key benefit of stopping manual entry for Quizlet sets?",
+        "answer": "Increased time for actual active review using the generated sets."
       },
       {
-        "question": "What information must a user provide to start the process?",
-        "answer": "The user must upload a source document (PDF, DOCX, PPT, or Image) containing the study material content."
+        "question": "Why does our AI outpace traditional Quizlet creation?",
+        "answer": "It eliminates the slow, repetitive task of typing and formatting individual cards."
       }
     ],
     "path": "/flashcards/make-my-quizlet",
@@ -53778,16 +53778,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What sound does the letter 'A' commonly represent?",
-        "answer": "The common short sound is /æ/ as in 'apple'. Long vowel sounds like /eɪ/ (as in 'ape') also exist."
+        "question": "What is a letter sound?",
+        "answer": "The specific sound or phoneme associated with a written letter (e.g., 'b' says /b/)."
       },
       {
-        "question": "What is the primary purpose of a CVC word in phonics?",
-        "answer": "CVC (Consonant-Vowel-Consonant) words are foundational for teaching basic decoding skills using short vowel sounds."
+        "question": "Why are letter sound cards important for early literacy?",
+        "answer": "They teach phoneme-grapheme correspondence, which is crucial for decoding words."
       },
       {
-        "question": "Name one scenario where manually creating flashcards fails students.",
-        "answer": "Manual creation delays study time significantly, meaning students spend less time practicing retrieval and more time transcribing notes."
+        "question": "How does AI generation help with letter sound cards?",
+        "answer": "It rapidly produces clear, consistent cards for all letters and their sounds."
       }
     ],
     "path": "/flashcards/letter-sound",
@@ -53988,16 +53988,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary difference between 'fog' and 'mist'?",
-        "answer": "Both involve water droplets suspended in the air. Fog reduces visibility to less than 1 km, whereas mist reduces visibility to more than 1 km."
+        "question": "Name three types of severe weather.",
+        "answer": "Tornado, hurricane, blizzard, thunderstorm (any three)."
       },
       {
-        "question": "Define 'cumulonimbus' in the context of weather.",
-        "answer": "A cumulonimbus cloud is a dense, towering vertical cloud associated with thunderstorms and heavy precipitation like hail."
+        "question": "What is the term for water falling from the sky?",
+        "answer": "Precipitation."
       },
       {
-        "question": "Describe a weather condition characterized by strong winds and heavy snow.",
-        "answer": "This condition is generally termed a blizzard, signifying severe winter weather posing hazardous travel conditions."
+        "question": "How do you say \"It is sunny\" in English?",
+        "answer": "It is a sunny day, or the sun is shining."
       }
     ],
     "path": "/flashcards/esl-weather",
@@ -54197,16 +54197,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary cognitive benefit of active recall?",
-        "answer": "It strengthens neural pathways by forcing retrieval, leading to faster and more reliable memory access during exams."
+        "question": "What is the advantage of using AI to create Quizlet Quiz material?",
+        "answer": "It instantly provides the content (Q&A) required for various Quizlet quiz modes."
       },
       {
-        "question": "What role does document format play in AI extraction quality?",
-        "answer": "Clear, typed formats like PDF or DOCX generally yield better results than low-resolution or complex image scans."
+        "question": "How does AI transform the way you create Quizlet Quiz content?",
+        "answer": "It automates the content population, allowing immediate focus on setting quiz parameters."
       },
       {
-        "question": "How does setting an exam date influence the study schedule?",
-        "answer": "The system calculates backward from the date, increasing review frequency as the deadline approaches to ensure peak preparedness."
+        "question": "What type of information is ideal for a Quizlet Quiz?",
+        "answer": "Definitions, dates, short facts, and vocabulary."
       }
     ],
     "path": "/flashcards/create-quizlet-quiz",
@@ -54407,16 +54407,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary goal of Spaced Repetition Scheduling?",
-        "answer": "To maximize long-term retention by timing reviews just before the point of forgetting."
+        "question": "Why is AI essential for SAT Vocab acquisition?",
+        "answer": "It instantly creates massive, systematic, and targeted study sets from official prep materials."
       },
       {
-        "question": "What benefit does active recall offer over passive review?",
-        "answer": "It forces retrieval practice, strengthening neural pathways and leading to better memory encoding."
+        "question": "Define the SAT vocab word 'parsimonious.'",
+        "answer": "Excessively unwilling to spend money or use resources; stingy."
       },
       {
-        "question": "What common SAT vocabulary root means 'against' or 'opposite'?",
-        "answer": "The prefix 'Anti-' or 'Contra-'. Example: Antithesis."
+        "question": "What is the benefit of studying SAT vocab with flashcards?",
+        "answer": "It enforces rapid, confident recall, necessary for quick comprehension on the exam."
       }
     ],
     "path": "/flashcards/sat-vocab",
@@ -54616,16 +54616,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is a word family relationship based on morphology?",
-        "answer": "A word family shares the same root or base word but changes form via affixes (prefixes/suffixes) to create different parts of speech."
+        "question": "What is a 'word family'?",
+        "answer": "A group of words that share the same root or a common pattern, such as the same ending rime (e.g., -at)."
       },
       {
-        "question": "If the root is 'port', what family member is 'portable'?",
-        "answer": "Portable is an adjective, meaning capable of being carried or moved easily."
+        "question": "Give three examples of words in the '-an' family.",
+        "answer": "Can, fan, man, ran, pan (any three)."
       },
       {
-        "question": "How does active recall improve learning word families?",
-        "answer": "Active recall forces retrieval of the relationship between the root and its derivatives, strengthening memory traces compared to passive reading."
+        "question": "How do AI flashcards assist in mastering word families?",
+        "answer": "They group words by shared phonetic patterns for systematic practice."
       }
     ],
     "path": "/flashcards/families",
@@ -54826,16 +54826,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the core benefit of active recall over passive reading?",
-        "answer": "Active recall forces retrieval, strengthening neural pathways. Passive reading creates a false sense of familiarity, which fades quickly."
+        "question": "What is the result of 5 + 3?",
+        "answer": "Eight (8)."
       },
       {
-        "question": "How is spaced repetition defined in learning theory?",
-        "answer": "It is the technique of increasing the time interval between successive reviews of learned material to optimize long-term retention."
+        "question": "What is the result of 10 - 4?",
+        "answer": "Six (6)."
       },
       {
-        "question": "When reviewing addition, what mathematical property is essential?",
-        "answer": "The Commutative Property (a + b = b + a) is key for flexible problem-solving and verification."
+        "question": "What are the two basic arithmetic operations studied first?",
+        "answer": "Addition and Subtraction."
       }
     ],
     "path": "/flashcards/addition-subtraction",
@@ -55033,16 +55033,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the plural form of 'child'?",
-        "answer": "The plural form is 'children'. This is an irregular plural that does not follow the standard '-s' or '-es' rule."
+        "question": "Give the plural form of the noun 'cat.'",
+        "answer": "Cats."
       },
       {
-        "question": "How do you form the plural of nouns ending in 'f' or 'fe'?",
-        "answer": "Many nouns change the 'f' or 'fe' ending to 'ves', such as 'knife' becoming 'knives'."
+        "question": "What is the plural form of the irregular noun 'child'?",
+        "answer": "Children."
       },
       {
-        "question": "What is the plural of 'datum'?",
-        "answer": "The plural is 'data'. This noun originates from Latin, showing the historical variation in English pluralization."
+        "question": "What rule typically governs singular-to-plural conversion in English?",
+        "answer": "Adding an -s to the singular form."
       }
     ],
     "path": "/flashcards/singular-plural",
@@ -55241,16 +55241,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What cognitive benefit does active recall provide over rereading?",
-        "answer": "Active recall forces retrieval pathways to strengthen, leading to better long-term memory formation compared to passive recognition."
+        "question": "What is cursive writing?",
+        "answer": "A style of writing where the letters are joined together in a flowing manner."
       },
       {
-        "question": "How is spaced repetition optimized for memory retention?",
-        "answer": "It schedules reviews at increasing intervals, targeting the moment just before forgetting occurs to solidify the memory trace efficiently."
+        "question": "Why are cursive flashcards still used in some education systems?",
+        "answer": "To practice handwriting fluency and letter connection."
       },
       {
-        "question": "What is the primary goal when learning new cursive letter formations?",
-        "answer": "The primary goal is consistent muscle memory development paired with accurate visual pattern recognition for each character."
+        "question": "What is the opposite of cursive writing?",
+        "answer": "Print or block lettering."
       }
     ],
     "path": "/flashcards/cursive",
@@ -55450,16 +55450,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary benefit of active recall over passive review?",
-        "answer": "Active recall forces retrieval practice, strengthening neural pathways and leading to significantly better long-term memory retention."
+        "question": "What is the result of 2 plus 7?",
+        "answer": "Nine (9)."
       },
       {
-        "question": "How does spaced repetition optimize study time?",
-        "answer": "It minimizes wasted time by prioritizing review of material just before you are about to forget it, maximizing memory consolidation."
+        "question": "In the equation 5 + 4 = 9",
+        "answer": "what is the number 9 called?"
       },
       {
-        "question": "If I upload a complex math PDF, what will the AI prioritize?",
-        "answer": "The AI focuses on extracting explicit definitions, formulas, procedural steps, and key numerical examples relevant to the topic."
+        "question": "The sum.",
+        "answer": "What is the property that states the order of addition doesn't matter (e.g., 2+3 = 3+2)?,Commutative Property."
       }
     ],
     "structuredData": {
@@ -55656,16 +55656,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What primary learning principle does automatic card generation support?",
-        "answer": "It primarily supports active recall by structuring material into question/answer formats that demand retrieval from memory."
+        "question": "What is the function of an AI Flashcard Quiz Maker?",
+        "answer": "To generate both the underlying flashcard data and various quiz formats from that data."
       },
       {
-        "question": "Name two file types convertible by the AI flashcard quiz maker.",
-        "answer": "PDF and DOCX files are directly supported for content parsing and conversion into flashcards."
+        "question": "How does the maker unlock smarter studying?",
+        "answer": "By automating test creation, forcing the student into active testing rather than passive review."
       },
       {
-        "question": "How does setting an exam date benefit the study process?",
-        "answer": "Setting a deadline allows the system to prioritize review intensity, focusing on difficult or critical items closer to your target date."
+        "question": "What type of question is easy for a quiz maker to generate from flashcard data?",
+        "answer": "Multiple-choice and fill-in-the-blank questions."
       }
     ],
     "structuredData": {
@@ -55861,16 +55861,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is a phoneme in early reading instruction?",
-        "answer": "A phoneme is the smallest unit of sound in a language. It distinguishes one word from another (e.g., /b/ vs /p/ in 'bat' vs 'pat')."
+        "question": "What is a phonics sound card?",
+        "answer": "A study aid that pairs a letter or letter group with the sound it makes (e.g., 'a' = /a/)."
       },
       {
-        "question": "Define a digraph in phonics examples.",
-        "answer": "A digraph is two letters representing one sound, like 'sh', 'ch', or 'th'. These represent a single phoneme."
+        "question": "How does AI automate the creation of phonics sound cards?",
+        "answer": "It extracts phonetic data and formats it for visual and auditory practice."
       },
       {
-        "question": "How does spaced repetition benefit learning sounds?",
-        "answer": "It schedules reviews just before you are about to forget, strengthening neural pathways for consistent long-term recall of complex sounds."
+        "question": "What is the primary goal of teaching phonics sound cards?",
+        "answer": "To help students decode unknown words by sounding them out."
       }
     ],
     "path": "/flashcards/phonics-sound",
@@ -56071,16 +56071,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the core mechanism that converts uploaded documents?",
-        "answer": "The mechanism uses advanced Natural Language Processing (NLP) models to parse text structure and identify key informational units suitable for Q&A."
+        "question": "What are 'Flash Card Notes'?",
+        "answer": "The concise, extracted pieces of information from a longer document that form the basis of a flashcard."
       },
       {
-        "question": "Why is spaced repetition superior to cramming for retention?",
-        "answer": "It leverages the forgetting curve by timing reviews just before memory decay, optimizing encoding strength over long periods."
+        "question": "How does AI convert documents into 'Flash Card Notes'?",
+        "answer": "It uses NLP to identify the essential terms, definitions, and facts."
       },
       {
-        "question": "What benefit does setting an exam date provide?",
-        "answer": "It enables the system to intelligently pace your learning, ensuring maximum recall proficiency on the specific target date."
+        "question": "Why is mastering study efficiency important for students?",
+        "answer": "It allows them to cover more material with better retention in less time."
       }
     ],
     "path": "/flashcards/notes",
@@ -56281,16 +56281,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What cognitive principle does spaced repetition optimize?",
-        "answer": "It optimizes the forgetting curve by scheduling reviews at increasing intervals, ensuring robust long-term memory consolidation."
+        "question": "What is the core technology behind an AI Flashcards Generator?",
+        "answer": "Natural Language Processing (NLP) and Machine Learning (ML)."
       },
       {
-        "question": "What is the key advantage of using an AI generator for notes?",
-        "answer": "The main benefit is eliminating the time spent manually synthesizing dense material into atomic recall questions."
+        "question": "Why is it smarter to use an AI Generator than to study harder?",
+        "answer": "AI automates the laborious prep work, ensuring time is spent on high-impact active recall."
       },
       {
-        "question": "Which input format is ideal for complex diagram analysis?",
-        "answer": "Image formats (like JPG/PNG) are often best for capturing handwritten diagrams or charts for subsequent AI analysis."
+        "question": "What input format does the AI generator primarily use?",
+        "answer": "PDFs, documents, or raw text input."
       }
     ],
     "structuredData": {
@@ -56484,16 +56484,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary purpose of a regulatory community sign?",
-        "answer": "To inform road users of specific traffic laws, prohibitions, or mandatory actions that must be obeyed for safety."
+        "question": "Name three common community signs.",
+        "answer": "Stop sign, yield sign, crosswalk sign, speed limit sign (any three)."
       },
       {
-        "question": "In sign coding, what does a diamond-shaped warning sign typically indicate?",
-        "answer": "It signifies potential hazards ahead on the roadway, such as curves, steep hills, or merges that require driver attention."
+        "question": "What color is a typical warning sign?",
+        "answer": "Yellow or fluorescent green."
       },
       {
-        "question": "How does spaced repetition improve memory encoding for sign recognition?",
-        "answer": "It schedules reviews at increasing intervals, forcing retrieval practice just as memory fades, which strengthens the long-term synaptic connection."
+        "question": "What does a \"yield\" sign instruct a driver to do?",
+        "answer": "Slow down and stop if necessary to allow other traffic to pass."
       }
     ],
     "structuredData": {
@@ -56690,16 +56690,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the core mechanism for material retention?",
-        "answer": "Active recall, which involves actively retrieving information from memory rather than passively rereading it."
+        "question": "What is the opposite of 'hot'?",
+        "answer": "Cold."
       },
       {
-        "question": "Define the purpose of Spaced Repetition Scheduling (SRS).",
-        "answer": "SRS optimizes review intervals by presenting cards just before forgetting occurs, maximizing memory consolidation efficiency."
+        "question": "What is the opposite of 'up'?",
+        "answer": "Down."
       },
       {
-        "question": "What is the inverse concept of 'Synthesis' in analytical study?",
-        "answer": "The inverse is 'Analysis' or 'Deconstruction,' which involves breaking down complex ideas into foundational components."
+        "question": "Give an example of an antonym pair.",
+        "answer": "Big/Small, Happy/Sad."
       }
     ],
     "path": "/flashcards/opposite",
@@ -56898,16 +56898,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What sound does the letter 'a' typically make in 'cat'?",
-        "answer": "The short 'a' sound is /æ/, often described as the sound you make when catching a ball."
+        "question": "What is a 'short vowel' sound?",
+        "answer": "The sound of a vowel that is not its name (e.g., the 'a' in 'cat')."
       },
       {
-        "question": "Identify the short vowel in the word 'dog'.",
-        "answer": "The short vowel is 'o', producing the sound /ɒ/ (as in octopus or top)."
+        "question": "Give an example of a word with the short 'O' sound.",
+        "answer": "Dog, pot, hop (Any valid word)."
       },
       {
-        "question": "How is the short 'i' sound in 'pig' phonetically represented?",
-        "answer": "The short 'i' sound is /ɪ/, which is a quick, lax vowel sound."
+        "question": "Why is mastering short vowels crucial for early reading?",
+        "answer": "They are the most common vowel sounds encountered in CVC words."
       }
     ],
     "path": "/flashcards/short-vowel",
@@ -57109,16 +57109,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary cognitive benefit of active recall?",
-        "answer": "Active recall forces the brain to retrieve information, strengthening neural pathways far more effectively than passive review."
+        "question": "Name the three secondary colors.",
+        "answer": "Green, orange, and purple (violet)."
       },
       {
-        "question": "When should I review a concept I rated as 'Hard'?",
-        "answer": "Concepts rated as 'Hard' are reintroduced by the spaced repetition algorithm sooner than concepts you marked as 'Easy' or 'Good'."
+        "question": "What is the complementary color of red?",
+        "answer": "Green."
       },
       {
-        "question": "What information can I upload to generate cards?",
-        "answer": "You can upload PDFs, DOCX files, PowerPoint slides, or images containing the textual information you wish to study."
+        "question": "How does AI help in creating Color Flash Cards from PDFs?",
+        "answer": "It extracts color names and related concepts (like color theory) from the document."
       }
     ],
     "path": "/flashcards/color",
@@ -57319,16 +57319,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary cognitive benefit of active recall over passive review?",
-        "answer": "Active recall forces the brain to retrieve information, strengthening neural pathways, unlike passive review which mimics recognition."
+        "question": "What is the main challenge medical students face with memory?",
+        "answer": "The rapid forgetting of vast amounts of detailed information."
       },
       {
-        "question": "Define the principle of Spaced Repetition scheduling.",
-        "answer": "It involves reviewing material at increasing intervals, targeting the precise moment before forgetting occurs for maximal retention."
+        "question": "How do smart study aids help medical students using Anki?",
+        "answer": "They automate the creation and management of large decks, optimizing the SRS schedule."
       },
       {
-        "question": "Why is using AI faster than creating flashcards manually?",
-        "answer": "AI eliminates the bottleneck of manual transcription and formatting, converting large documents into reviewable sets almost instantly."
+        "question": "What key knowledge areas require extensive flashcard study in medicine?",
+        "answer": "Anatomy, Pharmacology, and Pathology."
       }
     ],
     "structuredData": {
@@ -57521,16 +57521,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary benefit of AI over manual card creation?",
-        "answer": "AI minimizes the manual labor of concept extraction, ensuring faster setup and consistent formatting for active recall practice."
+        "question": "How do action picture study cards aid memory?",
+        "answer": "They link the abstract concept (the action) to a concrete visual image, aiding recall."
       },
       {
-        "question": "How does Spaced Repetition maximize retention?",
-        "answer": "It intelligently schedules reviews just before you are about to forget information, strengthening the memory trace over time."
+        "question": "What type of learner benefits most from action picture cards?",
+        "answer": "Visual learners and young children acquiring new vocabulary."
       },
       {
-        "question": "What study principle do flashcards enforce?",
-        "answer": "Flashcards inherently enforce active recall, forcing the brain to retrieve information rather than passively recognizing it."
+        "question": "Give an example of an action often depicted on a card.",
+        "answer": "Running, jumping, eating, sleeping."
       }
     ],
     "path": "/flashcards/action-picture",
@@ -57731,16 +57731,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What cognitive benefit does active recall provide over passive reading?",
-        "answer": "Active recall forces retrieval practice, strengthening neural pathways and significantly improving long-term memory retention compared to passive review."
+        "question": "What is the definition of an action verb?",
+        "answer": "A verb that expresses a physical or mental action."
       },
       {
-        "question": "In spaced repetition, when is the optimal time to review a concept?",
-        "answer": "The optimal time is just before the memory trace begins to fade, which the algorithm calculates based on previous successful recall attempts."
+        "question": "What question does an action verb answer?",
+        "answer": "What is the subject doing?"
       },
       {
-        "question": "What is the primary function of an action verb in a sentence?",
-        "answer": "Action verbs describe the physical or mental activity performed by the subject, indicating what the subject is doing."
+        "question": "Give a mental action verb example.",
+        "answer": "Think, dream, realize, believe."
       }
     ],
     "path": "/flashcards/action-verb",
@@ -57939,16 +57939,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary benefit of AI MCQ generation?",
-        "answer": "It automates the creation of assessment items, saving significant study prep time and ensuring comprehensive coverage of the source text."
+        "question": "How does AI create Multiple Choice Flashcards?",
+        "answer": "It extracts the correct answer and generates plausible, but incorrect, distractors from the source material."
       },
       {
-        "question": "How does setting an exam date affect the study schedule?",
-        "answer": "It anchors the spaced repetition algorithm, calculating optimal review times backwards from your deadline to maximize preparedness."
+        "question": "What is the benefit of studying with multiple-choice flashcards?",
+        "answer": "It prepares students for the format of standardized tests, testing recognition skills."
       },
       {
-        "question": "What cognitive science principle drives the scheduling?",
-        "answer": "The system leverages the concept of the 'forgetting curve' to schedule reviews right before you are likely to forget the material."
+        "question": "Why is AI essential for multiple-choice creation?",
+        "answer": "Manually writing accurate distractors is difficult and time-consuming."
       }
     ],
     "path": "/flashcards/create-multiple-choice",
@@ -58148,16 +58148,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary benefit of transforming notes via AI?",
-        "answer": "It eliminates manual entry time and instantly converts static notes into dynamic, practice-ready Q&A formats."
+        "question": "What is the primary benefit of converting notes to flashcards?",
+        "answer": "It shifts the learning process from passive reading to active, testable retrieval."
       },
       {
-        "question": "Which common file types does the generator support?",
-        "answer": "It supports major formats like PDF, DOCX, and images, ensuring versatility for various source materials."
+        "question": "What technology does AI use when you convert notes to flashcards?",
+        "answer": "Natural Language Processing (NLP) to understand the context of the notes."
       },
       {
-        "question": "What cognitive principle optimizes retention in this tool?",
-        "answer": "Spaced repetition scheduling is used to present material at increasing intervals based on recall performance."
+        "question": "Why is AI the future when you convert notes to flashcards?",
+        "answer": "It instantly performs the task that used to take hours of manual effort."
       }
     ],
     "path": "/flashcards/convert-notes",
@@ -58357,16 +58357,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What cognitive principle is optimized by spaced review?",
-        "answer": "The principle of spaced repetition is optimized to combat the forgetting curve by timing reviews just before recall decay."
+        "question": "What is the main function of an AI PDF to Flashcards converter?",
+        "answer": "To read unstructured PDF text and structure it into concise question/answer pairs."
       },
       {
-        "question": "What is the core benefit of using AI for flashcard creation?",
-        "answer": "The core benefit is automating the synthesis of dense source material into precise, active recall prompts, saving significant study prep time."
+        "question": "Why is PDF conversion a critical study tool?",
+        "answer": "Most academic and professional materials are shared in PDF format."
       },
       {
-        "question": "What input formats does the AI flashcard generator accept?",
-        "answer": "It accepts PDF, DOCX, PowerPoint, and image files for immediate content parsing and card generation."
+        "question": "How does AI ensure content accuracy from a PDF?",
+        "answer": "It analyzes font changes, bolding, and section breaks to identify key terms."
       }
     ],
     "path": "/flashcards/pdf-flashcards",
@@ -58567,16 +58567,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary cognitive benefit of flashcards?",
-        "answer": "The primary benefit is facilitating active recall, forcing the brain to retrieve information rather than passively recognizing it."
+        "question": "What is the primary benefit of an AI Flashcard Maker *from PDF*?",
+        "answer": "It turns dense, read-only documents into active, testable study material."
       },
       {
-        "question": "How does spaced repetition impact long-term memory?",
-        "answer": "It optimizes review timing by increasing the interval between successful recall attempts, strengthening memory traces over time."
+        "question": "How does the AI maker achieve deeper retention?",
+        "answer": "By focusing the generated cards on core concepts that require active recall."
       },
       {
-        "question": "What is 'atomic' in the context of a good flashcard?",
-        "answer": "An atomic card covers only one single concept or piece of information per question-answer pair for focused study."
+        "question": "What type of information is extracted by the maker from a PDF?",
+        "answer": "Definitions, formulas, dates, and names."
       }
     ],
     "path": "/flashcards/maker-from",
@@ -58775,16 +58775,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the core principle of Spaced Repetition?",
-        "answer": "It involves reviewing learned material at increasing intervals to strengthen memory traces right before forgetting occurs."
+        "question": "Name three common physical exercises.",
+        "answer": "Running, swimming, lifting weights, cycling (any three)."
       },
       {
-        "question": "Name two document formats supported for AI processing.",
-        "answer": "PDF and DOCX are fully supported formats for immediate conversion into flashcard content."
+        "question": "What is the difference between aerobic and anaerobic exercise?",
+        "answer": "Aerobic uses oxygen for energy (long duration); anaerobic does not (short, intense bursts)."
       },
       {
-        "question": "Why is active recall superior to passive review?",
-        "answer": "Active recall forces effortful retrieval, creating stronger, more durable neural pathways for information storage."
+        "question": "What is the benefit of regular exercise?",
+        "answer": "Improved cardiovascular health, muscle strength, and mood."
       }
     ],
     "path": "/flashcards/exercise",
@@ -58983,16 +58983,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary benefit of converting notes with AI?",
-        "answer": "It eliminates manual creation time and structures content optimized for active recall and spaced repetition scheduling."
+        "question": "What is the core function of a 'Program to Make Flashcards'?",
+        "answer": "To provide a streamlined, automated process for turning notes into reviewable study decks."
       },
       {
-        "question": "What cognitive mechanism does flashcard review leverage?",
-        "answer": "It leverages active recall, forcing the brain to retrieve information without cues, which strengthens memory traces significantly."
+        "question": "How does AI enhance the making program?",
+        "answer": "It drastically accelerates content generation and formatting."
       },
       {
-        "question": "How does setting an exam date affect the study plan?",
-        "answer": "The system adjusts the frequency of card presentation to ensure peak knowledge retention precisely on or before your specified deadline."
+        "question": "Why does this program outperform manual flashcard creation?",
+        "answer": "It removes the time-sink of typing and structuring every single card."
       }
     ],
     "path": "/flashcards/program-make",
@@ -59193,16 +59193,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What structural feature defines a fruit botanically?",
-        "answer": "A fruit develops from the ovary of a flowering plant after fertilization. It typically contains the seeds of the plant."
+        "question": "Is a cucumber botanically a fruit or a vegetable?",
+        "answer": "A cucumber is botanically a fruit because it develops from the flower and contains seeds."
       },
       {
-        "question": "What is the primary function of chlorophyll in edible vegetables?",
-        "answer": "Chlorophyll is the pigment responsible for photosynthesis, giving green vegetables their color and producing necessary energy."
+        "question": "Name one leafy green vegetable.",
+        "answer": "Spinach, kale, lettuce (any one)."
       },
       {
-        "question": "How does spaced repetition improve learning retention?",
-        "answer": "It schedules reviews based on the forgetting curve, prompting recall just as memory begins to fade, strengthening the neural pathway."
+        "question": "What is the common culinary distinction between a fruit and a vegetable?",
+        "answer": "Fruits are typically sweet; vegetables are savory."
       }
     ],
     "path": "/flashcards/fruit-vegetable",
@@ -59398,16 +59398,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary botanical classification of a berry?",
-        "answer": "A berry is a simple, fleshy fruit developing from one flower with one ovary, containing seeds embedded in the flesh."
+        "question": "What is the purpose of the seeds inside a fruit?",
+        "answer": "To facilitate plant reproduction."
       },
       {
-        "question": "How does active recall benefit learning fruit classifications?",
-        "answer": "Active recall forces retrieval practice, strengthening neural pathways faster than passive recognition of listed classifications."
+        "question": "Name a fruit that is high in Vitamin C.",
+        "answer": "Orange, strawberry, kiwi, lemon (any one)."
       },
       {
-        "question": "Name one key nutritional difference between citrus and stone fruits.",
-        "answer": "Citrus fruits are typically excellent sources of Vitamin C, while stone fruits (drupes) are often higher in fat-soluble vitamins or antioxidants."
+        "question": "What is the botanical definition of a fruit?",
+        "answer": "The mature ovary of a flowering plant, usually containing seeds."
       }
     ],
     "path": "/flashcards/fruit",
@@ -59608,16 +59608,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary sound of the phonogram 'igh'?",
-        "answer": "The primary sound is the long 'I' vowel sound, as in 'light' or 'high'."
+        "question": "What is a phonogram?",
+        "answer": "A symbol representing a sound or sounds of speech; often a letter or combination of letters."
       },
       {
-        "question": "Which phonogram represents the /sh/ sound found in 'ship'?",
-        "answer": "The single letter 'sh' is the most common digraph used to represent this sound."
+        "question": "What is the purpose of mastering the 70 phonograms?",
+        "answer": "To improve reading and spelling skills by recognizing consistent sound patterns."
       },
       {
-        "question": "What is the difference between a digraph and a trigraph?",
-        "answer": "A digraph uses two letters to represent one sound (e.g., 'th'), while a trigraph uses three letters (e.g., 'igh')."
+        "question": "Give an example of a multi-letter phonogram.",
+        "answer": "Sh, ch, th, er, or (any one)."
       }
     ],
     "path": "/flashcards/70-phonograms",
@@ -59817,16 +59817,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What term means the opposite of 'Ephemeral'?",
-        "answer": "The antonym is 'Permanent' or 'Lasting'. Ephemeral describes something that lasts for a very short time."
+        "question": "What is a synonym?",
+        "answer": "A word or phrase that means exactly or nearly the same as another word or phrase."
       },
       {
-        "question": "Provide a strong synonym for the word 'Ubiquitous'.",
-        "answer": "A strong synonym is 'Pervasive' or 'Omnipresent'. It means found everywhere at the same time."
+        "question": "What is an antonym?",
+        "answer": "A word opposite in meaning to another."
       },
       {
-        "question": "What is the relationship between 'Candid' and 'Evasive'?",
-        "answer": "Candid means truthful and straightforward; Evasive is the antonym, meaning tending to avoid commitment."
+        "question": "Give a synonym for 'large.'",
+        "answer": "Big, huge, enormous."
       }
     ],
     "path": "/flashcards/synonyms-antonyms",
@@ -60027,16 +60027,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the opposite of 'ubiquitous'?",
-        "answer": "The opposite is 'rare' or 'scarce'. These terms represent concepts of being found everywhere versus being difficult to find."
+        "question": "What is the opposite adjective for 'loud'?",
+        "answer": "Quiet or silent."
       },
       {
-        "question": "Provide an antonym for the adjective 'Ephemeral'.",
-        "answer": "The opposite is 'Permanent' or 'Eternal'. Ephemeral describes something lasting for a very short time."
+        "question": "What is the opposite adjective for 'easy'?",
+        "answer": "Difficult or hard."
       },
       {
-        "question": "What adjective is the opposite of 'Diligent'?",
-        "answer": "The opposite adjective is typically 'Lazy' or 'Indolent'. Diligent refers to showing care and conscientiousness in one's work."
+        "question": "How do AI flashcards assist in mastering adjective opposites?",
+        "answer": "They present pairs of words, forcing contrastive recall for better memory."
       }
     ],
     "path": "/flashcards/adjectives-opposites",
@@ -60235,16 +60235,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary purpose of the Subjunctive Mood in English?",
-        "answer": "It expresses wishes, doubts, necessity, or hypothetical situations contrary to fact, often using base verb forms."
+        "question": "Define the grammatical term 'gerund.'",
+        "answer": "A form of a verb that acts as a noun (e.g., 'swimming' in \"Swimming is fun\")."
       },
       {
-        "question": "When must a non-restrictive clause be set off by commas?",
-        "answer": "When the clause provides extra, non-essential information about a noun, making the sentence meaningful without it."
+        "question": "What is the purpose of a semicolon?",
+        "answer": "To separate two independent clauses that are closely related in meaning."
       },
       {
-        "question": "Define the difference between 'fewer' and 'less' usage.",
-        "answer": "'Fewer' is used for countable items (fewer people); 'less' is used for mass nouns (less time)."
+        "question": "Explain the function of the passive voice.",
+        "answer": "The subject receives the action, rather than performing it (e.g., \"The ball was thrown\")."
       }
     ],
     "structuredData": {
@@ -60441,16 +60441,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary function of spaced repetition?",
-        "answer": "It schedules review sessions at increasing intervals to move knowledge into long-term memory efficiently."
+        "question": "What sound does a cow make?",
+        "answer": "Moo."
       },
       {
-        "question": "What formats can I upload to generate my cards?",
-        "answer": "You can upload PDFs, DOCX files, PowerPoint documents, or image files directly into the system."
+        "question": "Name an animal that can fly.",
+        "answer": "Bird, bat, bee (any one)."
       },
       {
-        "question": "What is the main advantage of AI card generation?",
-        "answer": "It drastically cuts down the manual time required to transform source material into active recall study tools."
+        "question": "What animal is known for having stripes?",
+        "answer": "Zebra or tiger."
       }
     ],
     "structuredData": {
@@ -60646,16 +60646,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary function of a phonogram in linguistics?",
-        "answer": "A phonogram is a symbol or group of letters representing a single sound (phoneme) in a language."
+        "question": "What is the difference between a phonogram and a single letter sound?",
+        "answer": "A phonogram can be a single letter or a group of letters representing a sound."
       },
       {
-        "question": "Name a common English digraph that functions as a phonogram.",
-        "answer": "Common digraphs include 'sh' for /ʃ/ or 'th' for /θ/ or /ð/. These map two letters to one sound."
+        "question": "Give an example of a phonogram that includes three letters.",
+        "answer": "igh (as in 'light') or tch (as in 'watch')."
       },
       {
-        "question": "How does active recall benefit learning phonograms?",
-        "answer": "Active recall forces retrieval, strengthening the neural pathway between the grapheme and its specific sound."
+        "question": "How do phonogram flash cards support literacy?",
+        "answer": "They teach students the consistent spelling patterns in words."
       }
     ],
     "path": "/flashcards/phonogram",
@@ -60855,16 +60855,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What core principle maximizes long-term retention?",
-        "answer": "Active recall is crucial; retrieving information strengthens memory traces more effectively than passive review."
+        "question": "What does CGP specialize in?",
+        "answer": "Educational publishing, particularly revision guides and workbooks for UK exams (GCSE/A-Level)."
       },
       {
-        "question": "What is the primary goal of spaced repetition scheduling?",
-        "answer": "To review information right before you are likely to forget it, optimizing memory consolidation over time."
+        "question": "What subjects are included in Combined Science?",
+        "answer": "Biology, Chemistry, and Physics."
       },
       {
-        "question": "What types of files can be uploaded for card creation?",
-        "answer": "The generator accepts PDFs, DOCX files, and images containing the source text for analysis."
+        "question": "How do AI revision cards help with CGP material?",
+        "answer": "They convert the condensed CGP text into active, high-yield Q&A format."
       }
     ],
     "path": "/flashcards/cgp-combined-science-revision",
@@ -61058,16 +61058,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What defines the Business Analysis Core Concept Model (BACCM)?",
-        "answer": "The BACCM defines six core concepts: Change, Context, Solution, Stakeholder, Value, and Work. They are interdependent and critical for project success."
+        "question": "What does BABOK stand for?",
+        "answer": "Business Analysis Body of Knowledge."
       },
       {
-        "question": "What is the primary purpose of the BABOK 3.0 Knowledge Areas?",
-        "answer": "The Knowledge Areas provide a comprehensive framework defining the set of tasks and supporting skills required for effective business analysis practice."
+        "question": "What is the primary purpose of the BABOK Guide?",
+        "answer": "To provide a standard framework for the practice of business analysis."
       },
       {
-        "question": "How does spaced repetition benefit complex material like BABOK?",
-        "answer": "It combats the forgetting curve by scheduling reviews just before memory recall is likely to fail, ensuring deeper, more permanent encoding of key concepts."
+        "question": "Name one of the six core knowledge areas of BABOK 3.0.",
+        "answer": "Business Analysis Planning and Monitoring, Elicitation and Collaboration, Requirements Life Cycle Management, Strategy Analysis, Requirements Analysis and Design Definition, or Solution Evaluation."
       }
     ],
     "path": "/flashcards/babok-30",
@@ -61262,16 +61262,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What term describes garments worn on the upper body?",
-        "answer": "Shirt, blouse, or jacket. These cover the torso and arms, distinct from lower-body wear."
+        "question": "What is a 'collar' on a shirt?",
+        "answer": "The part that fastens around or hangs down from the neck."
       },
       {
-        "question": "In fashion vocabulary, what is 'haute couture'?",
-        "answer": "It refers to the creation of exclusive, custom-fitted, high-quality clothing made by a major fashion house."
+        "question": "What is the term for the thick wool or synthetic covering worn on the hands in cold weather?",
+        "answer": "Gloves or mittens."
       },
       {
-        "question": "Differentiate between 'scarf' and 'shawl' usage.",
-        "answer": "A scarf is typically long and narrow, worn for warmth or fashion; a shawl is a large piece of fabric draped over the shoulders."
+        "question": "What is 'denim'?",
+        "answer": "A sturdy cotton twill fabric, typically used for jeans."
       }
     ],
     "path": "/flashcards/clothes-vocabulary",
@@ -61472,16 +61472,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the antonym for 'Ephemeral'?",
-        "answer": "The antonym is 'Permanent' or 'Everlasting'. Ephemeral describes something lasting for a very short time."
+        "question": "What is the antonym for 'beautiful'?",
+        "answer": "Ugly, hideous, or plain."
       },
       {
-        "question": "Provide an antonym for the concept 'Ambiguous'.",
-        "answer": "The antonym is 'Unambiguous' or 'Explicit'. Ambiguous means open to more than one interpretation."
+        "question": "What is the antonym for 'permanent'?",
+        "answer": "Temporary or transient."
       },
       {
-        "question": "What word is the direct opposite of 'Frugal'?",
-        "answer": "The opposite is 'Extravagant' or 'Wasteful'. Frugal means sparing or economical with regard to money or food."
+        "question": "How do AI flashcards help in mastering antonyms?",
+        "answer": "They force the student to instantly recall the opposite meaning of a given word."
       }
     ],
     "structuredData": {
@@ -61675,16 +61675,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the comparative form of the irregular adjective 'good'?",
-        "answer": "The comparative form is 'better'. This must be memorized as it does not follow the standard '-er' rule."
+        "question": "What is a comparative adjective?",
+        "answer": "An adjective used to compare two things (e.g., 'faster', 'larger')."
       },
       {
-        "question": "When must you use 'more' instead of adding '-er'?",
-        "answer": "Use 'more' when the adjective has three or more syllables, such as in 'beautiful' becoming 'more beautiful'."
+        "question": "Form a comparative sentence using the adjective 'happy.'",
+        "answer": "I am happier today than I was yesterday."
       },
       {
-        "question": "What is the superlative form of 'little' used for quantity?",
-        "answer": "The superlative form is 'least'. (e.g., 'the least amount of effort')."
+        "question": "What word is usually used after a comparative adjective in a sentence?",
+        "answer": "Than."
       }
     ],
     "path": "/flashcards/comparatives",
@@ -61883,16 +61883,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the core purpose of Active Recall in learning?",
-        "answer": "It forces the brain to retrieve information without cues, strengthening memory pathways significantly better than passive review."
+        "question": "What is Critical Pass primarily known for?",
+        "answer": "Creating high-quality study flashcards for the Bar Exam."
       },
       {
-        "question": "How does Spaced Repetition optimize study time?",
-        "answer": "It schedules reviews at increasing intervals based on forgetting curves, maximizing retention efficiency."
+        "question": "Why do students use AI for Critical Pass materials (or similar dense content)?",
+        "answer": "To extract key legal rules and concepts into a personalized, active recall system."
       },
       {
-        "question": "What benefit does setting an Exam Date provide?",
-        "answer": "It allows the learning algorithm to calculate the optimal frequency for reviewing material before the target deadline."
+        "question": "What is the main goal of Bar Exam preparation?",
+        "answer": "To achieve mastery of a massive volume of legal rules and principles."
       }
     ],
     "path": "/flashcards/critical-pass-reddit",
@@ -62092,16 +62092,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What primary function does a ruminant perform?",
-        "answer": "Ruminants are mammals (like cows or sheep) that ferment food in their stomach before digestion, involving regurgitation and re-chewing."
+        "question": "Name three common farm animals.",
+        "answer": "Cow, pig, chicken, sheep, horse (any three)."
       },
       {
-        "question": "Name one common purpose of raising swine in modern agriculture.",
-        "answer": "Swine (pigs) are primarily raised for their meat, known as pork, and derived products."
+        "question": "What is the male sheep called?",
+        "answer": "Ram."
       },
       {
-        "question": "How does Spaced Repetition enhance learning?",
-        "answer": "It schedules reviews at increasing intervals based on recall success, reinforcing weak memories just before they fade."
+        "question": "What is the term for a baby goat?",
+        "answer": "Kid."
       }
     ],
     "path": "/flashcards/farm-animals",
@@ -62302,16 +62302,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the core difference between 'mood' and 'feeling'?",
-        "answer": "Mood is generally a longer-lasting, less intense affective state without a specific trigger, whereas a feeling is a more immediate, short-term reaction to an event."
+        "question": "What is the difference between a feeling and an emotion?",
+        "answer": "Feelings are subjective experiences; emotions are physiological and behavioral responses."
       },
       {
-        "question": "How does appraisal theory link cognition to emotion?",
-        "answer": "Appraisal theory posits that one's evaluation (appraisal) of a situation directly causes the emotional response, not the event itself."
+        "question": "How does AI help in mastering feeling flashcards?",
+        "answer": "It extracts nuanced definitions and examples of how feelings are expressed."
       },
       {
-        "question": "What is the primary benefit of using spaced repetition for complex learning?",
-        "answer": "It leverages the forgetting curve by scheduling review just before memory decay, solidifying long-term memory consolidation efficiently."
+        "question": "What feeling is associated with a desire to hurt someone who has hurt you?",
+        "answer": "Anger or vengefulness."
       }
     ],
     "path": "/flashcards/feeling",
@@ -62511,16 +62511,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What common file types are accepted for Goodnotes imports?",
-        "answer": "The app primarily accepts PDFs exported from Goodnotes, along with common image formats like JPG or PNG."
+        "question": "How does AI simplify the process of creating flashcards from Goodnotes?",
+        "answer": "It automatically reads the notes and formats them into a testable Q&A structure."
       },
       {
-        "question": "How does setting an exam date influence card reviews?",
-        "answer": "Setting an exam date allows the spaced repetition system to intensify reviews closer to the target date, optimizing pacing."
+        "question": "Why is converting Goodnotes files to flashcards essential for mastery?",
+        "answer": "It turns passive consumption of notes into active testing of knowledge."
       },
       {
-        "question": "What is the key benefit of using AI for card creation?",
-        "answer": "The primary benefit is speed and consistency, instantly converting dense material into atomic recall prompts without manual effort."
+        "question": "What is a benefit of AI content conversion from a digital notebook?",
+        "answer": "The generated cards are clean, consistent, and ready for use in any study app."
       }
     ],
     "path": "/flashcards/create-goodnotes",
@@ -62721,16 +62721,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the core principle behind spaced repetition?",
-        "answer": "Reviewing information at increasing intervals just before forgetting occurs, optimizing long-term memory encoding."
+        "question": "What is the purpose of a conversation flashcard?",
+        "answer": "To provide vocabulary, phrases, or scenarios for practicing speaking and fluency."
       },
       {
-        "question": "What is the benefit of active recall over passive review?",
-        "answer": "Active recall forces retrieval from memory, strengthening neural pathways and proving true knowledge mastery."
+        "question": "What is the difference between a conversation and a discussion?",
+        "answer": "A conversation is general talk; a discussion is focused talk to exchange views."
       },
       {
-        "question": "What file types does the generator accept for processing?",
-        "answer": "The AI accepts PDFs, DOCX files, and various image formats containing readable text."
+        "question": "What is a common conversation starter?",
+        "answer": "How are you? or What do you do?"
       }
     ],
     "path": "/flashcards/conversation",
@@ -62930,16 +62930,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "Ano ang tawag sa pagbabalik-tanaw ng impormasyon?",
-        "answer": "Ito ay tinatawag na 'Active Recall' o aktibong pag-alala. Ito ay mas epektibo kaysa sa simpleng pagbabasa."
+        "question": "What are the two official languages of the Philippines?",
+        "answer": "Filipino (Tagalog-based) and English."
       },
       {
-        "question": "Bakit mahalaga ang pag-upload ng PDF para sa pag-aaral?",
-        "answer": "Nagpapabilis ito ng paglikha ng flashcards mula sa mahahabang materyales. Ang AI ay nag-e-extract ng mahahalagang konsepto para sa iyo."
+        "question": "How do you say \"I love you\" in Filipino?",
+        "answer": "Mahal kita."
       },
       {
-        "question": "Ano ang layunin ng pagtatakda ng 'Exam Date' sa app?",
-        "answer": "Ang petsa ay ginagamit para i-adjust ang iskedyul ng spaced repetition. Tinitiyak nitong nakahanda ka sa itinakdang araw."
+        "question": "What is the term for the indigenous writing system of the Philippines (now largely supplanted)?_?",
+        "answer": "Baybayin."
       }
     ],
     "path": "/flashcards/filipino",
@@ -63138,16 +63138,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary goal of the 'Starter' level?",
-        "answer": "The primary goal is establishing foundational English vocabulary and basic sentence structures for simple conversations."
+        "question": "What is \"Everybody Up Starter\" likely used for in education?",
+        "answer": "An introductory or foundational level English language course for young learners."
       },
       {
-        "question": "How does active recall differ from recognition?",
-        "answer": "Active recall requires generating an answer from memory, while recognition only requires identifying the correct answer among options."
+        "question": "Why are flashcards crucial for Starter level courses?",
+        "answer": "They aid in rapid vocabulary acquisition and recognition of basic concepts."
       },
       {
-        "question": "When should spaced repetition be prioritized?",
-        "answer": "It should be prioritized when moving new vocabulary from short-term to long-term memory storage."
+        "question": "Name a core topic in an Everybody Up Starter course.",
+        "answer": "Greetings, colors, family, or basic objects."
       }
     ],
     "path": "/flashcards/everybody-up-starter",
@@ -63347,16 +63347,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary benefit of using spaced repetition?",
-        "answer": "It optimizes long-term memory retention by scheduling reviews just before the point of forgetting."
+        "question": "What is the past participle form of the verb 'eat'?",
+        "answer": "Eaten."
       },
       {
-        "question": "Which file types can be converted into study decks?",
-        "answer": "The system accepts PDF, DOCX, and image files for instant content extraction and card creation."
+        "question": "What are 'regular verbs'?",
+        "answer": "Verbs whose past tense and past participle are formed by adding -ed to the base form."
       },
       {
-        "question": "What is the key action required for effective recall?",
-        "answer": "The key is attempting to retrieve the information from memory without external cues, strengthening the neural pathway."
+        "question": "What is an auxiliary verb?",
+        "answer": "A helping verb used with the main verb to show tense or voice (e.g., be, have, do)."
       }
     ],
     "structuredData": {
@@ -63552,16 +63552,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "Define 'Analyze' as an action verb in Bloom's Taxonomy?",
-        "answer": "To break material into component parts to determine how the parts relate to one another or to an overall structure."
+        "question": "What is the difference between an action verb and a linking verb?",
+        "answer": "Action verbs show what the subject *does*; linking verbs show the subject's *state of being*."
       },
       {
-        "question": "What is the purpose of using 'Evaluate' in assignment prompts?",
-        "answer": "It requires making judgments based on criteria and standards, assessing the worth of ideas or materials."
+        "question": "Give an example of an action verb that describes a mental process.",
+        "answer": "Consider, decide, imagine."
       },
       {
-        "question": "Contrast the cognitive levels of 'List' versus 'Synthesize'?",
-        "answer": "'List' requires basic recall of facts, while 'Synthesize' demands combining parts to form a new whole or structure."
+        "question": "How does AI ensure the accuracy of action verb flashcards?",
+        "answer": "It extracts only the words that clearly denote an action or occurrence."
       }
     ],
     "structuredData": {
@@ -63756,16 +63756,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary benefit of active recall?",
-        "answer": "It strengthens neural pathways by forcing retrieval, leading to better long-term memory encoding than passive review."
+        "question": "Why are online flashcards effective for learning English?",
+        "answer": "They offer immediate feedback and the ability to review material anytime, anywhere."
       },
       {
-        "question": "Define 'spaced repetition' in learning algorithms.",
-        "answer": "It is a technique where reviewed material is repeated at increasing intervals to maximize retention efficiency over time."
+        "question": "What is the benefit of generating English flashcards from any source?",
+        "answer": "It allows learners to focus on the specific vocabulary and grammar from their chosen materials."
       },
       {
-        "question": "Why are flashcards effective for vocabulary acquisition?",
-        "answer": "They isolate specific terms and definitions, providing atomic units for focused, frequent retrieval practice."
+        "question": "What does 'fluency' mean in English learning?",
+        "answer": "The ability to speak or write easily, accurately, and well."
       }
     ],
     "structuredData": {
@@ -63962,16 +63962,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the simple past tense of 'to lie' (recline)?",
-        "answer": "The simple past tense is 'lay'. Remember, 'lie' (recline) is irregular; 'lay' (to place) is different."
+        "question": "What is the third person singular form of the verb 'study' in the present tense?",
+        "answer": "Studies."
       },
       {
-        "question": "What is the principal part of the verb 'to set'?",
-        "answer": "The principal parts are: set (present), set (past), set (past participle). This verb is non-changing."
+        "question": "What are the three core verb forms (tenses) in English grammar?",
+        "answer": "Past, Present, and Future (though the Future is often formed with modals)."
       },
       {
-        "question": "What is the function of the verb 'to bring' in a sentence?",
-        "answer": "It denotes the action of conveying something from one place to another, often implying movement toward the speaker."
+        "question": "How does AI aid in mastering English verb conjugations?",
+        "answer": "It isolates the verb and generates cards testing its various tense forms."
       }
     ],
     "path": "/flashcards/verbs-english",
@@ -64172,16 +64172,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary function of the mitochondria in a eukaryotic cell?",
-        "answer": "It is primarily responsible for cellular respiration, generating the cell's supply of adenosine triphosphate (ATP) to power metabolic activities."
+        "question": "What is DNA?",
+        "answer": "Deoxyribonucleic acid, the hereditary material in humans and almost all other organisms."
       },
       {
-        "question": "Name the process where DNA sequence is transcribed into mRNA.",
-        "answer": "This process is called transcription, where an RNA polymerase enzyme synthesizes a complementary strand of RNA from a DNA template."
+        "question": "What is the primary difference between a prokaryotic and a eukaryotic cell?",
+        "answer": "Eukaryotic cells have a membrane-bound nucleus; prokaryotic cells do not."
       },
       {
-        "question": "What is the defining characteristic of active recall in studying?",
-        "answer": "Active recall requires the learner to retrieve information from memory without cues, rather than passively recognizing information presented to them."
+        "question": "What process is responsible for genetic variation in sexual reproduction?",
+        "answer": "Meiosis."
       }
     ],
     "path": "/flashcards/biology",
@@ -64380,16 +64380,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the core difference between mood and emotion?",
-        "answer": "Emotions are typically intense, short-lived responses to specific stimuli, whereas moods are generally longer-lasting, less intense, and often lack a clear triggering event."
+        "question": "What is the difference between 'happy' and 'joyful'?",
+        "answer": "Joyful is a more intense, often exuberant form of happiness."
       },
       {
-        "question": "Define 'Affective Neuroscience' simply.",
-        "answer": "This field scientifically studies the biological substrates of emotion in the brain, examining how neural circuits generate feelings and influence behavior."
+        "question": "Name a physical manifestation of the emotion 'anger.'",
+        "answer": "Frowning, tense muscles, or a raised voice."
       },
       {
-        "question": "What does the term 'cognitive appraisal' mean in emotion theory?",
-        "answer": "Cognitive appraisal is the subjective interpretation of a situation that determines the type and intensity of the emotional response experienced."
+        "question": "How do AI flashcards help distinguish complex emotions and feelings?",
+        "answer": "They provide clear definitions and contextual differences between closely related terms."
       }
     ],
     "path": "/flashcards/emotions-feelings",
@@ -64588,16 +64588,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary benefit of using Spaced Repetition?",
-        "answer": "It leverages memory consolidation by scheduling reviews at increasing intervals, maximizing long-term retention."
+        "question": "What is a common challenge for English learners regarding articles (a",
+        "answer": "an, the)?"
       },
       {
-        "question": "Define 'Active Recall' in the context of language study.",
-        "answer": "Active recall is forcing your brain to retrieve information (like a definition or conjugation) without external cues, strengthening neural pathways."
+        "question": "Knowing when to use 'a' vs. 'an' and when to use the definite article 'the.'",
+        "answer": "How does AI improve the learning of English grammar?"
       },
       {
-        "question": "What must a source document contain for effective card generation?",
-        "answer": "The document needs clear concepts, vocabulary lists, or factual pairings that the AI can map to Question/Answer structures."
+        "question": "By instantly creating targeted flashcards for specific rules",
+        "answer": "like verb tenses or prepositions.,What is the importance of 'input' (reading/listening) in English learning?,It provides examples of natural language usage and vocabulary in context."
       }
     ],
     "structuredData": {
@@ -64794,16 +64794,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the standard greeting used to start a conversation?",
-        "answer": "Common greetings include 'Hello' or 'Hi' in English, or 'Hola' in Spanish. These open the door to further dialogue."
+        "question": "Name two common informal greetings in English.",
+        "answer": "Hello, Hi, Hey."
       },
       {
-        "question": "How do you politely ask how someone is doing in German?",
-        "answer": "You would typically ask 'Wie geht es Ihnen?' (formal) or 'Wie geht's?' (informal). This shows respect and engagement."
+        "question": "What is a formal greeting used in a business context?",
+        "answer": "Good morning/afternoon, or How do you do?"
       },
       {
-        "question": "What is the appropriate response to 'Nice to meet you'?",
-        "answer": "A standard response is 'You too' or 'Likewise.' This affirms the positive social connection established during the introduction."
+        "question": "How do greeting flashcards help language learners?",
+        "answer": "They teach appropriate social etiquette and basic conversational openings."
       }
     ],
     "path": "/flashcards/greeting",
@@ -65003,16 +65003,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "How do you say 'Hello' in Spanish?",
-        "answer": "Hola. This is a basic greeting used when meeting someone."
+        "question": "Give a common greeting used by children.",
+        "answer": "Hello or Hi."
       },
       {
-        "question": "What is the polite way to end a conversation?",
-        "answer": "Goodbye or See you later. Use polite phrasing to acknowledge the end of an interaction."
+        "question": "What is a way to greet someone at the end of the school day?",
+        "answer": "Goodbye or See you tomorrow."
       },
       {
-        "question": "What word expresses gratitude?",
-        "answer": "Thank you. Expressing thanks is a crucial social convention taught early."
+        "question": "Why is learning greetings important in kindergarten?",
+        "answer": "It teaches basic social skills and classroom etiquette."
       }
     ],
     "path": "/flashcards/greetings-kindergarten",
@@ -65212,16 +65212,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary cognitive benefit of active recall over rereading?",
-        "answer": "Active recall forces the brain to retrieve information, strengthening neural pathways significantly more than passive recognition during rereading."
+        "question": "Name three rooms typically found in a house.",
+        "answer": "Kitchen, living room, bedroom, bathroom (any three)."
       },
       {
-        "question": "Define 'Spaced Repetition' scheduling in study algorithms.",
-        "answer": "It is a technique where review intervals between study sessions increase over time, optimizing retention efficiency based on memory decay models."
+        "question": "What is the term for the outdoor area behind a house?",
+        "answer": "Backyard."
       },
       {
-        "question": "What document formats are supported for initial flashcard creation?",
-        "answer": "The application accepts uploads of PDF, DOCX, PowerPoint files, and images for content analysis."
+        "question": "What part of the house is used for parking a car?",
+        "answer": "Garage."
       }
     ],
     "path": "/flashcards/house",
@@ -65422,16 +65422,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary benefit of AI over manual card creation?",
-        "answer": "AI eliminates the time-intensive step of extracting and formulating concepts, allowing immediate focus on active recall."
+        "question": "What is the simplest way to say \"hello\" to a friend?",
+        "answer": "Hi."
       },
       {
-        "question": "How does setting an exam date affect scheduling?",
-        "answer": "The scheduler adjusts review frequency to ensure the final, intensive review cycle peaks right before your specified exam date."
+        "question": "What is the formal version of \"hello\"?",
+        "answer": "Good day or Hello (in a professional context)."
       },
       {
-        "question": "What study technique does this tool leverage for memory?",
-        "answer": "It leverages Spaced Repetition Scheduling combined with Active Recall by presenting content as challenging questions."
+        "question": "How do flashcards help with basic conversational words like \"hello\"?",
+        "answer": "They provide rapid-fire recall practice for high-frequency social vocabulary."
       }
     ],
     "path": "/flashcards/hello",
@@ -65630,16 +65630,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is a primary goal of auditory stimulation in infants?",
-        "answer": "To encourage language acquisition and refine the ability to distinguish between different phonemes and tones."
+        "question": "What is Infant Stimulation?",
+        "answer": "Activities and exercises designed to provide positive sensory input to a baby for optimal brain development."
       },
       {
-        "question": "What key development occurs during the sensorimotor stage?",
-        "answer": "Infants develop object permanence, understanding that objects exist even when not perceived directly."
+        "question": "Name one type of sensory stimulation used for infants.",
+        "answer": "Visual (black and white patterns), auditory (music), or tactile (massage)."
       },
       {
-        "question": "Why is tummy time crucial for motor skills?",
-        "answer": "It strengthens neck, shoulder, and core muscles necessary for later skills like rolling and sitting up."
+        "question": "What is the goal of using flashcards for infant stimulation?",
+        "answer": "To rapidly introduce visual and auditory information to encourage early neurological connections."
       }
     ],
     "structuredData": {
@@ -65834,16 +65834,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is a common informal way to greet someone in English?",
-        "answer": "A common informal greeting is 'What's up?' or 'Howdy.' These are used primarily among friends and peers."
+        "question": "Give a polite way to ask someone how they are.",
+        "answer": "How are you doing today?"
       },
       {
-        "question": "Translate the formal greeting 'It is a pleasure to meet you.'",
-        "answer": "This translates to 'Pleased to meet you' or 'Nice to meet you.' It is suitable for professional settings."
+        "question": "What is a common English closing greeting (parting)?_?",
+        "answer": "Goodbye or See you later."
       },
       {
-        "question": "What is the appropriate response to 'How do you do?'",
-        "answer": "The traditional and polite response is often to simply repeat, 'How do you do?' though 'I'm well, thank you' is also acceptable."
+        "question": "How do AI flashcards ensure mastery of English greetings?",
+        "answer": "They provide structured practice on situational use (formal vs. informal)."
       }
     ],
     "structuredData": {
@@ -66040,16 +66040,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the first fundamental vowel (Swar) in Devanagari script?",
-        "answer": "The first fundamental vowel is 'अ' (a), often referred to as the inherent vowel sound."
+        "question": "What does 'Swar' (स्वर) mean in Hindi grammar?",
+        "answer": "Vowels."
       },
       {
-        "question": "Which two short and long vowels are represented by 'इ' and 'ई'?",
-        "answer": "'इ' represents the short 'i' sound, while 'ई' represents the long 'ee' sound."
+        "question": "How many primary vowels (Swar) are there in the Hindi Devanagari script?",
+        "answer": "Thirteen (13)."
       },
       {
-        "question": "How many primary Swar (vowels) typically form the core set?",
-        "answer": "There are generally considered to be eleven primary Swar (vowels) in classical Sanskrit and many derived modern Indian languages."
+        "question": "How do AI flashcards help master Hindi Swar?",
+        "answer": "They link the vowel character with its corresponding sound for visual and auditory recall."
       }
     ],
     "path": "/flashcards/hindi-swar",
@@ -66250,16 +66250,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the most common cause of non-hemolytic jaundice in newborns?",
-        "answer": "Physiologic jaundice, resulting from the liver's temporary inability to conjugate bilirubin efficiently due to enzyme immaturity."
+        "question": "What is the purpose of the APGAR score in pediatrics?",
+        "answer": "To assess the physical condition of a newborn baby immediately after birth."
       },
       {
-        "question": "Define the standard presentation for classic Infantile Colic.",
-        "answer": "Rule of 3s: Crying for more than 3 hours a day, more than 3 days a week, for more than 3 weeks in an otherwise healthy infant."
+        "question": "What is a common infectious disease that affects the pediatric population?",
+        "answer": "Otitis media (ear infection) or Varicella (chickenpox)."
       },
       {
-        "question": "What diagnostic criterion differentiates bacterial meningitis from viral meningitis in children?",
-        "answer": "High cerebrospinal fluid (CSF) neutrophil count and markedly low CSF glucose are highly suggestive of bacterial infection."
+        "question": "What does 'WIC' stand for in pediatric health?",
+        "answer": "Women, Infants, and Children (a federal assistance program)."
       }
     ],
     "path": "/flashcards/medstudy-pediatrics",
@@ -66460,16 +66460,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary benefit of spaced repetition scheduling?",
-        "answer": "It optimizes memory retention by strategically increasing the time gap between successful reviews of a specific piece of information."
+        "question": "Why are AI-Powered Midterm Notes generators useful?",
+        "answer": "They quickly condense weeks of lecture material into manageable, testable study sets."
       },
       {
-        "question": "When analyzing midterm notes, what does the AI prioritize?",
-        "answer": "The AI prioritizes definitions, concepts requiring explanation, and factual pairings that best support active recall during testing."
+        "question": "What is the critical timing for studying midterm notes?",
+        "answer": "The few weeks leading up to the exam, requiring intensive, targeted review."
       },
       {
-        "question": "If I set an exam date, what scheduling adjustment is made?",
-        "answer": "The system calculates the required review frequency to ensure all material is seen shortly before the target date, adjusting for difficulty."
+        "question": "How does AI ensure the quality of midterm flashcards?",
+        "answer": "By prioritizing concepts that were heavily covered or bolded in the original notes."
       }
     ],
     "path": "/flashcards/midterm-notes",
@@ -66669,16 +66669,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary sound represented by the letter 's' in Jolly Phonics?",
-        "answer": "The primary sound is /s/, often associated with a slithering snake action."
+        "question": "What is the Jolly Phonics program focused on teaching?",
+        "answer": "Synthetic phonics: blending sounds together to read and segmenting them to spell."
       },
       {
-        "question": "How should the digraph 'sh' be reviewed for retention?",
-        "answer": "Review 'sh' as a single sound unit, emphasizing the action of shushing to keep a secret."
+        "question": "What is a key feature of the Jolly Phonics method?",
+        "answer": "Multi-sensory learning (actions, songs, stories)."
       },
       {
-        "question": "Why is active recall superior to passive reading for phonics mastery?",
-        "answer": "Active recall forces the brain to retrieve information (sound/letter) without cues, solidifying neural pathways for long-term memory."
+        "question": "What is the sound associated with the letter 'a' in Jolly Phonics?",
+        "answer": "The short 'a' sound /a/ (as in ant)."
       }
     ],
     "path": "/flashcards/jolly-phonics-download",
@@ -66878,16 +66878,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary benefit of active recall over passive review?",
-        "answer": "Active recall forces the brain to retrieve information, strengthening memory pathways much more effectively than simply rereading material."
+        "question": "What is a common synonym for 'immediate family'?",
+        "answer": "Nuclear family."
       },
       {
-        "question": "How does Spaced Repetition combat the forgetting curve?",
-        "answer": "It strategically schedules review sessions just before you are likely to forget information, reinforcing memory consolidation over time."
+        "question": "What term is used for a brother or sister?",
+        "answer": "Sibling."
       },
       {
-        "question": "What content formats does the AI effectively process for card generation?",
-        "answer": "The AI excels at parsing structured text from PDFs, DOCX files, and clear imagery containing study material."
+        "question": "How do AI flashcards help master 'My Family' vocabulary?",
+        "answer": "They quickly generate Q&A cards for different kinship terms and their definitions."
       }
     ],
     "path": "/flashcards/my-family",
@@ -67087,16 +67087,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the normal heart rate range for a full-term newborn?",
-        "answer": "The normal range is typically between 100 to 160 beats per minute (bpm) when the infant is awake."
+        "question": "What is the normal term gestation for a newborn?",
+        "answer": "Approximately 40 weeks."
       },
       {
-        "question": "What common screening test is mandatory before hospital discharge?",
-        "answer": "The newborn metabolic screening (heel stick test) screens for critical congenital metabolic disorders."
+        "question": "What reflex causes a newborn to turn their head and seek food when their cheek is stroked?",
+        "answer": "The Rooting Reflex."
       },
       {
-        "question": "Define physiological jaundice in neonates.",
-        "answer": "It is the harmless yellowing of skin peaking days 2-4, caused by immature liver conjugation of bilirubin."
+        "question": "What is the medical term for the first stool passed by a newborn?",
+        "answer": "Meconium."
       }
     ],
     "path": "/flashcards/newborn",
@@ -67297,16 +67297,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary benefit of active recall?",
-        "answer": "It forces retrieval from memory, strengthening neural pathways far more effectively than passive rereading of notes."
+        "question": "What is Quizlet Live primarily used for in the classroom?",
+        "answer": "A collaborative, competitive game mode for reviewing flashcard material."
       },
       {
-        "question": "Define the function of Spaced Repetition Software (SRS)?",
-        "answer": "SRS schedules reviews at increasing intervals, targeting the point just before forgetting to maximize long-term memory consolidation."
+        "question": "How does AI help in making a Quizlet Live alternative deck?",
+        "answer": "It instantly generates the structured data necessary to run any competitive review game."
       },
       {
-        "question": "How does AI speed up flashcard creation?",
-        "answer": "It automatically extracts core concepts from large documents (PDFs, slides) into atomic Q&A pairs instantly."
+        "question": "What is the goal of transforming study documents into active recall sessions?",
+        "answer": "To increase engagement and accelerate memory consolidation."
       }
     ],
     "path": "/flashcards/make-quizlet-live",
@@ -67506,16 +67506,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary goal of Active Recall during study?",
-        "answer": "The primary goal is to force the brain to retrieve information without cues, strengthening the memory trace more robustly than passive review."
+        "question": "What is the primary function of the circulatory system?",
+        "answer": "To transport oxygen, nutrients, and hormones to cells, and remove waste products."
       },
       {
-        "question": "How does setting an exam date influence spaced repetition?",
-        "answer": "Setting a deadline programs the algorithm to increase review frequency near that date, prioritizing concepts needing more immediate attention."
+        "question": "Name the three main types of muscles in the human body.",
+        "answer": "Skeletal, smooth, and cardiac."
       },
       {
-        "question": "What is the function of the AI in flashcard creation?",
-        "answer": "The AI analyzes uploaded content to distill core concepts into precise, atomic question-and-answer pairs suitable for testing."
+        "question": "What is the largest organ in the human body?",
+        "answer": "Skin (or liver, depending on criteria)."
       }
     ],
     "path": "/flashcards/kaplan-anatomy",
@@ -67716,16 +67716,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary difference between additive and subtractive color mixing?",
-        "answer": "Additive mixing (light) combines colors to create white. Subtractive mixing (pigments) combines colors to create black or dark colors."
+        "question": "Name two primary colors.",
+        "answer": "Red, blue, or yellow."
       },
       {
-        "question": "Name two essential properties that define a quadrilateral shape.",
-        "answer": "It must have four sides and four vertices. An example is a parallelogram."
+        "question": "How many sides does a square have?",
+        "answer": "Four."
       },
       {
-        "question": "In digital displays, what colors make up the CMYK model used for printing?",
-        "answer": "Cyan, Magenta, Yellow, and Key (Black) are used to absorb light and create images on paper."
+        "question": "What shape is typically used to represent a stop sign?",
+        "answer": "Octagon (8 sides)."
       }
     ],
     "structuredData": {
@@ -67920,16 +67920,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary initiating event in acute inflammation?",
-        "answer": "Vascular changes, specifically transient vasoconstriction followed by rapid vasodilation and increased vascular permeability."
+        "question": "What is Pathophysiology?",
+        "answer": "The study of how disease processes affect the normal function of the body."
       },
       {
-        "question": "Define apoptosis versus necrosis at a cellular level.",
-        "answer": "Apoptosis is programmed cell death involving cell shrinkage and orderly packaging. Necrosis is unregulated death due to acute injury, leading to cell swelling and lysis."
+        "question": "Define 'homeostasis.'",
+        "answer": "The tendency toward a relatively stable equilibrium between interdependent elements, maintained by physiological processes."
       },
       {
-        "question": "How does hypoxia impair cellular function?",
-        "answer": "Lack of oxygen shifts metabolism to anaerobic glycolysis, leading to rapid ATP depletion and lactic acid accumulation, disrupting ion pumps."
+        "question": "What is the main purpose of inflammation?",
+        "answer": "To protect the body from injury or infection and start the healing process."
       }
     ],
     "path": "/flashcards/pathophysiology-exam-1-questions-quizlet",
@@ -68130,16 +68130,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the opposite of 'Ephemeral'?",
-        "answer": "The opposite is 'Permanent' or 'Eternal'. Ephemeral refers to something lasting for a very short time."
+        "question": "Give the opposite adjective for 'fast.'",
+        "answer": "Slow."
       },
       {
-        "question": "Provide an opposite for 'Ambivalent'.",
-        "answer": "The opposite is 'Decisive' or 'Certain'. Ambivalent means having mixed feelings or contradictory ideas about something."
+        "question": "What is the opposite adjective for 'expensive'?",
+        "answer": "Cheap or inexpensive."
       },
       {
-        "question": "What adjective contrasts with 'Garrulous'?",
-        "answer": "The opposite is 'Reticent' or 'Taciturn'. Garrulous describes someone who is excessively talkative."
+        "question": "How does the use of flashcards improve recall of opposite adjectives?",
+        "answer": "By forcing the student to immediately contrast the meanings of the two terms."
       }
     ],
     "path": "/flashcards/opposite-adjectives",
@@ -68334,16 +68334,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary difference between 'mood' and 'affect'?",
-        "answer": "Affect is the immediate, observable expression of emotion. Mood is a more pervasive, long-lasting emotional state that colors one's general outlook."
+        "question": "What emotion is associated with a feeling of deep satisfaction and well-being?",
+        "answer": "Contentment or happiness."
       },
       {
-        "question": "Define 'Cognitive Reappraisal' in emotion regulation.",
-        "answer": "It involves consciously changing how one thinks about a situation to alter its emotional impact, often reducing negative arousal."
+        "question": "What is the primary difference between a 'feeling' and a 'mood'?",
+        "answer": "A feeling is immediate and short-lived; a mood is a prolonged emotional state."
       },
       {
-        "question": "What category does 'schadenfreude' typically fall under?",
-        "answer": "It is often categorized as a complex social emotion involving pleasure derived from another person's misfortune."
+        "question": "How does AI aid in studying feelings and emotions?",
+        "answer": "It generates structured cards that clearly define and contextualize emotional terms."
       }
     ],
     "path": "/flashcards/feelings-emotions",
@@ -68537,16 +68537,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the single most critical step before performing a venipuncture?",
-        "answer": "Patient identification and confirmation using at least two identifiers, such as name and date of birth, is mandatory."
+        "question": "What is Phlebotomy?",
+        "answer": "The process of drawing blood from a vein (venipuncture) for testing or donation."
       },
       {
-        "question": "Name the correct order of the evacuated tube draw (Order of Draw).",
-        "answer": "Blood culture, Citrate (Blue top), Serum (Red/Gold), Heparin (Green), EDTA (Lavender), Glycolytic inhibitor (Gray)."
+        "question": "What is the most common vein used for venipuncture?",
+        "answer": "The median cubital vein."
       },
       {
-        "question": "What is the primary anticoagulant found in the Lavender top tube?",
-        "answer": "EDTA (Ethylenediaminetetraacetic acid). It prevents coagulation by binding calcium ions in the sample."
+        "question": "What is the purpose of the order of draw in phlebotomy?",
+        "answer": "To prevent cross-contamination of tube additives, ensuring accurate lab results."
       }
     ],
     "path": "/flashcards/phlebotomy-essentials-7th-edition-quizlet",
@@ -68746,16 +68746,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary benefit of using AI for card creation?",
-        "answer": "It automates the time-consuming process of extraction and formatting, allowing immediate focus on studying via active recall."
+        "question": "Name three typical summer activities.",
+        "answer": "Swimming, beach trips, hiking, barbecues (any three)."
       },
       {
-        "question": "What key principle optimizes flashcard review timing?",
-        "answer": "Spaced repetition scheduling, which revisits difficult concepts at progressively longer intervals to aid long-term memory."
+        "question": "What season immediately precedes summer?",
+        "answer": "Spring."
       },
       {
-        "question": "How can I share a set of generated study materials?",
-        "answer": "You can share your compiled flashcard decks with others by generating and distributing a unique, public access link."
+        "question": "Which season is usually the warmest?",
+        "answer": "Summer."
       }
     ],
     "path": "/flashcards/summer",
@@ -68955,16 +68955,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary goal of the Shichida Method?",
-        "answer": "The primary goal is to develop the child's latent potential, focusing on whole-brain thinking and visual-spatial ability development."
+        "question": "What format are Shichida flashcards typically in?",
+        "answer": "Visual cards featuring images, words, or dots."
       },
       {
-        "question": "How does Spaced Repetition optimize learning?",
-        "answer": "It schedules reviews at optimal intervals based on forgetting curves, maximizing long-term memory retention with minimal study time."
+        "question": "Why is it beneficial to generate Shichida flashcards instantly?",
+        "answer": "It allows for immediate implementation of the high-speed flashing technique."
       },
       {
-        "question": "Why choose AI generation over manual card creation?",
-        "answer": "AI generation saves significant time by instantly structuring content from large documents, allowing immediate focus on active recall practice."
+        "question": "What is the primary study method used with Shichida cards?",
+        "answer": "Rapid presentation (flashing) to stimulate the right brain."
       }
     ],
     "path": "/flashcards/shichida-download",
@@ -69165,16 +69165,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the core benefit of using Spaced Repetition (SR)?",
-        "answer": "SR optimizes study time by scheduling reviews right before forgetting occurs, significantly boosting long-term retention."
+        "question": "Define the summer vocabulary word 'sunscreen.'",
+        "answer": "A lotion or spray that protects the skin from the sun's harmful ultraviolet rays."
       },
       {
-        "question": "What happens if I set a specific exam date?",
-        "answer": "The system adjusts the review frequency to ensure comprehensive content mastery aligns precisely with your chosen deadline."
+        "question": "What is a synonym for a summer 'vacation'?",
+        "answer": "Holiday or break."
       },
       {
-        "question": "How does AI handle dense text from a PDF source?",
-        "answer": "The AI extracts key information segments and synthesizes them into concise, atomic question-and-answer pairs."
+        "question": "What does the word 'humidity' describe?",
+        "answer": "The amount of water vapor in the air, often high in summer."
       }
     ],
     "path": "/flashcards/summer-vocabulary",
@@ -69375,16 +69375,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary benefit of spaced repetition scheduling?",
-        "answer": "It optimizes long-term memory by reviewing information just before it is forgotten, maximizing retention efficiency."
+        "question": "Define the SAT vocabulary word 'dogmatic.'",
+        "answer": "Inclined to lay down principles as undeniably true; opinionated."
       },
       {
-        "question": "What is 'Active Recall' in vocabulary acquisition?",
-        "answer": "It is the act of actively retrieving a word from memory rather than passively rereading its definition."
+        "question": "What does the term 'alleviate' mean?",
+        "answer": "To make suffering, deficiency, or a problem less severe."
       },
       {
-        "question": "If a word is used in a Barron's list, what does that imply?",
-        "answer": "It implies the word has a high probability of appearing on the SAT exam, making it a high-yield target for study."
+        "question": "Why is focused flashcard practice essential for Barron's SAT prep?",
+        "answer": "The list is extensive and requires systematic, spaced repetition for mastery."
       }
     ],
     "path": "/flashcards/sat-vocabulary-barrons-test-prep",
@@ -69585,16 +69585,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What grammatical role does an antecedent play?",
-        "answer": "The antecedent is the noun or noun phrase that a pronoun replaces or refers back to in the sentence."
+        "question": "What is the function of an indefinite pronoun?",
+        "answer": "Refers to a person, place, thing, or idea that may or may not be specifically named (e.g., 'someone')."
       },
       {
-        "question": "Differentiate between a relative and an interrogative pronoun.",
-        "answer": "Relative pronouns (who, which, that) introduce subordinate clauses; interrogative pronouns (who, whom, what) are used to ask questions."
+        "question": "Give an example of a possessive pronoun.",
+        "answer": "Mine, yours, hers, his, ours, theirs."
       },
       {
-        "question": "When should a reflexive pronoun be used?",
-        "answer": "A reflexive pronoun (e.g., myself, themselves) is used when the object of the verb is the same as the subject of the verb."
+        "question": "What is a relative pronoun?",
+        "answer": "A pronoun that introduces a dependent clause (e.g., who, whom, which, that)."
       }
     ],
     "path": "/flashcards/pronoun",
@@ -69794,16 +69794,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary function of the Past Perfect tense?",
-        "answer": "It describes an action completed before another action or point in the past. Example: 'She had already left when I arrived.'"
+        "question": "How many main tenses are there in English grammar?",
+        "answer": "Three: Past, Present, and Future."
       },
       {
-        "question": "When should the Present Perfect Continuous tense be used?",
-        "answer": "Use it for actions that started in the past and are still continuing, or have just recently stopped, emphasizing duration."
+        "question": "What are the four aspects of an English verb tense?",
+        "answer": "Simple, Progressive (Continuous), Perfect, and Perfect Progressive."
       },
       {
-        "question": "Identify the verb form needed in a sentence using Future Perfect.",
-        "answer": "The structure requires 'will have' followed by the past participle of the main verb. Example: 'By next week, I will have finished the module.'"
+        "question": "Form the Present Perfect Continuous tense of the verb 'run.'",
+        "answer": "Have been running or has been running."
       }
     ],
     "path": "/flashcards/tenses",
@@ -70000,16 +70000,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What was the central problem facing the thirsty crow?",
-        "answer": "The crow was thirsty, but the water level in the pot was too low for its beak to reach effectively."
+        "question": "What was the main problem the thirsty crow faced in the fable?",
+        "answer": "The water level in the pitcher was too low for him to reach."
       },
       {
-        "question": "What natural principle did the crow use to solve the problem?",
-        "answer": "It used the principle of water displacement by dropping pebbles into the pot to raise the water level."
+        "question": "How did the crow solve his problem?",
+        "answer": "He dropped stones into the pitcher to raise the water level."
       },
       {
-        "question": "What is the common moral lesson derived from the Thirsty Crow?",
-        "answer": "The lesson emphasizes that necessity is the mother of invention, encouraging resourcefulness and perseverance."
+        "question": "What is the moral of the fable \"The Thirsty Crow\"?",
+        "answer": "Necessity is the mother of invention (or where there's a will, there's a way)."
       }
     ],
     "path": "/flashcards/thirsty-crow",
@@ -70210,16 +70210,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary benefit of multimodal transport integration?",
-        "answer": "It optimizes cost and efficiency by leveraging the strengths of different transport modes (road, rail, sea, air) in a single logistical chain."
+        "question": "What are the three main categories of transportation?",
+        "answer": "Land, air, and water."
       },
       {
-        "question": "Define 'Last-Mile Delivery' challenges in urban logistics.",
-        "answer": "This refers to the final stage of moving goods from a distribution hub to the end consumer, often complicated by congestion and accessibility issues."
+        "question": "Name a vehicle used for air transportation.",
+        "answer": "Airplane, helicopter, jet (any one)."
       },
       {
-        "question": "How does Spaced Repetition differ from massed practice?",
-        "answer": "SRS spreads study sessions out over time, enhancing long-term retention, whereas massed practice involves cramming information in one block."
+        "question": "What system is used to move people underground in a city?",
+        "answer": "Subway or metro."
       }
     ],
     "path": "/flashcards/transportation",
@@ -70420,16 +70420,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is sensory transduction in biological systems?",
-        "answer": "It is the process where a sensory stimulus is converted into an electrical signal that the nervous system can interpret. This relies on specialized receptor cells."
+        "question": "What organ is responsible for the sense of hearing?",
+        "answer": "The ear."
       },
       {
-        "question": "Differentiate between tonic and phasic receptor responses.",
-        "answer": "Tonic receptors generate action potentials constantly while the stimulus is present; phasic receptors fire rapidly at the start and end of the stimulus."
+        "question": "Which of the five senses is crucial for balancing in space?",
+        "answer": "Sight and touch (also vestibular sense)."
       },
       {
-        "question": "Name the three primary types of sensory receptors for touch.",
-        "answer": "Mechanoreceptors (pressure/vibration), Thermoreceptors (temperature), and Nociceptors (pain). These detect different physical stimuli."
+        "question": "How does AI help students master concepts related to the senses?",
+        "answer": "By generating cards that link the sense, the organ, and its function."
       }
     ],
     "path": "/flashcards/senses",
@@ -70630,16 +70630,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary cognitive benefit of active recall?",
-        "answer": "Active recall strengthens memory traces by forcing retrieval practice, making future access faster and more reliable."
+        "question": "How does AI allow students to \"Make Your Own Study Material Fast\"?",
+        "answer": "By automating the process of turning notes into testable flashcard content."
       },
       {
-        "question": "How does Spaced Repetition System (SRS) optimize review timing?",
-        "answer": "SRS shows you challenging items more frequently and easy items less often, scheduling reviews just before you are due to forget."
+        "question": "What is the key benefit of making your own flashcards with AI?",
+        "answer": "The material is tailored to your course and instantly ready for active study."
       },
       {
-        "question": "What key information does the AI extract from lecture slides?",
-        "answer": "The AI identifies headings, bullet points, key terms, and conceptual relationships to form concise question-answer pairs."
+        "question": "Why should students stop making cards manually?",
+        "answer": "It saves time and energy for the more effective learning steps."
       }
     ],
     "path": "/flashcards/make-sight",
@@ -70835,16 +70835,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What core cognitive principle does spaced repetition leverage?",
-        "answer": "It leverages the testing effect by reviewing material at increasing intervals just before it is likely to be forgotten."
+        "question": "What is a 'Virtual Flashcards Maker'?",
+        "answer": "A digital tool that creates electronic study cards from documents, often accessible online or via an app."
       },
       {
-        "question": "What common study task does the AI automate during creation?",
-        "answer": "The AI automates the manual process of extracting key concepts and formatting them into atomic question-answer pairs."
+        "question": "How does the AI maker help with effortless studying?",
+        "answer": "It automates the tedious preparation phase (typing, formatting)."
       },
       {
-        "question": "What is the primary input data format for the flashcard generator?",
-        "answer": "Inputs include lecture documents (DOCX), presentations (PPTX), or research materials (PDF)."
+        "question": "What is the benefit of a virtual maker for complex topics?",
+        "answer": "It quickly breaks down large, dense files into concise, manageable units."
       }
     ],
     "path": "/flashcards/virtual-maker",
@@ -71045,16 +71045,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the core cognitive advantage of spaced repetition?",
-        "answer": "It optimizes memory consolidation by prompting retrieval just as forgetting begins, strengthening neural pathways over time."
+        "question": "Name three things associated with winter.",
+        "answer": "Snow, cold weather, holidays, ice, gloves (any three)."
       },
       {
-        "question": "Which file types can I upload for card generation?",
-        "answer": "You can upload PDFs, DOCX files, and image formats like JPG or PNG containing your lecture or textbook content."
+        "question": "What season follows winter?",
+        "answer": "Spring."
       },
       {
-        "question": "How does setting an exam date affect my study plan?",
-        "answer": "The system uses the exam date to reverse-engineer an optimal review schedule, prioritizing difficult concepts near your target date."
+        "question": "What is the shortest day of the year called?",
+        "answer": "Winter Solstice."
       }
     ],
     "path": "/flashcards/winter",
@@ -71253,16 +71253,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "When is a semicolon used instead of a comma?",
-        "answer": "A semicolon connects two closely related independent clauses without a coordinating conjunction. It can also separate items in a complex list."
+        "question": "What is the purpose of a question mark (?)",
+        "answer": "To indicate an interrogative sentence (a question)."
       },
       {
-        "question": "What is the primary function of an em dash in a sentence?",
-        "answer": "The em dash sets off abrupt breaks, adds emphasis, or introduces an explanation or appositive phrase clearly."
+        "question": "When should a comma be used in a sentence?",
+        "answer": "To separate items in a list, or to separate clauses."
       },
       {
-        "question": "Differentiate between restrictive and non-restrictive clauses.",
-        "answer": "Restrictive clauses are essential to the sentence meaning and are not set off by commas; non-restrictive clauses add extra info and require commas."
+        "question": "What punctuation mark is used to show ownership or contraction?",
+        "answer": "Apostrophe (')."
       }
     ],
     "structuredData": {
@@ -71458,16 +71458,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What is the primary benefit of active recall over passive review?",
-        "answer": "Active recall forces the brain to retrieve information, strengthening neural pathways far more effectively than simply rereading notes."
+        "question": "What number comes immediately after 15?",
+        "answer": "Sixteen (16)."
       },
       {
-        "question": "How does spaced repetition optimize memory consolidation?",
-        "answer": "It schedules reviews right before the point of forgetting, maximizing long-term memory retention with minimal wasted study time."
+        "question": "What is the result of 10 + 9?",
+        "answer": "Nineteen (19)."
       },
       {
-        "question": "What key concept must an AI identify in a document for good flashcards?",
-        "answer": "The AI must identify core definitions, relationships between concepts, and critical factual statements that require memorization."
+        "question": "Write the number 13 as a word.",
+        "answer": "Thirteen."
       }
     ],
     "path": "/flashcards/1-20",
@@ -71666,16 +71666,16 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
     },
     "embeddedFlashcards": [
       {
-        "question": "What structure in the eye converts light into neural signals?",
-        "answer": "The photoreceptor cells: rods (for low light) and cones (for color vision) located in the retina."
+        "question": "What sense allows you to feel the texture of a surface?",
+        "answer": "Touch."
       },
       {
-        "question": "Which cranial nerve primarily governs the sense of smell?",
-        "answer": "Cranial Nerve I, the olfactory nerve, transmits signals from the olfactory receptors to the brain."
+        "question": "Which of the five senses is used to perceive light and images?",
+        "answer": "Sight."
       },
       {
-        "question": "What sensory system detects pressure, temperature, and pain?",
-        "answer": "The somatosensory system uses various specialized mechanoreceptors, thermoreceptors, and nociceptors in the skin."
+        "question": "How does AI aid in creating 5 Senses flashcards?",
+        "answer": "By generating cards that define each sense and the organ responsible."
       }
     ],
     "path": "/flashcards/5-senses",
