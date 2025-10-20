@@ -76,7 +76,9 @@ CONVERSION (CTAs):
 10) Use action-oriented, consistent CTAs (3-4 words max). Pick ONE primary label and reuse it consistently across the page.
 
 EMBEDDED FLASHCARDS PREVIEW:
-11) Craft exactly three topic-specific flashcards that would be what the user wanted if he searched for the target keyword with the intent of finding ready-made Flashcards, but if the target keyword is most likely not for a ready-made flashcard intent, then write flashcards upselling benefit of AI Flashcards vs manual making or benefits of active recall, spaced repetition, etc. Do not make flashcards related to memorizing features of the app (e.g Don't make flashcards asking about what are the file formats supported for uploading).
+11) Craft exactly three topic-specific flashcards that would be what the user wanted if he searched for the target keyword with the intent of finding ready-made Flashcards.
+    - The ready-made flashcard samples should be on the subject/topic of the target keyword.
+    - If the target keyword is not a learning/studying topic, then come up with a relevant topic to the assumed audience that searches for such a keyword (assume high-school/college students).
     - Questions must be open-ended and atomic (less than 80 characters).
     - Answers must be concise (≤2 sentences) and accurate (less than 120 characters).
     - Mirror the language of the page (e.g., same locale, terminology).
