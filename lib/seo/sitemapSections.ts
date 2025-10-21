@@ -8,7 +8,7 @@ const coreRoutes = [
   '/ai-flashcard-generator',
   '/pricing',
   '/contact',
-  '/use-cases',
+  '/flashcards',
   '/blog/how-to-study-for-exams',
   '/blog/study-tips-for-high-school-students',
   '/legal/terms',
@@ -31,7 +31,7 @@ export const getCoreSitemapEntries = (): SitemapEntry[] =>
 export const getHubSitemapEntries = (): SitemapEntry[] =>
   sortByLocation(
     useCaseHubs.map((hub) => ({
-      loc: ensureAbsoluteUrl(`/use-cases/${hub.slug}`),
+      loc: ensureAbsoluteUrl(hub.path),
       lastmod: formatLastmod(),
     }))
   );
@@ -42,7 +42,7 @@ export const getSubhubSitemapEntries = (): SitemapEntry[] => {
   useCaseHubs.forEach((hub) => {
     hub.subhubs.forEach((subhub) => {
       entries.push({
-        loc: ensureAbsoluteUrl(`/use-cases/${hub.slug}/${subhub.slug}`),
+        loc: ensureAbsoluteUrl(subhub.path),
         lastmod: formatLastmod(),
       });
     });

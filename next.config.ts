@@ -41,6 +41,20 @@ const nextConfig: NextConfig = {
       },
     ];
   },
+  async redirects() {
+    return [
+      {
+        source: "/use-cases",
+        destination: "/flashcards",
+        statusCode: 301,
+      },
+      {
+        source: "/use-cases/:path*",
+        destination: "/flashcards/:path*",
+        statusCode: 301,
+      },
+    ];
+  },
   // This is required to support PostHog trailing slash API requests
   skipTrailingSlashRedirect: true,
 };

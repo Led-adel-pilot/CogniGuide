@@ -358,7 +358,7 @@ export default function FlashcardGeneratorLanding({ page }: FlashcardGeneratorLa
                         {useCaseHubs.map((hub) => (
                           <Link
                             key={hub.slug}
-                            href={`/use-cases/${hub.slug}`}
+                            href={hub.path}
                             onClick={() => setUseCasesOpen(false)}
                             className="group flex h-full flex-col rounded-xl border border-transparent bg-muted/30 p-4 transition hover:border-primary/60 hover:bg-muted/60 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
                           >
@@ -413,7 +413,7 @@ export default function FlashcardGeneratorLanding({ page }: FlashcardGeneratorLa
                           {useCaseHubs.map((hub) => (
                             <Link
                               key={hub.slug}
-                              href={`/use-cases/${hub.slug}`}
+                              href={hub.path}
                               onClick={() => {
                                 setUseCasesOpen(false);
                                 setMobileMenuOpen(false);

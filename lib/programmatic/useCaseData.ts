@@ -13,6 +13,7 @@ export type UseCaseLink = {
 export type UseCaseSubhub = {
   name: string;
   slug: string;
+  path: string;
   description: string;
   pageIntro: string;
   metaDescription: string;
@@ -22,10 +23,16 @@ export type UseCaseSubhub = {
 export type UseCaseHub = {
   name: string;
   slug: string;
+  path: string;
   menuDescription: string;
   pageIntro: string;
   metaDescription: string;
   subhubs: UseCaseSubhub[];
+};
+
+export type FlashcardBreadcrumbSegment = {
+  label: string;
+  href?: string;
 };
 
 const slugify = (value: string): string =>
@@ -41,6 +48,11 @@ const humanize = (value: string): string =>
     .filter(Boolean)
     .map((segment) => segment.charAt(0).toUpperCase() + segment.slice(1))
     .join(' ');
+
+const buildHubPath = (slug: string): string => `/flashcards/${slug}`;
+
+const buildSubhubPath = (hubSlug: string, subhubSlug: string): string =>
+  `/flashcards/${hubSlug}/${subhubSlug}`;
 
 const flashcardPageMap = new Map(
   generatedFlashcardPages.map((page) => [
@@ -904,6 +916,7 @@ export const useCaseHubs: UseCaseHub[] = Object.entries(rawHubData).map(([hubNam
   return {
     name: hubName,
     slug: hubSlug,
+    path: buildHubPath(hubSlug),
     menuDescription: hubMetadata.menuDescription,
     pageIntro: hubMetadata.pageIntro,
     metaDescription: hubMetadata.metaDescription,
@@ -913,6 +926,7 @@ export const useCaseHubs: UseCaseHub[] = Object.entries(rawHubData).map(([hubNam
       return {
         name: subhubName,
         slug: subhubSlug,
+        path: buildSubhubPath(hubSlug, subhubSlug),
         description: subhubMetadata.description,
         pageIntro: subhubMetadata.pageIntro,
         metaDescription: subhubMetadata.metaDescription,
@@ -937,9 +951,46 @@ export const getSubhubBySlugs = (
   return { hub, subhub };
 };
 
-export const useCasesMetadataBase: Metadata = {
-  title: 'Use Cases | CogniGuide',
+export const getFlashcardBreadcrumbs = (slug: string): FlashcardBreadcrumbSegment[] => {
+  const segments: FlashcardBreadcrumbSegment[] = [
+    { label: 'Home', href: '/' },
+    { label: 'Flashcards', href: '/flashcards' },
+  ];
+
+  for (const hub of useCaseHubs) {
+    const subhub = hub.subhubs.find((candidate) =>
+      candidate.flashcards.some((flashcard) => flashcard.slug === slug)
+    );
+
+    if (!subhub) {
+      continue;
+    }
+
+    const flashcard = subhub.flashcards.find((item) => item.slug === slug);
+
+    segments.push({ label: hub.name, href: hub.path });
+    segments.push({ label: subhub.name, href: subhub.path });
+    segments.push({
+      label: flashcard?.anchorText ?? flashcard?.title ?? humanize(slug),
+    });
+
+    return segments;
+  }
+
+  const fallbackTitle = flashcardPageMap.get(slug)?.title ?? humanize(slug);
+  segments.push({ label: fallbackTitle });
+  return segments;
+};
+
+export const flashcardsPillarMetadata: Metadata = {
+  title: 'AI Flashcards & Study Generator | CogniGuide',
   description:
-    'Explore AI flashcard and study tool use cases organized by exam prep, language learning, phonics, K-5 skills, and more specialized study goals.',
+    'Learn how CogniGuide creates AI flashcards with spaced repetition, explore top study workflows, and jump into curated hubs for exams, languages, phonics, and K-5 skills.',
+};
+
+export const flashcardHierarchyMetadataBase: Metadata = {
+  title: 'Flashcard Study Hubs | CogniGuide',
+  description:
+    'Browse AI flashcard hubs organized by exam prep, language learning, literacy, STEM, K-5 skills, and more specialized study goals.',
 };
 

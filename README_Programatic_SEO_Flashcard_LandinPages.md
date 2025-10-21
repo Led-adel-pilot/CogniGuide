@@ -91,9 +91,8 @@ interface ProgrammaticFlashcardPage {
 
 **Supporting Routes & UI**:
 - `components/HomeLanding.tsx`: Adds a "Use-cases" mega menu that links directly to every hub.
-- `app/use-cases/page.tsx`: Lists all hubs for quick discovery.
-- `app/use-cases/[hub]/page.tsx`: Displays subhubs that belong to a specific hub.
-- `app/use-cases/[hub]/[subhub]/page.tsx`: Surfaces the flashcard landing page links for a given subhub.
+- `app/flashcards/[[...slug]]/page.tsx`: Handles the `/flashcards` pillar page, hub views, subhub views, and individual landing pages in a single catch-all route.
+- `components/FlashcardsPillarPage.tsx`: Marketing page content that sells the AI flashcard generator and promotes primary hubs.
 
 ### 6. Page Management (`lib/programmatic/flashcardPages.ts`)
 
@@ -118,17 +117,21 @@ interface ProgrammaticFlashcardPage {
 - Keyword inheritance from site defaults
 - Absolute URL construction
 
-### 8. Dynamic Page Generation (`app/flashcards/[slug]/page.tsx`)
+### 8. Dynamic Page Generation (`app/flashcards/[[...slug]]/page.tsx`)
 
 **Purpose**: Next.js dynamic route handling
 
 **Features**:
-- `generateStaticParams()`: Pre-generate all programmatic pages at build time
-- `generateMetadata()`: Dynamic metadata generation per page
+- `generateStaticParams()`: Pre-generate pillar, hub, subhub, and landing pages at build time
+- `generateMetadata()`: Dynamic metadata generation per route level
 - `notFound()`: Handle invalid slugs gracefully
-- Structured data injection for rich snippets
+- Structured data injection for rich snippets on landing pages
 
-**Route Structure**: `/flashcards/{slug}`
+**Route Structure**:
+- `/flashcards` → Pillar page
+- `/flashcards/{hub}` → Hub overview
+- `/flashcards/{hub}/{subhub}` → Subhub landing directory
+- `/flashcards/{slug}` → Programmatic flashcard landing page
 
 ### 9. Sitemap Integration (`app/sitemap.ts`)
 
@@ -222,17 +225,12 @@ lib/programmatic/
 └── metadata.ts                        # SEO metadata
 
 components/
-└── HomeLanding.tsx                    # Home page hero with "Use-cases" mega menu
+├── HomeLanding.tsx                    # Home page hero with "Use-cases" mega menu
+└── FlashcardsPillarPage.tsx           # Marketing-focused pillar content for /flashcards
 
-app/use-cases/
-├── page.tsx                           # Hub index page
-├── [hub]/
-│   └── page.tsx                       # Subhub listings for a hub
-└── [hub]/[subhub]/
-    └── page.tsx                       # Flashcard links for a subhub
-
-app/flashcards/[slug]/
-└── page.tsx                           # Dynamic page component
+app/flashcards/
+└── [[...slug]]/
+    └── page.tsx                       # Pillar, hub, subhub, and landing page routing
 
 app/
 └── sitemap.ts                         # Sitemap generation

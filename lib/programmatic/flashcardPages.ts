@@ -198,8 +198,8 @@ export { generatedFlashcardPages };
 export const allFlashcardPages: ProgrammaticFlashcardPage[] = [defaultFlashcardLanding, ...generatedFlashcardPages];
 
 type UseCaseBreadcrumb = {
-  hub: { name: string; slug: string };
-  subhub: { name: string; slug: string };
+  hub: { name: string; path: string };
+  subhub: { name: string; path: string };
 };
 
 const useCaseBreadcrumbMap = new Map<string, UseCaseBreadcrumb>();
@@ -209,8 +209,8 @@ useCaseHubs.forEach((hub) => {
     subhub.flashcards.forEach((flashcard) => {
       if (!useCaseBreadcrumbMap.has(flashcard.slug)) {
         useCaseBreadcrumbMap.set(flashcard.slug, {
-          hub: { name: hub.name, slug: hub.slug },
-          subhub: { name: subhub.name, slug: subhub.slug },
+          hub: { name: hub.name, path: hub.path },
+          subhub: { name: subhub.name, path: subhub.path },
         });
       }
     });
@@ -246,18 +246,13 @@ const buildBreadcrumbItems = (
   const homeUrl = getHomeUrl();
   addItem('CogniGuide', homeUrl);
 
+  addItem('Flashcards', `${siteMetadata.url}/flashcards`);
+
   const breadcrumb = useCaseBreadcrumbMap.get(page.slug);
 
   if (breadcrumb) {
-    const useCasesUrl = `${homeUrl}use-cases`;
-    addItem('Use Cases', useCasesUrl);
-    addItem(breadcrumb.hub.name, `${useCasesUrl}/${breadcrumb.hub.slug}`);
-    addItem(
-      breadcrumb.subhub.name,
-      `${useCasesUrl}/${breadcrumb.hub.slug}/${breadcrumb.subhub.slug}`
-    );
-  } else {
-    addItem('Flashcards', `${siteMetadata.url}/flashcards`);
+    addItem(breadcrumb.hub.name, `${siteMetadata.url}${breadcrumb.hub.path}`);
+    addItem(breadcrumb.subhub.name, `${siteMetadata.url}${breadcrumb.subhub.path}`);
   }
 
   addItem(page.metadata.title ?? page.hero.heading ?? page.slug, canonical);
