@@ -303,7 +303,7 @@ export default function FlashcardGeneratorLanding({ page }: FlashcardGeneratorLa
                       {shouldRenderFlashcards ? (
                         <EmbeddedFlashcards
                           cards={embeddedFlashcardDeck}
-                          title={`${page.hero.heading} Flashcards Preview`}
+                          title="AI Generated Samples"
                           onHeightChange={handleEmbeddedFlashcardHeight}
                         />
                       ) : (

@@ -68,7 +68,7 @@ export default function EmbeddedFlashcards({ cards, title, onHeightChange }: Emb
           open={true}
           isEmbedded={true}
           cards={deck}
-          title={title ?? 'Sample Flashcards'}
+          title={title ?? 'AI Generated Samples'}
           onClose={() => {}}
         />
       </div>
