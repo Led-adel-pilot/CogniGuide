@@ -32,6 +32,7 @@ export default function HomeLanding() {
   const [showAuth, setShowAuth] = useState(false);
   const [isAuthed, setIsAuthed] = useState(false);
   const [useCasesOpen, setUseCasesOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const [shouldRenderMindMap, setShouldRenderMindMap] = useState(false);
   const [shouldRenderFlashcards, setShouldRenderFlashcards] = useState(false);
@@ -39,6 +40,9 @@ export default function HomeLanding() {
   const mindMapSectionRef = useRef<HTMLDivElement | null>(null);
   const flashcardsSectionRef = useRef<HTMLDivElement | null>(null);
   const useCaseMenuRef = useRef<HTMLDivElement | null>(null);
+  const mobileUseCaseMenuRef = useRef<HTMLDivElement | null>(null);
+  const mobileMenuRef = useRef<HTMLDivElement | null>(null);
+  const mobileMenuToggleRef = useRef<HTMLButtonElement | null>(null);
 
   useEffect(() => {
     try {
@@ -90,7 +94,14 @@ export default function HomeLanding() {
 
     const handleClick = (event: MouseEvent) => {
       const target = event.target as Node;
-      if (useCaseMenuRef.current && !useCaseMenuRef.current.contains(target)) {
+      const desktopMenu = useCaseMenuRef.current;
+      const mobileMenu = mobileUseCaseMenuRef.current;
+
+      if ((desktopMenu && desktopMenu.contains(target)) || (mobileMenu && mobileMenu.contains(target))) {
+        return;
+      }
+
+      if (desktopMenu || mobileMenu) {
         setUseCasesOpen(false);
       }
     };
@@ -102,9 +113,39 @@ export default function HomeLanding() {
   }, [useCasesOpen]);
 
   useEffect(() => {
+    if (!mobileMenuOpen) {
+      return undefined;
+    }
+
+    const handleClick = (event: MouseEvent) => {
+      const target = event.target as Node;
+      const toggleButton = mobileMenuToggleRef.current;
+      if (toggleButton && toggleButton.contains(target)) {
+        return;
+      }
+
+      if (mobileMenuRef.current && !mobileMenuRef.current.contains(target)) {
+        setMobileMenuOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClick);
+    return () => {
+      document.removeEventListener('mousedown', handleClick);
+    };
+  }, [mobileMenuOpen]);
+
+  useEffect(() => {
+    if (!mobileMenuOpen) {
+      setUseCasesOpen(false);
+    }
+  }, [mobileMenuOpen]);
+
+  useEffect(() => {
     const handleKey = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
         setUseCasesOpen(false);
+        setMobileMenuOpen(false);
       }
     };
 
@@ -167,50 +208,76 @@ export default function HomeLanding() {
       <AuthModal open={showAuth} />
       <div className="flex flex-col min-h-screen font-sans bg-background text-foreground">
         <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-          <div className="w-full h-16 flex items-center justify-between px-4 sm:px-6 lg:px-10">
-            <div className="flex items-center gap-2">
-              <Image src={CogniGuideLogo} alt="CogniGuide Logo" width={40} height={40} className="h-10 w-10 text-primary" />
-              <h1 className="text-2xl font-bold font-heading tracking-tighter">CogniGuide</h1>
+          <div className="w-full h-16 flex items-center justify-between px-4 sm:px-6 lg:px-10 relative">
+            <div className="flex items-center gap-3 md:gap-6">
+              <button
+                type="button"
+                ref={mobileMenuToggleRef}
+                className="md:hidden inline-flex items-center justify-center rounded-full border border-transparent p-2 text-sm text-foreground transition hover:border-border hover:bg-muted/40 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                aria-label="Toggle navigation menu"
+                aria-expanded={mobileMenuOpen}
+                onClick={() => setMobileMenuOpen((prev) => !prev)}
+              >
+                <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                  <path
+                    fillRule="evenodd"
+                    d="M3 5a1 1 0 0 1 1-1h12a1 1 0 1 1 0 2H4A1 1 0 0 1 3 5Zm0 5a1 1 0 0 1 1-1h12a1 1 0 1 1 0 2H4a1 1 0 0 1-1-1Zm1 4a1 1 0 1 0 0 2h12a1 1 0 1 0 0-2H4Z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+              </button>
+              <div className="flex items-center gap-2">
+                <Image
+                  src={CogniGuideLogo}
+                  alt="CogniGuide Logo"
+                  width={28}
+                  height={28}
+                  className="h-7 w-7 text-primary md:h-10 md:w-10"
+                />
+                <h1 className="text-lg font-bold font-heading tracking-tighter md:text-2xl">CogniGuide</h1>
+              </div>
+              <div className="hidden md:flex items-center gap-4">
+                <div className="relative" ref={useCaseMenuRef}>
+                  <button
+                    type="button"
+                    onClick={() => setUseCasesOpen((prev) => !prev)}
+                    className="flex items-center gap-1 rounded-full border border-transparent px-3 py-2 text-sm font-medium text-foreground transition hover:border-border hover:bg-muted/40 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                    aria-expanded={useCasesOpen}
+                    aria-haspopup="true"
+                  >
+                    Use-cases
+                    <span aria-hidden="true" className="text-xs text-muted-foreground">
+                      {useCasesOpen ? '▴' : '▾'}
+                    </span>
+                  </button>
+                  {useCasesOpen ? (
+                    <div className="absolute left-0 z-50 mt-3 w-screen max-w-3xl rounded-2xl border border-border bg-background/95 p-4 shadow-xl backdrop-blur">
+                      <div className="mb-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Featured hubs</div>
+                      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                        {useCaseHubs.map((hub) => (
+                          <Link
+                            key={hub.slug}
+                            href={`/use-cases/${hub.slug}`}
+                            onClick={() => setUseCasesOpen(false)}
+                            className="group flex h-full flex-col rounded-xl border border-transparent bg-muted/30 p-4 transition hover:border-primary/60 hover:bg-muted/60 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                          >
+                            <span className="text-base font-semibold group-hover:text-primary">{hub.name}</span>
+                            <span className="mt-2 text-sm text-muted-foreground">{hub.menuDescription}</span>
+                          </Link>
+                        ))}
+                      </div>
+                    </div>
+                  ) : null}
+                </div>
+                <Link
+                  href="/pricing"
+                  className="text-sm text-muted-foreground hover:underline"
+                >
+                  Pricing
+                </Link>
+              </div>
             </div>
             <div className="flex items-center gap-4">
-              <div className="relative" ref={useCaseMenuRef}>
-                <button
-                  type="button"
-                  onClick={() => setUseCasesOpen((prev) => !prev)}
-                  className="flex items-center gap-1 rounded-full border border-transparent px-3 py-2 text-sm font-medium text-foreground transition hover:border-border hover:bg-muted/40 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-                  aria-expanded={useCasesOpen}
-                  aria-haspopup="true"
-                >
-                  Use-cases
-                  <span aria-hidden="true" className="text-xs text-muted-foreground">
-                    {useCasesOpen ? '▴' : '▾'}
-                  </span>
-                </button>
-                {useCasesOpen ? (
-                  <div className="absolute right-0 z-50 mt-3 w-screen max-w-3xl rounded-2xl border border-border bg-background/95 p-4 shadow-xl backdrop-blur">
-                    <div className="mb-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Featured hubs</div>
-                    <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                      {useCaseHubs.map((hub) => (
-                        <Link
-                          key={hub.slug}
-                          href={`/use-cases/${hub.slug}`}
-                          onClick={() => setUseCasesOpen(false)}
-                          className="group flex h-full flex-col rounded-xl border border-transparent bg-muted/30 p-4 transition hover:border-primary/60 hover:bg-muted/60 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-                        >
-                      <span className="text-base font-semibold group-hover:text-primary">{hub.name}</span>
-                      <span className="mt-2 text-sm text-muted-foreground">{hub.menuDescription}</span>
-                    </Link>
-                  ))}
-                </div>
-                  </div>
-                ) : null}
-              </div>
-              <Link
-                href="/pricing"
-                className="hidden text-sm text-muted-foreground hover:underline sm:inline"
-              >
-                Pricing
-              </Link>
               {isAuthed ? (
                 <>
                   <button onClick={() => router.push('/dashboard')} className="px-4 py-2 text-sm rounded-full border hover:bg-muted/50">Dashboard</button>
@@ -219,6 +286,57 @@ export default function HomeLanding() {
                 <button onClick={() => setShowAuth(true)} className="px-4 py-2 text-sm rounded-full bg-primary text-primary-foreground hover:bg-primary/90 transition-colors">Try for Free</button>
               )}
             </div>
+            {mobileMenuOpen ? (
+              <div
+                ref={mobileMenuRef}
+                className="absolute left-0 top-full w-full border-b border-border bg-background/95 shadow-lg md:hidden"
+              >
+                <nav className="flex flex-col gap-1 p-4">
+                  <div className="relative" ref={mobileUseCaseMenuRef}>
+                    <button
+                      type="button"
+                      onClick={() => setUseCasesOpen((prev) => !prev)}
+                      className="flex w-full items-center justify-between rounded-lg border border-transparent px-3 py-2 text-sm font-medium text-foreground transition hover:border-border hover:bg-muted/40 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                      aria-expanded={useCasesOpen}
+                      aria-haspopup="true"
+                    >
+                      Use-cases
+                      <span aria-hidden="true" className="text-xs text-muted-foreground">
+                        {useCasesOpen ? '▴' : '▾'}
+                      </span>
+                    </button>
+                    {useCasesOpen ? (
+                      <div className="mt-2 space-y-2 rounded-xl border border-border bg-background/95 p-3 shadow">
+                        <div className="text-[0.65rem] font-semibold uppercase tracking-wide text-muted-foreground">Featured hubs</div>
+                        <div className="grid gap-2">
+                          {useCaseHubs.map((hub) => (
+                            <Link
+                              key={hub.slug}
+                              href={`/use-cases/${hub.slug}`}
+                              onClick={() => {
+                                setUseCasesOpen(false);
+                                setMobileMenuOpen(false);
+                              }}
+                              className="group flex flex-col rounded-lg border border-transparent bg-muted/30 p-3 text-left transition hover:border-primary/60 hover:bg-muted/60 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                            >
+                              <span className="text-sm font-semibold group-hover:text-primary">{hub.name}</span>
+                              <span className="mt-1 text-xs text-muted-foreground">{hub.menuDescription}</span>
+                            </Link>
+                          ))}
+                        </div>
+                      </div>
+                    ) : null}
+                  </div>
+                  <Link
+                    href="/pricing"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="rounded-lg px-3 py-2 text-sm text-muted-foreground transition hover:bg-muted/40 hover:text-foreground"
+                  >
+                    Pricing
+                  </Link>
+                </nav>
+              </div>
+            ) : null}
           </div>
         </header>
 
