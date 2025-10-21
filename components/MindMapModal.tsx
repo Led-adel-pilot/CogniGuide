@@ -1015,6 +1015,15 @@ export default function MindMapModal({ markdown, onClose, onShareMindMap, onShar
 
   return (
     <>
+      <style jsx global>{`
+        #mindmap-container mark {
+          background-color: rgba(255, 230, 35, 0.55);
+          color: inherit;
+          border-radius: 0.25em;
+          padding: 0 0.15em;
+          box-shadow: 0 0 0 0.1em rgba(255, 225, 35, 0.55);
+        }
+      `}</style>
       <AuthModal open={showAuthModal} />
       <div className="fixed inset-0 backdrop-blur-sm flex items-center justify-center z-[100] p-1 font-sans" style={{ backgroundColor: 'var(--color-background)' }}>
         <div className="relative w-full h-full rounded-[1.5rem] border border-border ring-1 ring-black/5 shadow-2xl shadow-[0_10px_25px_rgba(0,0,0,0.12),0_25px_70px_rgba(0,0,0,0.18)] flex flex-col overflow-hidden" style={{ backgroundColor: 'var(--color-background)' }}>
