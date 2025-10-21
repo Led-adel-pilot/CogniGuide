@@ -55,61 +55,28 @@ const credibilityPoints = [
 export default function FlashcardsPillarPage() {
   return (
     <div className="mx-auto flex w-full max-w-6xl flex-col gap-20 px-4 py-16 sm:px-6 lg:px-8">
-      <header className="grid gap-10 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
-        <div className="space-y-6 text-center lg:text-left">
-          <p className="text-sm font-semibold uppercase tracking-wider text-primary/80">AI flashcard generator</p>
-          <h1 className="text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
-            Generate smarter flashcards and keep every review on schedule
-          </h1>
-          <p className="text-lg text-muted-foreground sm:text-xl">
-            CogniGuide turns dense study material into polished decks with FSRS-powered spaced repetition. Upload content, invite
-            collaborators, and explore curated hubs for every exam, language, and learning goal.
-          </p>
-          <div className="flex flex-col items-center gap-3 sm:flex-row sm:justify-start">
-            <Link
-              href="/pricing"
-              className="inline-flex items-center justify-center rounded-full bg-primary px-8 py-3 text-base font-semibold text-primary-foreground shadow-lg shadow-primary/30 transition hover:-translate-y-0.5 hover:bg-primary/90"
-            >
-              Start for free
-            </Link>
-            <Link
-              href="#flashcard-categories"
-              className="inline-flex items-center justify-center rounded-full border border-border px-8 py-3 text-base font-semibold text-foreground transition hover:border-primary/60 hover:text-primary"
-            >
-              Explore flashcard hubs
-            </Link>
-          </div>
-          <dl className="mt-6 grid w-full gap-4 text-left sm:grid-cols-3">
-            <div>
-              <dt className="text-sm uppercase tracking-wide text-muted-foreground">Decks generated</dt>
-              <dd className="text-2xl font-semibold">50k+</dd>
-            </div>
-            <div>
-              <dt className="text-sm uppercase tracking-wide text-muted-foreground">Supported formats</dt>
-              <dd className="text-2xl font-semibold">PDF, DOCX, PPTX, TXT, images</dd>
-            </div>
-            <div>
-              <dt className="text-sm uppercase tracking-wide text-muted-foreground">Review boost</dt>
-              <dd className="text-2xl font-semibold">Up to 2× faster mastery</dd>
-            </div>
-          </dl>
-        </div>
-        <div className="rounded-3xl border border-border bg-card/50 p-8 shadow-xl shadow-primary/10">
-          <h2 className="text-xl font-semibold">Why teams choose CogniGuide</h2>
-          <ul className="mt-5 space-y-4 text-muted-foreground">
-            <li>
-              <span className="font-semibold text-foreground">Upload anything:</span> Drag PDFs, slide decks, spreadsheets, and
-              scanned notes—our parser extracts the key concepts for you.
-            </li>
-            <li>
-              <span className="font-semibold text-foreground">FSRS scheduling:</span> Automatic review plans keep students ahead of
-              exam day without manual spreadsheets.
-            </li>
-            <li>
-              <span className="font-semibold text-foreground">Collaborative by default:</span> Invite peers, share decks, and export
-              highlights to other study tools.
-            </li>
-          </ul>
+      <header className="space-y-6 text-center lg:text-left">
+        <p className="text-sm font-semibold uppercase tracking-wider text-primary/80">Active recall, streamlined</p>
+        <h1 className="text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
+          Master active recall with AI flashcards built for spaced repetition
+        </h1>
+        <p className="text-lg text-muted-foreground sm:text-xl">
+          CogniGuide drafts decks in seconds so you can stay focused on spaced repetition sessions instead of spending hours
+          writing cards.
+        </p>
+        <div className="flex flex-col items-center gap-3 sm:flex-row sm:justify-start">
+          <Link
+            href="/pricing"
+            className="inline-flex items-center justify-center rounded-full bg-primary px-8 py-3 text-base font-semibold text-primary-foreground shadow-lg shadow-primary/30 transition hover:-translate-y-0.5 hover:bg-primary/90"
+          >
+            Start for free
+          </Link>
+          <Link
+            href="#flashcard-categories"
+            className="inline-flex items-center justify-center rounded-full border border-border px-8 py-3 text-base font-semibold text-foreground transition hover:border-primary/60 hover:text-primary"
+          >
+            Explore flashcard hubs
+          </Link>
         </div>
       </header>
 
