@@ -55,7 +55,7 @@ PLACEHOLDER_RELATED_LINKS = [
 
 PROMPT_TEMPLATE = """
 You will generate a complete landing page JSON for an AI flashcards generator app, suitable for static rendering.
-Info on app: You upload your PDFs, DOCX, powerpoint, images, or you can write a prompt eg "make flashcards on X", and the AI generates flashcards with spaced-repetition scheduling, you can also select the exam date, share flashcards with other through a public link. The app is free to use and also has a paid plan with more generation credits and the ability to use a more advanced AI model. Do not hallucinate other features (e.g. the app does not automatically tag concepts, or allow editing cards at the momment). 
+Info on app: You upload your PDFs, DOCX, powerpoint, images, or you can type a prompt eg "make flashcards on X", and the AI generates flashcards with spaced-repetition scheduling, you can also select the exam date, share flashcards with other through a public link. The app is free to use and also has a paid plan with more generation credits and the ability to use a more advanced AI model. Do not hallucinate other features (e.g. the app does not automatically tag concepts, or allow editing cards at the momment). 
 
 You will receive structured CSV data for one landing page. Follow these requirements precisely:
 
@@ -131,7 +131,7 @@ Return ONLY a single valid JSON object with this shape (no markdown, no commenta
     "cta": { "type": "modal", "label": string }
   },
   "linkingRecommendations": {
-    "anchorTextVariants": [string, string],    // exactly 2 anchor texts variants, both variants must contain the target keyword/variant.
+    "anchorTextVariants": [string, string],    // exactly 2 anchor texts variants, both 3-5 words, both variants must contain the target keyword/variant.
     "descriptionVariants": [string, string]    // exactly 2 short descriptions of the page you made, both variants must contain the target keyword/variant.
   },
   "embeddedFlashcards": [
