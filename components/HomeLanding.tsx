@@ -287,7 +287,7 @@ export default function HomeLanding() {
                   <button
                     type="button"
                     onClick={() => setUseCasesOpen((prev) => !prev)}
-                    className="flex items-center gap-1 rounded-full border border-transparent px-3 py-2 text-sm font-medium text-foreground transition hover:border-border hover:bg-muted/40 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                    className="flex items-center gap-1 rounded-full border border-transparent px-3 py-2 text-sm text-foreground transition hover:border-border hover:bg-muted/40 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
                     aria-expanded={useCasesOpen}
                     aria-haspopup="true"
                   >
@@ -342,7 +342,7 @@ export default function HomeLanding() {
                     <button
                       type="button"
                       onClick={() => setUseCasesOpen((prev) => !prev)}
-                      className="flex w-full items-center justify-between rounded-lg border border-transparent px-3 py-2 text-sm font-medium text-foreground transition hover:border-border hover:bg-muted/40 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                    className="flex w-full items-center justify-between rounded-lg border border-transparent px-3 py-2 text-sm text-foreground transition hover:border-border hover:bg-muted/40 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
                       aria-expanded={useCasesOpen}
                       aria-haspopup="true"
                     >
