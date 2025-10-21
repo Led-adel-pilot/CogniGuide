@@ -84,8 +84,7 @@ EMBEDDED FLASHCARDS PREVIEW:
     - Mirror the language of the page (e.g., same locale, terminology).
 
 STRUCTURED DATA:
-12) Include FAQPage JSON-LD that mirrors the FAQ items. Also add a BreadcrumbList for:
-    - “/flashcards” → “/flashcards/{slug}” (use base_url + "/flashcards/" + slug). Do not invent deeper levels.
+12) Include FAQPage JSON-LD that mirrors the FAQ items. Breadcrumb trails are generated automatically, so do not add them.
 
 OUTPUT FORMAT (STRICT):
 Return ONLY a single valid JSON object with this shape (no markdown, no commentary). The slug and path are managed externally, so do not include them:
@@ -140,13 +139,6 @@ Return ONLY a single valid JSON object with this shape (no markdown, no commenta
     "@context": "https://schema.org",
     "@graph": [
       {
-        "@type": "BreadcrumbList",
-        "itemListElement": [
-          {"@type":"ListItem","position":1,"name":"Flashcards","item":"{base_url}/flashcards"},
-          {"@type":"ListItem","position":2,"name": "{context.target_keyword || slug}", "item": "{base_url}/flashcards/{slug}"}
-        ]
-      },
-      {
         "@type": "FAQPage",
         "mainEntity": [
           {
@@ -172,6 +164,93 @@ QUALITY GATES (the model must self-check BEFORE returning JSON):
 
 Return ONLY the JSON object. Ensure the first sentence of seoSection.body[0].html begins with the target keyword or its closest natural variant.
 """
+
+
+SCRIPT_DIR = Path(__file__).resolve().parent
+REPO_ROOT = SCRIPT_DIR.parent
+TAXONOMY_PATH = REPO_ROOT / "data" / "flashcard_taxonomy.json"
+
+TaxonomyEntry = Dict[str, str]
+_TAXONOMY_CACHE: Dict[str, TaxonomyEntry] | None = None
+
+
+def slugify(value: str) -> str:
+  normalized = value.lower().replace("&", "and")
+  normalized = re.sub(r"[^a-z0-9]+", "-", normalized)
+  return normalized.strip("-")
+
+
+def load_taxonomy_map() -> Dict[str, TaxonomyEntry]:
+  global _TAXONOMY_CACHE
+  if _TAXONOMY_CACHE is not None:
+    return _TAXONOMY_CACHE
+
+  try:
+    raw = json.loads(TAXONOMY_PATH.read_text(encoding="utf-8"))
+  except FileNotFoundError:
+    _TAXONOMY_CACHE = {}
+    return _TAXONOMY_CACHE
+
+  mapping: Dict[str, TaxonomyEntry] = {}
+  if isinstance(raw, dict):
+    for hub_name, subhub_map in raw.items():
+      if not isinstance(subhub_map, dict):
+        continue
+      hub_slug = slugify(str(hub_name))
+      for subhub_name, slugs in subhub_map.items():
+        if not isinstance(slugs, list):
+          continue
+        subhub_slug = slugify(str(subhub_name))
+        for slug in slugs:
+          if not isinstance(slug, str):
+            continue
+          mapping.setdefault(
+            slug,
+            {
+              "hub_name": str(hub_name),
+              "hub_slug": hub_slug,
+              "subhub_name": str(subhub_name),
+              "subhub_slug": subhub_slug,
+            },
+          )
+
+  _TAXONOMY_CACHE = mapping
+  return _TAXONOMY_CACHE
+
+
+def build_breadcrumb_segments(row: CsvRow, breadcrumb_name: str) -> List[Dict[str, str]]:
+  base_url = row.base_url.rstrip("/")
+  segments: List[Dict[str, str]] = [
+    {"name": "Home", "item": f"{base_url}/"},
+    {"name": "Flashcards", "item": f"{base_url}/flashcards/"},
+  ]
+
+  taxonomy = load_taxonomy_map()
+  entry = taxonomy.get(row.slug)
+  if isinstance(entry, dict):
+    hub_name = entry.get("hub_name")
+    hub_slug = entry.get("hub_slug")
+    if hub_name and hub_slug:
+      segments.append(
+        {
+          "name": hub_name,
+          "item": f"{base_url}/flashcards/{hub_slug}/",
+        }
+      )
+
+    subhub_name = entry.get("subhub_name")
+    subhub_slug = entry.get("subhub_slug")
+    if subhub_name and subhub_slug and hub_slug:
+      segments.append(
+        {
+          "name": subhub_name,
+          "item": f"{base_url}/flashcards/{hub_slug}/{subhub_slug}/",
+        }
+      )
+
+  breadcrumb_label = breadcrumb_name.strip() or row.slug
+  segments.append({"name": breadcrumb_label})
+  return segments
 
 
 def parse_args(argv: Iterable[str] | None = None) -> argparse.Namespace:
@@ -428,22 +507,22 @@ def build_structured_data(row: CsvRow, payload: Dict[str, Any]) -> Dict[str, Any
             }
           )
 
+  breadcrumb_segments = build_breadcrumb_segments(row, breadcrumb_name)
+  item_list: List[Dict[str, Any]] = []
+  for idx, segment in enumerate(breadcrumb_segments, start=1):
+    item: Dict[str, Any] = {
+      "@type": "ListItem",
+      "position": idx,
+      "name": segment.get("name") or "",
+    }
+    href = segment.get("item")
+    if href:
+      item["item"] = href
+    item_list.append(item)
+
   breadcrumb_graph = {
     "@type": "BreadcrumbList",
-    "itemListElement": [
-      {
-        "@type": "ListItem",
-        "position": 1,
-        "name": "Flashcards",
-        "item": f"{row.base_url.rstrip('/')}/flashcards",
-      },
-      {
-        "@type": "ListItem",
-        "position": 2,
-        "name": breadcrumb_name,
-        "item": canonical,
-      },
-    ],
+    "itemListElement": item_list,
   }
 
   graph = [breadcrumb_graph]
@@ -475,13 +554,11 @@ def normalise_page(row: CsvRow, payload: Dict[str, Any]) -> Dict[str, Any]:
   payload.setdefault("path", row.path)
   payload["slug"] = row.slug
 
-  structured_data = payload.get("structuredData")
-  if not isinstance(structured_data, dict) or not structured_data.get("@graph"):
-    fallback_structured = build_structured_data(row, payload)
-    if fallback_structured:
-      payload["structuredData"] = fallback_structured
-    else:
-      payload.pop("structuredData", None)
+  structured_data = build_structured_data(row, payload)
+  if structured_data:
+    payload["structuredData"] = structured_data
+  else:
+    payload.pop("structuredData", None)
   return payload
 
 

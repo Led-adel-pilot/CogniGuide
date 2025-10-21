@@ -21,6 +21,7 @@ This document details the comprehensive programmatic SEO system implemented for 
 - **Input Processing**: Reads CSV definitions and creates structured prompts
 - **AI Integration**: Uses Gemini 2.5 Flash Lite model with temperature 2.0 for creative variation
 - **Content Structure**: Generates complete page objects following the `ProgrammaticFlashcardPage` schema
+- **Programmatic Breadcrumbs**: Builds JSON-LD breadcrumb trails from the shared taxonomy map so the LLM never hallucinates hierarchy data.
 - **Output Generation**: Creates TypeScript files with generated content
 
 **Process Flow**:
@@ -80,11 +81,12 @@ interface ProgrammaticFlashcardPage {
 - Canonical URL management
 - Meta descriptions optimized for click-through rates
 
-### 5. Use-Case Taxonomy & Navigation (`lib/programmatic/useCaseData.ts`)
+### 5. Use-Case Taxonomy & Navigation (`data/flashcard_taxonomy.json`, `lib/programmatic/useCaseData.ts`)
 
 **Purpose**: Curates hub and subhub groupings that surface relevant flashcard destinations across the site.
 
 **Key Capabilities**:
+- Centralizes hub → subhub → landing-page assignments in `data/flashcard_taxonomy.json` so that both the TypeScript navigation helpers and Python generators stay in sync.
 - Converts hub and subhub labels from the master CSVs into URL-friendly slugs.
 - Pairs each subhub with the flashcard landing page metadata sourced from `generatedFlashcardPages`.
 - Powers the hierarchical navigation experiences listed below via a single data map.
@@ -93,6 +95,7 @@ interface ProgrammaticFlashcardPage {
 - `components/HomeLanding.tsx`: Adds a "Use-cases" mega menu that links directly to every hub.
 - `app/flashcards/[[...slug]]/page.tsx`: Handles the `/flashcards` pillar page, hub views, subhub views, and individual landing pages in a single catch-all route.
 - `components/FlashcardsPillarPage.tsx`: Marketing page content that sells the AI flashcard generator and promotes primary hubs.
+- `scripts/generate_programmatic_flashcards.py`: Reuses the taxonomy map to assemble breadcrumb structured data for every generated landing page.
 
 ### 6. Page Management (`lib/programmatic/flashcardPages.ts`)
 
