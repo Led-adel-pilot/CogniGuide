@@ -1,4 +1,4 @@
-export { generateMetadata, generateStaticParams } from '@/app/flashcards/[slug]/page';
+export { generateMetadata, generateStaticParams } from '@/app/flashcards/[[...slug]]/page';
 
 import { notFound, permanentRedirect } from 'next/navigation';
 import { getProgrammaticFlashcardPage } from '@/lib/programmatic/flashcardPages';
