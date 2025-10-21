@@ -48,9 +48,14 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
 """
 OUTPUT_FOOTER = "];\n"
 
+PLACEHOLDER_RELATED_LINKS = [
+  {"label": "/", "href": "/"},
+  {"label": "/flashcards", "href": "/flashcards"},
+]
+
 PROMPT_TEMPLATE = """
 You will generate a complete landing page JSON for an AI flashcards generator app, suitable for static rendering.
-Info on app: You upload your PDFs, DOCX, powerpoint or images and generates flashcards with spaced-repetition scheduling, you can also select the exam date, share flashcards with other through a public link. The app is free to use and also has a paid plan with more generation credits and the ability to use a more advanced AI model. Do not hallucinate other features (e.g. the app does not automatically tag concepts, or allow editing cards at the momment). 
+Info on app: You upload your PDFs, DOCX, powerpoint, images, or you can write a prompt eg "make flashcards on X", and the AI generates flashcards with spaced-repetition scheduling, you can also select the exam date, share flashcards with other through a public link. The app is free to use and also has a paid plan with more generation credits and the ability to use a more advanced AI model. Do not hallucinate other features (e.g. the app does not automatically tag concepts, or allow editing cards at the momment). 
 
 You will receive structured CSV data for one landing page. Follow these requirements precisely:
 
@@ -69,11 +74,11 @@ ON-PAGE SEO REQUIREMENTS:
 5) H1 (hero.heading): must include the target keyword. H1 ≈ title but not identical.
 6) Headings hierarchy: Use concise H2/H3s; avoid keyword stuffing. Every section must be meaningfully different.
 7) Semantic coverage: Naturally weave related_terms and subject-specific subtopics (if given). Include spaced repetition, active recall, tagging, and study workflow concepts where relevant.
-8) Internal links: Use internal_links if provided; otherwise create at least two sensible links under relatedTopicsSection that point to topical neighbors at {base_url}.
+8) Internal linking guidance: Provide two distinct anchor text variations for this page and two succinct descriptions (≤120 characters each) that other editors can use when linking to it from elsewhere on the site.
 9) Accessibility: Any example references should describe content plainly so screen readers convey value (no images required in output).
 
 CONVERSION (CTAs):
-10) Use action-oriented, consistent CTAs (3-4 words max). Pick ONE primary label and reuse it consistently across the page.
+10) Use action-oriented, consistent CTAs (3-4 words max). Pick ONE primary label and reuse it consistently across the page. The CTAs in question will open the sign up for free account page.
 
 EMBEDDED FLASHCARDS PREVIEW:
 11) Craft exactly three topic-specific flashcards that would be what the user wanted if he searched for the target keyword with the intent of finding ready-made Flashcards.
@@ -98,8 +103,7 @@ Return ONLY a single valid JSON object with this shape (no markdown, no commenta
   },
   "hero": {
     "heading": string,          // H1, contains target keyword/variant
-    "subheading": string,       // 1–2 sentences: Explains what the tool does and how it could be helpfull for someone searching for that target keyword.
-    "primaryCta": { "type": "modal", "label": string }
+    "subheading": string,       // 1–2 sentences: Explains what the tool does and how it could be helpful for someone searching for that target keyword (essentially Upload X or ask for X using a prompt and get flashcards, in contexts where asking the AI (prompting) is more suited start mentioning that, in contexts when uploading study materials is more suited mention that mainly).mentioning    "primaryCta": { "type": "modal", "label": string }
   },
   "featuresSection": {
     "heading": string,          // H2
@@ -126,9 +130,9 @@ Return ONLY a single valid JSON object with this shape (no markdown, no commenta
     "items": [{ "question": string, "answer": string }, ...], // 4 distinct, relevant questions
     "cta": { "type": "modal", "label": string }
   },
- "relatedTopicsSection": {
-    "heading": string,          // H2
-    "links": [{ "label": string, "href": string, "description": string }, ...] // At least 2 internal links
+  "linkingRecommendations": {
+    "anchorTextVariants": [string, string],    // exactly 2 anchor texts variants, both variants must contain the target keyword/variant.
+    "descriptionVariants": [string, string]    // exactly 2 short descriptions of the page you made, both variants must contain the target keyword/variant.
   },
   "embeddedFlashcards": [
     { "question": string, "answer": string },
@@ -161,6 +165,7 @@ QUALITY GATES (the model must self-check BEFORE returning JSON):
   * Ask open-ended, atomic questions tailored to the topic.
   * Provide concise answers (≤2 sentences) that support active recall.
   * Avoid markdown unless needed for short lists.
+- Linking recommendations must contain exactly two items in each array and stay focused on this page's value proposition.
 
 Return ONLY the JSON object. Ensure the first sentence of seoSection.body[0].html begins with the target keyword or its closest natural variant.
 """
@@ -381,6 +386,25 @@ def call_model(
             "seoSection": {"type": "object"},
             "faqSection": {"type": "object"},
             "relatedTopicsSection": {"type": "object"},
+            "linkingRecommendations": {
+              "type": "object",
+              "properties": {
+                "anchorTextVariants": {
+                  "type": "array",
+                  "items": {"type": "string"},
+                  "minItems": 2,
+                  "maxItems": 2,
+                },
+                "descriptionVariants": {
+                  "type": "array",
+                  "items": {"type": "string"},
+                  "minItems": 2,
+                  "maxItems": 2,
+                },
+              },
+              "required": ["anchorTextVariants", "descriptionVariants"],
+              "additionalProperties": False,
+            },
             "embeddedFlashcards": {
               "type": "array",
               "items": {
@@ -403,7 +427,7 @@ def call_model(
             "howItWorksSection",
             "seoSection",
             "faqSection",
-            "relatedTopicsSection",
+            "linkingRecommendations",
             "embeddedFlashcards",
           ],
           "additionalProperties": True,
@@ -553,6 +577,32 @@ def normalise_page(row: CsvRow, payload: Dict[str, Any]) -> Dict[str, Any]:
 
   payload.setdefault("path", row.path)
   payload["slug"] = row.slug
+
+  linking_recs = payload.get("linkingRecommendations")
+  if not isinstance(linking_recs, dict):
+    raise ValueError(
+      f"Model response for slug '{row.slug}' is missing linkingRecommendations"
+    )
+
+  for key in ("anchorTextVariants", "descriptionVariants"):
+    values = linking_recs.get(key)
+    if not isinstance(values, list) or len(values) < 2:
+      raise ValueError(
+        f"linkingRecommendations.{key} must include two entries for slug '{row.slug}'"
+      )
+    cleaned = [str(item).strip() for item in values if isinstance(item, str)][:2]
+    if len(cleaned) < 2:
+      raise ValueError(
+        f"linkingRecommendations.{key} contained invalid entries for slug '{row.slug}'"
+      )
+    linking_recs[key] = cleaned
+
+  placeholder_section = {
+    "heading": payload.get("relatedTopicsSection", {}).get("heading")
+    or "Explore related topics",
+    "links": [dict(link) for link in PLACEHOLDER_RELATED_LINKS],
+  }
+  payload["relatedTopicsSection"] = placeholder_section
 
   structured_data = build_structured_data(row, payload)
   if structured_data:

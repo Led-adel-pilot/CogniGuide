@@ -52,6 +52,11 @@ export interface ProgrammaticRelatedLink {
   description?: string;
 }
 
+export interface ProgrammaticLinkingRecommendations {
+  anchorTextVariants: [string, string];
+  descriptionVariants: [string, string];
+}
+
 export interface ProgrammaticSectionCopy {
   heading: string;
   subheading?: string;
@@ -92,6 +97,7 @@ export interface ProgrammaticFlashcardPage {
   relatedTopicsSection?: ProgrammaticSectionCopy & {
     links: ProgrammaticRelatedLink[];
   };
+  linkingRecommendations?: ProgrammaticLinkingRecommendations;
   structuredData?: Record<string, unknown>;
   embeddedFlashcards?: ProgrammaticEmbeddedFlashcard[];
 }

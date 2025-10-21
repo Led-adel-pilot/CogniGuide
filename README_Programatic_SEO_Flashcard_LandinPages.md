@@ -22,6 +22,7 @@ This document details the comprehensive programmatic SEO system implemented for 
 - **AI Integration**: Uses Gemini 2.5 Flash Lite model with temperature 2.0 for creative variation
 - **Content Structure**: Generates complete page objects following the `ProgrammaticFlashcardPage` schema
 - **Programmatic Breadcrumbs**: Builds JSON-LD breadcrumb trails from the shared taxonomy map so the LLM never hallucinates hierarchy data.
+- **Linking Guidance**: Captures anchor text and description variants for future internal linking while leaving related topic links as placeholders.
 - **Output Generation**: Creates TypeScript files with generated content
 
 **Process Flow**:
@@ -54,6 +55,7 @@ interface ProgrammaticFlashcardPage {
   seoSection?: SEOSection;
   faqSection?: FAQSection;
   relatedTopicsSection?: RelatedTopicsSection;
+  linkingRecommendations?: LinkingRecommendations;
   structuredData?: Record<string, unknown>;
 }
 ```
@@ -72,12 +74,13 @@ interface ProgrammaticFlashcardPage {
 - **How It Works Section**: Exactly 3 sequential steps customized to topic
 - **SEO Section**: Mix of paragraphs and bullet lists with HTML markup for emphasis and internal links
 - **FAQ Section**: 4 topic-specific questions with helpful answers
-- **Related Topics Section**: Internal linking opportunities (minimum 2 links)
+- **Related Topics Section**: Placeholder entries (`/` and `/flashcards`) inserted for later manual curation
+- **Linking Recommendations**: Two anchor text variations and two short descriptions to guide future internal links
 
 **SEO Optimization Features**:
 - Long-tail keyword targeting in titles and descriptions
 - Structured HTML with semantic markup
-- Internal linking for topical authority
+- Editor-friendly linking recommendations for topical authority
 - Canonical URL management
 - Meta descriptions optimized for click-through rates
 
