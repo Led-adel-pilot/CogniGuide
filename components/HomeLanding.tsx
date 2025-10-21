@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
@@ -36,6 +36,7 @@ export default function HomeLanding() {
 
   const [shouldRenderMindMap, setShouldRenderMindMap] = useState(false);
   const [shouldRenderFlashcards, setShouldRenderFlashcards] = useState(false);
+  const [embeddedFlashcardHeight, setEmbeddedFlashcardHeight] = useState<number | null>(null);
   const router = useRouter();
   const mindMapSectionRef = useRef<HTMLDivElement | null>(null);
   const flashcardsSectionRef = useRef<HTMLDivElement | null>(null);
@@ -43,6 +44,51 @@ export default function HomeLanding() {
   const mobileUseCaseMenuRef = useRef<HTMLDivElement | null>(null);
   const mobileMenuRef = useRef<HTMLDivElement | null>(null);
   const mobileMenuToggleRef = useRef<HTMLButtonElement | null>(null);
+  const lastMeasuredFlashcardHeightRef = useRef<number>(0);
+
+  const computeFlashcardBaseHeight = useCallback(() => {
+    if (typeof window === 'undefined') return 0;
+    const width = window.innerWidth;
+    if (width >= 768) {
+      return 600; // md:h-[600px]
+    }
+    return Math.round(window.innerHeight * 0.68); // h-[68vh]
+  }, []);
+
+  const handleEmbeddedFlashcardHeight = useCallback(
+    (height: number) => {
+      if (!height || !Number.isFinite(height)) return;
+      lastMeasuredFlashcardHeightRef.current = height;
+      const baseHeight = computeFlashcardBaseHeight();
+      const nextHeight = Math.max(height, baseHeight);
+      setEmbeddedFlashcardHeight((prev) => {
+        if (prev === null) return nextHeight;
+        return Math.abs(prev - nextHeight) > 1 ? nextHeight : prev;
+      });
+    },
+    [computeFlashcardBaseHeight]
+  );
+
+  useEffect(() => {
+    const handleResize = () => {
+      const baseHeight = computeFlashcardBaseHeight();
+      const measured = lastMeasuredFlashcardHeightRef.current;
+      if (!measured) {
+        setEmbeddedFlashcardHeight(baseHeight > 0 ? baseHeight : null);
+        return;
+      }
+      const nextHeight = Math.max(measured, baseHeight);
+      setEmbeddedFlashcardHeight((prev) => {
+        if (prev === null) return nextHeight;
+        return Math.abs(prev - nextHeight) > 1 ? nextHeight : prev;
+      });
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, [computeFlashcardBaseHeight]);
 
   useEffect(() => {
     try {
@@ -400,9 +446,12 @@ export default function HomeLanding() {
                 </p>
               </div>
               <div className="bg-background rounded-[2rem] border shadow-xl shadow-slate-200/50 dark:shadow-slate-700/50 overflow-hidden">
-                <div className="w-full h-[68vh] md:h-[600px]">
+                <div
+                  className="w-full h-[68vh] md:h-[600px]"
+                  style={embeddedFlashcardHeight ? { height: `${embeddedFlashcardHeight}px` } : undefined}
+                >
                   {shouldRenderFlashcards ? (
-                    <EmbeddedFlashcards />
+                    <EmbeddedFlashcards onHeightChange={handleEmbeddedFlashcardHeight} />
                   ) : (
                     <div className="w-full h-full animate-pulse bg-muted/40" aria-hidden="true" />
                   )}

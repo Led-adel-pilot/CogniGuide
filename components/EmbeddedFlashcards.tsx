@@ -1,5 +1,6 @@
 'use client';
 
+import React from 'react';
 import FlashcardsModal, { type Flashcard } from '@/components/FlashcardsModal';
 
 const fallbackFlashcards: Flashcard[] = [
@@ -22,14 +23,47 @@ const fallbackFlashcards: Flashcard[] = [
 type EmbeddedFlashcardsProps = {
   cards?: Flashcard[] | null;
   title?: string;
+  onHeightChange?: (height: number) => void;
 };
 
-export default function EmbeddedFlashcards({ cards, title }: EmbeddedFlashcardsProps) {
+export default function EmbeddedFlashcards({ cards, title, onHeightChange }: EmbeddedFlashcardsProps) {
   const deck = cards && cards.length > 0 ? cards : fallbackFlashcards;
+  const contentRef = React.useRef<HTMLDivElement | null>(null);
+  const lastHeightRef = React.useRef<number | null>(null);
+
+  React.useEffect(() => {
+    const node = contentRef.current;
+    if (!node) return;
+
+    const notifyHeight = () => {
+      const rect = node.getBoundingClientRect();
+      const height = Math.ceil(rect.height);
+      if (!Number.isFinite(height) || height <= 0) return;
+      if (lastHeightRef.current === height) return;
+      lastHeightRef.current = height;
+      onHeightChange?.(height);
+    };
+
+    notifyHeight();
+
+    if (typeof ResizeObserver === 'undefined') {
+      const id = window.setInterval(notifyHeight, 250);
+      return () => {
+        window.clearInterval(id);
+      };
+    }
+
+    const observer = new ResizeObserver(() => {
+      notifyHeight();
+    });
+
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, [onHeightChange]);
 
   return (
-    <div className="flex h-full w-full items-center justify-center px-4 py-4 sm:px-6 sm:py-6 md:px-8">
-      <div className="h-full w-full max-w-4xl">
+    <div className="flex w-full items-center justify-center px-4 py-4 sm:px-6 sm:py-6 md:px-8">
+      <div ref={contentRef} className="w-full max-w-4xl">
         <FlashcardsModal
           open={true}
           isEmbedded={true}

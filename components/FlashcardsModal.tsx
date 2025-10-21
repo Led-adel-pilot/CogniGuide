@@ -793,9 +793,9 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
       )}
 
       <div
-        className={`w-full grid grid-rows-[auto,1fr,auto] bg-background gap-y-3 pb-4 sm:pb-6 ${
-          !isEmbedded ? 'h-full pt-14 sm:pt-4 md:pt-0' : 'h-auto pt-4 md:pt-0'
-        }`}
+        className={`w-full grid grid-rows-[auto,1fr,auto] bg-background gap-y-3 ${
+          isEmbedded ? 'pb-8 sm:pb-10' : 'pb-4 sm:pb-6'
+        } ${!isEmbedded ? 'h-full pt-14 sm:pt-4 md:pt-0' : 'h-auto pt-4 md:pt-0'}`}
       >
         <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 items-center gap-2 sm:gap-3 px-4 sm:px-6 md:px-0 mt-10">
           <div className="text-center md:text-left text-sm font-medium truncate text-foreground">{studyInterleaved ? (current?.deckTitle || title) : (title || 'Flashcards')}</div>

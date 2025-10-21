@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef, useMemo } from 'react';
+import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
@@ -78,8 +78,57 @@ export default function FlashcardGeneratorLanding({ page }: FlashcardGeneratorLa
   const [showAuth, setShowAuth] = useState(false);
   const [isAuthed, setIsAuthed] = useState(false);
   const [shouldRenderFlashcards, setShouldRenderFlashcards] = useState(false);
+  const [embeddedFlashcardHeight, setEmbeddedFlashcardHeight] = useState<number | null>(null);
   const router = useRouter();
   const flashcardsSectionRef = useRef<HTMLDivElement | null>(null);
+  const lastMeasuredEmbedHeightRef = useRef<number>(0);
+
+  const computeEmbeddedBaseHeight = useCallback(() => {
+    if (typeof window === 'undefined') return 0;
+    const width = window.innerWidth;
+    if (width >= 1024) {
+      return 30 * 16; // lg:h-[30rem]
+    }
+    if (width >= 768) {
+      return 26 * 16; // md:h-[26rem]
+    }
+    return Math.round(window.innerHeight * 0.65); // h-[65vh]
+  }, []);
+
+  const handleEmbeddedFlashcardHeight = useCallback(
+    (height: number) => {
+      if (!height || !Number.isFinite(height)) return;
+      lastMeasuredEmbedHeightRef.current = height;
+      const baseHeight = computeEmbeddedBaseHeight();
+      const nextHeight = Math.max(height, baseHeight);
+      setEmbeddedFlashcardHeight((prev) => {
+        if (prev === null) return nextHeight;
+        return Math.abs(prev - nextHeight) > 1 ? nextHeight : prev;
+      });
+    },
+    [computeEmbeddedBaseHeight]
+  );
+
+  useEffect(() => {
+    const handleResize = () => {
+      const baseHeight = computeEmbeddedBaseHeight();
+      const measured = lastMeasuredEmbedHeightRef.current;
+      if (!measured) {
+        setEmbeddedFlashcardHeight(baseHeight > 0 ? baseHeight : null);
+        return;
+      }
+      const nextHeight = Math.max(measured, baseHeight);
+      setEmbeddedFlashcardHeight((prev) => {
+        if (prev === null) return nextHeight;
+        return Math.abs(prev - nextHeight) > 1 ? nextHeight : prev;
+      });
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, [computeEmbeddedBaseHeight]);
 
   const embeddedFlashcardDeck = useMemo<Flashcard[] | null>(() => {
     if (!Array.isArray(page.embeddedFlashcards)) {
@@ -247,11 +296,15 @@ export default function FlashcardGeneratorLanding({ page }: FlashcardGeneratorLa
 
                 <div className="flex-1 w-full min-h-[28rem]" ref={flashcardsSectionRef}>
                   <div className="bg-background rounded-[2rem] border shadow-xl shadow-slate-200/50 dark:shadow-slate-700/50 overflow-hidden">
-                    <div className="w-full h-[65vh] md:h-[26rem] lg:h-[30rem]">
+                    <div
+                      className="w-full h-[65vh] md:h-[26rem] lg:h-[30rem]"
+                      style={embeddedFlashcardHeight ? { height: `${embeddedFlashcardHeight}px` } : undefined}
+                    >
                       {shouldRenderFlashcards ? (
                         <EmbeddedFlashcards
                           cards={embeddedFlashcardDeck}
                           title={`${page.hero.heading} Flashcards Preview`}
+                          onHeightChange={handleEmbeddedFlashcardHeight}
                         />
                       ) : (
                         <div className="w-full h-full animate-pulse bg-muted/40" aria-hidden="true" />
