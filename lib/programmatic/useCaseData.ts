@@ -70,7 +70,30 @@ const flashcardPageMap = new Map(
   ])
 );
 
-const getHubCopy = (hubName: string): HubCopy => {
+type HubCopyEntry = {
+  menuDescription: string;
+  pageIntro: string;
+  metaDescription: string;
+};
+
+type HubCopy = Record<string, HubCopyEntry>;
+
+type SubhubCopyEntry = {
+  description: string;
+  pageIntro: string;
+  metaDescription: string;
+};
+
+type SubhubCopyMap = Record<string, SubhubCopyEntry>;
+
+const hubCopy: HubCopy = {};
+
+const makeSubhubKey = (hubSlug: string, subhubSlug: string): string =>
+  `${hubSlug}::${subhubSlug}`;
+
+const subhubCopy: SubhubCopyMap = {};
+
+const getHubCopy = (hubName: string): HubCopyEntry => {
   const copy = hubCopy[hubName];
   if (copy) {
     return copy;
@@ -87,7 +110,7 @@ const getSubhubCopy = (
   hubSlug: string,
   subhubName: string,
   subhubSlug: string
-): SubhubCopy => {
+): SubhubCopyEntry => {
   const key = makeSubhubKey(hubSlug, subhubSlug);
   const copy = subhubCopy[key];
   if (copy) {
