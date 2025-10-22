@@ -27,9 +27,11 @@ interface GeneratorProps {
   showTitle?: boolean;
   compact?: boolean;
   modelChoice?: ModelChoice;
+  isPaidSubscriber?: boolean;
+  onRequireUpgrade?: () => void;
 }
 
-export default function Generator({ redirectOnAuth = false, showTitle = true, compact = false, modelChoice = 'fast' }: GeneratorProps) {
+export default function Generator({ redirectOnAuth = false, showTitle = true, compact = false, modelChoice = 'fast', isPaidSubscriber, onRequireUpgrade }: GeneratorProps) {
   // Enforce a client-side per-file size cap to avoid server 413s (Vercel ~4.5MB)
   const MAX_FILE_BYTES = Math.floor(50 * 1024 * 1024); // 50MB per file when using Supabase Storage
   const [files, setFiles] = useState<File[]>([]);
@@ -63,6 +65,7 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
   const [markdown, setMarkdown] = useState<string | null>(null);
   const [showAuth, setShowAuth] = useState(false);
   const [isAuthed, setIsAuthed] = useState(false);
+  const [isPaidSubscriberState, setIsPaidSubscriberState] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
   const [mode, setMode] = useState<'mindmap' | 'flashcards'>('mindmap');
   const [flashcardsOpen, setFlashcardsOpen] = useState(false);
@@ -75,6 +78,7 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
   const [previewLoading, setPreviewLoading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState<number | undefined>(undefined);
   const router = useRouter();
+  const resolvedIsPaidSubscriber = typeof isPaidSubscriber === 'boolean' ? isPaidSubscriber : isPaidSubscriberState;
   const limitExceededCacheRef = useRef<{
     signature: string;
     preParsed: { text: string; images: string[]; rawCharCount?: number } | null;
@@ -204,6 +208,50 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
     });
     return () => { sub.subscription.unsubscribe(); };
   }, [router, redirectOnAuth]);
+
+  useEffect(() => {
+    if (typeof isPaidSubscriber === 'boolean') {
+      return;
+    }
+    if (!userId) {
+      setIsPaidSubscriberState(false);
+      return;
+    }
+
+    let cancelled = false;
+
+    const loadSubscription = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('subscriptions')
+          .select('status')
+          .eq('user_id', userId)
+          .order('updated_at', { ascending: false })
+          .limit(1)
+          .maybeSingle();
+
+        if (cancelled) return;
+
+        if (error) {
+          setIsPaidSubscriberState(false);
+          return;
+        }
+
+        const status = data?.status ?? null;
+        setIsPaidSubscriberState(status === 'active' || status === 'trialing' || status === 'past_due');
+      } catch {
+        if (!cancelled) {
+          setIsPaidSubscriberState(false);
+        }
+      }
+    };
+
+    void loadSubscription();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [userId, isPaidSubscriber]);
 
   // Effect to handle preview animation for non-auth users
   useEffect(() => {
@@ -1210,8 +1258,23 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
 
   return (
     <>
-      <MindMapModal markdown={markdown} onClose={handleCloseModal} />
-      <FlashcardsModal open={flashcardsOpen} title={flashcardsTitle} cards={flashcardsCards} isGenerating={isLoading && mode==='flashcards'} error={flashcardsError} onClose={handleCloseFlashcards} deckId={flashcardsDeckId} />
+      <MindMapModal
+        markdown={markdown}
+        onClose={handleCloseModal}
+        isPaidUser={resolvedIsPaidSubscriber}
+        onRequireUpgrade={onRequireUpgrade ?? handleUpgradeClick}
+      />
+      <FlashcardsModal
+        open={flashcardsOpen}
+        title={flashcardsTitle}
+        cards={flashcardsCards}
+        isGenerating={isLoading && mode === 'flashcards'}
+        error={flashcardsError}
+        onClose={handleCloseFlashcards}
+        deckId={flashcardsDeckId}
+        isPaidUser={resolvedIsPaidSubscriber}
+        onRequireUpgrade={onRequireUpgrade ?? handleUpgradeClick}
+      />
       <AuthModal open={showAuth} />
       <section id="generator" className={showTitle ? (compact ? 'pt-3 pb-5' : 'pt-4 pb-8') : (compact ? 'pb-12' : 'pb-20')}>
         <div className="container">

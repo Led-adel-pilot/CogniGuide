@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
 import type { ChatCompletionChunk } from 'openai/resources/chat/completions';
 import { createClient } from '@supabase/supabase-js';
-import { MODEL_CREDIT_MULTIPLIERS, MODEL_REQUIRED_TIER } from '@/lib/plans';
+import { FEATURE_REQUIRED_TIER, MODEL_CREDIT_MULTIPLIERS } from '@/lib/plans';
 
 const openai = new OpenAI({
   apiKey: process.env.GEMINI_API_KEY,
@@ -221,7 +221,7 @@ export async function POST(req: NextRequest) {
   }
 
   const userTier = await getUserTier(userId);
-  const requiredTier = MODEL_REQUIRED_TIER.fast as 'free' | 'paid';
+  const requiredTier = FEATURE_REQUIRED_TIER.explain;
   if (requiredTier === 'paid' && userTier !== 'paid') {
     return NextResponse.json({
       error: 'Upgrade required',

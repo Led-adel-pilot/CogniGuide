@@ -19,10 +19,12 @@ interface MindMapModalProps {
   onClose: () => void;
   onShareMindMap?: () => void;
   onShareFlashcards?: (deckId: string, title: string | null) => void;
+  isPaidUser?: boolean;
+  onRequireUpgrade?: () => void;
 }
 
 
-export default function MindMapModal({ markdown, onClose, onShareMindMap, onShareFlashcards }: MindMapModalProps) {
+export default function MindMapModal({ markdown, onClose, onShareMindMap, onShareFlashcards, isPaidUser = false, onRequireUpgrade }: MindMapModalProps) {
   const viewportRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [isDropdownOpen, setDropdownOpen] = useState(false);
@@ -1155,6 +1157,8 @@ export default function MindMapModal({ markdown, onClose, onShareMindMap, onShar
                 deckId={flashcardsSavedId || undefined}
                 initialIndex={flashcardIndex}
                 onShare={flashcardsSavedId && onShareFlashcards ? () => onShareFlashcards(flashcardsSavedId, getTitle(markdown) || null) : undefined}
+                isPaidUser={isPaidUser}
+                onRequireUpgrade={onRequireUpgrade}
               />
             )}
           </div>

@@ -8,7 +8,7 @@ import { loadDeckSchedule, saveDeckSchedule, loadDeckScheduleAsync, saveDeckSche
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import type { Components } from 'react-markdown';
-import { ChevronLeft, ChevronRight, Eye, Loader2, X } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Eye, Loader2, Lock, X } from 'lucide-react';
 import posthog from 'posthog-js';
 import { DatePicker } from '@/components/DatePicker';
 import { ensureKatexAssets } from '@/lib/katex-loader';
@@ -100,9 +100,11 @@ type Props = {
   dueIndices?: number[];
   isEmbedded?: boolean;
   onShare?: () => void;
+  isPaidUser?: boolean;
+  onRequireUpgrade?: () => void;
 };
 
-export default function FlashcardsModal({ open, title, cards, isGenerating = false, error, onClose, onReviewDueCards, deckId, initialIndex, studyDueOnly = false, studyInterleaved = false, interleavedDecks, dueIndices, isEmbedded = false, onShare }: Props) {
+export default function FlashcardsModal({ open, title, cards, isGenerating = false, error, onClose, onReviewDueCards, deckId, initialIndex, studyDueOnly = false, studyInterleaved = false, interleavedDecks, dueIndices, isEmbedded = false, onShare, isPaidUser = false, onRequireUpgrade }: Props) {
   const [index, setIndex] = React.useState(0);
   const [showAnswer, setShowAnswer] = React.useState(false);
   const [showExplanation, setShowExplanation] = React.useState(false);
@@ -147,6 +149,15 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
   }, []);
 
   const handleExplain = React.useCallback(async () => {
+    if (!isPaidUser) {
+      if (onRequireUpgrade) {
+        onRequireUpgrade();
+      } else {
+        setShowAuthModal(true);
+      }
+      return;
+    }
+
     if (!questionContent || !answerContent) return;
     const requestId = explainRequestRef.current + 1;
     explainRequestRef.current = requestId;
@@ -219,7 +230,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
         setIsExplaining(false);
       }
     }
-  }, [answerContent, questionContent, studyInterleaved, current, title]);
+  }, [answerContent, questionContent, studyInterleaved, current, title, isPaidUser, onRequireUpgrade]);
 
   const handleExplanationBack = React.useCallback(() => {
     resetExplanation();
@@ -1104,10 +1115,14 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
                           <button
                             onClick={handleExplain}
                             disabled={isExplaining}
-                            className="inline-flex items-center h-6 px-3 rounded-full border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-300/50 flashcard-grade-good disabled:opacity-60 disabled:cursor-not-allowed"
+                            className="inline-flex items-center gap-1.5 h-6 px-3 rounded-full border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-300/50 flashcard-grade-good disabled:opacity-60 disabled:cursor-not-allowed"
                           >
-                            {isExplaining ? <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" /> : null}
-                            Explain
+                            {isExplaining ? (
+                              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                            ) : (
+                              !isPaidUser ? <Lock className="h-3.5 w-3.5" aria-hidden="true" /> : null
+                            )}
+                            <span>Explain</span>
                           </button>
                         ) : null}
                         {showAnswer && explanationError && !isExplaining ? (

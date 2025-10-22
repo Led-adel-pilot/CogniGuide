@@ -32,6 +32,10 @@ export const MODEL_REQUIRED_TIER = {
   smart: 'paid',
 } as const;
 
+export const FEATURE_REQUIRED_TIER = {
+  explain: 'paid',
+} as const;
+
 export type ModelChoice = keyof typeof MODEL_CREDIT_MULTIPLIERS;
 
 export function getPlanByPriceId(priceId: string): Plan | null {

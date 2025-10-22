@@ -2031,7 +2031,12 @@ export default function DashboardClient() {
                 ) : null;
               })()}
             </div>
-            <Generator showTitle={false} modelChoice={selectedModel} />
+            <Generator
+              showTitle={false}
+              modelChoice={selectedModel}
+              isPaidSubscriber={isPaidUser}
+              onRequireUpgrade={() => setIsPricingModalOpen(true)}
+            />
           </div>
         </div>
       </main>
@@ -2047,6 +2052,8 @@ export default function DashboardClient() {
         onShareFlashcards={(deckId, title) => {
           setShareItem({ id: deckId, type: 'flashcards', title });
         }}
+        isPaidUser={isPaidUser}
+        onRequireUpgrade={() => setIsPricingModalOpen(true)}
       />
       <FlashcardsModal
         open={flashcardsOpen}
@@ -2071,6 +2078,8 @@ export default function DashboardClient() {
         dueIndices={dueIndices}
         initialIndex={initialDueIndex}
         onShare={activeDeckId && activeDeckId !== 'interleaved-session' ? () => setShareItem({ id: activeDeckId, type: 'flashcards', title: flashcardsTitle ?? null }) : undefined}
+        isPaidUser={isPaidUser}
+        onRequireUpgrade={() => setIsPricingModalOpen(true)}
       />
       <PricingModal
         isOpen={isPricingModalOpen}
