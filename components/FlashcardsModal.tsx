@@ -1102,7 +1102,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
                           <button
                             onClick={handleExplain}
                             disabled={isExplaining}
-                            className="inline-flex items-center h-6 px-3 rounded-full border border-border bg-background text-foreground hover:bg-muted/60 disabled:opacity-60 disabled:cursor-not-allowed transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/50"
+                            className="inline-flex items-center h-6 px-3 rounded-full border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-300/50 flashcard-grade-good disabled:opacity-60 disabled:cursor-not-allowed"
                           >
                             {isExplaining ? <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" /> : null}
                             Explain
