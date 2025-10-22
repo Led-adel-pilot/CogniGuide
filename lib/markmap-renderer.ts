@@ -1036,16 +1036,27 @@ function handleWheel(e: WheelEvent) {
     userHasInteracted = true;
     // Cancel ongoing transform animation on user interaction
     transformAnimationToken++;
-    const zoomSpeed = 0.1;
-    const oldScale = scale;
     const rect = getViewportRect();
     const mouseX = e.clientX - rect.left;
     const mouseY = e.clientY - rect.top;
-    if (e.deltaY < 0) {
-        scale = Math.min(scale + zoomSpeed, 5);
+    const oldScale = scale;
+    const DOM_DELTA_PIXEL = 0;
+    const isTrackpadLike = e.ctrlKey || (e.deltaMode === DOM_DELTA_PIXEL && Math.abs(e.deltaY) < 40);
+    let nextScale = scale;
+
+    if (isTrackpadLike) {
+        const zoomIntensity = 0.013;
+        const zoomDelta = -e.deltaY * zoomIntensity;
+        const multiplier = 1 + zoomDelta;
+        if (multiplier > 0) {
+            nextScale = scale * multiplier;
+        }
     } else {
-        scale = Math.max(0.1, scale - zoomSpeed);
+        const zoomStep = 0.1;
+        nextScale = scale + (e.deltaY < 0 ? zoomStep : -zoomStep);
     }
+
+    scale = Math.max(0.1, Math.min(5, nextScale));
     panX = mouseX - (mouseX - panX) * (scale / oldScale);
     panY = mouseY - (mouseY - panY) * (scale / oldScale);
     bumpContainerWillChange();
