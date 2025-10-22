@@ -11,7 +11,6 @@ import type { Components } from 'react-markdown';
 import { ChevronLeft, ChevronRight, Eye, Loader2, X } from 'lucide-react';
 import posthog from 'posthog-js';
 import { DatePicker } from '@/components/DatePicker';
-import { formatDate, formatTime } from '@/lib/utils';
 import { ensureKatexAssets } from '@/lib/katex-loader';
 import ShareTriggerButton from '@/components/ShareTriggerButton';
 
@@ -106,6 +105,10 @@ type Props = {
 export default function FlashcardsModal({ open, title, cards, isGenerating = false, error, onClose, onReviewDueCards, deckId, initialIndex, studyDueOnly = false, studyInterleaved = false, interleavedDecks, dueIndices, isEmbedded = false, onShare }: Props) {
   const [index, setIndex] = React.useState(0);
   const [showAnswer, setShowAnswer] = React.useState(false);
+  const [showExplanation, setShowExplanation] = React.useState(false);
+  const [explanation, setExplanation] = React.useState('');
+  const [isExplaining, setIsExplaining] = React.useState(false);
+  const [explanationError, setExplanationError] = React.useState<string | null>(null);
   const [scheduledCards, setScheduledCards] = React.useState<CardWithSchedule[] | null>(null);
   const [deckExamDate, setDeckExamDate] = React.useState<string>('');
   const [examDateInput, setExamDateInput] = React.useState<Date | undefined>(undefined);
@@ -113,8 +116,6 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
   const [dueNowIndices, setDueNowIndices] = React.useState<number[]>([]);
   const [immediateReviewIndices, setImmediateReviewIndices] = React.useState<number[]>([]);
   const [predictedDueByGrade, setPredictedDueByGrade] = React.useState<Record<number, string>>({});
-  const [predictedDueDatesByGrade, setPredictedDueDatesByGrade] = React.useState<Record<number, Date>>({});
-  const [hoveredGrade, setHoveredGrade] = React.useState<number | null>(null);
   const [finished, setFinished] = React.useState(false);
   const [userId, setUserId] = React.useState<string | null>(null);
   const [isCurrentDeckExamReady, setIsCurrentDeckExamReady] = React.useState(!studyInterleaved);
@@ -126,6 +127,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
   const [answerShownTime, setAnswerShownTime] = React.useState<number | null>(null);
   const [originalDueCount, setOriginalDueCount] = React.useState(0);
   const [originalDueList, setOriginalDueList] = React.useState<number[]>([]);
+  const explainRequestRef = React.useRef(0);
   const current = scheduledCards && scheduledCards[index] ? scheduledCards[index] : null;
 
   const hasCards = Boolean(cards && cards.length > 0);
@@ -135,6 +137,92 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
 
   const questionRef = React.useRef<HTMLDivElement | null>(null);
   const answerRef = React.useRef<HTMLDivElement | null>(null);
+
+  const resetExplanation = React.useCallback(() => {
+    explainRequestRef.current += 1;
+    setShowExplanation(false);
+    setExplanation('');
+    setExplanationError(null);
+    setIsExplaining(false);
+  }, []);
+
+  const handleExplain = React.useCallback(async () => {
+    if (!questionContent || !answerContent) return;
+    const requestId = explainRequestRef.current + 1;
+    explainRequestRef.current = requestId;
+    setShowExplanation(true);
+    setExplanation('');
+    setExplanationError(null);
+    setIsExplaining(true);
+    try {
+      const { data } = await supabase.auth.getSession();
+      const token = data.session?.access_token;
+      // Determine deck title: use current card's deckTitle if in interleaved mode, otherwise use the modal's title prop
+      const deckTitleToSend = studyInterleaved && current?.deckTitle ? current.deckTitle : title;
+      const response = await fetch('/api/explain-flashcard', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({ 
+          question: questionContent, 
+          answer: answerContent,
+          deckTitle: deckTitleToSend 
+        }),
+      });
+      if (explainRequestRef.current !== requestId) return;
+      if (!response.ok) {
+        let message = 'Failed to generate explanation.';
+        try {
+          const payload = await response.json();
+          if (payload && typeof payload.message === 'string' && payload.message.trim()) {
+            message = payload.message;
+          }
+        } catch {}
+        throw new Error(message);
+      }
+
+      // Read streaming response
+      const reader = response.body?.getReader();
+      const decoder = new TextDecoder();
+      
+      if (!reader) {
+        throw new Error('Unable to read response stream.');
+      }
+
+      let accumulatedText = '';
+      while (true) {
+        const { done, value } = await reader.read();
+        if (explainRequestRef.current !== requestId) {
+          reader.cancel();
+          return;
+        }
+        if (done) break;
+        
+        const chunk = decoder.decode(value, { stream: true });
+        accumulatedText += chunk;
+        setExplanation(accumulatedText);
+      }
+
+      if (!accumulatedText.trim()) {
+        throw new Error('Explanation unavailable.');
+      }
+    } catch (error) {
+      if (explainRequestRef.current !== requestId) return;
+      setExplanationError(error instanceof Error ? error.message : 'Failed to generate explanation.');
+      setShowExplanation(false);
+    } finally {
+      if (explainRequestRef.current === requestId) {
+        setIsExplaining(false);
+      }
+    }
+  }, [answerContent, questionContent, studyInterleaved, current, title]);
+
+  const handleExplanationBack = React.useCallback(() => {
+    resetExplanation();
+    setShowAnswer(true);
+  }, [resetExplanation]);
 
   const renderMath = React.useCallback((isCancelled?: () => boolean) => {
     if (typeof window === 'undefined') return;
@@ -202,6 +290,10 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
     };
   });
 
+  React.useEffect(() => {
+    resetExplanation();
+  }, [index, questionContent, answerContent, resetExplanation]);
+
   const deckIdentifier = React.useMemo(() => getDeckIdentifier(deckId, title, cards), [deckId, title, cards]);
 
   React.useEffect(() => {
@@ -241,9 +333,8 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
     if (!open) {
       setIndex(0);
       setShowAnswer(false);
-      setHoveredGrade(null);
+      resetExplanation();
       setPredictedDueByGrade({});
-      setPredictedDueDatesByGrade({});
       setFinished(false);
       setShowLossAversionPopup(false);
       setShowSignupPopup(false);
@@ -253,7 +344,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
       setDueNowIndices([]);
       setImmediateReviewIndices([]);
     }
-  }, [open]);
+  }, [open, resetExplanation]);
 
   React.useEffect(() => {
     let isMounted = true;
@@ -325,6 +416,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
           if (typeof initialIndex === 'number' && Number.isFinite(initialIndex)) {
             setIndex(Math.max(0, Math.min(cards.length - 1, initialIndex)));
             setShowAnswer(false);
+            resetExplanation();
           }
           // Initialize due list from props if provided
           const initialDueList = Array.isArray(dueIndices) ? dueIndices.slice() : [];
@@ -387,6 +479,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
         if (typeof initialIndex === 'number' && Number.isFinite(initialIndex)) {
           setIndex(Math.max(0, Math.min(cards.length - 1, initialIndex)));
           setShowAnswer(false);
+          resetExplanation();
         }
         const initialDueList = Array.isArray(dueIndices) ? dueIndices.slice() : [];
         setDueList(initialDueList);
@@ -401,6 +494,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
         if (typeof initialIndex === 'number' && Number.isFinite(initialIndex)) {
           setIndex(Math.max(0, Math.min(cards.length - 1, initialIndex)));
           setShowAnswer(false);
+          resetExplanation();
         }
         const initialDueList = Array.isArray(dueIndices) ? dueIndices.slice() : [];
         setDueList(initialDueList);
@@ -414,7 +508,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
     return () => {
       cancelled = true;
     };
-  }, [cards, deckId, initialIndex, dueIndices, title, studyInterleaved]);
+  }, [cards, deckId, initialIndex, dueIndices, title, studyInterleaved, resetExplanation]);
 
   React.useEffect(() => {
     if (!deckId || !scheduledCards || studyInterleaved) return;
@@ -434,7 +528,6 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
   React.useEffect(() => {
     if (!showAnswer || !current) {
       setPredictedDueByGrade({});
-      setPredictedDueDatesByGrade({});
       return;
     }
 
@@ -450,16 +543,13 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
 
       const withDeckExam = { ...base, examDate } as FsrsScheduleState;
       const map: Record<number, string> = {};
-      const dateMap: Record<number, Date> = {};
       const grades = [1, 2, 3, 4] as Grade[];
       for (const g of grades) {
         const s = nextSchedule(withDeckExam, g, now);
         const due = new Date(s.due);
         map[g as number] = formatTimeUntil(due, now);
-        dateMap[g as number] = due;
       }
       setPredictedDueByGrade(map);
-      setPredictedDueDatesByGrade(dateMap);
     };
 
     predict();
@@ -691,9 +781,8 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
       });
     }
     setShowAnswer(false);
-    setHoveredGrade(null);
+    resetExplanation();
     setPredictedDueByGrade({});
-    setPredictedDueDatesByGrade({});
     setAnswerShownTime(null);
     // If studying due-only, remove current index from due list and move to next due
     if (studyDueOnly) {
@@ -874,9 +963,8 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
                             }
                             setFinished(false);
                             setShowAnswer(false);
-                            setHoveredGrade(null);
+                            resetExplanation();
                             setPredictedDueByGrade({});
-                            setPredictedDueDatesByGrade({});
                             setImmediateReviewIndices([]);
                             setCardsViewedCount(0);
                             setShowSignupPopup(false);
@@ -921,9 +1009,8 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
                           setFinished(false);
                           setIndex(0);
                           setShowAnswer(false);
-                          setHoveredGrade(null);
+                          resetExplanation();
                           setPredictedDueByGrade({});
-                          setPredictedDueDatesByGrade({});
                           setCardsViewedCount(0);
                           setShowSignupPopup(false);
                           setAnswerShownTime(null);
@@ -960,9 +1047,8 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
                           setFinished(false);
                           setIndex(0);
                           setShowAnswer(false);
-                          setHoveredGrade(null);
+                          resetExplanation();
                           setPredictedDueByGrade({});
-                          setPredictedDueDatesByGrade({});
                           setCardsViewedCount(0);
                           setShowSignupPopup(false);
                           setAnswerShownTime(null);
@@ -979,40 +1065,71 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
           ) : (
             <div className="w-full">
               <div className="relative mx-auto rounded-[1.35rem] p-[1.5px] bg-gradient-to-br from-indigo-200 via-sky-200 to-emerald-200">
-                <div className="bg-background border border-border rounded-[1.25rem] shadow p-5 sm:p-6 min-h-[180px] sm:min-h-[200px]">
-                  <div
-                    ref={questionRef}
-                    className="text-foreground text-xl sm:text-2xl font-semibold leading-7 sm:leading-8 break-words flashcard-katex-content"
-                  >
-                    {questionContent}
-                  </div>
-                  <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-                    {showAnswer && current?.schedule?.due ? (
-                      <span className="inline-flex items-center h-6 px-2.5 rounded-full bg-sky-50 dark:bg-sky-900/30 text-sky-700 dark:text-sky-300 border border-sky-200 dark:border-sky-800 flashcard-due-pill">
-                        {hoveredGrade && predictedDueDatesByGrade[hoveredGrade]
-                          ? `Next due: ${formatDate(predictedDueDatesByGrade[hoveredGrade])} ${formatTime(predictedDueDatesByGrade[hoveredGrade], {hour: '2-digit', minute:'2-digit'})}`
-                          : `Was due: ${formatDate(new Date(current.schedule.due))} ${formatTime(new Date(current.schedule.due), {hour: '2-digit', minute:'2-digit'})}`
-                        }
-                      </span>
-                    ) : null}
-                  </div>
-                  {showAnswer && (
-                    <div className="mt-4 text-foreground">
-                      <div className="h-px bg-border mb-4" />
+                <div className="bg-background border border-border rounded-[1.25rem] shadow p-5 sm:p-6 min-h-[180px] sm:min-h-[200px] flex flex-col">
+                  {showExplanation ? (
+                    <div className="flex-1 flex flex-col">
                       <div
                         ref={answerRef}
-                        className={`${
-                          isEmbedded
-                            ? 'max-h-none overflow-visible'
-                            : 'max-h-[45vh] overflow-y-auto'
+                        className={`flex-1 ${
+                          isEmbedded ? 'overflow-visible' : 'overflow-y-auto'
                         } text-sm text-foreground flashcard-katex-content`}
                       >
-                        <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
-                          {answerContent || ''}
-                        </ReactMarkdown>
+                        <div className="space-y-3">
+                          {explanation ? (
+                            <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
+                              {explanation}
+                            </ReactMarkdown>
+                          ) : null}
+                          {(!explanation || isExplaining) ? (
+                            <div className="flex items-center gap-2 text-muted-foreground">
+                              <Loader2 className="h-4 w-4 animate-spin" />
+                              {explanation ? 'Finishing explanation…' : 'Generating explanation…'}
+                            </div>
+                          ) : null}
+                        </div>
                       </div>
-
                     </div>
+                  ) : (
+                    <>
+                      <div
+                        ref={questionRef}
+                        className="text-foreground text-xl sm:text-2xl font-semibold leading-7 sm:leading-8 break-words flashcard-katex-content"
+                      >
+                        {questionContent}
+                      </div>
+                      <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+                        {showAnswer && !showExplanation ? (
+                          <button
+                            onClick={handleExplain}
+                            disabled={isExplaining}
+                            className="inline-flex items-center h-6 px-3 rounded-full border border-border bg-background text-foreground hover:bg-muted/60 disabled:opacity-60 disabled:cursor-not-allowed transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/50"
+                          >
+                            {isExplaining ? <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" /> : null}
+                            Explain
+                          </button>
+                        ) : null}
+                        {showAnswer && explanationError && !isExplaining ? (
+                          <span className="text-red-500 dark:text-red-400">{explanationError}</span>
+                        ) : null}
+                      </div>
+                      {showAnswer && (
+                        <div className="mt-4 text-foreground">
+                          <div className="h-px bg-border mb-4" />
+                          <div
+                            ref={answerRef}
+                            className={`${
+                              isEmbedded
+                                ? 'max-h-none overflow-visible'
+                                : 'max-h-[45vh] overflow-y-auto'
+                            } text-sm text-foreground flashcard-katex-content`}
+                          >
+                            <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
+                              {answerContent || ''}
+                            </ReactMarkdown>
+                          </div>
+                        </div>
+                      )}
+                    </>
                   )}
                 </div>
               </div>
@@ -1029,9 +1146,8 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
                     const prevIndex = getPrevIndex();
                     setIndex(prevIndex);
                     setShowAnswer(false);
-                    setHoveredGrade(null);
+                    resetExplanation();
                     setPredictedDueByGrade({});
-                    setPredictedDueDatesByGrade({});
                     setAnswerShownTime(null);
                   }}
                   className="inline-flex items-center justify-center h-10 w-10 sm:w-auto sm:px-4 rounded-full border border-border bg-background text-foreground hover:bg-muted/50 dark:hover:bg-muted/80 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400/50"
@@ -1043,54 +1159,56 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
             ) : <div />}
             <div className="justify-self-center flex flex-col items-center gap-2">
               {showAnswer ? (
-                <div className="flex items-end justify-center gap-3 flex-nowrap">
-                  <div className="flex flex-col items-center">
-                    <span className="text-[11px] text-gray-500 dark:text-gray-400 h-4">{predictedDueByGrade[1] || ''}</span>
-                    <button
-                      onClick={() => handleGrade(1)}
-                      onMouseEnter={() => setHoveredGrade(1)}
-                      onMouseLeave={() => setHoveredGrade(null)}
-                      className="h-9 px-3 text-xs rounded-full border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-300/50 flashcard-grade-again"
-                    >
-                      Again
-                    </button>
+                showExplanation ? (
+                  <button
+                    onClick={handleExplanationBack}
+                    className="inline-flex items-center h-10 px-5 rounded-full text-white bg-gradient-primary shadow-sm hover:bg-gradient-primary-hover transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/50 whitespace-nowrap"
+                  >
+                    Back
+                  </button>
+                ) : (
+                  <div className="flex items-end justify-center gap-3 flex-nowrap">
+                    <div className="flex flex-col items-center">
+                      <span className="text-[11px] text-gray-500 dark:text-gray-400 h-4">{predictedDueByGrade[1] || ''}</span>
+                      <button
+                        onClick={() => handleGrade(1)}
+                        className="h-9 px-3 text-xs rounded-full border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-300/50 flashcard-grade-again"
+                      >
+                        Again
+                      </button>
+                    </div>
+                    <div className="flex flex-col items-center">
+                      <span className="text-[11px] text-gray-500 dark:text-gray-400 h-4">{predictedDueByGrade[2] || ''}</span>
+                      <button
+                        onClick={() => handleGrade(2)}
+                        className="h-9 px-3 text-xs rounded-full border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-300/50 flashcard-grade-hard"
+                      >
+                        Hard
+                      </button>
+                    </div>
+                    <div className="flex flex-col items-center">
+                      <span className="text-[11px] text-gray-500 dark:text-gray-400 h-4">{predictedDueByGrade[3] || ''}</span>
+                      <button
+                        onClick={() => handleGrade(3)}
+                        className="h-9 px-3 text-xs rounded-full border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-300/50 flashcard-grade-good"
+                      >
+                        Good
+                      </button>
+                    </div>
+                    <div className="flex flex-col items-center">
+                      <span className="text-[11px] text-gray-500 dark:text-gray-400 h-4">{predictedDueByGrade[4] || ''}</span>
+                      <button
+                        onClick={() => handleGrade(4)}
+                        className="h-9 px-3 text-xs rounded-full border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/50 flashcard-grade-easy"
+                      >
+                        Easy
+                      </button>
+                    </div>
                   </div>
-                  <div className="flex flex-col items-center">
-                    <span className="text-[11px] text-gray-500 dark:text-gray-400 h-4">{predictedDueByGrade[2] || ''}</span>
-                    <button
-                      onClick={() => handleGrade(2)}
-                      onMouseEnter={() => setHoveredGrade(2)}
-                      onMouseLeave={() => setHoveredGrade(null)}
-                      className="h-9 px-3 text-xs rounded-full border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-300/50 flashcard-grade-hard"
-                    >
-                      Hard
-                    </button>
-                  </div>
-                  <div className="flex flex-col items-center">
-                    <span className="text-[11px] text-gray-500 dark:text-gray-400 h-4">{predictedDueByGrade[3] || ''}</span>
-                    <button
-                      onClick={() => handleGrade(3)}
-                      onMouseEnter={() => setHoveredGrade(3)}
-                      onMouseLeave={() => setHoveredGrade(null)}
-                      className="h-9 px-3 text-xs rounded-full border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-300/50 flashcard-grade-good"
-                    >
-                      Good
-                    </button>
-                  </div>
-                  <div className="flex flex-col items-center">
-                    <span className="text-[11px] text-gray-500 dark:text-gray-400 h-4">{predictedDueByGrade[4] || ''}</span>
-                    <button
-                      onClick={() => handleGrade(4)}
-                      onMouseEnter={() => setHoveredGrade(4)}
-                      onMouseLeave={() => setHoveredGrade(null)}
-                      className="h-9 px-3 text-xs rounded-full border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/50 flashcard-grade-easy"
-                    >
-                      Easy
-                    </button>
-                  </div>
-                </div>
+                )
               ) : (
                 <button onClick={() => {
+                  resetExplanation();
                   posthog.capture('flashcard_answer_shown', {
                     deckId: deckId,
                     card_index: index,
@@ -1129,9 +1247,8 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
                     const nextIndex = getNextIndex();
                     setIndex(nextIndex);
                     setShowAnswer(false);
-                    setHoveredGrade(null);
+                    resetExplanation();
                     setPredictedDueByGrade({});
-                    setPredictedDueDatesByGrade({});
                     setAnswerShownTime(null);
                   }}
                   className="inline-flex items-center justify-center h-10 w-10 sm:w-auto sm:px-4 rounded-full border border-border bg-background text-foreground hover:bg-muted/50 dark:hover:bg-muted/80 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400/50"
