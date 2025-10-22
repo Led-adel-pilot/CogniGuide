@@ -146,11 +146,10 @@ function buildExplanationPrompt(question: string, answer: string, deckTitle?: st
 Explain the following flashcard concisely so the learner grasps why the answer is correct.
 - For complex words write next to them between () a simpler synonyme or a short explanation.
 - Use simple language. Avoid jargon. If you must use a technical term, you're forced to define it in the simplest way possible.
-- Start by refactoring the question in bold, then follow with the explanation.
-- Your explanation must use the same outline and format as the provided answer (e.g., if the answer is a 3-point list, your explanation must also be a 3-point list).
+- Your explanation should use the same outline and format as the provided answer (e.g., if the answer is a 3-point list, your explanation must also be a 3-point list).
 - Dont use labels like 'Question:' or 'Explanation:'.
-- You explanation should be at maximum 2 times the length of the answer.
-- Your explanation MUST be in the SAME language as the question and answer.
+- Your explanation should be at maximum 2 times the length of the answer.
+- Your explanation MUST BE in the SAME LANGUAGE as the provided answer.
 
 ${contextLine}
 Question: ${question}

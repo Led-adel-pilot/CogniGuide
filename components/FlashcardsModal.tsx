@@ -202,7 +202,9 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
         
         const chunk = decoder.decode(value, { stream: true });
         accumulatedText += chunk;
-        setExplanation(accumulatedText);
+        // Prepend the question in bold format to the explanation
+        const fullExplanation = `**${questionContent}**\n\n${accumulatedText}`;
+        setExplanation(fullExplanation);
       }
 
       if (!accumulatedText.trim()) {
