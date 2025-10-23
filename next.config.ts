@@ -3,6 +3,9 @@ import type { NextConfig } from "next";
 const ONE_YEAR_IN_SECONDS = 60 * 60 * 24 * 365;
 
 const nextConfig: NextConfig = {
+  experimental: {
+    optimizeCss: true,
+  },
   eslint: {
     // Allow production builds to successfully complete even if there are ESLint errors.
     ignoreDuringBuilds: true,
