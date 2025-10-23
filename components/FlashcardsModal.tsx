@@ -1003,19 +1003,15 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
                     <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full max-w-md justify-center">
                       <button
                         onClick={() => {
-                          const element = document.getElementById('generator');
-                          if (element) {
-                            const elementTop = element.getBoundingClientRect().top + window.pageYOffset;
-                            // Account for sticky header (64px) plus additional padding
-                            window.scrollTo({
-                              top: elementTop - 100,
-                              behavior: 'smooth'
-                            });
+                          if (title && cards) {
+                            const pendingDeck = { title, cards };
+                            localStorage.setItem('cogniguide:pending_flashcards', JSON.stringify(pendingDeck));
                           }
+                          setShowAuthModal(true);
                         }}
                         className="flex-1 h-auto sm:h-10 py-2 sm:py-0 px-6 text-base font-bold text-white bg-gradient-primary rounded-full hover:bg-gradient-primary-hover transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/50 whitespace-nowrap inline-flex items-center justify-center"
                       >
-                        Create My Study Set
+                        Generate Your Deck
                       </button>
                       <button
                         onClick={() => {
@@ -1300,6 +1296,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
     return (
       <>
         <ModalContent />
+        <AuthModal open={showAuthModal} />
         <style jsx global>{katexAlignmentStyles}</style>
       </>
     );

@@ -144,7 +144,7 @@ function buildExplanationPrompt(question: string, answer: string, deckTitle?: st
   const contextLine = deckTitle ? `\n\nDeck context: This flashcard is from the "${deckTitle}" study deck.` : '';
   return `You are helping a student understand their flashcards.
 Explain the following flashcard concisely so the learner grasps why the answer is correct.
-- For complex words write next to them between () a simpler synonyme or a short explanation.
+- For technical terms write next to them between () a simpler synonyme or a short explanation.
 - Use simple language. Avoid jargon. If you must use a technical term, you're forced to define it in the simplest way possible.
 - Your explanation should use the same outline and format as the provided answer (e.g., if the answer is a 3-point list, your explanation must also be a 3-point list).
 - Dont use labels like 'Question:' or 'Explanation:'.
