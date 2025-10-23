@@ -88,13 +88,13 @@ const structuredData = {
   publisher: {
     "@type": "Organization",
     name: siteMetadata.name,
+    email: siteMetadata.contactEmail,
   },
   sameAs: [
     siteMetadata.url,
     "https://twitter.com/CogniGuideApp",
     "https://www.linkedin.com/company/cogniguide/",
   ],
-  email: siteMetadata.contactEmail,
 };
 
 export default function RootLayout({
