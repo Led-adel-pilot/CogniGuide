@@ -6354,7 +6354,7 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
         },
         {
           "label": "Professions",
-          "href": "https://www.cogniguide.app/flashcards/professions"
+          "href": "https://www.cogniguide.app/flashcards/community-signs"
         }
       ]
     },
@@ -6563,7 +6563,7 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
         },
         {
           "label": "Hobbies",
-          "href": "https://www.cogniguide.app/flashcards/hobbies"
+          "href": "https://www.cogniguide.app/flashcards/action-verbs"
         }
       ]
     },
@@ -7400,7 +7400,7 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
         },
         {
           "label": "Capitals",
-          "href": "https://www.cogniguide.app/flashcards/capitals"
+          "href": "https://www.cogniguide.app/flashcards/flags-world"
         }
       ]
     },
@@ -8637,7 +8637,7 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
         },
         {
           "label": "Location",
-          "href": "https://www.cogniguide.app/flashcards/location"
+          "href": "https://www.cogniguide.app/flashcards/transport"
         }
       ]
     },
@@ -10712,7 +10712,7 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
         },
         {
           "label": "Capitals",
-          "href": "https://www.cogniguide.app/flashcards/capitals"
+          "href": "https://www.cogniguide.app/flashcards/countries"
         }
       ]
     },
@@ -12586,7 +12586,7 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
         },
         {
           "label": "Vegetables",
-          "href": "https://www.cogniguide.app/flashcards/vegetables"
+          "href": "https://www.cogniguide.app/flashcards/fruit-vegetable"
         }
       ]
     },
@@ -19639,7 +19639,7 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
         },
         {
           "label": "Textbook Flashcards",
-          "href": "https://www.cogniguide.app/flashcards/textbook-flashcards"
+          "href": "https://www.cogniguide.app/flashcards/pdf-flashcards"
         }
       ]
     },
@@ -20476,7 +20476,7 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
         },
         {
           "label": "Sustainability",
-          "href": "https://www.cogniguide.app/flashcards/sustainability"
+          "href": "https://www.cogniguide.app/flashcards/science"
         }
       ]
     },
@@ -20890,7 +20890,7 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "links": [
         {
           "label": "Preposition",
-          "href": "https://www.cogniguide.app/flashcards/preposition"
+          "href": "https://www.cogniguide.app/flashcards/adjective"
         },
         {
           "label": "AI Grammar Flashcards",
@@ -22134,7 +22134,7 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "links": [
         {
           "label": "AI Quiz Maker",
-          "href": "https://www.cogniguide.app/flashcards/quizlet-make-quiz",
+          "href": "https://www.cogniguide.app/flashcards/quizlet-make-your-own-quiz",
           "description": "Stop manually making quizzes; use our AI flashcard generator instead."
         },
         {
@@ -22759,7 +22759,7 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
         },
         {
           "label": "Certification Prep",
-          "href": "https://www.cogniguide.app/flashcards/certification-prep"
+          "href": "https://www.cogniguide.app/flashcards/servsafe-7th-edition-quizlet"
         }
       ]
     },
@@ -23594,7 +23594,7 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
         },
         {
           "label": "Cars",
-          "href": "https://www.cogniguide.app/flashcards/cars"
+          "href": "https://www.cogniguide.app/flashcards/transportation"
         }
       ]
     },
@@ -24208,7 +24208,7 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "links": [
         {
           "label": "Summer Sports",
-          "href": "https://www.cogniguide.app/flashcards/summer-sports"
+          "href": "https://www.cogniguide.app/flashcards/summer"
         },
         {
           "label": "AI Fitness Study Aids",
@@ -24421,7 +24421,7 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
         },
         {
           "label": "Clock Flashcards",
-          "href": "https://www.cogniguide.app/flashcards/clock-flashcards"
+          "href": "https://www.cogniguide.app/flashcards/telling-time"
         }
       ]
     },
@@ -30033,7 +30033,7 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "links": [
         {
           "label": "Tesol",
-          "href": "https://www.cogniguide.app/flashcards/tesol"
+          "href": "https://www.cogniguide.app/flashcards/esl"
         },
         {
           "label": "AI English as a Second Language",
@@ -31701,7 +31701,7 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
         },
         {
           "label": "Kitchen Items",
-          "href": "https://www.cogniguide.app/flashcards/kitchen-items"
+          "href": "https://www.cogniguide.app/flashcards/house"
         }
       ]
     },
@@ -32734,11 +32734,11 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "links": [
         {
           "label": "Music Theory",
-          "href": "https://www.cogniguide.app/flashcards/music-theory"
+          "href": "https://www.cogniguide.app/flashcards/note-name"
         },
         {
           "label": "Instrument Flashcards",
-          "href": "https://www.cogniguide.app/flashcards/instrument-flashcards"
+          "href": "https://www.cogniguide.app/flashcards/note-online-study"
         }
       ]
     },
@@ -35028,11 +35028,11 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "links": [
         {
           "label": "Boat Safety",
-          "href": "https://www.cogniguide.app/flashcards/boat-safety"
+          "href": "https://www.cogniguide.app/flashcards/transport"
         },
         {
           "label": "Navigation Rules",
-          "href": "https://www.cogniguide.app/flashcards/navigation-rules"
+          "href": "https://www.cogniguide.app/flashcards/transportation"
         }
       ]
     },
@@ -35441,7 +35441,7 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "links": [
         {
           "label": "Chemistry",
-          "href": "https://www.cogniguide.app/flashcards/chemistry"
+          "href": "https://www.cogniguide.app/flashcards/ap-chemistry"
         },
         {
           "label": "PDF to Biology Study Guide",
@@ -36689,7 +36689,7 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
         },
         {
           "label": "Food Safety",
-          "href": "https://www.cogniguide.app/flashcards/food-safety"
+          "href": "https://www.cogniguide.app/flashcards/food-drinks"
         }
       ]
     },
@@ -36898,7 +36898,7 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
         },
         {
           "label": "Music Theory",
-          "href": "https://www.cogniguide.app/flashcards/music-theory"
+          "href": "https://www.cogniguide.app/flashcards/note-recognition"
         }
       ]
     },
@@ -39190,7 +39190,7 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
         },
         {
           "label": "Best Creator",
-          "href": "https://www.cogniguide.app/flashcards/best-creator"
+          "href": "https://www.cogniguide.app/flashcards/best-create"
         }
       ]
     },
@@ -44606,7 +44606,7 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
         },
         {
           "label": "Clock Flashcards",
-          "href": "https://www.cogniguide.app/flashcards/clock-flashcards"
+          "href": "https://www.cogniguide.app/flashcards/time"
         }
       ]
     },
@@ -45021,7 +45021,7 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
         },
         {
           "label": "Cbse Flashcards",
-          "href": "https://www.cogniguide.app/flashcards/cbse-flashcards"
+          "href": "https://www.cogniguide.app/flashcards/pdf-flashcards"
         }
       ]
     },
@@ -51066,7 +51066,7 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
         },
         {
           "label": "Trades Prep",
-          "href": "https://www.cogniguide.app/flashcards/trades-prep"
+          "href": "https://www.cogniguide.app/flashcards/api-570"
         }
       ]
     },
@@ -54185,7 +54185,7 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "links": [
         {
           "label": "AI Quiz Maker",
-          "href": "https://www.cogniguide.app/flashcards/quizlet-make-quiz",
+          "href": "https://www.cogniguide.app/flashcards/quizlet-make-set",
           "description": "Stop manually making quizzes; use our AI flashcard generator instead."
         },
         {
@@ -54820,7 +54820,7 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
         },
         {
           "label": "Subtraction",
-          "href": "https://www.cogniguide.app/flashcards/subtraction"
+          "href": "https://www.cogniguide.app/flashcards/addition"
         }
       ]
     },
@@ -55027,7 +55027,7 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
         },
         {
           "label": "Nouns",
-          "href": "https://www.cogniguide.app/flashcards/nouns"
+          "href": "https://www.cogniguide.app/flashcards/pronouns"
         }
       ]
     },
@@ -55235,7 +55235,7 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
         },
         {
           "label": "Writing Practice",
-          "href": "https://www.cogniguide.app/flashcards/writing-practice"
+          "href": "https://www.cogniguide.app/flashcards/write"
         }
       ]
     },
@@ -56478,7 +56478,7 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
         },
         {
           "label": "Safety Signs",
-          "href": "https://www.cogniguide.app/flashcards/safety-signs"
+          "href": "https://www.cogniguide.app/flashcards/make-sight"
         }
       ]
     },
@@ -58769,7 +58769,7 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
         },
         {
           "label": "Health Flashcards",
-          "href": "https://www.cogniguide.app/flashcards/health-flashcards"
+          "href": "https://www.cogniguide.app/flashcards/healthy-food"
         }
       ]
     },
@@ -61048,11 +61048,11 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "links": [
         {
           "label": "Pmp Prep",
-          "href": "https://www.cogniguide.app/flashcards/pmp-prep"
+          "href": "https://www.cogniguide.app/flashcards/bicsi-rcdd"
         },
         {
           "label": "Certification Flashcards",
-          "href": "https://www.cogniguide.app/flashcards/certification-flashcards"
+          "href": "https://www.cogniguide.app/flashcards/servicenow-cis-itsm-quizlet"
         }
       ]
     },
@@ -61669,7 +61669,7 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
         },
         {
           "label": "Superlatives",
-          "href": "https://www.cogniguide.app/flashcards/superlatives"
+          "href": "https://www.cogniguide.app/flashcards/adjectives-opposites"
         }
       ]
     },
@@ -61873,11 +61873,11 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "links": [
         {
           "label": "Bar Exam",
-          "href": "https://www.cogniguide.app/flashcards/bar-exam"
+          "href": "https://www.cogniguide.app/flashcards/magoosh"
         },
         {
           "label": "Law School",
-          "href": "https://www.cogniguide.app/flashcards/law-school"
+          "href": "https://www.cogniguide.app/flashcards/kaplan-gre-vocabulary"
         }
       ]
     },
@@ -64997,7 +64997,7 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
         },
         {
           "label": "Social Stories",
-          "href": "https://www.cogniguide.app/flashcards/social-stories"
+          "href": "https://www.cogniguide.app/flashcards/greetings-english"
         }
       ]
     },
@@ -67081,7 +67081,7 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
         },
         {
           "label": "Pediatrics",
-          "href": "https://www.cogniguide.app/flashcards/pediatrics"
+          "href": "https://www.cogniguide.app/flashcards/medstudy-pediatrics"
         }
       ]
     },
@@ -68527,11 +68527,11 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "links": [
         {
           "label": "Medical Terms",
-          "href": "https://www.cogniguide.app/flashcards/medical-terms"
+          "href": "https://www.cogniguide.app/flashcards/medical-student-anki"
         },
         {
           "label": "Anatomy",
-          "href": "https://www.cogniguide.app/flashcards/anatomy"
+          "href": "https://www.cogniguide.app/flashcards/kaplan-anatomy"
         }
       ]
     },
@@ -69990,11 +69990,11 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
       "links": [
         {
           "label": "Moral Stories",
-          "href": "https://www.cogniguide.app/flashcards/moral-stories"
+          "href": "https://www.cogniguide.app/flashcards/english-learning"
         },
         {
           "label": "Reading Comprehension",
-          "href": "https://www.cogniguide.app/flashcards/reading-comprehension"
+          "href": "https://www.cogniguide.app/flashcards/english-vocabulary"
         }
       ]
     },
@@ -71247,7 +71247,7 @@ export const generatedFlashcardPages: ProgrammaticFlashcardPage[] = [
         },
         {
           "label": "Writing Rules",
-          "href": "https://www.cogniguide.app/flashcards/writing-rules"
+          "href": "https://www.cogniguide.app/flashcards/grammar-adults"
         }
       ]
     },
