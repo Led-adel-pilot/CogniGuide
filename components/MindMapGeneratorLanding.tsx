@@ -1,16 +1,31 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
-import Generator from '@/components/Generator';
-import AuthModal from '@/components/AuthModal';
-import EmbeddedMindMap from '@/components/EmbeddedMindMap';
 import CogniGuideLogo from '../CogniGuide_logo.png';
 import { mindMapGeneratorFaqs } from '@/lib/data/mindMapGeneratorFaqs';
 import { useCaseHubs } from '@/lib/programmatic/useCaseData';
 import { broadcastAuthState, readSignedInFromCookies, writeCgAuthedCookie } from '@/lib/authCookie';
+
+const AuthModal = dynamic(() => import('@/components/AuthModal'), { ssr: false });
+
+const EmbeddedMindMap = dynamic(() => import('@/components/EmbeddedMindMap'), {
+  ssr: false,
+  loading: () => <div className="w-full h-full animate-pulse bg-muted/40" aria-hidden="true" />,
+});
+
+const GeneratorWidget = dynamic(() => import('@/components/Generator'), {
+  ssr: false,
+  loading: () => (
+    <div className="flex h-full min-h-[420px] w-full items-center justify-center rounded-3xl border border-dashed border-muted/60 bg-muted/20">
+      <div className="h-20 w-20 animate-spin rounded-full border-4 border-muted border-t-primary" aria-hidden="true" />
+      <span className="sr-only">Loading generator…</span>
+    </div>
+  ),
+});
 
 const mapTypes = [
   'Concept maps',
@@ -45,12 +60,18 @@ export default function MindMapGeneratorLanding() {
   const [isAuthed, setIsAuthed] = useState(false);
   const [useCasesOpen, setUseCasesOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [shouldRenderGenerator, setShouldRenderGenerator] = useState(false);
   const router = useRouter();
+  const generatorSectionRef = useRef<HTMLDivElement | null>(null);
   const useCaseMenuRef = useRef<HTMLDivElement | null>(null);
   const mobileUseCaseMenuRef = useRef<HTMLDivElement | null>(null);
   const mobileMenuRef = useRef<HTMLDivElement | null>(null);
   const mobileMenuToggleRef = useRef<HTMLButtonElement | null>(null);
   const lastSyncedAuthRef = useRef<boolean | null>(null);
+
+  const loadGenerator = useCallback(() => {
+    setShouldRenderGenerator(true);
+  }, []);
 
   useEffect(() => {
     try {
@@ -63,6 +84,39 @@ export default function MindMapGeneratorLanding() {
       }
     } catch {}
   }, []);
+
+  useEffect(() => {
+    if (isAuthed) {
+      setShouldRenderGenerator(true);
+    }
+  }, [isAuthed]);
+
+  useEffect(() => {
+    if (shouldRenderGenerator) {
+      return undefined;
+    }
+
+    const node = generatorSectionRef.current;
+    if (!node) {
+      return undefined;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries, obs) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            setShouldRenderGenerator(true);
+            obs.disconnect();
+            break;
+          }
+        }
+      },
+      { rootMargin: '160px 0px 160px 0px' }
+    );
+
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, [shouldRenderGenerator]);
 
   useEffect(() => {
     const syncAuthState = (signedIn: boolean) => {
@@ -341,8 +395,24 @@ export default function MindMapGeneratorLanding() {
                 </div>
               </div>
 
-              <div className="flex-1 w-full">
-                <Generator redirectOnAuth showTitle={false} />
+              <div className="flex-1 w-full" ref={generatorSectionRef}>
+                {shouldRenderGenerator ? (
+                  <GeneratorWidget redirectOnAuth showTitle={false} />
+                ) : (
+                  <div className="flex h-full min-h-[420px] flex-col items-center justify-center rounded-3xl border border-dashed border-muted/60 bg-muted/20 p-8 text-center">
+                    <h2 className="text-xl font-semibold">Load the interactive generator</h2>
+                    <p className="mt-3 max-w-md text-sm text-muted-foreground">
+                      Launch the AI mind map builder when you want to upload notes or explore sample outputs. The workspace loads only after you opt in.
+                    </p>
+                    <button
+                      type="button"
+                      onClick={loadGenerator}
+                      className="mt-6 inline-flex items-center justify-center rounded-full bg-primary px-6 py-2 text-sm font-semibold text-primary-foreground shadow hover:bg-primary/90"
+                    >
+                      Launch mind map builder
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           </div>

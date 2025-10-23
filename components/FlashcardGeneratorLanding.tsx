@@ -81,6 +81,7 @@ export default function FlashcardGeneratorLanding({ page }: FlashcardGeneratorLa
   const [useCasesOpen, setUseCasesOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [shouldRenderFlashcards, setShouldRenderFlashcards] = useState(false);
+  const [flashcardsSectionVisible, setFlashcardsSectionVisible] = useState(false);
   const [embeddedFlashcardHeight, setEmbeddedFlashcardHeight] = useState<number | null>(null);
   const router = useRouter();
   const flashcardsSectionRef = useRef<HTMLDivElement | null>(null);
@@ -116,6 +117,12 @@ export default function FlashcardGeneratorLanding({ page }: FlashcardGeneratorLa
     },
     [computeEmbeddedBaseHeight]
   );
+
+  useEffect(() => {
+    if (isAuthed) {
+      setShouldRenderFlashcards(true);
+    }
+  }, [isAuthed]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -300,14 +307,16 @@ export default function FlashcardGeneratorLanding({ page }: FlashcardGeneratorLa
   }, []);
 
   useEffect(() => {
-    if (shouldRenderFlashcards) return;
+    if (shouldRenderFlashcards && flashcardsSectionVisible) {
+      return undefined;
+    }
     const node = flashcardsSectionRef.current;
     if (!node) return;
     const observer = new IntersectionObserver(
       (entries, obs) => {
         for (const entry of entries) {
           if (entry.isIntersecting) {
-            setShouldRenderFlashcards(true);
+            setFlashcardsSectionVisible(true);
             obs.disconnect();
             break;
           }
@@ -317,7 +326,17 @@ export default function FlashcardGeneratorLanding({ page }: FlashcardGeneratorLa
     );
     observer.observe(node);
     return () => observer.disconnect();
-  }, [shouldRenderFlashcards]);
+  }, [flashcardsSectionVisible, shouldRenderFlashcards]);
+
+  useEffect(() => {
+    if (flashcardsSectionVisible && !shouldRenderFlashcards && !isAuthed) {
+      setEmbeddedFlashcardHeight((prev) => prev ?? computeEmbeddedBaseHeight());
+    }
+  }, [computeEmbeddedBaseHeight, flashcardsSectionVisible, isAuthed, shouldRenderFlashcards]);
+
+  const handleLoadFlashcards = useCallback(() => {
+    setShouldRenderFlashcards(true);
+  }, []);
 
   return (
     <>
@@ -489,7 +508,7 @@ export default function FlashcardGeneratorLanding({ page }: FlashcardGeneratorLa
                 <div className="flex-1 w-full min-h-[28rem]" ref={flashcardsSectionRef}>
                   <div className="bg-background rounded-[2rem] border shadow-xl shadow-slate-200/50 dark:shadow-slate-700/50 overflow-hidden">
                     <div
-                      className="w-full h-[65vh] md:h-[26rem] lg:h-[30rem]"
+                      className="w-full"
                       style={embeddedFlashcardHeight ? { height: `${embeddedFlashcardHeight}px` } : undefined}
                     >
                       {shouldRenderFlashcards ? (
@@ -499,7 +518,19 @@ export default function FlashcardGeneratorLanding({ page }: FlashcardGeneratorLa
                           onHeightChange={handleEmbeddedFlashcardHeight}
                         />
                       ) : (
-                        <div className="w-full h-full animate-pulse bg-muted/40" aria-hidden="true" />
+                        <div className="flex h-[65vh] w-full flex-col items-center justify-center gap-4 bg-muted/20 p-8 text-center md:h-[26rem] lg:h-[30rem]">
+                          <h2 className="text-lg font-semibold">Preview the spaced repetition deck</h2>
+                          <p className="max-w-md text-sm text-muted-foreground">
+                            Load a sample flashcard experience to see how CogniGuide formats questions and answers. Launching the deck may take a moment while we prepare the interactive viewer.
+                          </p>
+                          <button
+                            type="button"
+                            onClick={handleLoadFlashcards}
+                            className="inline-flex items-center justify-center rounded-full bg-primary px-5 py-2 text-sm font-semibold text-primary-foreground shadow hover:bg-primary/90"
+                          >
+                            Launch flashcard preview
+                          </button>
+                        </div>
                       )}
                     </div>
                   </div>

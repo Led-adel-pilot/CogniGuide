@@ -1,7 +1,17 @@
 'use client';
 
 import React from 'react';
-import FlashcardsModal, { type Flashcard } from '@/components/FlashcardsModal';
+import dynamic from 'next/dynamic';
+import type { Flashcard } from '@/components/FlashcardsModal';
+
+const FlashcardsModal = dynamic(() => import('@/components/FlashcardsModal'), {
+  ssr: false,
+  loading: () => (
+    <div className="flex h-full w-full items-center justify-center">
+      <div className="h-28 w-full max-w-3xl animate-pulse rounded-3xl bg-muted/40" aria-hidden="true" />
+    </div>
+  ),
+});
 
 const fallbackFlashcards: Flashcard[] = [
   {
