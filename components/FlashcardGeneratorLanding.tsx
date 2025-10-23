@@ -80,11 +80,8 @@ export default function FlashcardGeneratorLanding({ page }: FlashcardGeneratorLa
   const [isAuthed, setIsAuthed] = useState(false);
   const [useCasesOpen, setUseCasesOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [shouldRenderFlashcards, setShouldRenderFlashcards] = useState(false);
-  const [flashcardsSectionVisible, setFlashcardsSectionVisible] = useState(false);
   const [embeddedFlashcardHeight, setEmbeddedFlashcardHeight] = useState<number | null>(null);
   const router = useRouter();
-  const flashcardsSectionRef = useRef<HTMLDivElement | null>(null);
   const lastMeasuredEmbedHeightRef = useRef<number>(0);
   const lastSyncedAuthRef = useRef<boolean | null>(null);
   const useCaseMenuRef = useRef<HTMLDivElement | null>(null);
@@ -117,12 +114,6 @@ export default function FlashcardGeneratorLanding({ page }: FlashcardGeneratorLa
     },
     [computeEmbeddedBaseHeight]
   );
-
-  useEffect(() => {
-    if (isAuthed) {
-      setShouldRenderFlashcards(true);
-    }
-  }, [isAuthed]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -307,36 +298,8 @@ export default function FlashcardGeneratorLanding({ page }: FlashcardGeneratorLa
   }, []);
 
   useEffect(() => {
-    if (shouldRenderFlashcards && flashcardsSectionVisible) {
-      return undefined;
-    }
-    const node = flashcardsSectionRef.current;
-    if (!node) return;
-    const observer = new IntersectionObserver(
-      (entries, obs) => {
-        for (const entry of entries) {
-          if (entry.isIntersecting) {
-            setFlashcardsSectionVisible(true);
-            obs.disconnect();
-            break;
-          }
-        }
-      },
-      { rootMargin: '200px 0px 200px 0px' }
-    );
-    observer.observe(node);
-    return () => observer.disconnect();
-  }, [flashcardsSectionVisible, shouldRenderFlashcards]);
-
-  useEffect(() => {
-    if (flashcardsSectionVisible && !shouldRenderFlashcards && !isAuthed) {
-      setEmbeddedFlashcardHeight((prev) => prev ?? computeEmbeddedBaseHeight());
-    }
-  }, [computeEmbeddedBaseHeight, flashcardsSectionVisible, isAuthed, shouldRenderFlashcards]);
-
-  const handleLoadFlashcards = useCallback(() => {
-    setShouldRenderFlashcards(true);
-  }, []);
+    setEmbeddedFlashcardHeight((prev) => prev ?? computeEmbeddedBaseHeight());
+  }, [computeEmbeddedBaseHeight]);
 
   return (
     <>
@@ -505,33 +468,17 @@ export default function FlashcardGeneratorLanding({ page }: FlashcardGeneratorLa
                   </div>
                 </div>
 
-                <div className="flex-1 w-full min-h-[28rem]" ref={flashcardsSectionRef}>
+                <div className="flex-1 w-full min-h-[28rem]">
                   <div className="bg-background rounded-[2rem] border shadow-xl shadow-slate-200/50 dark:shadow-slate-700/50 overflow-hidden">
                     <div
                       className="w-full"
                       style={embeddedFlashcardHeight ? { height: `${embeddedFlashcardHeight}px` } : undefined}
                     >
-                      {shouldRenderFlashcards ? (
-                        <EmbeddedFlashcards
-                          cards={embeddedFlashcardDeck}
-                          title="AI Generated Samples"
-                          onHeightChange={handleEmbeddedFlashcardHeight}
-                        />
-                      ) : (
-                        <div className="flex h-[65vh] w-full flex-col items-center justify-center gap-4 bg-muted/20 p-8 text-center md:h-[26rem] lg:h-[30rem]">
-                          <h2 className="text-lg font-semibold">Preview the spaced repetition deck</h2>
-                          <p className="max-w-md text-sm text-muted-foreground">
-                            Load a sample flashcard experience to see how CogniGuide formats questions and answers. Launching the deck may take a moment while we prepare the interactive viewer.
-                          </p>
-                          <button
-                            type="button"
-                            onClick={handleLoadFlashcards}
-                            className="inline-flex items-center justify-center rounded-full bg-primary px-5 py-2 text-sm font-semibold text-primary-foreground shadow hover:bg-primary/90"
-                          >
-                            Launch flashcard preview
-                          </button>
-                        </div>
-                      )}
+                      <EmbeddedFlashcards
+                        cards={embeddedFlashcardDeck}
+                        title="AI Generated Samples"
+                        onHeightChange={handleEmbeddedFlashcardHeight}
+                      />
                     </div>
                   </div>
                 </div>

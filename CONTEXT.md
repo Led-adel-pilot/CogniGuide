@@ -13,10 +13,11 @@
 ## 3. Routing & Page Modules
 ### 3.1 Home (`app/page.tsx` & `components/HomeLanding.tsx`)
 - The root page is statically rendered and delegates to `HomeLanding`, extending metadata with study-focused keywords.【F:app/page.tsx†L1-L38】
-- `HomeLanding` handles auth state, referral code persistence, and cookie mirroring for middleware via Supabase listeners. It dynamically loads Auth, Mind Map, and Flashcard demo modals, lazy-renders interactive sections on intersection, and embeds the primary `Generator` component alongside marketing sections.【F:components/HomeLanding.tsx†L1-L199】
+- `HomeLanding` handles auth state, referral code persistence, and cookie mirroring for middleware via Supabase listeners. It dynamically loads Auth, Mind Map, and Flashcard demo modals while mounting the `Generator`, `EmbeddedMindMap`, and `EmbeddedFlashcards` immediately to prioritise fast-first interaction and lower bounce rates on the marketing surface.【F:components/HomeLanding.tsx†L1-L199】
 
 ### 3.2 AI Mind Map Generator Landing
-- `app/ai-mind-map-generator/page.tsx` publishes a dedicated marketing page with extensive SEO metadata, JSON-LD (SoftwareApplication, FAQ, breadcrumbs), and renders `MindMapGeneratorLanding` which hosts product content drawn from `lib/data/mindMapGeneratorFaqs`.【F:app/ai-mind-map-generator/page.tsx†L1-L143】【F:lib/data/mindMapGeneratorFaqs.ts†L1-L28】
+- `app/ai-mind-map-generator/page.tsx` publishes a dedicated marketing page with extensive SEO metadata, JSON-LD (SoftwareApplication, FAQ, breadcrumbs), and renders `MindMapGeneratorLanding` which hosts product content drawn from `lib/data/mindMapGeneratorFaqs` while mounting its `Generator` preview immediately for a snappier first impression.【F:app/ai-mind-map-generator/page.tsx†L1-L143】【F:lib/data/mindMapGeneratorFaqs.ts†L1-L28】
+- Programmatic flashcard routes render `FlashcardGeneratorLanding`, which now loads the embedded flashcard deck on first paint to honour the fast-loading UX mandate and minimise landing-page bounce.【F:components/FlashcardGeneratorLanding.tsx†L1-L200】
 
 ### 3.3 Dashboard Experience
 - `app/dashboard/page.tsx` wraps `DashboardClient` in a suspense boundary with a spinner fallback.【F:app/dashboard/page.tsx†L1-L16】

@@ -43,14 +43,8 @@ export default function HomeLanding() {
   const [useCasesOpen, setUseCasesOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  const [shouldRenderGenerator, setShouldRenderGenerator] = useState(false);
-  const [shouldRenderMindMap, setShouldRenderMindMap] = useState(false);
-  const [shouldRenderFlashcards, setShouldRenderFlashcards] = useState(false);
   const [embeddedFlashcardHeight, setEmbeddedFlashcardHeight] = useState<number | null>(null);
   const router = useRouter();
-  const generatorSectionRef = useRef<HTMLDivElement | null>(null);
-  const mindMapSectionRef = useRef<HTMLDivElement | null>(null);
-  const flashcardsSectionRef = useRef<HTMLDivElement | null>(null);
   const useCaseMenuRef = useRef<HTMLDivElement | null>(null);
   const mobileUseCaseMenuRef = useRef<HTMLDivElement | null>(null);
   const mobileMenuRef = useRef<HTMLDivElement | null>(null);
@@ -65,10 +59,6 @@ export default function HomeLanding() {
       return 600; // md:h-[600px]
     }
     return Math.round(window.innerHeight * 0.68); // h-[68vh]
-  }, []);
-
-  const loadGenerator = useCallback(() => {
-    setShouldRenderGenerator(true);
   }, []);
 
   const handleEmbeddedFlashcardHeight = useCallback(
@@ -108,36 +98,9 @@ export default function HomeLanding() {
 
   useEffect(() => {
     if (isAuthed) {
-      setShouldRenderGenerator(true);
+      setShowAuth(false);
     }
   }, [isAuthed]);
-
-  useEffect(() => {
-    if (shouldRenderGenerator) {
-      return undefined;
-    }
-
-    const node = generatorSectionRef.current;
-    if (!node) {
-      return undefined;
-    }
-
-    const observer = new IntersectionObserver(
-      (entries, obs) => {
-        for (const entry of entries) {
-          if (entry.isIntersecting) {
-            setShouldRenderGenerator(true);
-            obs.disconnect();
-            break;
-          }
-        }
-      },
-      { rootMargin: '160px 0px 160px 0px' }
-    );
-
-    observer.observe(node);
-    return () => observer.disconnect();
-  }, [shouldRenderGenerator]);
 
   useEffect(() => {
     try {
@@ -263,54 +226,6 @@ export default function HomeLanding() {
       document.removeEventListener('keydown', handleKey);
     };
   }, []);
-
-
-
-  useEffect(() => {
-    if (shouldRenderMindMap) return;
-
-    const node = mindMapSectionRef.current;
-    if (!node) return;
-
-    const observer = new IntersectionObserver(
-      (entries, obs) => {
-        for (const entry of entries) {
-          if (entry.isIntersecting) {
-            setShouldRenderMindMap(true);
-            obs.disconnect();
-            break;
-          }
-        }
-      },
-      { rootMargin: '200px 0px 200px 0px' }
-    );
-
-    observer.observe(node);
-    return () => observer.disconnect();
-  }, [shouldRenderMindMap]);
-
-  useEffect(() => {
-    if (shouldRenderFlashcards) return;
-
-    const node = flashcardsSectionRef.current;
-    if (!node) return;
-
-    const observer = new IntersectionObserver(
-      (entries, obs) => {
-        for (const entry of entries) {
-          if (entry.isIntersecting) {
-            setShouldRenderFlashcards(true);
-            obs.disconnect();
-            break;
-          }
-        }
-      },
-      { rootMargin: '200px 0px 200px 0px' }
-    );
-
-    observer.observe(node);
-    return () => observer.disconnect();
-  }, [shouldRenderFlashcards]);
 
   return (
     <>
@@ -477,30 +392,14 @@ export default function HomeLanding() {
                   </div>
                 </div>
 
-                <div className="flex-1 w-full min-h-[28rem]" ref={generatorSectionRef}>
-                  {shouldRenderGenerator ? (
-                    <GeneratorWidget redirectOnAuth showTitle={false} />
-                  ) : (
-                    <div className="flex h-full min-h-[420px] flex-col items-center justify-center rounded-3xl border border-dashed border-muted/60 bg-muted/20 p-8 text-center">
-                      <h2 className="text-xl font-semibold">Launch the AI workspace</h2>
-                      <p className="mt-3 max-w-md text-sm text-muted-foreground">
-                        Load the interactive generator when you&apos;re ready to upload notes or explore mind maps. The full experience appears after you click below.
-                      </p>
-                      <button
-                        type="button"
-                        onClick={loadGenerator}
-                        className="mt-6 inline-flex items-center justify-center rounded-full bg-primary px-6 py-2 text-sm font-semibold text-primary-foreground shadow hover:bg-primary/90"
-                      >
-                        Launch generator preview
-                      </button>
-                    </div>
-                  )}
+                <div className="flex-1 w-full min-h-[28rem]">
+                  <GeneratorWidget redirectOnAuth showTitle={false} />
                 </div>
               </div>
             </div>
           </section>
 
-          <section className="pt-10 md:pt-12 pb-16 bg-muted/30 border-y" ref={mindMapSectionRef}>
+          <section className="pt-10 md:pt-12 pb-16 bg-muted/30 border-y">
             <div className="container">
               <div className="text-center mb-8">
                 <h2 className="text-3xl md:text-4xl font-bold font-heading tracking-tight">Visual Learning with Mind Maps</h2>
@@ -510,13 +409,13 @@ export default function HomeLanding() {
               </div>
               <div className="bg-background rounded-[2rem] border shadow-xl shadow-slate-200/50 dark:shadow-slate-700/50 overflow-hidden">
                 <div className="w-full h-[300px] md:h-[600px]">
-                  {shouldRenderMindMap ? <InteractiveMindMap /> : <div className="w-full h-full animate-pulse bg-muted/40" aria-hidden="true" />}
+                  <InteractiveMindMap />
                 </div>
               </div>
             </div>
           </section>
 
-          <section className="pt-16 md:pt-20 pb-16" ref={flashcardsSectionRef}>
+          <section className="pt-16 md:pt-20 pb-16">
             <div className="container">
               <div className="text-center mb-8">
                 <h2 className="text-3xl md:text-4xl font-bold font-heading tracking-tight">Active Recall with Spaced Repetition</h2>
@@ -529,11 +428,7 @@ export default function HomeLanding() {
                   className="w-full h-[68vh] md:h-[600px]"
                   style={embeddedFlashcardHeight ? { height: `${embeddedFlashcardHeight}px` } : undefined}
                 >
-                  {shouldRenderFlashcards ? (
-                    <EmbeddedFlashcards onHeightChange={handleEmbeddedFlashcardHeight} />
-                  ) : (
-                    <div className="w-full h-full animate-pulse bg-muted/40" aria-hidden="true" />
-                  )}
+                  <EmbeddedFlashcards onHeightChange={handleEmbeddedFlashcardHeight} />
                 </div>
               </div>
               <div className="text-center mt-12">
