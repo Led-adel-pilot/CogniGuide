@@ -1,4 +1,11 @@
+@config "../tailwind.config.js";
 @import "tailwindcss";
+@source "../app/**/*.{ts,tsx,js,jsx,mdx}";
+@source "../components/**/*.{ts,tsx,js,jsx,mdx}";
+@source "../hooks/**/*.{ts,tsx,js,jsx}";
+@source "../lib/**/*.{ts,tsx,js,jsx}";
+@source "../data/**/*.{ts,tsx,js,jsx,md,mdx}";
+@source "../scripts/**/*.{ts,tsx,js,jsx}";
 
 @font-face {
   font-family: "Poppins";

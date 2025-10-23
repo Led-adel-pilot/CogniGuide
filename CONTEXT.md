@@ -4,6 +4,7 @@
 - **Framework & Runtime**: The project is a Next.js 15.4 application running on React 19 with pnpm-managed workspaces. Key scripts expose Turbopack dev, production build, and lint commands.【F:package.json†L2-L57】
 - **Client Libraries**: Core dependencies include Supabase for authentication/storage, OpenAI SDK (used with Gemini endpoints) for LLM streaming, PostHog analytics, TS-FSRS for spaced repetition, Mammoth/PDF-Parse/PPTX parsing utilities, React Markdown + remark-gfm for rendering, Radix UI primitives, and Tailwind merge helpers.【F:package.json†L11-L41】
 - **Tooling**: ESLint 9 with the Next.js shareable config, Tailwind CSS v4 PostCSS tooling, TypeScript 5, and next-sitemap are configured for development workflows.【F:package.json†L43-L55】
+- **CSS Optimization**: Tailwind now ships with an explicit `tailwind.config.js`/`tailwind.config.ts` bridge and production builds run PurgeCSS via `postcss.config.cjs` to strip unused utilities while respecting safelisted dynamic classes.【F:tailwind.config.js†L1-L17】【F:postcss.config.cjs†L1-L34】
 
 ## 2. Global Application Shell & Theming
 - **Root Layout**: `app/layout.tsx` establishes global metadata (OpenGraph, Twitter, robots), structured data for a SoftwareApplication, Google verification, favicon links, and preconnects for PostHog assets. It injects an inline script that restores the saved theme before hydration and wraps the app in a Poppins font body with a modal root container.【F:app/layout.tsx†L1-L162】
