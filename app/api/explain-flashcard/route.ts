@@ -273,7 +273,7 @@ export async function POST(req: NextRequest) {
     const stream = await openai.chat.completions.create({
       model: FAST_MODEL,
       // @ts-ignore
-      reasoning_effort: 'none',
+      //reasoning_effort: 'none',
       messages: [{ role: 'user', content: prompt }],
       stream: true,
       stream_options: { include_usage: false },

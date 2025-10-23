@@ -405,7 +405,7 @@ export async function POST(req: NextRequest) {
         stream = await openai.chat.completions.create({
           model: MODEL_NAMES[modelChoice],
           // @ts-ignore
-          reasoning_effort: 'none', // Reduce thinking time for faster responses
+          //reasoning_effort: 'none', // Reduce thinking time for faster responses
           messages: [{ role: 'user', content: userContent }],
           stream: true,
           stream_options: { include_usage: false }, // Reduce overhead
