@@ -8,9 +8,9 @@ import Generator from '@/components/Generator';
 import AuthModal from '@/components/AuthModal';
 import EmbeddedMindMap from '@/components/EmbeddedMindMap';
 import CogniGuideLogo from '../CogniGuide_logo.png';
-import { supabase } from '@/lib/supabaseClient';
 import { mindMapGeneratorFaqs } from '@/lib/data/mindMapGeneratorFaqs';
 import { useCaseHubs } from '@/lib/programmatic/useCaseData';
+import { broadcastAuthState, readSignedInFromCookies, writeCgAuthedCookie } from '@/lib/authCookie';
 
 const mapTypes = [
   'Concept maps',
@@ -50,6 +50,7 @@ export default function MindMapGeneratorLanding() {
   const mobileUseCaseMenuRef = useRef<HTMLDivElement | null>(null);
   const mobileMenuRef = useRef<HTMLDivElement | null>(null);
   const mobileMenuToggleRef = useRef<HTMLButtonElement | null>(null);
+  const lastSyncedAuthRef = useRef<boolean | null>(null);
 
   useEffect(() => {
     try {
@@ -64,38 +65,46 @@ export default function MindMapGeneratorLanding() {
   }, []);
 
   useEffect(() => {
-    const syncAuthCookie = (signedIn: boolean) => {
-      try {
-        if (typeof document !== 'undefined') {
-          if (signedIn) {
-            document.cookie = 'cg_authed=1; Path=/; Max-Age=2592000; SameSite=Lax; Secure';
-          } else {
-            document.cookie = 'cg_authed=; Path=/; Max-Age=0; SameSite=Lax; Secure';
-          }
-        }
-      } catch {}
+    const syncAuthState = (signedIn: boolean) => {
+      if (lastSyncedAuthRef.current === signedIn) {
+        return;
+      }
+      lastSyncedAuthRef.current = signedIn;
+      writeCgAuthedCookie(signedIn);
+      broadcastAuthState(signedIn);
     };
 
-    const init = async () => {
-      const { data } = await supabase.auth.getUser();
-      const authed = Boolean(data.user);
-      setIsAuthed(authed);
-      syncAuthCookie(authed);
-    };
-
-    void init();
-
-    const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
-      const signedIn = Boolean(session);
+    const evaluateAuth = () => {
+      const signedIn = readSignedInFromCookies();
       setIsAuthed(signedIn);
       if (signedIn) {
         setShowAuth(false);
       }
-      syncAuthCookie(signedIn);
-    });
+      syncAuthState(signedIn);
+    };
+
+    const handleFocus = () => evaluateAuth();
+    const handleVisibility = () => {
+      if (document.visibilityState === 'visible') {
+        evaluateAuth();
+      }
+    };
+    const handleStorage = (event: StorageEvent) => {
+      if (event.key === 'cg_auth_sync') {
+        evaluateAuth();
+      }
+    };
+
+    evaluateAuth();
+
+    window.addEventListener('focus', handleFocus);
+    document.addEventListener('visibilitychange', handleVisibility);
+    window.addEventListener('storage', handleStorage);
 
     return () => {
-      sub.subscription.unsubscribe();
+      window.removeEventListener('focus', handleFocus);
+      document.removeEventListener('visibilitychange', handleVisibility);
+      window.removeEventListener('storage', handleStorage);
     };
   }, []);
 

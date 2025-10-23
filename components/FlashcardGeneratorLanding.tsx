@@ -7,9 +7,9 @@ import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 import type { ProgrammaticCTA, ProgrammaticFlashcardPage, RichTextBlock } from '@/lib/programmatic/flashcardPageSchema';
 import CogniGuideLogo from '../CogniGuide_logo.png';
-import { supabase } from '@/lib/supabaseClient';
 import type { Flashcard } from '@/components/FlashcardsModal';
 import { useCaseHubs } from '@/lib/programmatic/useCaseData';
+import { broadcastAuthState, readSignedInFromCookies, writeCgAuthedCookie } from '@/lib/authCookie';
 
 const AuthModal = dynamic(() => import('@/components/AuthModal'), { ssr: false });
 const EmbeddedFlashcards = dynamic(() => import('@/components/EmbeddedFlashcards'), {
@@ -85,6 +85,7 @@ export default function FlashcardGeneratorLanding({ page }: FlashcardGeneratorLa
   const router = useRouter();
   const flashcardsSectionRef = useRef<HTMLDivElement | null>(null);
   const lastMeasuredEmbedHeightRef = useRef<number>(0);
+  const lastSyncedAuthRef = useRef<boolean | null>(null);
   const useCaseMenuRef = useRef<HTMLDivElement | null>(null);
   const mobileUseCaseMenuRef = useRef<HTMLDivElement | null>(null);
   const mobileMenuRef = useRef<HTMLDivElement | null>(null);
@@ -255,32 +256,46 @@ export default function FlashcardGeneratorLanding({ page }: FlashcardGeneratorLa
   }, []);
 
   useEffect(() => {
-    const syncAuthCookie = (signedIn: boolean) => {
-      try {
-        if (typeof document !== 'undefined') {
-          if (signedIn) {
-            document.cookie = 'cg_authed=1; Path=/; Max-Age=2592000; SameSite=Lax; Secure';
-          } else {
-            document.cookie = 'cg_authed=; Path=/; Max-Age=0; SameSite=Lax; Secure';
-          }
-        }
-      } catch {}
+    const syncAuthState = (signedIn: boolean) => {
+      if (lastSyncedAuthRef.current === signedIn) {
+        return;
+      }
+      lastSyncedAuthRef.current = signedIn;
+      writeCgAuthedCookie(signedIn);
+      broadcastAuthState(signedIn);
     };
-    const init = async () => {
-      const { data } = await supabase.auth.getUser();
-      const authed = Boolean(data.user);
-      setIsAuthed(authed);
-      syncAuthCookie(authed);
-    };
-    init();
-    const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
-      const signedIn = Boolean(session);
+
+    const evaluateAuth = () => {
+      const signedIn = readSignedInFromCookies();
       setIsAuthed(signedIn);
-      if (signedIn) setShowAuth(false);
-      syncAuthCookie(signedIn);
-    });
+      if (signedIn) {
+        setShowAuth(false);
+      }
+      syncAuthState(signedIn);
+    };
+
+    const handleFocus = () => evaluateAuth();
+    const handleVisibility = () => {
+      if (document.visibilityState === 'visible') {
+        evaluateAuth();
+      }
+    };
+    const handleStorage = (event: StorageEvent) => {
+      if (event.key === 'cg_auth_sync') {
+        evaluateAuth();
+      }
+    };
+
+    evaluateAuth();
+
+    window.addEventListener('focus', handleFocus);
+    document.addEventListener('visibilitychange', handleVisibility);
+    window.addEventListener('storage', handleStorage);
+
     return () => {
-      sub.subscription.unsubscribe();
+      window.removeEventListener('focus', handleFocus);
+      document.removeEventListener('visibilitychange', handleVisibility);
+      window.removeEventListener('storage', handleStorage);
     };
   }, []);
 

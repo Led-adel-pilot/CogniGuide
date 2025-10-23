@@ -6,9 +6,9 @@ import Link from 'next/link';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 import CogniGuideLogo from '../CogniGuide_logo.png';
-import { supabase } from '@/lib/supabaseClient';
 import Generator from '@/components/Generator';
 import { useCaseHubs } from '@/lib/programmatic/useCaseData';
+import { broadcastAuthState, readSignedInFromCookies, writeCgAuthedCookie } from '@/lib/authCookie';
 
 const AuthModal = dynamic(() => import('@/components/AuthModal'), { ssr: false });
 
@@ -45,6 +45,7 @@ export default function HomeLanding() {
   const mobileMenuRef = useRef<HTMLDivElement | null>(null);
   const mobileMenuToggleRef = useRef<HTMLButtonElement | null>(null);
   const lastMeasuredFlashcardHeightRef = useRef<number>(0);
+  const lastSyncedAuthRef = useRef<boolean | null>(null);
 
   const computeFlashcardBaseHeight = useCallback(() => {
     if (typeof window === 'undefined') return 0;
@@ -103,33 +104,47 @@ export default function HomeLanding() {
   }, []);
 
   useEffect(() => {
-    const syncAuthCookie = (signedIn: boolean) => {
-      try {
-        if (typeof document !== 'undefined') {
-          if (signedIn) {
-            document.cookie = 'cg_authed=1; Path=/; Max-Age=2592000; SameSite=Lax; Secure';
-          } else {
-            document.cookie = 'cg_authed=; Path=/; Max-Age=0; SameSite=Lax; Secure';
-          }
-        }
-      } catch {}
+    const syncAuthState = (signedIn: boolean) => {
+      if (lastSyncedAuthRef.current === signedIn) {
+        return;
+      }
+      lastSyncedAuthRef.current = signedIn;
+      writeCgAuthedCookie(signedIn);
+      broadcastAuthState(signedIn);
     };
-    const init = async () => {
-      const { data } = await supabase.auth.getUser();
-      const authed = Boolean(data.user);
-      setIsAuthed(authed);
-      syncAuthCookie(authed);
-    };
-    init();
-    const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
-      const signedIn = Boolean(session);
+
+    const evaluateAuth = () => {
+      const signedIn = readSignedInFromCookies();
       setIsAuthed(signedIn);
       if (signedIn) {
         setShowAuth(false);
       }
-      syncAuthCookie(signedIn);
-    });
-    return () => { sub.subscription.unsubscribe(); };
+      syncAuthState(signedIn);
+    };
+
+    const handleFocus = () => evaluateAuth();
+    const handleVisibility = () => {
+      if (document.visibilityState === 'visible') {
+        evaluateAuth();
+      }
+    };
+    const handleStorage = (event: StorageEvent) => {
+      if (event.key === 'cg_auth_sync') {
+        evaluateAuth();
+      }
+    };
+
+    evaluateAuth();
+
+    window.addEventListener('focus', handleFocus);
+    document.addEventListener('visibilitychange', handleVisibility);
+    window.addEventListener('storage', handleStorage);
+
+    return () => {
+      window.removeEventListener('focus', handleFocus);
+      document.removeEventListener('visibilitychange', handleVisibility);
+      window.removeEventListener('storage', handleStorage);
+    };
   }, []);
 
 
