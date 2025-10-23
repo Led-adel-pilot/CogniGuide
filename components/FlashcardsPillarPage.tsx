@@ -172,6 +172,16 @@ export default function FlashcardsPillarPage() {
           ))}
         </div>
       </section>
+
+      <section className="border-t border-border pt-8 text-center sm:text-left">
+        <p className="text-sm text-muted-foreground">
+          Dive deeper into active recall strategies with our guide{' '}
+          <Link href="https://claude.ai/public/artifacts/d4e61670-43bd-4a31-9787-2f6848d0f5d7" className="text-primary underline underline-offset-4">
+            Active Recall and Flashcards: A Student&apos;s Guide to Effective Learning
+          </Link>
+          .
+        </p>
+      </section>
     </div>
   );
 }
