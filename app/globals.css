@@ -131,14 +131,15 @@
 @theme {
   --color-background: #ffffff;
   --color-foreground: oklch(8% 0.01 240);
-  --color-primary: oklch(72% 0.19 260);
-  --color-primary-foreground: oklch(98.5% 0.01 240);
+  --color-primary: oklch(55% 0.19 260);
+  --color-primary-foreground: oklch(99% 0.01 240);
   --color-secondary: oklch(90% 0.02 250);
   --color-muted: oklch(94% 0.015 250);
-  --color-muted-foreground: oklch(40% 0.015 250);
-  --color-accent: oklch(75% 0.15 260);
+  --color-muted-foreground: oklch(35% 0.015 250);
+  --color-accent: oklch(95% 0.06 260);
+  --color-accent-foreground: oklch(45% 0.18 260);
   --color-border: oklch(90% 0.02 250);
-  --color-ring: oklch(65% 0.2 260);
+  --color-ring: oklch(55% 0.2 260);
 
   --font-sans: "Poppins", "sans-serif";
   --font-heading: "Poppins", "sans-serif";
@@ -155,23 +156,24 @@
   /* Lighter dark theme (midnight slate) */
   --color-background: oklch(20% 0.02 250);
   --color-foreground: oklch(96% 0.01 240);
-  --color-primary: oklch(72% 0.19 260);
-  --color-primary-foreground: oklch(18% 0.01 250);
+  --color-primary: oklch(65% 0.19 260);
+  --color-primary-foreground: oklch(15% 0.01 250);
   --color-secondary: oklch(28% 0.02 250);
   --color-muted: oklch(30% 0.015 250);
-  --color-muted-foreground: oklch(80% 0.01 250);
-  --color-accent: oklch(35% 0.12 260);
+  --color-muted-foreground: oklch(75% 0.01 250);
+  --color-accent: oklch(32% 0.06 260);
+  --color-accent-foreground: oklch(72% 0.18 260);
   --color-border: oklch(34% 0.02 250);
-  --color-ring: oklch(72% 0.19 260);
+  --color-ring: oklch(65% 0.19 260);
 
   /* Dark mode button overrides */
   .upgrade-plan-btn {
-    background-color: rgba(30, 64, 175, 0.5); /* dark blue background */
-    color: #60a5fa; /* lighter blue text for dark mode */
+    background-color: rgba(30, 64, 175, 0.7); /* dark blue background - more opaque */
+    color: #bfdbfe; /* lighter blue text for dark mode - better contrast */
   }
 
   .upgrade-plan-btn:hover {
-    background-color: rgba(37, 99, 235, 0.5); /* slightly lighter dark blue on hover */
+    background-color: rgba(37, 99, 235, 0.8); /* slightly lighter dark blue on hover - more opaque */
   }
 
   --generator-shadow-default: 0 0 22px 2px rgba(148, 192, 255, 0.16);
@@ -387,6 +389,58 @@
     background: linear-gradient(to right, #1d4ed8, #0891b2, #0f766e);
   }
 
+  /* Better contrast utilities - avoid opacity on text */
+  .text-muted-foreground\/70 {
+    color: var(--color-muted-foreground) !important;
+  }
+
+  .bg-muted\/40 {
+    background-color: var(--color-muted) !important;
+  }
+
+  .bg-muted\/50 {
+    background-color: var(--color-muted) !important;
+  }
+
+  .bg-muted\/60 {
+    background-color: var(--color-muted) !important;
+  }
+
+  .bg-muted\/30 {
+    background-color: color-mix(in oklab, var(--color-muted) 85%, transparent) !important;
+  }
+
+  .bg-muted\/20 {
+    background-color: color-mix(in oklab, var(--color-muted) 70%, transparent) !important;
+  }
+
+  /* Calendar date selection - use primary hue but lighter/saturated for visibility */
+  [data-selected-single="true"],
+  [data-range-start="true"],
+  [data-range-end="true"] {
+    background-color: oklch(68% 0.16 260) !important;
+    color: white !important;
+  }
+
+  [data-selected-single="true"]:hover,
+  [data-range-start="true"]:hover,
+  [data-range-end="true"]:hover {
+    background-color: oklch(62% 0.18 260) !important;
+  }
+
+  [data-theme="dark"] [data-selected-single="true"],
+  [data-theme="dark"] [data-range-start="true"],
+  [data-theme="dark"] [data-range-end="true"] {
+    background-color: oklch(60% 0.16 260) !important;
+    color: white !important;
+  }
+
+  [data-theme="dark"] [data-selected-single="true"]:hover,
+  [data-theme="dark"] [data-range-start="true"]:hover,
+  [data-theme="dark"] [data-range-end="true"]:hover {
+    background-color: oklch(65% 0.18 260) !important;
+  }
+
   /* Upgrade Plan Button Styles */
   .upgrade-plan-btn {
     display: inline-flex;
@@ -396,15 +450,15 @@
     font-size: 0.875rem;
     font-weight: 500;
     border-radius: 9999px;
-    background-color: rgba(219, 234, 254, 0.5); /* bg-blue-100/50 */
-    color: #2563eb; /* text-blue-600 */
+    background-color: rgba(191, 219, 254, 0.8); /* bg-blue-200/80 - more opaque for better contrast */
+    color: #1e40af; /* text-blue-800 - darker for better contrast */
     border: none;
     transition: all 0.2s ease;
     cursor: pointer;
   }
 
   .upgrade-plan-btn:hover {
-    background-color: rgba(191, 219, 254, 0.5); /* bg-blue-200/50 */
+    background-color: rgba(147, 197, 253, 0.9); /* bg-blue-300/90 - more opaque */
   }
 
   /* Smooth button attention animation for non-auth users */

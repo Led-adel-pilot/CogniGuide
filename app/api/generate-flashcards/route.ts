@@ -372,7 +372,7 @@ async function generateJsonFromModel(userContent: any, modelChoice: ModelChoice)
     completion = await openai.chat.completions.create({
       model: MODEL_NAMES[modelChoice],
       // @ts-ignore
-      reasoning_effort: 'none',
+      //reasoning_effort: 'none',
       messages: [{ role: 'user', content: userContent }],
       stream: false,
       // @ts-ignore
@@ -443,7 +443,7 @@ export async function POST(req: NextRequest) {
         stream = await openai.chat.completions.create({
           model: MODEL_NAMES[modelChoice],
           // @ts-ignore
-          reasoning_effort: 'none', // Reduce thinking time for faster responses
+          //reasoning_effort: 'none', // Reduce thinking time for faster responses
           messages: [{ role: 'user', content: promptContent }],
           stream: true,
           stream_options: { include_usage: false }, // Reduce overhead
