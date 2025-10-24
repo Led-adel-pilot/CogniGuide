@@ -2101,9 +2101,6 @@ const handleMindMapLinked = useCallback(
           setActiveMindMapTitle(null);
         }}
         onShareMindMap={activeMindMapId ? () => setShareItem({ id: activeMindMapId, type: 'mindmap', title: activeMindMapTitle ?? null }) : undefined}
-        onShareFlashcards={(deckId, title) => {
-          setShareItem({ id: deckId, type: 'flashcards', title });
-        }}
         isPaidUser={isPaidUser}
         onRequireUpgrade={() => setIsPricingModalOpen(true)}
       />

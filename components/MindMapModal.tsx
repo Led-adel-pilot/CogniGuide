@@ -5,13 +5,9 @@ import dynamic from 'next/dynamic';
 import { initializeMindMap, cleanup, getFullMindMapBounds, updateMindMap, recommendPrintScaleMultiplier, getPrintZoomBias, collapseToMainBranches } from '@/lib/markmap-renderer';
 import { ensureKatexAssets } from '@/lib/katex-loader';
 import { Download, X, FileImage, Loader2, Map as MapIcon, ChevronLeft } from 'lucide-react';
-import FlashcardIcon from '@/components/FlashcardIcon';
-
-const FlashcardsModal = dynamic(() => import('@/components/FlashcardsModal'), { ssr: false });
 import ShareTriggerButton from '@/components/ShareTriggerButton';
 import { toSvg, toPng } from 'html-to-image';
 import { supabase } from '@/lib/supabaseClient';
-import { loadDeckSchedule, saveDeckSchedule, loadDeckScheduleAsync, saveDeckScheduleAsync } from '@/lib/sr-store';
 import posthog from 'posthog-js';
 import AuthModal from '@/components/AuthModal';
 import jsPDF from 'jspdf';
@@ -20,7 +16,6 @@ interface MindMapModalProps {
   markdown: string | null;
   onClose: () => void;
   onShareMindMap?: () => void;
-  onShareFlashcards?: (deckId: string, title: string | null) => void;
   isPaidUser?: boolean;
   onRequireUpgrade?: () => void;
   embedded?: boolean;
@@ -36,7 +31,7 @@ type MindMapStreamEventDetail = {
   source?: string;
 };
 
-export default function MindMapModal({ markdown, onClose, onShareMindMap, onShareFlashcards, isPaidUser = false, onRequireUpgrade, embedded = false, onBackToFlashcards, disableSignupPrompts = false, streamingRequestId = null }: MindMapModalProps) {
+export default function MindMapModal({ markdown, onClose, onShareMindMap, isPaidUser = false, onRequireUpgrade, embedded = false, onBackToFlashcards, disableSignupPrompts = false, streamingRequestId = null }: MindMapModalProps) {
   const viewportRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [isDropdownOpen, setDropdownOpen] = useState(false);
@@ -211,21 +206,7 @@ export default function MindMapModal({ markdown, onClose, onShareMindMap, onShar
     return { css: `rgb(${fallbackRgb[0]}, ${fallbackRgb[1]}, ${fallbackRgb[2]})`, rgb: fallbackRgb };
   };
 
-  // Lightweight SHA-256 hex for stable local cache keys per markdown
-  const computeSHA256Hex = async (input: string): Promise<string> => {
-    const encoder = new TextEncoder();
-    const data = encoder.encode(input);
-    const digest = await crypto.subtle.digest('SHA-256', data);
-    const bytes = new Uint8Array(digest);
-    let hex = '';
-    for (let i = 0; i < bytes.length; i++) {
-      const h = bytes[i].toString(16).padStart(2, '0');
-      hex += h;
-    }
-    return hex;
-  };
 
-  const getLocalDeckKey = (hash: string) => `cogniguide:flashcards:md:${hash}`;
 
   useEffect(() => {
     const updateWidth = () => {
@@ -524,19 +505,7 @@ export default function MindMapModal({ markdown, onClose, onShareMindMap, onShar
 
   const initializedRef = useRef(false);
 
-  // Flashcards state
-  type Flashcard = { question: string; answer: string };
-  const [viewMode, setViewMode] = useState<'map' | 'flashcards'>('map');
-  const viewModeRef = useRef<'map' | 'flashcards'>(viewMode);
-  const [flashcards, setFlashcards] = useState<Flashcard[] | null>(null);
-  const [isGeneratingFlashcards, setIsGeneratingFlashcards] = useState(false);
-  const [flashcardIndex, setFlashcardIndex] = useState(0);
-  const [generationError, setGenerationError] = useState<string | null>(null);
-  const flashcardsCacheRef = useRef<Map<string, Flashcard[]>>(new Map());
   const [userId, setUserId] = useState<string | null>(null);
-  const [isSavingFlashcards, setIsSavingFlashcards] = useState(false);
-  const [flashcardsSavedId, setFlashcardsSavedId] = useState<string | null>(null);
-  const [isCheckingFlashcards, setIsCheckingFlashcards] = useState(false);
   const [showLossAversionPopup, setShowLossAversionPopup] = useState(false);
   const [showTimeBasedPopup, setShowTimeBasedPopup] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
@@ -552,7 +521,6 @@ export default function MindMapModal({ markdown, onClose, onShareMindMap, onShar
   const katexReadyRef = useRef<boolean>(false);
   const ensuringKatexPromiseRef = useRef<Promise<void> | null>(null);
   const renderedMarkdownRef = useRef<string | null>(null);
-  const allowFlashcardToggle = !embedded;
 
   const handleClose = (event?: React.MouseEvent) => {
     // Prevent any automatic triggers
@@ -569,196 +537,7 @@ export default function MindMapModal({ markdown, onClose, onShareMindMap, onShar
     }
   };
 
-  const handleGenerateFlashcards = async () => {
-    if (!markdown) return;
-    posthog.capture('flashcards_generation_requested', { markdown_length: markdown.length });
-    try {
-      setIsGeneratingFlashcards(true);
-      setGenerationError(null);
-      setFlashcardsSavedId(null);
-      // Use cached cards if available for this exact markdown
-      const cached = flashcardsCacheRef.current.get(markdown);
-      if (cached && Array.isArray(cached) && cached.length > 0) {
-        setFlashcards(cached);
-        setViewMode('flashcards');
-        return;
-      }
-      // Request streaming NDJSON so we can show cards incrementally
-      const { data: sessionData } = await supabase.auth.getSession();
-      const accessToken = sessionData?.session?.access_token;
-      const res = await fetch('/api/generate-flashcards?stream=1', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
-        },
-        body: JSON.stringify({ markdown })
-      });
-      if (!res.ok) {
-        let errMsg = 'Failed to generate flashcards';
-        try {
-          const err = await res.json();
-          errMsg = err?.error || errMsg;
-        } catch {}
-        throw new Error(errMsg);
-      }
-      // Deduction occurs server-side at start; if signed in, refresh credits and notify listeners
-      try {
-        const { data } = await supabase.auth.getUser();
-        const uid = data.user?.id;
-        if (uid) {
-          const { data: creditsData } = await supabase.from('user_credits').select('credits').eq('user_id', uid).single();
-          if (typeof window !== 'undefined') window.dispatchEvent(new CustomEvent('cogniguide:credits-updated', { detail: { credits: creditsData?.credits } }));
-        }
-      } catch (error) {
-        console.error('Failed to get user session:', error);
-      }
 
-      // If the environment does not support streaming, fall back to JSON body
-      if (!res.body) {
-        const data = await res.json().catch(() => null);
-        const cards = Array.isArray(data?.cards) ? data.cards : [];
-        if (cards.length === 0) throw new Error('No cards generated');
-        flashcardsCacheRef.current.set(markdown, cards);
-        setFlashcards(cards);
-        setViewMode('flashcards');
-        // Persist locally by markdown hash for instantaneous future lookups
-        try {
-          const hash = await computeSHA256Hex(markdown);
-          const title = (typeof data?.title === 'string' && data.title.trim()) ? data.title.trim() : getTitle(markdown);
-          const local = { id: null as string | null, title, cards, created_at: new Date().toISOString() };
-          if (typeof window !== 'undefined') window.localStorage.setItem(getLocalDeckKey(hash), JSON.stringify(local));
-        } catch {}
-        if (userId) {
-          try {
-            const title = (typeof data?.title === 'string' && data.title.trim()) ? data.title.trim() : getTitle(markdown);
-            setIsSavingFlashcards(true);
-            const { data: insertData, error: insertError } = await supabase
-              .from('flashcards')
-              .insert({ user_id: userId, title, markdown, cards })
-              .select('id')
-              .single();
-            if (!insertError && insertData?.id) {
-              setFlashcardsSavedId(insertData.id as string);
-              // Update local cache with Supabase id for cross-session reference
-              try {
-                const hash = await computeSHA256Hex(markdown);
-                const key = getLocalDeckKey(hash);
-                const raw = typeof window !== 'undefined' ? window.localStorage.getItem(key) : null;
-                const obj = raw ? JSON.parse(raw) : null;
-                if (obj && typeof obj === 'object') {
-                  obj.id = insertData.id;
-                  window.localStorage.setItem(key, JSON.stringify(obj));
-                }
-              } catch {}
-            }
-          } catch (err: any) {
-            console.error('Failed to save flashcards to Supabase:', err);
-          } finally {
-            setIsSavingFlashcards(false);
-          }
-        }
-        return;
-      }
-
-      const reader = res.body.getReader();
-      const decoder = new TextDecoder();
-      let buf = '';
-      let firstCardShown = false;
-      let streamedTitle: string | null = null;
-      const accumulated: Flashcard[] = [];
-
-      // Switch to flashcards view immediately so the user sees progress
-      setViewMode('flashcards');
-
-      while (true) {
-        // eslint-disable-next-line no-await-in-loop
-        const { value, done } = await reader.read();
-        if (done) break;
-        if (value) buf += decoder.decode(value, { stream: true });
-
-        let nl;
-        while ((nl = buf.indexOf('\n')) !== -1) {
-          const rawLine = buf.slice(0, nl).trim();
-          buf = buf.slice(nl + 1);
-          if (!rawLine) continue;
-          let obj: any;
-          try {
-            obj = JSON.parse(rawLine);
-          } catch {
-            // Ignore malformed lines (server only forwards valid ones)
-            continue;
-          }
-          if (obj?.type === 'meta') {
-            if (typeof obj.title === 'string' && obj.title.trim()) {
-              streamedTitle = obj.title.trim();
-            }
-          } else if (obj?.type === 'card') {
-            const card: Flashcard = {
-              question: String(obj.question || ''),
-              answer: String(obj.answer || ''),
-            };
-            accumulated.push(card);
-            setFlashcards(prev => {
-              const next = prev ? [...prev, card] : [card];
-              return next;
-            });
-            if (!firstCardShown) {
-              firstCardShown = true;
-            }
-          } else if (obj?.type === 'done') {
-            // End of stream per protocol; ignore remaining buffered data
-            buf = '';
-          }
-        }
-      }
-
-      // Finished streaming; cache and persist if we received any cards
-      if (accumulated.length === 0) throw new Error('No cards generated');
-      flashcardsCacheRef.current.set(markdown, accumulated);
-      // Also persist to localStorage for quick reopen without network/db
-      try {
-        const hash = await computeSHA256Hex(markdown);
-        const title = streamedTitle && streamedTitle.trim() ? streamedTitle.trim() : getTitle(markdown);
-        const local = { id: null as string | null, title, cards: accumulated, created_at: new Date().toISOString() };
-        if (typeof window !== 'undefined') window.localStorage.setItem(getLocalDeckKey(hash), JSON.stringify(local));
-      } catch {}
-      if (userId) {
-        try {
-          const title = streamedTitle && streamedTitle.trim() ? streamedTitle.trim() : getTitle(markdown);
-          setIsSavingFlashcards(true);
-          const { data: insertData, error: insertError } = await supabase
-            .from('flashcards')
-            .insert({ user_id: userId, title, markdown, cards: accumulated })
-            .select('id')
-            .single();
-          if (!insertError && insertData?.id) {
-            setFlashcardsSavedId(insertData.id as string);
-            // Update local cache with the assigned id
-            try {
-              const hash = await computeSHA256Hex(markdown);
-              const key = getLocalDeckKey(hash);
-              const raw = typeof window !== 'undefined' ? window.localStorage.getItem(key) : null;
-              const obj = raw ? JSON.parse(raw) : null;
-              if (obj && typeof obj === 'object') {
-                obj.id = insertData.id;
-                window.localStorage.setItem(key, JSON.stringify(obj));
-              }
-            } catch {}
-          }
-        } catch (err: any) {
-          console.error('Failed to save flashcards to Supabase:', err);
-        } finally {
-          setIsSavingFlashcards(false);
-        }
-      }
-    } catch (err: any) {
-      const msg = err.message || 'Failed to generate flashcards';
-      setGenerationError(msg);
-    } finally {
-      setIsGeneratingFlashcards(false);
-    }
-  };
 
   const ensureKatexReady = useCallback(async () => {
     if (katexReadyRef.current) return;
@@ -789,7 +568,6 @@ export default function MindMapModal({ markdown, onClose, onShareMindMap, onShar
   }, []);
 
   const executeRendererUpdate = useCallback(() => {
-    if (viewModeRef.current !== 'map') return;
     if (!viewportRef.current || !containerRef.current) return;
     const content = latestMarkdownRef.current;
     if (!content) return;
@@ -809,12 +587,10 @@ export default function MindMapModal({ markdown, onClose, onShareMindMap, onShar
   }, []);
 
   const queueRendererUpdate = useCallback(() => {
-    if (viewModeRef.current !== 'map') return;
     if (!viewportRef.current || !containerRef.current) return;
 
     const invoke = () => {
       void ensureKatexReady().then(() => {
-        if (viewModeRef.current !== 'map') return;
         executeRendererUpdate();
       });
     };
@@ -841,10 +617,6 @@ export default function MindMapModal({ markdown, onClose, onShareMindMap, onShar
       }, THROTTLE_MS - elapsed);
     }
   }, [ensureKatexReady, executeRendererUpdate]);
-
-  useEffect(() => {
-    viewModeRef.current = viewMode;
-  }, [viewMode]);
 
   useEffect(() => {
     latestMarkdownRef.current = markdown;
@@ -884,10 +656,7 @@ export default function MindMapModal({ markdown, onClose, onShareMindMap, onShar
         collapseRequestedRef.current = false;
         return;
       }
-      if (viewModeRef.current !== 'map') {
-        collapseRequestedRef.current = false;
-        return;
-      }
+
       if (!initializedRef.current) {
         if (collapseRetryTimeoutRef.current !== null) {
           window.clearTimeout(collapseRetryTimeoutRef.current);
@@ -1069,7 +838,7 @@ export default function MindMapModal({ markdown, onClose, onShareMindMap, onShar
     return () => { cancelled = true; };
   }, [userId, embedded]);
 
-  // Detect authenticated user for saving flashcards
+  // Detect authenticated user for signup prompts
   useEffect(() => {
     let isMounted = true;
     const init = async () => {
@@ -1094,122 +863,9 @@ export default function MindMapModal({ markdown, onClose, onShareMindMap, onShar
     };
   }, []);
 
-  // Clean up renderer when switching to flashcards; re-init when returning to map
-  useEffect(() => {
-    if (viewMode === 'flashcards') {
-      if (throttledUpdateTimeoutRef.current !== null) {
-        window.clearTimeout(throttledUpdateTimeoutRef.current);
-        throttledUpdateTimeoutRef.current = null;
-      }
-      if (collapseRetryTimeoutRef.current !== null) {
-        window.clearTimeout(collapseRetryTimeoutRef.current);
-        collapseRetryTimeoutRef.current = null;
-      }
-      lastRendererUpdateRef.current = 0;
-      initializedRef.current = false;
-      renderedMarkdownRef.current = null;
-      cleanup();
-      return;
-    }
 
-    if (viewMode !== 'map') return;
-    if (!markdown) return;
-    if (!viewportRef.current || !containerRef.current || initializedRef.current) return;
 
-    let cancelled = false;
 
-    const run = async () => {
-      try {
-        await ensureKatexAssets();
-      } catch (error) {
-        console.error('Failed to load KaTeX assets when switching to map view', error);
-      }
-
-      if (cancelled) return;
-      if (!viewportRef.current || !containerRef.current || initializedRef.current) return;
-
-      initializeMindMap(markdown, viewportRef.current, containerRef.current);
-      renderedMarkdownRef.current = markdown;
-      initializedRef.current = true;
-    };
-
-    void run();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [viewMode, markdown]);
-
-  // Reset flashcard state when switching to a different mind map markdown
-  useEffect(() => {
-    if (!markdown) return;
-    setViewMode('map');
-    setGenerationError(null);
-    setFlashcardIndex(0);
-    // New generation: clear previous completion flag to avoid stale collapses
-    collapseRequestedRef.current = false;
-
-    if (!allowFlashcardToggle) {
-      setFlashcards(null);
-      setFlashcardsSavedId(null);
-      setIsCheckingFlashcards(false);
-      return;
-    }
-
-    const cached = flashcardsCacheRef.current.get(markdown);
-    setFlashcards(cached ?? null);
-    setFlashcardsSavedId(null);
-
-    (async () => {
-      if (cached) return;
-      try {
-        const hash = await computeSHA256Hex(markdown);
-        const key = getLocalDeckKey(hash);
-        const raw = typeof window !== 'undefined' ? window.localStorage.getItem(key) : null;
-        if (raw) {
-          const obj = JSON.parse(raw);
-          if (obj && Array.isArray(obj.cards) && obj.cards.length > 0) {
-            flashcardsCacheRef.current.set(markdown, obj.cards);
-            setFlashcards(obj.cards);
-            if (obj.id) setFlashcardsSavedId(String(obj.id));
-            return;
-          }
-        }
-      } catch {}
-
-      if (!userId) return;
-
-      setIsCheckingFlashcards(true);
-      try {
-        const title = getTitle(markdown);
-        const { data, error } = await supabase
-          .from('flashcards')
-          .select('id, cards')
-          .eq('user_id', userId)
-          .eq('title', title)
-          .order('created_at', { ascending: false })
-          .limit(1);
-        if (!error && Array.isArray(data) && data.length > 0) {
-          const record = data[0] as { id: string; cards: Flashcard[] };
-          if (Array.isArray(record.cards) && record.cards.length > 0) {
-            flashcardsCacheRef.current.set(markdown, record.cards);
-            setFlashcards(record.cards);
-            setFlashcardsSavedId(record.id);
-            try {
-              const hash = await computeSHA256Hex(markdown);
-              const key = getLocalDeckKey(hash);
-              const local = { id: record.id, title, cards: record.cards, created_at: new Date().toISOString() };
-              if (typeof window !== 'undefined') window.localStorage.setItem(key, JSON.stringify(local));
-            } catch {}
-          }
-        }
-      } catch (dbError) {
-        console.error('Failed to retrieve flashcards from database:', dbError);
-      } finally {
-        setIsCheckingFlashcards(false);
-      }
-    })();
-  }, [markdown, allowFlashcardToggle, userId]);
 
   if (!markdown) {
     return null;
@@ -1236,84 +892,52 @@ export default function MindMapModal({ markdown, onClose, onShareMindMap, onShar
       <div className={rootClassName} style={rootStyle}>
         <div className={containerClassName} style={{ backgroundColor: 'var(--color-background)' }}>
           <div className="absolute top-2 right-2 z-30 group inline-flex items-center gap-1.5">
-            {viewMode === 'map' ? (
-              <>
-                {allowFlashcardToggle && (
-                  <button
-                    onClick={flashcards ? () => setViewMode('flashcards') : handleGenerateFlashcards}
-                    className={`inline-flex items-center gap-1 px-4 py-1.5 rounded-full border border-border text-foreground hover:bg-muted/50 text-sm focus:outline-none min-w-[44px] transition-all duration-300 ease-in-out ${
-                      isGeneratingFlashcards
-                        ? 'opacity-100 translate-x-0 pointer-events-auto'
-                        : 'opacity-0 translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 pointer-events-none group-hover:pointer-events-auto'
-                    }`}
-                    style={{ backgroundColor: 'var(--color-background)' }}
-                    disabled={isGeneratingFlashcards}
-                  >
-                    {isGeneratingFlashcards ? (
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                    ) : (
-                      <FlashcardIcon className="h-4 w-4" />
-                    )}
-                  </button>
-                )}
-
-                <div className="relative">
-                  <div
-                    ref={triggerGroupRef}
-                    className="inline-flex rounded-full opacity-0 translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 ease-in-out pointer-events-none group-hover:pointer-events-auto"
-                  >
-                    <button
-                      onClick={() => setDropdownOpen(!isDropdownOpen)}
-                      className="inline-flex items-center gap-1 px-4 py-1.5 rounded-full border border-border text-foreground hover:bg-muted/50 text-sm focus:outline-none min-w-[44px]"
-                      style={{ backgroundColor: 'var(--color-background)' }}
-                      aria-haspopup="menu"
-                      aria-expanded={isDropdownOpen}
-                    >
-                      <Download className="h-4 w-4" />
-                      <svg className="h-4 w-4 ml-1 -mr-0.5" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" /></svg>
-                    </button>
-                  </div>
-
-                  {isDropdownOpen && (
-                    <div
-                      className="absolute right-0 mt-2 rounded-3xl shadow-sm z-20 border border-border p-2 min-w-[120px]"
-                      style={{
-                        backgroundColor: 'var(--color-background)',
-                        width: Math.max(dropdownWidth || 0, 120)
-                      }}
-                      role="menu"
-                    >
-                      <div className="flex flex-col gap-1.5">
-                        <button
-                          type="button"
-                          onClick={() => { posthog.capture('mindmap_exported', { format: 'png' }); handleDownload('png'); setDropdownOpen(false); }}
-                          className="w-full flex items-center gap-2 px-3 py-1.5 text-sm text-foreground hover:bg-muted rounded-xl focus:outline-none"
-                        >
-                          <FileImage className="h-4 w-4" /> PNG
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => { posthog.capture('mindmap_exported', { format: 'pdf' }); handleDownload('pdf'); setDropdownOpen(false); }}
-                          className="w-full flex items-center gap-2 px-3 py-1.5 text-sm text-foreground hover:bg-muted rounded-xl focus:outline-none"
-                        >
-                          <FileImage className="h-4 w-4" /> PDF
-                        </button>
-
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </>
-            ) : (
-              <button
-                onClick={() => setViewMode('map')}
-                className="inline-flex items-center justify-center w-8 h-8 rounded-full border border-border text-foreground hover:bg-muted/50 focus:outline-none opacity-100 translate-x-0 transition-all duration-300 ease-in-out"
-                style={{ backgroundColor: 'var(--color-background)' }}
-                aria-label="Back to Map"
+            <div className="relative">
+              <div
+                ref={triggerGroupRef}
+                className="inline-flex rounded-full opacity-0 translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 ease-in-out pointer-events-none group-hover:pointer-events-auto"
               >
-                <MapIcon className="h-4 w-4" />
-              </button>
-            )}
+                <button
+                  onClick={() => setDropdownOpen(!isDropdownOpen)}
+                  className="inline-flex items-center gap-1 px-4 py-1.5 rounded-full border border-border text-foreground hover:bg-muted/50 text-sm focus:outline-none min-w-[44px]"
+                  style={{ backgroundColor: 'var(--color-background)' }}
+                  aria-haspopup="menu"
+                  aria-expanded={isDropdownOpen}
+                >
+                  <Download className="h-4 w-4" />
+                  <svg className="h-4 w-4 ml-1 -mr-0.5" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" /></svg>
+                </button>
+              </div>
+
+              {isDropdownOpen && (
+                <div
+                  className="absolute right-0 mt-2 rounded-3xl shadow-sm z-20 border border-border p-2 min-w-[120px]"
+                  style={{
+                    backgroundColor: 'var(--color-background)',
+                    width: Math.max(dropdownWidth || 0, 120)
+                  }}
+                  role="menu"
+                >
+                  <div className="flex flex-col gap-1.5">
+                    <button
+                      type="button"
+                      onClick={() => { posthog.capture('mindmap_exported', { format: 'png' }); handleDownload('png'); setDropdownOpen(false); }}
+                      className="w-full flex items-center gap-2 px-3 py-1.5 text-sm text-foreground hover:bg-muted rounded-xl focus:outline-none"
+                    >
+                      <FileImage className="h-4 w-4" /> PNG
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => { posthog.capture('mindmap_exported', { format: 'pdf' }); handleDownload('pdf'); setDropdownOpen(false); }}
+                      className="w-full flex items-center gap-2 px-3 py-1.5 text-sm text-foreground hover:bg-muted rounded-xl focus:outline-none"
+                    >
+                      <FileImage className="h-4 w-4" /> PDF
+                    </button>
+
+                  </div>
+                </div>
+              )}
+            </div>
 
             {onShareMindMap && (
               <ShareTriggerButton
@@ -1343,34 +967,14 @@ export default function MindMapModal({ markdown, onClose, onShareMindMap, onShar
             )}
           </div>
 
-          {/* White overlay to fully cover mind map when in flashcards mode */}
-          {allowFlashcardToggle && viewMode === 'flashcards' && (
-            <div className="absolute inset-0 z-10" style={{ backgroundColor: 'var(--color-background)' }} />
-          )}
-
           <div className="w-full h-full relative">
             <div
               ref={viewportRef}
-              className={`map-viewport w-full h-full flex-grow z-0 ${viewMode === 'flashcards' ? 'hidden' : ''}`}
+              className="map-viewport w-full h-full flex-grow z-0"
               style={{ backgroundColor: 'var(--color-background)' }}
             >
               <div ref={containerRef} id="mindmap-container" />
             </div>
-            {allowFlashcardToggle && viewMode === 'flashcards' && (
-              <FlashcardsModal
-                open={true}
-                title={getTitle(markdown) || undefined}
-                cards={flashcards}
-                isGenerating={isGeneratingFlashcards}
-                error={generationError || undefined}
-                onClose={() => setViewMode('map')}
-                deckId={flashcardsSavedId || undefined}
-                initialIndex={flashcardIndex}
-                onShare={flashcardsSavedId && onShareFlashcards ? () => onShareFlashcards(flashcardsSavedId, getTitle(markdown) || null) : undefined}
-                isPaidUser={isPaidUser}
-                onRequireUpgrade={onRequireUpgrade}
-              />
-            )}
           </div>
         </div>
 
@@ -1381,7 +985,7 @@ export default function MindMapModal({ markdown, onClose, onShareMindMap, onShar
             <div className="border p-8 rounded-2xl shadow-xl max-w-md w-full text-center relative z-10" style={{ backgroundColor: 'var(--color-background)' }}>
               <h2 className="text-2xl font-bold mb-4">Don't Lose Your Mind Map!</h2>
               <p className="text-muted-foreground mb-6">
-                Sign up to save your mind map, and track your study progress with spaced repetition flashcards.
+                Sign up to save your mind map and access it anytime, anywhere.
               </p>
               <div className="flex flex-col gap-3 w-full max-w-md">
                 <button
@@ -1414,7 +1018,7 @@ export default function MindMapModal({ markdown, onClose, onShareMindMap, onShar
             <div className="border p-8 rounded-2xl shadow-xl max-w-md w-full text-center relative z-10" style={{ backgroundColor: 'var(--color-background)' }}>
               <h2 className="text-2xl font-bold mb-4">Sign Up to Save Your Mind Map!</h2>
               <p className="text-muted-foreground mb-6">
-                Sign up to continue reading and track your study progress with spaced repetition flashcards.
+                Sign up to continue reading and save your mind map.
               </p>
               <div className="flex flex-col gap-3 w-full max-w-md">
                 <button

@@ -223,13 +223,12 @@ interface Flashcard {
 
 function buildFlashcardPrompt(opts: {
   mode: 'stream' | 'json';
-  sourceType: 'markmap' | 'text';
   sourceContent: string;
   userInstruction?: string;
   imagesCount?: number;
   numCards?: number;
 }): string {
-  const { mode, sourceType, sourceContent, userInstruction, imagesCount } = opts;
+  const { mode, sourceContent, userInstruction, imagesCount } = opts;
   const userLine = userInstruction ? `\nAdditional user instruction: ${userInstruction}` : '';
   const imagesNote = imagesCount && imagesCount > 0
     ? `You are also provided ${imagesCount} image(s). Carefully read text inside the images (OCR) and analyze diagrams to extract key concepts.`
@@ -250,14 +249,9 @@ function buildFlashcardPrompt(opts: {
 - JSON schema:
   { "title": string, "cards": [ { "question": string, "answer": string } ] }`;
 
-  const scopeLine = sourceType === 'markmap'
-    ? `You will be given a mind map described in Markmap-compatible Markdown. Generate high-quality active-recall flashcards that help a learner master the content.`
-    : `You will be given source content. Generate high-quality active-recall flashcards that help a learner master the content.`;
+  const scopeLine = `You will be given source content. Generate high-quality active-recall flashcards that help a learner master the content.`;
 
-  const languageAndCount = sourceType === 'markmap'
-    ? `- Produce about 20 to 100 cards depending on content size.
-- The flashcards MUST be in the same language as the mind map.`
-    : `- Produce about 20 to 100 cards depending on content size.
+  const languageAndCount = `- Produce about 20 to 100 cards depending on content size.
 - The flashcards MUST be in the same language as the source content.`;
 
   const body = `You are an expert instructional designer.
@@ -283,7 +277,7 @@ ${outputFormat}
 ${languageAndCount}
 ${imagesNote ? `- ${imagesNote}` : ''}
 
-${sourceType === 'markmap' ? 'Mind map (Markmap Markdown):' : 'Source content:'}\n---\n${sourceContent}\n---`;
+Source content:\n---\n${sourceContent}\n---`;
 
   return body;
 }
@@ -873,11 +867,11 @@ export async function POST(req: NextRequest) {
     };
 
     if (contentType.includes('application/json')) {
-      // Enhanced JSON path: supports either { markdown } OR { text, images?, prompt?, numCards? }
-      let body: { markdown?: string; numCards?: number; text?: string; images?: string[]; prompt?: string; rawCharCount?: number; model?: string } | null = null;
+      // JSON path: supports { text, images?, prompt?, numCards? }
+      let body: { numCards?: number; text?: string; images?: string[]; prompt?: string; rawCharCount?: number; model?: string } | null = null;
 
       try {
-        body = await req.json() as { markdown?: string; numCards?: number; text?: string; images?: string[]; prompt?: string; rawCharCount?: number; model?: string } | null;
+        body = await req.json() as { numCards?: number; text?: string; images?: string[]; prompt?: string; rawCharCount?: number; model?: string } | null;
       } catch (jsonError) {
         return NextResponse.json({
           error: 'Invalid JSON',
@@ -889,18 +883,17 @@ export async function POST(req: NextRequest) {
       if (!body) {
         return NextResponse.json({
           error: 'Empty request body',
-          message: 'The request body is empty. Please provide markdown, text, images, or a prompt.',
+          message: 'The request body is empty. Please provide text, images, or a prompt.',
           code: 'EMPTY_REQUEST'
         }, { status: 400 });
       }
 
-      const hasMarkdown = typeof body.markdown === 'string' && body.markdown.trim().length > 0;
       const hasTextPayload = (typeof body.text === 'string' && body.text.trim().length > 0) || (Array.isArray(body.images) && body.images.length > 0) || (typeof body.prompt === 'string' && body.prompt.trim().length > 0);
 
-      if (!hasMarkdown && !hasTextPayload) {
+      if (!hasTextPayload) {
         return NextResponse.json({
           error: 'No content provided',
-          message: 'Please provide either markdown content or text/images/prompt content to process.',
+          message: 'Please provide text, images, or prompt content to process.',
           code: 'NO_CONTENT'
         }, { status: 400 });
       }
@@ -932,94 +925,6 @@ export async function POST(req: NextRequest) {
         } catch (creditError) {
           console.warn('Failed to ensure free monthly credits:', creditError);
           // Continue processing - don't fail the request for credit setup issues
-        }
-      }
-
-      if (hasMarkdown) {
-        const totalRawChars = body.markdown!.length;
-        const multiplier = MODEL_CREDIT_MULTIPLIERS[modelChoice] ?? 1;
-        const creditsNeeded = Number((((totalRawChars > 0 ? (totalRawChars / ONE_CREDIT_CHARS) : 0)) * multiplier).toFixed(3));
-        if (userIdForCredits && creditsNeeded > 0) {
-          const currentCredits = await getCurrentCredits(userIdForCredits);
-          if (currentCredits === null) {
-            return NextResponse.json({
-              error: 'Credits service unavailable',
-              message: 'Unable to check your credit balance. Please try again later.',
-              code: 'CREDITS_SERVICE_ERROR'
-            }, { status: 503 });
-          }
-
-          if (currentCredits < creditsNeeded) {
-            const shortfall = creditsNeeded - currentCredits;
-            return NextResponse.json({
-              error: 'Insufficient credits',
-              message: `You need ${creditsNeeded.toFixed(1)} credits but only have ${currentCredits.toFixed(1)}. Please upload a smaller file or upgrade your plan.`,
-              code: 'INSUFFICIENT_CREDITS',
-              creditsNeeded: creditsNeeded,
-              creditsAvailable: currentCredits,
-              shortfall: shortfall
-            }, { status: 402 });
-          }
-
-          const ok = await deductCredits(userIdForCredits, creditsNeeded);
-          if (!ok) {
-            return NextResponse.json({
-              error: 'Credit deduction failed',
-              message: 'Failed to deduct credits from your account. Please try again.',
-              code: 'CREDIT_DEDUCTION_ERROR'
-            }, { status: 500 });
-          }
-        }
-        if (shouldStream) {
-          const streamingPrompt = buildFlashcardPrompt({ mode: 'stream', sourceType: 'markmap', sourceContent: body.markdown!, numCards: body.numCards });
-
-          logLlmInput('FLASHCARDS MARKDOWN STREAMING LLM INPUT', streamingPrompt, modelChoice);
-
-          return streamNdjson(
-            streamingPrompt,
-            modelChoice,
-            (userIdForCredits && creditsNeeded > 0) ? { userId: userIdForCredits, credits: creditsNeeded } : undefined,
-            undefined,
-            [],
-          );
-        }
-        const prompt = buildFlashcardPrompt({ mode: 'json', sourceType: 'markmap', sourceContent: body.markdown!, numCards: body.numCards });
-
-        logLlmInput('FLASHCARDS MARKDOWN NON-STREAMING LLM INPUT', prompt, modelChoice);
-        try {
-          const result = await generateJsonFromModel(prompt, modelChoice);
-          return NextResponse.json(result);
-        } catch (e) {
-          console.error('Flashcard generation error:', e);
-          if (e instanceof Error) {
-            if (e.message.includes('No content returned')) {
-              return NextResponse.json({
-                error: 'No content generated',
-                message: 'The AI service returned no content. Please try again with different content.',
-                code: 'NO_CONTENT_GENERATED'
-              }, { status: 502 });
-            }
-            if (e.message.includes('Failed to generate flashcards')) {
-              return NextResponse.json({
-                error: 'Generation failed',
-                message: 'Unable to generate flashcards from the provided content. Please try with different content.',
-                code: 'GENERATION_FAILED'
-              }, { status: 502 });
-            }
-            if (e.message.includes('Model response was not valid JSON')) {
-              return NextResponse.json({
-                error: 'Invalid response format',
-                message: 'The AI service returned an invalid response. Please try again.',
-                code: 'INVALID_RESPONSE_FORMAT'
-              }, { status: 502 });
-            }
-          }
-          const sanitizedMessage = e instanceof Error ? e.message.replace(/API key|token|secret/gi, '[REDACTED]') : 'Unknown error occurred';
-          return NextResponse.json({
-            error: 'Flashcard generation failed',
-            message: sanitizedMessage.length > 200 ? sanitizedMessage.substring(0, 200) + '...' : sanitizedMessage,
-            code: 'FLASHCARD_GENERATION_ERROR'
-          }, { status: 502 });
         }
       }
 
@@ -1096,7 +1001,7 @@ export async function POST(req: NextRequest) {
           code: 'INVALID_IMAGE_URLS'
         }, { status: 400 });
       }
-      const streamingPrompt = buildFlashcardPrompt({ mode: shouldStream ? 'stream' : 'json', sourceType: 'text', sourceContent: text || 'No text provided. Analyze the attached image(s) only and build flashcards from their content.', userInstruction: promptText, imagesCount: images.length, numCards: body.numCards });
+      const streamingPrompt = buildFlashcardPrompt({ mode: shouldStream ? 'stream' : 'json', sourceContent: text || 'No text provided. Analyze the attached image(s) only and build flashcards from their content.', userInstruction: promptText, imagesCount: images.length, numCards: body.numCards });
 
       logLlmInput('FLASHCARDS PRE-PARSED LLM INPUT', streamingPrompt, modelChoice);
       const userContent: any = validImages.length > 0
@@ -1308,7 +1213,6 @@ export async function POST(req: NextRequest) {
     if (shouldStream) {
       const prompt = buildFlashcardPrompt({
         mode: 'stream',
-        sourceType: 'text',
         sourceContent: extractedText || 'No text provided. Analyze the attached image(s) only and build flashcards from their content.',
         userInstruction: promptText,
         imagesCount: imageParts.length,
@@ -1353,7 +1257,6 @@ export async function POST(req: NextRequest) {
     // Non-streaming JSON
     const prompt = buildFlashcardPrompt({
       mode: 'json',
-      sourceType: 'text',
       sourceContent: extractedText || 'No text provided. Analyze the attached image(s) only and build flashcards from their content.',
       userInstruction: promptText,
       imagesCount: imageParts.length,
