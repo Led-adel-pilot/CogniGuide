@@ -117,10 +117,14 @@ create table public.flashcards (
   markdown text not null,
   cards jsonb not null,
   created_at timestamp with time zone not null default now(),
+  mindmap_id uuid null,
   constraint flashcards_pkey primary key (id),
+  constraint flashcards_mindmap_id_fkey foreign KEY (mindmap_id) references mindmaps (id) on delete set null,
   constraint flashcards_user_id_fkey foreign KEY (user_id) references auth.users (id) on delete CASCADE,
   constraint flashcards_cards_is_array check ((jsonb_typeof(cards) = 'array'::text))
 ) TABLESPACE pg_default;
+
+create index IF not exists flashcards_mindmap_id_idx on public.flashcards using btree (mindmap_id) TABLESPACE pg_default;
 
 create index IF not exists flashcards_user_id_created_at_idx on public.flashcards using btree (user_id, created_at desc) TABLESPACE pg_default;
 ```

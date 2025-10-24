@@ -106,9 +106,12 @@ type Props = {
   isPaidUser?: boolean;
   onRequireUpgrade?: () => void;
   mindMapModelChoice?: ModelChoice;
+  linkedMindMapId?: string | null;
+  linkedMindMapMarkdown?: string | null;
+  onMindMapLinked?: (mindmapId: string | null, markdown: string | null) => void;
 };
 
-export default function FlashcardsModal({ open, title, cards, isGenerating = false, error, onClose, onReviewDueCards, deckId, initialIndex, studyDueOnly = false, studyInterleaved = false, interleavedDecks, dueIndices, isEmbedded = false, onShare, isPaidUser = false, onRequireUpgrade, mindMapModelChoice = 'fast' }: Props) {
+export default function FlashcardsModal({ open, title, cards, isGenerating = false, error, onClose, onReviewDueCards, deckId, initialIndex, studyDueOnly = false, studyInterleaved = false, interleavedDecks, dueIndices, isEmbedded = false, onShare, isPaidUser = false, onRequireUpgrade, mindMapModelChoice = 'fast', linkedMindMapId, linkedMindMapMarkdown, onMindMapLinked }: Props) {
   const [index, setIndex] = React.useState(0);
   const [showAnswer, setShowAnswer] = React.useState(false);
   const [showExplanation, setShowExplanation] = React.useState(false);
@@ -116,7 +119,9 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
   const [isExplaining, setIsExplaining] = React.useState(false);
   const [explanationError, setExplanationError] = React.useState<string | null>(null);
   const [isMindMapModalOpen, setIsMindMapModalOpen] = React.useState(false);
-  const [mindMapMarkdown, setMindMapMarkdown] = React.useState<string | null>(null);
+  const [mindMapMarkdown, setMindMapMarkdown] = React.useState<string | null>(linkedMindMapMarkdown ?? null);
+  const [persistedMindMapId, setPersistedMindMapId] = React.useState<string | null>(linkedMindMapId ?? null);
+  const [persistedMindMapMarkdown, setPersistedMindMapMarkdown] = React.useState<string | null>(linkedMindMapMarkdown ?? null);
   const [mindMapError, setMindMapError] = React.useState<string | null>(null);
   const [isMindMapGenerating, setIsMindMapGenerating] = React.useState(false);
   const [activeMindMapRequestId, setActiveMindMapRequestId] = React.useState<number | null>(null);
@@ -179,6 +184,62 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
     if (typeof title === 'string' && title.trim().length > 0) return title.trim();
     return 'mindmap';
   }, [title]);
+
+  React.useEffect(() => {
+    setPersistedMindMapId(linkedMindMapId ?? null);
+  }, [deckId, linkedMindMapId]);
+
+  React.useEffect(() => {
+    setPersistedMindMapMarkdown(linkedMindMapMarkdown ?? null);
+  }, [deckId, linkedMindMapId, linkedMindMapMarkdown]);
+
+  React.useEffect(() => {
+    setMindMapMarkdown(linkedMindMapMarkdown ?? null);
+  }, [deckId, linkedMindMapId, linkedMindMapMarkdown]);
+
+  const persistMindMapLink = React.useCallback(
+    async (markdownText: string) => {
+      if (!userId) return null;
+      try {
+        const insertTitle = deriveMindMapTitle(markdownText);
+        const { data: inserted, error: insertError } = await supabase
+          .from('mindmaps')
+          .insert({ user_id: userId, title: insertTitle, markdown: markdownText })
+          .select('id')
+          .single();
+
+        if (insertError) throw insertError;
+        const newId = inserted && typeof inserted.id === 'string' ? inserted.id : null;
+        if (newId) {
+          setPersistedMindMapId(newId);
+          setPersistedMindMapMarkdown(markdownText);
+          if (deckId && deckId !== 'interleaved-session') {
+            try {
+              await supabase
+                .from('flashcards')
+                .update({ mindmap_id: newId, markdown: markdownText })
+                .eq('id', deckId);
+            } catch (updateError) {
+              console.error('Failed to link mind map to flashcards deck:', updateError);
+            }
+          }
+          try {
+            onMindMapLinked?.(newId, markdownText);
+          } catch (callbackError) {
+            console.error('Failed to notify parent about linked mind map:', callbackError);
+          }
+          if (typeof window !== 'undefined') {
+            window.dispatchEvent(new CustomEvent('cogniguide:generation-complete'));
+          }
+        }
+        return newId;
+      } catch (persistError) {
+        console.error('Failed to persist generated mind map:', persistError);
+        return null;
+      }
+    },
+    [deckId, deriveMindMapTitle, onMindMapLinked, userId],
+  );
 
   const handleExplain = React.useCallback(async () => {
     if (!isPaidUser) {
@@ -287,11 +348,61 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
       return;
     }
 
-    const hasExisting = typeof mindMapMarkdown === 'string' && mindMapMarkdown.trim().length > 0;
-    if (hasExisting) {
+    const trimmedCurrentMarkdown = typeof mindMapMarkdown === 'string' ? mindMapMarkdown.trim() : '';
+    if (trimmedCurrentMarkdown.length > 0) {
       setMindMapError(null);
       setIsMindMapModalOpen(true);
       return;
+    }
+
+    const trimmedPersistedMarkdown = typeof persistedMindMapMarkdown === 'string' ? persistedMindMapMarkdown.trim() : '';
+    if (trimmedPersistedMarkdown.length > 0) {
+      setMindMapError(null);
+      setMindMapMarkdown(persistedMindMapMarkdown);
+      setIsMindMapModalOpen(true);
+      return;
+    }
+
+    if (persistedMindMapId && !persistedMindMapMarkdown) {
+      try {
+        const { data, error } = await supabase
+          .from('mindmaps')
+          .select('markdown')
+          .eq('id', persistedMindMapId)
+          .maybeSingle();
+
+        const fetchedMarkdown = data && typeof data.markdown === 'string' ? data.markdown : null;
+        if (!error && fetchedMarkdown && fetchedMarkdown.trim().length > 0) {
+          setPersistedMindMapMarkdown(fetchedMarkdown);
+          setMindMapMarkdown(fetchedMarkdown);
+          setMindMapError(null);
+          setIsMindMapModalOpen(true);
+          try {
+            onMindMapLinked?.(persistedMindMapId, fetchedMarkdown);
+          } catch (callbackError) {
+            console.error('Failed to notify parent about fetched mind map:', callbackError);
+          }
+          return;
+        }
+      } catch (loadError) {
+        console.error('Failed to load linked mind map:', loadError);
+      }
+
+      setPersistedMindMapId(null);
+      setPersistedMindMapMarkdown(null);
+      setMindMapMarkdown(null);
+      try {
+        onMindMapLinked?.(null, null);
+      } catch (callbackError) {
+        console.error('Failed to notify parent about removed mind map link:', callbackError);
+      }
+      if (deckId && deckId !== 'interleaved-session') {
+        try {
+          await supabase.from('flashcards').update({ mindmap_id: null, markdown: '' }).eq('id', deckId);
+        } catch (clearError) {
+          console.error('Failed to clear stale mind map link:', clearError);
+        }
+      }
     }
 
     const requestId = mindMapRequestRef.current + 1;
@@ -437,13 +548,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
       }
 
       if (userId) {
-        try {
-          const insertTitle = deriveMindMapTitle(finalMarkdown);
-          await supabase.from('mindmaps').insert({ user_id: userId, title: insertTitle, markdown: finalMarkdown });
-          if (typeof window !== 'undefined') window.dispatchEvent(new CustomEvent('cogniguide:generation-complete'));
-        } catch (insertError) {
-          console.error('Failed to save generated mind map:', insertError);
-        }
+        await persistMindMapLink(finalMarkdown);
 
         try {
           const { data: creditsData } = await supabase
@@ -476,7 +581,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
         setActiveMindMapRequestId(null);
       }
     }
-  }, [cards, deckId, deriveMindMapTitle, mindMapMarkdown, mindMapModelChoice, onRequireUpgrade, title, userId, isMindMapGenerating, dispatchMindMapStreamUpdate]);
+  }, [cards, deckId, dispatchMindMapStreamUpdate, isMindMapGenerating, mindMapMarkdown, mindMapModelChoice, onRequireUpgrade, persistedMindMapId, persistedMindMapMarkdown, persistMindMapLink, title, userId]);
 
   const renderMath = React.useCallback((isCancelled?: () => boolean) => {
     if (typeof window === 'undefined') return;
@@ -1126,6 +1231,12 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
   if (!open && !isEmbedded) return null;
 
   const ModalContent = () => {
+    const resolvedMindMapContent = (() => {
+      if (mindMapMarkdown && mindMapMarkdown.trim().length > 0) return mindMapMarkdown;
+      if (persistedMindMapMarkdown && persistedMindMapMarkdown.trim().length > 0) return persistedMindMapMarkdown;
+      return null;
+    })();
+    const hasMindMapAvailable = Boolean(resolvedMindMapContent) || Boolean(persistedMindMapId);
     const dueAgainCount = dueNowIndices.length;
     const hasImmediateDue = dueAgainCount > 0;
     const dueAgainText = dueAgainCount === 1 ? '1 card is already due for review' : `${dueAgainCount} cards are already due for review`;
@@ -1149,7 +1260,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
               disabled={isMindMapGenerating}
               className="inline-flex items-center gap-2 h-8 px-3 rounded-full border border-border bg-background text-sm font-medium text-foreground hover:bg-muted/50 dark:hover:bg-muted/80 disabled:opacity-60 disabled:cursor-not-allowed focus:outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400/50"
             >
-              {isMindMapGenerating ? <Loader2 className="h-4 w-4 animate-spin" /> : (mindMapMarkdown && mindMapMarkdown.trim().length > 0 ? <MapIcon className="h-4 w-4" /> : <Sparkles className="h-4 w-4" />)}
+              {isMindMapGenerating ? <Loader2 className="h-4 w-4 animate-spin" /> : hasMindMapAvailable ? <MapIcon className="h-4 w-4" /> : <Sparkles className="h-4 w-4" />}
               <span>Mind map</span>
             </button>
           )}
@@ -1594,7 +1705,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
       </div>
       {isMindMapModalOpen && (
         <MindMapModal
-          markdown={mindMapMarkdown}
+          markdown={mindMapMarkdown ?? persistedMindMapMarkdown}
           onClose={handleBackToFlashcardsView}
           onBackToFlashcards={handleBackToFlashcardsView}
           disableSignupPrompts
@@ -1603,7 +1714,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
           isPaidUser={isPaidUser}
         />
       )}
-      {isMindMapModalOpen && !mindMapMarkdown && isMindMapGenerating && (
+      {isMindMapModalOpen && !mindMapMarkdown && !persistedMindMapMarkdown && isMindMapGenerating && (
         <div className="fixed inset-0 z-[120] flex items-center justify-center bg-background/90 backdrop-blur-sm">
           <div className="flex flex-col items-center gap-3 text-sm text-muted-foreground">
             <Loader2 className="h-6 w-6 animate-spin" />

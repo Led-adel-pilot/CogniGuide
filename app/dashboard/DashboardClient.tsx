@@ -141,7 +141,7 @@ export default function DashboardClient() {
   // Sidebar combined history (paginated)
   const [combinedHistory, setCombinedHistory] = useState<Array<
     | { type: 'mindmap'; id: string; title: string | null; created_at: string; markdown: string }
-    | { type: 'flashcards'; id: string; title: string | null; created_at: string; cards: FlashcardType[] }
+    | { type: 'flashcards'; id: string; title: string | null; created_at: string; cards: FlashcardType[]; mindmap_id: string | null; markdown: string | null }
   >>([]);
   // Pagination state
   const PAGE_SIZE = 10;
@@ -151,7 +151,7 @@ export default function DashboardClient() {
   const [hasMoreFc, setHasMoreFc] = useState(true);
   const [historyBuffer, setHistoryBuffer] = useState<Array<
     | { type: 'mindmap'; id: string; title: string | null; created_at: string; markdown: string }
-    | { type: 'flashcards'; id: string; title: string | null; created_at: string; cards: FlashcardType[] }
+    | { type: 'flashcards'; id: string; title: string | null; created_at: string; cards: FlashcardType[]; mindmap_id: string | null; markdown: string | null }
   >>([]);
   const [isHistoryInitialLoading, setIsHistoryInitialLoading] = useState(true);
   const [isHistoryLoadingMore, setIsHistoryLoadingMore] = useState(false);
@@ -160,6 +160,8 @@ export default function DashboardClient() {
   const [flashcardsTitle, setFlashcardsTitle] = useState<string | null>(null);
   const [flashcardsCards, setFlashcardsCards] = useState<FlashcardType[] | null>(null);
   const [flashcardsError, setFlashcardsError] = useState<string | null>(null);
+  const [activeDeckMindMapId, setActiveDeckMindMapId] = useState<string | null>(null);
+  const [activeDeckMindMapMarkdown, setActiveDeckMindMapMarkdown] = useState<string | null>(null);
   const [credits, setCredits] = useState<number>(0);
   const [selectedModel, setSelectedModel] = useState<ModelChoice>('fast');
   const [userTier, setUserTier] = useState<'free' | 'paid'>('free');
@@ -201,7 +203,7 @@ export default function DashboardClient() {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isPricingModalOpen, setIsPricingModalOpen] = useState(false);
   const [spacedOpen, setSpacedOpen] = useState(false);
-  const [dueQueue, setDueQueue] = useState<Array<{ id: string; title: string | null; cards: FlashcardType[] }>>([]);
+  const [dueQueue, setDueQueue] = useState<Array<{ id: string; title: string | null; cards: FlashcardType[]; mindmap_id?: string | null; mindmap_markdown?: string | null }>>([]);
   const [studyDueOnly, setStudyDueOnly] = useState(false);
   const [studyInterleaved, setStudyInterleaved] = useState(false);
   const [dueIndices, setDueIndices] = useState<number[] | undefined>(undefined);
@@ -288,6 +290,44 @@ export default function DashboardClient() {
   useEffect(() => { historyBufferRef.current = historyBuffer; }, [historyBuffer]);
   useEffect(() => { hasMoreMmRef.current = hasMoreMm; }, [hasMoreMm]);
   useEffect(() => { hasMoreFcRef.current = hasMoreFc; }, [hasMoreFc]);
+const handleMindMapLinked = useCallback(
+  (mindmapId: string | null, markdownValue: string | null) => {
+    setActiveDeckMindMapId(mindmapId);
+    setActiveDeckMindMapMarkdown(markdownValue);
+    const deckId = activeDeckId;
+    if (!deckId || deckId === 'interleaved-session') {
+      return;
+    }
+
+    const updateCombinedItems = <T extends { type: string; id: string }>(items: T[]) =>
+      items.map((item) => {
+        if (item.type !== 'flashcards' || item.id !== deckId) return item;
+        return { ...item, mindmap_id: mindmapId ?? null, markdown: markdownValue ?? null } as T;
+      }) as T[];
+
+    setCombinedHistory((prev) => updateCombinedItems(prev));
+    setHistoryBuffer((prev) => {
+      const next = updateCombinedItems(prev);
+      historyBufferRef.current = next;
+      return next;
+    });
+    setFlashcardsHistory((prev) =>
+      prev.map((item) =>
+        item.id === deckId
+          ? { ...item, mindmap_id: mindmapId ?? null, markdown: markdownValue ?? null }
+          : item,
+      ),
+    );
+    setDueQueue((prev) =>
+      prev.map((deck) =>
+        deck.id === deckId
+          ? { ...deck, mindmap_id: mindmapId ?? null, mindmap_markdown: markdownValue ?? null }
+          : deck,
+      ),
+    );
+  },
+  [activeDeckId],
+);
   useEffect(() => {
     if (shareItem) {
       const key = `${shareItem.type}:${shareItem.id}`;
@@ -1230,6 +1270,8 @@ export default function DashboardClient() {
       title: f.title,
       created_at: f.created_at,
       cards: (f.cards as any) as FlashcardType[],
+      mindmap_id: f.mindmap_id ?? null,
+      markdown: f.markdown ?? null,
     }));
   };
 
@@ -1319,7 +1361,15 @@ export default function DashboardClient() {
         const fcArr = (!fc.error && fc.data ? (fc.data as any as FlashcardsRecord[]) : []);
         const merged = mergeAndSort([
           ...mmArr.map((m) => ({ type: 'mindmap' as const, id: m.id, title: m.title, created_at: m.created_at, markdown: m.markdown })),
-          ...fcArr.map((f) => ({ type: 'flashcards' as const, id: f.id, title: f.title, created_at: f.created_at, cards: (f.cards as any) as FlashcardType[] })),
+          ...fcArr.map((f) => ({
+            type: 'flashcards' as const,
+            id: f.id,
+            title: f.title,
+            created_at: f.created_at,
+            cards: (f.cards as any) as FlashcardType[],
+            mindmap_id: f.mindmap_id ?? null,
+            markdown: f.markdown ?? null,
+          })),
         ]).slice(0, PAGE_SIZE);
         setCombinedHistory(merged);
       } catch {}
@@ -1423,7 +1473,7 @@ export default function DashboardClient() {
         dueMap[deckId] = dIdx;
         totalDue += dIdx.length;
         if (!isCancelled && dIdx.length > 0) {
-          queue.push({ id: deckId, title: f.title, cards: cardsArr });
+          queue.push({ id: deckId, title: f.title, cards: cardsArr, mindmap_id: f.mindmap_id ?? null, mindmap_markdown: f.markdown ?? null });
         }
       }
       if (bulkToSave.length > 0) {
@@ -1491,7 +1541,7 @@ export default function DashboardClient() {
       }
       dueMap[deckId] = dIdx;
       totalDue += dIdx.length;
-      if (!isCancelled && dIdx.length > 0) queue.push({ id: deckId, title: f.title, cards: cardsArr });
+      if (!isCancelled && dIdx.length > 0) queue.push({ id: deckId, title: f.title, cards: cardsArr, mindmap_id: f.mindmap_id ?? null, mindmap_markdown: f.markdown ?? null });
     }
     setDueQueue(queue);
     if (typeof window !== 'undefined') {
@@ -1760,6 +1810,8 @@ export default function DashboardClient() {
                         // Attach a temporary symbol on cards array to carry deck id into modal
                         const arr = (item.cards as FlashcardType[]) as any;
                         (arr as any).__deckId = item.id;
+                        setActiveDeckMindMapId(item.mindmap_id ?? null);
+                        setActiveDeckMindMapMarkdown(item.markdown ?? null);
                         setActiveDeckId(item.id);
                         setFlashcardsCards(arr as FlashcardType[]);
                         setFlashcardsError(null);
@@ -2061,7 +2113,18 @@ export default function DashboardClient() {
         cards={flashcardsCards}
         isGenerating={false}
         error={flashcardsError}
-        onClose={() => { setFlashcardsOpen(false); setFlashcardsCards(null); setFlashcardsError(null); setStudyDueOnly(false); setStudyInterleaved(false); setDueIndices(undefined); setInitialDueIndex(undefined); setActiveDeckId(undefined); }}
+        onClose={() => {
+          setFlashcardsOpen(false);
+          setFlashcardsCards(null);
+          setFlashcardsError(null);
+          setStudyDueOnly(false);
+          setStudyInterleaved(false);
+          setDueIndices(undefined);
+          setInitialDueIndex(undefined);
+          setActiveDeckId(undefined);
+          setActiveDeckMindMapId(null);
+          setActiveDeckMindMapMarkdown(null);
+        }}
         onReviewDueCards={(indices) => {
           if (!indices || indices.length === 0) {
             return;
@@ -2081,6 +2144,9 @@ export default function DashboardClient() {
         isPaidUser={isPaidUser}
         onRequireUpgrade={() => setIsPricingModalOpen(true)}
         mindMapModelChoice={selectedModel}
+        linkedMindMapId={activeDeckMindMapId}
+        linkedMindMapMarkdown={activeDeckMindMapMarkdown}
+        onMindMapLinked={handleMindMapLinked}
       />
       <PricingModal
         isOpen={isPricingModalOpen}
@@ -2185,6 +2251,8 @@ export default function DashboardClient() {
 
                       setFlashcardsTitle(interleavedDeck.title);
                       setFlashcardsCards(interleavedDeck.cards as any); // cast needed due to deckId
+                      setActiveDeckMindMapId(null);
+                      setActiveDeckMindMapMarkdown(null);
                       setActiveDeckId(interleavedDeck.id);
                       setStudyDueOnly(true); // to enable SR logic
                       setStudyInterleaved(true);
@@ -2230,7 +2298,11 @@ export default function DashboardClient() {
                             deck_id: f.id,
                             due_card_count: list.length,
                           });
-                          const arr = f.cards as any; (arr as any).__deckId = f.id; setActiveDeckId(f.id);
+                          const arr = f.cards as any;
+                          (arr as any).__deckId = f.id;
+                          setActiveDeckMindMapId(f.mindmap_id ?? null);
+                          setActiveDeckMindMapMarkdown(f.mindmap_markdown ?? null);
+                          setActiveDeckId(f.id);
                           setStudyDueOnly(true);
                           setDueIndices(list);
                           setInitialDueIndex(list[0] ?? 0);

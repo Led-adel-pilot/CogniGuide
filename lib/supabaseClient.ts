@@ -26,7 +26,8 @@ export type FlashcardsRecord = {
   id: string;
   user_id: string;
   title: string | null;
-  markdown: string; // source mindmap markdown snapshot
+  mindmap_id: string | null;
+  markdown: string | null; // linked mind map markdown snapshot
   cards: Array<{ question: string; answer: string }>; // stored as jsonb
   created_at: string;
 };
