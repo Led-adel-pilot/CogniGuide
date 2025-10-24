@@ -1179,7 +1179,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
           isEmbedded ? 'pb-8 sm:pb-10' : 'pb-4 sm:pb-6'
         } ${!isEmbedded ? 'h-full pt-14 sm:pt-4 md:pt-6' : 'h-auto pt-4 md:pt-6'}`}
       >
-        <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 items-center gap-2 sm:gap-3 px-4 sm:px-6 md:px-0 mt-10">
+        <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 items-center gap-2 sm:gap-3 px-4 sm:px-6 md:px-0 mt-4">
           <div className="text-center md:text-left text-sm font-medium truncate text-foreground">{studyInterleaved ? (current?.deckTitle || title) : (title || 'Flashcards')}</div>
           <div className="text-sm text-muted-foreground text-center hidden md:block">{hasCards ? (finished ? 'Completed' : studyDueOnly ? `${originalDueList.indexOf(index) + 1} / ${originalDueCount} due` : `${index + 1} / ${cards!.length}`) : ''}</div>
           <div className="justify-self-center md:justify-self-end">
@@ -1588,7 +1588,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
 
   return (
     <>
-      <div className="fixed inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center z-[90] p-3 font-sans">
+      <div className="fixed inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center z-[90] p-1 font-sans">
         <AuthModal open={showAuthModal} />
         <ModalContent />
       </div>
