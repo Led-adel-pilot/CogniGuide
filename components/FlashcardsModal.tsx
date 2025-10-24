@@ -9,7 +9,7 @@ import { loadDeckSchedule, saveDeckSchedule, loadDeckScheduleAsync, saveDeckSche
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import type { Components } from 'react-markdown';
-import { ChevronLeft, ChevronRight, Eye, Loader2, Lock, Map as MapIcon, X } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Eye, Loader2, Lock, Map as MapIcon, Sparkles, X } from 'lucide-react';
 import posthog from 'posthog-js';
 import { DatePicker } from '@/components/DatePicker';
 import { ensureKatexAssets } from '@/lib/katex-loader';
@@ -1149,7 +1149,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
               disabled={isMindMapGenerating}
               className="inline-flex items-center gap-2 h-8 px-3 rounded-full border border-border bg-background text-sm font-medium text-foreground hover:bg-muted/50 dark:hover:bg-muted/80 disabled:opacity-60 disabled:cursor-not-allowed focus:outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400/50"
             >
-              {isMindMapGenerating ? <Loader2 className="h-4 w-4 animate-spin" /> : <MapIcon className="h-4 w-4" />}
+              {isMindMapGenerating ? <Loader2 className="h-4 w-4 animate-spin" /> : (mindMapMarkdown && mindMapMarkdown.trim().length > 0 ? <MapIcon className="h-4 w-4" /> : <Sparkles className="h-4 w-4" />)}
               <span>Mind map</span>
             </button>
           )}

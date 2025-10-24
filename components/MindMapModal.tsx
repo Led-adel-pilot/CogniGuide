@@ -1325,9 +1325,11 @@ export default function MindMapModal({ markdown, onClose, onShareMindMap, onShar
             {onBackToFlashcards ? (
               <button
                 onClick={onBackToFlashcards}
-                className="inline-flex items-center gap-2 h-8 px-4 rounded-full border border-border text-sm font-medium text-foreground hover:bg-muted/50 focus:outline-none"
+                className="inline-flex items-center justify-center w-8 h-8 text-foreground rounded-full border border-border shadow-sm hover:bg-muted/50 focus:outline-none opacity-100 translate-x-0 transition-all duration-200 ease-in-out"
+                style={{ backgroundColor: 'var(--color-background)' }}
+                aria-label="Back to flashcards"
               >
-                <ChevronLeft className="h-4 w-4" /> Back to flashcards
+                <ChevronLeft className="h-4 w-4" />
               </button>
             ) : (
               <button
