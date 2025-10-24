@@ -2080,6 +2080,7 @@ export default function DashboardClient() {
         onShare={activeDeckId && activeDeckId !== 'interleaved-session' ? () => setShareItem({ id: activeDeckId, type: 'flashcards', title: flashcardsTitle ?? null }) : undefined}
         isPaidUser={isPaidUser}
         onRequireUpgrade={() => setIsPricingModalOpen(true)}
+        mindMapModelChoice={selectedModel}
       />
       <PricingModal
         isOpen={isPricingModalOpen}

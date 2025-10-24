@@ -1,11 +1,13 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import dynamic from 'next/dynamic';
 import { initializeMindMap, cleanup, getFullMindMapBounds, updateMindMap, recommendPrintScaleMultiplier, getPrintZoomBias, collapseToMainBranches } from '@/lib/markmap-renderer';
 import { ensureKatexAssets } from '@/lib/katex-loader';
-import { Download, X, FileImage, Loader2, Map as MapIcon } from 'lucide-react';
+import { Download, X, FileImage, Loader2, Map as MapIcon, ChevronLeft } from 'lucide-react';
 import FlashcardIcon from '@/components/FlashcardIcon';
-import FlashcardsModal from '@/components/FlashcardsModal';
+
+const FlashcardsModal = dynamic(() => import('@/components/FlashcardsModal'), { ssr: false });
 import ShareTriggerButton from '@/components/ShareTriggerButton';
 import { toSvg, toPng } from 'html-to-image';
 import { supabase } from '@/lib/supabaseClient';
@@ -21,10 +23,20 @@ interface MindMapModalProps {
   onShareFlashcards?: (deckId: string, title: string | null) => void;
   isPaidUser?: boolean;
   onRequireUpgrade?: () => void;
+  embedded?: boolean;
+  onBackToFlashcards?: () => void;
+  disableSignupPrompts?: boolean;
+  streamingRequestId?: number | null;
 }
 
+type MindMapStreamEventDetail = {
+  requestId: number;
+  markdown: string;
+  isFinal?: boolean;
+  source?: string;
+};
 
-export default function MindMapModal({ markdown, onClose, onShareMindMap, onShareFlashcards, isPaidUser = false, onRequireUpgrade }: MindMapModalProps) {
+export default function MindMapModal({ markdown, onClose, onShareMindMap, onShareFlashcards, isPaidUser = false, onRequireUpgrade, embedded = false, onBackToFlashcards, disableSignupPrompts = false, streamingRequestId = null }: MindMapModalProps) {
   const viewportRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [isDropdownOpen, setDropdownOpen] = useState(false);
@@ -514,6 +526,7 @@ export default function MindMapModal({ markdown, onClose, onShareMindMap, onShar
   // Flashcards state
   type Flashcard = { question: string; answer: string };
   const [viewMode, setViewMode] = useState<'map' | 'flashcards'>('map');
+  const viewModeRef = useRef<'map' | 'flashcards'>(viewMode);
   const [flashcards, setFlashcards] = useState<Flashcard[] | null>(null);
   const [isGeneratingFlashcards, setIsGeneratingFlashcards] = useState(false);
   const [flashcardIndex, setFlashcardIndex] = useState(0);
@@ -530,6 +543,15 @@ export default function MindMapModal({ markdown, onClose, onShareMindMap, onShar
   // Gate auto-collapse: allow for non-auth users, and for auth users only if they have never generated a mind map before
   const [shouldAutoCollapse, setShouldAutoCollapse] = useState<boolean>(false);
   const shouldAutoCollapseRef = useRef<boolean>(false);
+  const collapseRetryTimeoutRef = useRef<number | null>(null);
+  const finalizedRequestIdRef = useRef<number | null>(null);
+  const latestMarkdownRef = useRef<string | null>(null);
+  const throttledUpdateTimeoutRef = useRef<number | null>(null);
+  const lastRendererUpdateRef = useRef<number>(0);
+  const katexReadyRef = useRef<boolean>(false);
+  const ensuringKatexPromiseRef = useRef<Promise<void> | null>(null);
+  const renderedMarkdownRef = useRef<string | null>(null);
+  const allowFlashcardToggle = !embedded;
 
   const handleClose = (event?: React.MouseEvent) => {
     // Prevent any automatic triggers
@@ -539,7 +561,7 @@ export default function MindMapModal({ markdown, onClose, onShareMindMap, onShar
     }
 
     // Only show popup if user has generated content and is not authenticated
-    if (!userId && hasGeneratedContent) {
+    if (!disableSignupPrompts && !userId && hasGeneratedContent) {
       setShowLossAversionPopup(true);
     } else {
       onClose();
@@ -737,39 +759,171 @@ export default function MindMapModal({ markdown, onClose, onShareMindMap, onShar
     }
   };
 
+  const ensureKatexReady = useCallback(async () => {
+    if (katexReadyRef.current) return;
+    if (ensuringKatexPromiseRef.current) {
+      try {
+        await ensuringKatexPromiseRef.current;
+      } catch {
+        // ignore, we'll retry on next invocation
+      }
+      return;
+    }
+    ensuringKatexPromiseRef.current = ensureKatexAssets()
+      .then(() => {
+        katexReadyRef.current = true;
+      })
+      .catch((error) => {
+        console.error('Failed to load KaTeX assets for mind map modal', error);
+        katexReadyRef.current = false;
+      })
+      .finally(() => {
+        ensuringKatexPromiseRef.current = null;
+      });
+    try {
+      await ensuringKatexPromiseRef.current;
+    } catch {
+      // swallow to allow retries later
+    }
+  }, []);
 
+  const executeRendererUpdate = useCallback(() => {
+    if (viewModeRef.current !== 'map') return;
+    if (!viewportRef.current || !containerRef.current) return;
+    const content = latestMarkdownRef.current;
+    if (!content) return;
 
-  useEffect(() => {
-    if (!markdown) return;
+    if (renderedMarkdownRef.current === content) {
+      return;
+    }
+
+    if (!initializedRef.current) {
+      initializeMindMap(content, viewportRef.current, containerRef.current);
+      initializedRef.current = true;
+      setHasGeneratedContent(true);
+    } else {
+      updateMindMap(content);
+    }
+    renderedMarkdownRef.current = content;
+  }, []);
+
+  const queueRendererUpdate = useCallback(() => {
+    if (viewModeRef.current !== 'map') return;
     if (!viewportRef.current || !containerRef.current) return;
 
-    let cancelled = false;
+    const invoke = () => {
+      void ensureKatexReady().then(() => {
+        if (viewModeRef.current !== 'map') return;
+        executeRendererUpdate();
+      });
+    };
 
-    const run = async () => {
-      try {
-        await ensureKatexAssets();
-      } catch (error) {
-        console.error('Failed to load KaTeX assets for mind map modal', error);
+    const THROTTLE_MS = 80;
+    const now = performance.now();
+    const elapsed = now - lastRendererUpdateRef.current;
+
+    if (elapsed >= THROTTLE_MS) {
+      if (throttledUpdateTimeoutRef.current !== null) {
+        window.clearTimeout(throttledUpdateTimeoutRef.current);
+        throttledUpdateTimeoutRef.current = null;
       }
+      lastRendererUpdateRef.current = now;
+      invoke();
+    } else {
+      if (throttledUpdateTimeoutRef.current !== null) {
+        window.clearTimeout(throttledUpdateTimeoutRef.current);
+      }
+      throttledUpdateTimeoutRef.current = window.setTimeout(() => {
+        throttledUpdateTimeoutRef.current = null;
+        lastRendererUpdateRef.current = performance.now();
+        invoke();
+      }, THROTTLE_MS - elapsed);
+    }
+  }, [ensureKatexReady, executeRendererUpdate]);
 
-      if (cancelled) return;
-      if (!viewportRef.current || !containerRef.current) return;
+  useEffect(() => {
+    viewModeRef.current = viewMode;
+  }, [viewMode]);
 
-      if (!initializedRef.current && viewMode === 'map') {
-        initializeMindMap(markdown, viewportRef.current, containerRef.current);
-        initializedRef.current = true;
-        setHasGeneratedContent(true);
-      } else if (viewMode === 'map') {
-        updateMindMap(markdown);
+  useEffect(() => {
+    latestMarkdownRef.current = markdown;
+
+    if (!markdown) {
+      if (throttledUpdateTimeoutRef.current !== null) {
+        window.clearTimeout(throttledUpdateTimeoutRef.current);
+        throttledUpdateTimeoutRef.current = null;
+      }
+      lastRendererUpdateRef.current = 0;
+      renderedMarkdownRef.current = null;
+      return;
+    }
+    queueRendererUpdate();
+  }, [markdown, queueRendererUpdate]);
+
+  const requestCollapse = useCallback(() => {
+    if (!shouldAutoCollapseRef.current) {
+      collapseRequestedRef.current = false;
+      return;
+    }
+
+    collapseRequestedRef.current = true;
+
+    const attempt = () => {
+      if (!collapseRequestedRef.current) return;
+      if (!shouldAutoCollapseRef.current) {
+        collapseRequestedRef.current = false;
+        return;
+      }
+      if (viewModeRef.current !== 'map') {
+        collapseRequestedRef.current = false;
+        return;
+      }
+      if (!initializedRef.current) {
+        if (collapseRetryTimeoutRef.current !== null) {
+          window.clearTimeout(collapseRetryTimeoutRef.current);
+        }
+        collapseRetryTimeoutRef.current = window.setTimeout(() => {
+          collapseRetryTimeoutRef.current = null;
+          attempt();
+        }, 120);
+        return;
+      }
+      try { collapseToMainBranches({ animate: false }); } catch {}
+      collapseRequestedRef.current = false;
+    };
+
+    attempt();
+  }, []);
+
+  useEffect(() => {
+    finalizedRequestIdRef.current = null;
+    if (!streamingRequestId) return;
+    if (typeof window === 'undefined') return;
+
+    const handler = (event: Event) => {
+      const customEvent = event as CustomEvent<MindMapStreamEventDetail>;
+      const detail = customEvent.detail;
+      if (!detail || detail.requestId !== streamingRequestId) return;
+      if (finalizedRequestIdRef.current !== null && finalizedRequestIdRef.current === detail.requestId) return;
+      latestMarkdownRef.current = detail.markdown;
+      queueRendererUpdate();
+      if (detail.isFinal) {
+        finalizedRequestIdRef.current = detail.requestId;
+        if (!embedded) {
+          requestCollapse();
+        }
       }
     };
 
-    void run();
-
+    window.addEventListener('cogniguide:mindmap-stream-update', handler);
     return () => {
-      cancelled = true;
+      window.removeEventListener('cogniguide:mindmap-stream-update', handler);
+      if (collapseRetryTimeoutRef.current !== null) {
+        window.clearTimeout(collapseRetryTimeoutRef.current);
+        collapseRetryTimeoutRef.current = null;
+      }
     };
-  }, [markdown, viewMode]);
+  }, [streamingRequestId, queueRendererUpdate, requestCollapse, embedded]);
 
   // Reset renderer when modal is closed (markdown becomes null)
   useEffect(() => {
@@ -780,23 +934,35 @@ export default function MindMapModal({ markdown, onClose, onShareMindMap, onShar
       setShowTimeBasedPopup(false);
       // Reset collapse request state so future generations don't inherit it
       collapseRequestedRef.current = false;
+      if (collapseRetryTimeoutRef.current !== null) {
+        window.clearTimeout(collapseRetryTimeoutRef.current);
+        collapseRetryTimeoutRef.current = null;
+      }
       cleanup();
     }
   }, [markdown]);
 
   // Timer for time-based signup popup for non-auth users
   useEffect(() => {
-    if (!markdown || userId || showTimeBasedPopup) return;
+    if (!markdown || userId || showTimeBasedPopup || disableSignupPrompts) return;
 
     const timer = setTimeout(() => {
       setShowTimeBasedPopup(true);
     }, 120000); // 120 seconds
 
     return () => clearTimeout(timer);
-  }, [markdown, userId, showTimeBasedPopup]);
+  }, [markdown, userId, showTimeBasedPopup, disableSignupPrompts]);
 
   useEffect(() => {
     return () => {
+      if (throttledUpdateTimeoutRef.current !== null) {
+        window.clearTimeout(throttledUpdateTimeoutRef.current);
+        throttledUpdateTimeoutRef.current = null;
+      }
+      if (collapseRetryTimeoutRef.current !== null) {
+        window.clearTimeout(collapseRetryTimeoutRef.current);
+        collapseRetryTimeoutRef.current = null;
+      }
       initializedRef.current = false;
       cleanup();
     };
@@ -804,14 +970,10 @@ export default function MindMapModal({ markdown, onClose, onShareMindMap, onShar
 
   // Collapse to main branches when mindmap stream completes
   useEffect(() => {
+    if (embedded) return;
+
     const onComplete = () => {
-      if (!shouldAutoCollapseRef.current) return;
-      collapseRequestedRef.current = true;
-      try { collapseToMainBranches({ animate: false }); } catch {}
-      // Retry a few times to handle race with renderer initialization
-      try { setTimeout(() => { try { collapseToMainBranches({ animate: false }); } catch {} }, 60); } catch {}
-      try { setTimeout(() => { try { collapseToMainBranches({ animate: false }); } catch {} }, 180); } catch {}
-      try { setTimeout(() => { try { collapseToMainBranches({ animate: false }); } catch {} }, 360); } catch {}
+      requestCollapse();
     };
     if (typeof window !== 'undefined') {
       window.addEventListener('cogniguide:mindmap-stream-complete', onComplete);
@@ -820,23 +982,34 @@ export default function MindMapModal({ markdown, onClose, onShareMindMap, onShar
       if (typeof window !== 'undefined') {
         window.removeEventListener('cogniguide:mindmap-stream-complete', onComplete);
       }
+      if (collapseRetryTimeoutRef.current !== null) {
+        window.clearTimeout(collapseRetryTimeoutRef.current);
+        collapseRetryTimeoutRef.current = null;
+      }
     };
-  }, []);
+  }, [embedded, requestCollapse]);
 
   // If initialization happens after completion event, apply collapse immediately
   useEffect(() => {
-    if (!viewportRef.current || !containerRef.current) return;
+    if (embedded) return;
     if (!markdown) return;
-    if (initializedRef.current && collapseRequestedRef.current && shouldAutoCollapseRef.current) {
-      try { collapseToMainBranches({ animate: false }); } catch {}
-    }
-  }, [markdown, initializedRef.current]);
+    if (!collapseRequestedRef.current) return;
+    requestCollapse();
+  }, [markdown, embedded, requestCollapse]);
 
   // Determine whether auto-collapse should be enabled for this user
   useEffect(() => {
     let cancelled = false;
+
+    if (embedded) {
+      setShouldAutoCollapse(false);
+      shouldAutoCollapseRef.current = false;
+      return () => {
+        cancelled = true;
+      };
+    }
+
     const computeAutoCollapse = async () => {
-      // Non-auth users: enable auto-collapse
       if (!userId) {
         if (!cancelled) {
           setShouldAutoCollapse(true);
@@ -845,7 +1018,6 @@ export default function MindMapModal({ markdown, onClose, onShareMindMap, onShar
         return;
       }
       const cacheKey = `cogniguide:user:${userId}:hasPriorMindmap`;
-      // Try local cache first
       try {
         const raw = typeof window !== 'undefined' ? window.localStorage.getItem(cacheKey) : null;
         if (raw === 'true' || raw === 'false') {
@@ -857,7 +1029,6 @@ export default function MindMapModal({ markdown, onClose, onShareMindMap, onShar
           return;
         }
       } catch {}
-      // Query Supabase to see if the user has any prior mindmaps
       try {
         const { data, error } = await supabase
           .from('mindmaps')
@@ -881,7 +1052,7 @@ export default function MindMapModal({ markdown, onClose, onShareMindMap, onShar
     };
     computeAutoCollapse();
     return () => { cancelled = true; };
-  }, [userId]);
+  }, [userId, embedded]);
 
   // Detect authenticated user for saving flashcards
   useEffect(() => {
@@ -911,7 +1082,17 @@ export default function MindMapModal({ markdown, onClose, onShareMindMap, onShar
   // Clean up renderer when switching to flashcards; re-init when returning to map
   useEffect(() => {
     if (viewMode === 'flashcards') {
+      if (throttledUpdateTimeoutRef.current !== null) {
+        window.clearTimeout(throttledUpdateTimeoutRef.current);
+        throttledUpdateTimeoutRef.current = null;
+      }
+      if (collapseRetryTimeoutRef.current !== null) {
+        window.clearTimeout(collapseRetryTimeoutRef.current);
+        collapseRetryTimeoutRef.current = null;
+      }
+      lastRendererUpdateRef.current = 0;
       initializedRef.current = false;
+      renderedMarkdownRef.current = null;
       cleanup();
       return;
     }
@@ -933,6 +1114,7 @@ export default function MindMapModal({ markdown, onClose, onShareMindMap, onShar
       if (!viewportRef.current || !containerRef.current || initializedRef.current) return;
 
       initializeMindMap(markdown, viewportRef.current, containerRef.current);
+      renderedMarkdownRef.current = markdown;
       initializedRef.current = true;
     };
 
@@ -951,14 +1133,20 @@ export default function MindMapModal({ markdown, onClose, onShareMindMap, onShar
     setFlashcardIndex(0);
     // New generation: clear previous completion flag to avoid stale collapses
     collapseRequestedRef.current = false;
+
+    if (!allowFlashcardToggle) {
+      setFlashcards(null);
+      setFlashcardsSavedId(null);
+      setIsCheckingFlashcards(false);
+      return;
+    }
+
     const cached = flashcardsCacheRef.current.get(markdown);
     setFlashcards(cached ?? null);
     setFlashcardsSavedId(null);
-    // Attempt to load previously saved flashcards for this markdown from Supabase
-    // Only if not present in the in-memory cache and the user is signed in
+
     (async () => {
       if (cached) return;
-      // 1) Try localStorage hashed cache (fast, no network)
       try {
         const hash = await computeSHA256Hex(markdown);
         const key = getLocalDeckKey(hash);
@@ -969,14 +1157,13 @@ export default function MindMapModal({ markdown, onClose, onShareMindMap, onShar
             flashcardsCacheRef.current.set(markdown, obj.cards);
             setFlashcards(obj.cards);
             if (obj.id) setFlashcardsSavedId(String(obj.id));
-            return; // Done, skip DB lookup
+            return;
           }
         }
       } catch {}
 
       if (!userId) return;
 
-      // 2) Fallback: Supabase by title only (avoid sending huge markdown)
       setIsCheckingFlashcards(true);
       try {
         const title = getTitle(markdown);
@@ -993,7 +1180,6 @@ export default function MindMapModal({ markdown, onClose, onShareMindMap, onShar
             flashcardsCacheRef.current.set(markdown, record.cards);
             setFlashcards(record.cards);
             setFlashcardsSavedId(record.id);
-            // Mirror into localStorage for next open
             try {
               const hash = await computeSHA256Hex(markdown);
               const key = getLocalDeckKey(hash);
@@ -1008,12 +1194,17 @@ export default function MindMapModal({ markdown, onClose, onShareMindMap, onShar
         setIsCheckingFlashcards(false);
       }
     })();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [markdown]);
+  }, [markdown, allowFlashcardToggle, userId]);
 
   if (!markdown) {
     return null;
   }
+
+  const rootClassName = embedded
+    ? 'relative flex flex-col w-full h-full font-sans'
+    : 'fixed inset-0 backdrop-blur-sm flex items-center justify-center z-[100] p-1 font-sans';
+  const rootStyle = embedded ? undefined : { backgroundColor: 'var(--color-background)' };
+  const containerClassName = 'relative w-full h-full rounded-[1.5rem] border border-border ring-1 ring-black/5 shadow-2xl shadow-[0_10px_25px_rgba(0,0,0,0.12),0_25px_70px_rgba(0,0,0,0.18)] flex flex-col overflow-hidden';
 
   return (
     <>
@@ -1027,12 +1218,13 @@ export default function MindMapModal({ markdown, onClose, onShareMindMap, onShar
         }
       `}</style>
       <AuthModal open={showAuthModal} />
-      <div className="fixed inset-0 backdrop-blur-sm flex items-center justify-center z-[100] p-1 font-sans" style={{ backgroundColor: 'var(--color-background)' }}>
-        <div className="relative w-full h-full rounded-[1.5rem] border border-border ring-1 ring-black/5 shadow-2xl shadow-[0_10px_25px_rgba(0,0,0,0.12),0_25px_70px_rgba(0,0,0,0.18)] flex flex-col overflow-hidden" style={{ backgroundColor: 'var(--color-background)' }}>
+      <div className={rootClassName} style={rootStyle}>
+        <div className={containerClassName} style={{ backgroundColor: 'var(--color-background)' }}>
           <div className="absolute top-2 right-2 z-30 group inline-flex items-center gap-1.5">
             {viewMode === 'map' ? (
               <>
-                <button
+                {allowFlashcardToggle && (
+                  <button
                     onClick={flashcards ? () => setViewMode('flashcards') : handleGenerateFlashcards}
                     className={`inline-flex items-center gap-1 px-4 py-1.5 rounded-full border border-border text-foreground hover:bg-muted/50 text-sm focus:outline-none min-w-[44px] transition-all duration-300 ease-in-out ${
                       isGeneratingFlashcards
@@ -1048,73 +1240,65 @@ export default function MindMapModal({ markdown, onClose, onShareMindMap, onShar
                       <FlashcardIcon className="h-4 w-4" />
                     )}
                   </button>
+                )}
 
-                  <div className="relative">
-                    <div
-                      ref={triggerGroupRef}
-                      className="inline-flex rounded-full opacity-0 translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 ease-in-out pointer-events-none group-hover:pointer-events-auto"
-                    >
-                      <button
-                        onClick={() => setDropdownOpen(!isDropdownOpen)}
-                        className="inline-flex items-center gap-1 px-4 py-1.5 rounded-full border border-border text-foreground hover:bg-muted/50 text-sm focus:outline-none min-w-[44px]"
-                        style={{ backgroundColor: 'var(--color-background)' }}
-                        aria-haspopup="menu"
-                        aria-expanded={isDropdownOpen}
-                      >
-                        <Download className="h-4 w-4" />
-                        <svg className="h-4 w-4 ml-1 -mr-0.5" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" /></svg>
-                      </button>
-                    </div>
-
-                    {isDropdownOpen && (
-                      <div
-                        className="absolute right-0 mt-2 rounded-3xl shadow-sm z-20 border border-border p-2 min-w-[120px]"
-                        style={{
-                          backgroundColor: 'var(--color-background)',
-                          width: Math.max(dropdownWidth || 0, 120)
-                        }}
-                        role="menu"
-                      >
-                        <div className="flex flex-col gap-1.5">
-                          {/* <button
-                            type="button"
-                            onClick={() => { posthog.capture('mindmap_exported', { format: 'svg' }); handleDownload('svg'); setDropdownOpen(false); }}
-                            className="w-full flex items-center gap-2 px-3 py-1.5 text-sm text-foreground hover:bg-muted rounded-xl focus:outline-none"
-                          >
-                            <FileImage className="h-4 w-4" /> SVG
-                          </button> */}
-                          <button
-                            type="button"
-                            onClick={() => { posthog.capture('mindmap_exported', { format: 'png' }); handleDownload('png'); setDropdownOpen(false); }}
-                            className="w-full flex items-center gap-2 px-3 py-1.5 text-sm text-foreground hover:bg-muted rounded-xl focus:outline-none"
-                          >
-                            <FileImage className="h-4 w-4" /> PNG
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => { posthog.capture('mindmap_exported', { format: 'pdf' }); handleDownload('pdf'); setDropdownOpen(false); }}
-                            className="w-full flex items-center gap-2 px-3 py-1.5 text-sm text-foreground hover:bg-muted rounded-xl focus:outline-none"
-                          >
-                            <FileImage className="h-4 w-4" /> PDF
-                          </button>
-
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </>
-              ) : (
-                <>
-                  <button
-                    onClick={() => setViewMode('map')}
-                    className="inline-flex items-center justify-center w-8 h-8 rounded-full border border-border text-foreground hover:bg-muted/50 focus:outline-none opacity-100 translate-x-0 transition-all duration-300 ease-in-out"
-                    style={{ backgroundColor: 'var(--color-background)' }}
-                    aria-label="Back to Map"
+                <div className="relative">
+                  <div
+                    ref={triggerGroupRef}
+                    className="inline-flex rounded-full opacity-0 translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 ease-in-out pointer-events-none group-hover:pointer-events-auto"
                   >
-                    <MapIcon className="h-4 w-4" />
-                  </button>
-                </>
-              )}
+                    <button
+                      onClick={() => setDropdownOpen(!isDropdownOpen)}
+                      className="inline-flex items-center gap-1 px-4 py-1.5 rounded-full border border-border text-foreground hover:bg-muted/50 text-sm focus:outline-none min-w-[44px]"
+                      style={{ backgroundColor: 'var(--color-background)' }}
+                      aria-haspopup="menu"
+                      aria-expanded={isDropdownOpen}
+                    >
+                      <Download className="h-4 w-4" />
+                      <svg className="h-4 w-4 ml-1 -mr-0.5" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" /></svg>
+                    </button>
+                  </div>
+
+                  {isDropdownOpen && (
+                    <div
+                      className="absolute right-0 mt-2 rounded-3xl shadow-sm z-20 border border-border p-2 min-w-[120px]"
+                      style={{
+                        backgroundColor: 'var(--color-background)',
+                        width: Math.max(dropdownWidth || 0, 120)
+                      }}
+                      role="menu"
+                    >
+                      <div className="flex flex-col gap-1.5">
+                        <button
+                          type="button"
+                          onClick={() => { posthog.capture('mindmap_exported', { format: 'png' }); handleDownload('png'); setDropdownOpen(false); }}
+                          className="w-full flex items-center gap-2 px-3 py-1.5 text-sm text-foreground hover:bg-muted rounded-xl focus:outline-none"
+                        >
+                          <FileImage className="h-4 w-4" /> PNG
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => { posthog.capture('mindmap_exported', { format: 'pdf' }); handleDownload('pdf'); setDropdownOpen(false); }}
+                          className="w-full flex items-center gap-2 px-3 py-1.5 text-sm text-foreground hover:bg-muted rounded-xl focus:outline-none"
+                        >
+                          <FileImage className="h-4 w-4" /> PDF
+                        </button>
+
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </>
+            ) : (
+              <button
+                onClick={() => setViewMode('map')}
+                className="inline-flex items-center justify-center w-8 h-8 rounded-full border border-border text-foreground hover:bg-muted/50 focus:outline-none opacity-100 translate-x-0 transition-all duration-300 ease-in-out"
+                style={{ backgroundColor: 'var(--color-background)' }}
+                aria-label="Back to Map"
+              >
+                <MapIcon className="h-4 w-4" />
+              </button>
+            )}
 
             {onShareMindMap && (
               <ShareTriggerButton
@@ -1123,18 +1307,27 @@ export default function MindMapModal({ markdown, onClose, onShareMindMap, onShar
               />
             )}
 
-            <button
-              onClick={handleClose}
-              className="inline-flex items-center justify-center w-8 h-8 text-foreground rounded-full border border-border shadow-sm hover:bg-muted/50 focus:outline-none opacity-100 translate-x-0 transition-all duration-200 ease-in-out"
-              style={{ backgroundColor: 'var(--color-background)' }}
-              aria-label="Close"
-            >
-              <X className="h-4 w-4" />
-            </button>
+            {onBackToFlashcards ? (
+              <button
+                onClick={onBackToFlashcards}
+                className="inline-flex items-center gap-2 h-8 px-4 rounded-full border border-border text-sm font-medium text-foreground hover:bg-muted/50 focus:outline-none"
+              >
+                <ChevronLeft className="h-4 w-4" /> Back to flashcards
+              </button>
+            ) : (
+              <button
+                onClick={handleClose}
+                className="inline-flex items-center justify-center w-8 h-8 text-foreground rounded-full border border-border shadow-sm hover:bg-muted/50 focus:outline-none opacity-100 translate-x-0 transition-all duration-200 ease-in-out"
+                style={{ backgroundColor: 'var(--color-background)' }}
+                aria-label="Close"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            )}
           </div>
 
           {/* White overlay to fully cover mind map when in flashcards mode */}
-          {viewMode === 'flashcards' && (
+          {allowFlashcardToggle && viewMode === 'flashcards' && (
             <div className="absolute inset-0 z-10" style={{ backgroundColor: 'var(--color-background)' }} />
           )}
 
@@ -1146,7 +1339,7 @@ export default function MindMapModal({ markdown, onClose, onShareMindMap, onShar
             >
               <div ref={containerRef} id="mindmap-container" />
             </div>
-            {viewMode === 'flashcards' && (
+            {allowFlashcardToggle && viewMode === 'flashcards' && (
               <FlashcardsModal
                 open={true}
                 title={getTitle(markdown) || undefined}
@@ -1164,7 +1357,7 @@ export default function MindMapModal({ markdown, onClose, onShareMindMap, onShar
           </div>
         </div>
 
-        {showLossAversionPopup && (
+        {showLossAversionPopup && !disableSignupPrompts && (
           <div className="absolute inset-0 flex items-center justify-center z-[110]">
             {/* Black transparent background */}
             <div className="absolute inset-0 bg-black/40 dark:bg-black/60 z-0"></div>
@@ -1197,7 +1390,7 @@ export default function MindMapModal({ markdown, onClose, onShareMindMap, onShar
           </div>
         )}
 
-        {showTimeBasedPopup && (
+        {showTimeBasedPopup && !disableSignupPrompts && (
           <div className="absolute inset-0 flex items-center justify-center z-[110]">
             {/* Black transparent background */}
             <div className="absolute inset-0 bg-black/40 dark:bg-black/60 z-0"></div>

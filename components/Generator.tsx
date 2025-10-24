@@ -1274,6 +1274,7 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
         deckId={flashcardsDeckId}
         isPaidUser={resolvedIsPaidSubscriber}
         onRequireUpgrade={onRequireUpgrade ?? handleUpgradeClick}
+        mindMapModelChoice={modelChoice}
       />
       <AuthModal open={showAuth} />
       <section id="generator" className={showTitle ? (compact ? 'pt-3 pb-5' : 'pt-4 pb-8') : (compact ? 'pb-12' : 'pb-20')}>

@@ -25,6 +25,37 @@ const TIER_CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
 const SUPABASE_IMAGE_PREFIX = 'supabase://';
 
+type FlashcardInput = { question?: unknown; answer?: unknown };
+
+function serializeDeck(cards: FlashcardInput[], deckTitle?: string | null) {
+  const cleanedTitle = typeof deckTitle === 'string' && deckTitle.trim().length > 0
+    ? deckTitle.trim()
+    : null;
+  const meaningfulCards = cards
+    .map((card) => ({
+      question: typeof card.question === 'string' ? card.question.trim() : '',
+      answer: typeof card.answer === 'string' ? card.answer.trim() : '',
+    }))
+    .filter((card) => card.question.length > 0 || card.answer.length > 0);
+
+  if (meaningfulCards.length === 0) {
+    return { text: '', promptNote: '' };
+  }
+
+  const header = cleanedTitle ? `Flashcard Deck: ${cleanedTitle}` : 'Flashcard Deck';
+  const sections = meaningfulCards.map((card, index) => {
+    const parts: string[] = [`Card ${index + 1}`];
+    if (card.question) parts.push(`Question: ${card.question}`);
+    if (card.answer) parts.push(`Answer: ${card.answer}`);
+    return parts.join('\n');
+  });
+
+  const text = [header, '---', ...sections].join('\n\n');
+  const promptNote = 'Use the flashcard deck provided to identify the main themes and structure a mind map. Treat each question-answer pair as related concepts, with questions indicating primary ideas and answers supplying supporting details.';
+
+  return { text, promptNote };
+}
+
 async function resolveImageInputs(rawImages: string[]): Promise<{ resolved: string[]; cleanupPaths: string[] }> {
   const resolved: string[] = [];
   const cleanupPaths = new Set<string>();
@@ -558,7 +589,7 @@ export async function POST(req: NextRequest) {
     }
 
     if (contentType.includes('application/json')) {
-      let body: { text?: string; images?: string[]; prompt?: string; model?: string } | null = null;
+      let body: { text?: string; images?: string[]; prompt?: string; model?: string; cards?: FlashcardInput[]; deckTitle?: string } | null = null;
 
       try {
         body = await req.json() as { text?: string; images?: string[]; prompt?: string; model?: string } | null;
@@ -578,13 +609,25 @@ export async function POST(req: NextRequest) {
         }, { status: 400 });
       }
 
-      const text = (body.text || '').toString();
-      const prompt = (body.prompt || '').toString();
+      const textFromBody = (body.text || '').toString();
+      const promptFromBody = (body.prompt || '').toString();
       const images = Array.isArray(body.images) ? body.images.filter(img => typeof img === 'string') : [];
-      const rawCharCount = typeof (body as any)?.rawCharCount === 'number' ? (body as any).rawCharCount as number : undefined;
+      const cardsInput = Array.isArray(body.cards) ? body.cards : [];
+      const deckTitle = typeof body.deckTitle === 'string' ? body.deckTitle : undefined;
+
+      const { text: deckText, promptNote } = serializeDeck(cardsInput, deckTitle);
+      const combinedText = [textFromBody, deckText].filter(part => part && part.trim().length > 0).join('\n\n');
+      const effectiveText = combinedText || textFromBody;
+      const effectivePromptParts = [promptNote, promptFromBody].filter(part => part && part.trim().length > 0);
+      const effectivePrompt = effectivePromptParts.join('\n\n');
+
+      const baseRawCharCount = typeof (body as any)?.rawCharCount === 'number' ? (body as any).rawCharCount as number : undefined;
+      const combinedRawCharCount = baseRawCharCount !== undefined
+        ? baseRawCharCount + deckText.length
+        : (effectiveText.length > 0 ? effectiveText.length : undefined);
 
       // Validate input
-      if (!text && !prompt && images.length === 0) {
+      if (!effectiveText && !effectivePrompt && images.length === 0) {
         return NextResponse.json({
           error: 'No content provided',
           message: 'Please provide text content, a prompt, or image URLs to process.',
@@ -593,7 +636,7 @@ export async function POST(req: NextRequest) {
       }
 
       const userId = await getUserIdFromAuthHeader(req);
-      return await respondWithStream({ text, prompt, images, userId, rawCharCount, model: body.model });
+      return await respondWithStream({ text: effectiveText, prompt: effectivePrompt, images, userId, rawCharCount: combinedRawCharCount, model: body.model });
     }
 
     // Fallback: multipart (legacy)

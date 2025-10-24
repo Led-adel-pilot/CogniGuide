@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import dynamic from 'next/dynamic';
 import { supabase } from '@/lib/supabaseClient';
 import AuthModal from '@/components/AuthModal';
 import { nextSchedule, createInitialSchedule, type FsrsScheduleState, type Grade } from '@/lib/spaced-repetition';
@@ -8,12 +9,14 @@ import { loadDeckSchedule, saveDeckSchedule, loadDeckScheduleAsync, saveDeckSche
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import type { Components } from 'react-markdown';
-import { ChevronLeft, ChevronRight, Eye, Loader2, Lock, X } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Eye, Loader2, Lock, Map as MapIcon, X } from 'lucide-react';
 import posthog from 'posthog-js';
 import { DatePicker } from '@/components/DatePicker';
 import { ensureKatexAssets } from '@/lib/katex-loader';
 import ShareTriggerButton from '@/components/ShareTriggerButton';
+import type { ModelChoice } from '@/lib/plans';
 
+const MindMapModal = dynamic(() => import('@/components/MindMapModal'), { ssr: false });
 const getDeckIdentifier = (deckId?: string, title?: string | null, cards?: Flashcard[] | null): string | null => {
   if (deckId) return deckId;
   if (cards && cards.length > 0) {
@@ -102,15 +105,21 @@ type Props = {
   onShare?: () => void;
   isPaidUser?: boolean;
   onRequireUpgrade?: () => void;
+  mindMapModelChoice?: ModelChoice;
 };
 
-export default function FlashcardsModal({ open, title, cards, isGenerating = false, error, onClose, onReviewDueCards, deckId, initialIndex, studyDueOnly = false, studyInterleaved = false, interleavedDecks, dueIndices, isEmbedded = false, onShare, isPaidUser = false, onRequireUpgrade }: Props) {
+export default function FlashcardsModal({ open, title, cards, isGenerating = false, error, onClose, onReviewDueCards, deckId, initialIndex, studyDueOnly = false, studyInterleaved = false, interleavedDecks, dueIndices, isEmbedded = false, onShare, isPaidUser = false, onRequireUpgrade, mindMapModelChoice = 'fast' }: Props) {
   const [index, setIndex] = React.useState(0);
   const [showAnswer, setShowAnswer] = React.useState(false);
   const [showExplanation, setShowExplanation] = React.useState(false);
   const [explanation, setExplanation] = React.useState('');
   const [isExplaining, setIsExplaining] = React.useState(false);
   const [explanationError, setExplanationError] = React.useState<string | null>(null);
+  const [isMindMapView, setIsMindMapView] = React.useState(false);
+  const [mindMapMarkdown, setMindMapMarkdown] = React.useState<string | null>(null);
+  const [mindMapError, setMindMapError] = React.useState<string | null>(null);
+  const [isMindMapGenerating, setIsMindMapGenerating] = React.useState(false);
+  const [activeMindMapRequestId, setActiveMindMapRequestId] = React.useState<number | null>(null);
   const [scheduledCards, setScheduledCards] = React.useState<CardWithSchedule[] | null>(null);
   const [deckExamDate, setDeckExamDate] = React.useState<string>('');
   const [examDateInput, setExamDateInput] = React.useState<Date | undefined>(undefined);
@@ -130,7 +139,21 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
   const [originalDueCount, setOriginalDueCount] = React.useState(0);
   const [originalDueList, setOriginalDueList] = React.useState<number[]>([]);
   const explainRequestRef = React.useRef(0);
+  const mindMapRequestRef = React.useRef(0);
   const current = scheduledCards && scheduledCards[index] ? scheduledCards[index] : null;
+  const dispatchMindMapStreamUpdate = React.useCallback((requestId: number, markdownPayload: string, isFinal = false) => {
+    if (typeof window === 'undefined') return;
+    window.dispatchEvent(
+      new CustomEvent('cogniguide:mindmap-stream-update', {
+        detail: {
+          requestId,
+          markdown: markdownPayload,
+          isFinal,
+          source: 'flashcards',
+        },
+      }),
+    );
+  }, []);
 
   const hasCards = Boolean(cards && cards.length > 0);
 
@@ -147,6 +170,15 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
     setExplanationError(null);
     setIsExplaining(false);
   }, []);
+
+  const deriveMindMapTitle = React.useCallback((markdownText: string) => {
+    const h1Match = markdownText.match(/^#\s+(.*)/m);
+    if (h1Match?.[1]) return h1Match[1].trim();
+    const fmMatch = markdownText.match(/title:\s*(.*)/);
+    if (fmMatch?.[1]) return fmMatch[1].trim();
+    if (typeof title === 'string' && title.trim().length > 0) return title.trim();
+    return 'mindmap';
+  }, [title]);
 
   const handleExplain = React.useCallback(async () => {
     if (!isPaidUser) {
@@ -236,6 +268,210 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
     resetExplanation();
     setShowAnswer(true);
   }, [resetExplanation]);
+
+  const handleBackToFlashcardsView = React.useCallback(() => {
+    mindMapRequestRef.current += 1;
+    setActiveMindMapRequestId(null);
+    setIsMindMapView(false);
+    setIsMindMapGenerating(false);
+    setMindMapError(null);
+  }, []);
+
+  const handleGenerateMindMap = React.useCallback(async () => {
+    if (!cards || cards.length === 0) {
+      return;
+    }
+
+    if (isMindMapGenerating) {
+      setIsMindMapView(true);
+      return;
+    }
+
+    const hasExisting = typeof mindMapMarkdown === 'string' && mindMapMarkdown.trim().length > 0;
+    if (hasExisting) {
+      setMindMapError(null);
+      setIsMindMapView(true);
+      return;
+    }
+
+    const requestId = mindMapRequestRef.current + 1;
+    mindMapRequestRef.current = requestId;
+
+    setIsMindMapView(true);
+    setMindMapError(null);
+    setMindMapMarkdown(null);
+    setIsMindMapGenerating(true);
+    setActiveMindMapRequestId(requestId);
+
+    try {
+      const { data } = await supabase.auth.getSession();
+      const token = data.session?.access_token;
+
+      posthog.capture('mindmap_generation_from_flashcards_started', {
+        card_count: cards.length,
+        model_choice: mindMapModelChoice,
+        deck_id: deckId,
+      });
+
+      const payloadCards = cards.map((card) => ({ question: card.question, answer: card.answer }));
+      const response = await fetch('/api/generate-mindmap', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({
+          cards: payloadCards,
+          deckTitle: title ?? undefined,
+          model: mindMapModelChoice,
+        }),
+      });
+
+      if (mindMapRequestRef.current !== requestId) return;
+
+      if (response.status === 403) {
+        let message = 'Smart mode is available on paid plans. Please upgrade to continue.';
+        try {
+          const json = await response.json();
+          if (json && typeof json.message === 'string' && json.message.trim()) {
+            message = json.message;
+          }
+        } catch {}
+        setMindMapError(message);
+        if (onRequireUpgrade) onRequireUpgrade();
+        return;
+      }
+
+      if (response.status === 402) {
+        let message = 'Insufficient credits. Please upload a smaller deck or upgrade your plan.';
+        try {
+          const json = await response.json();
+          if (json && typeof json.message === 'string' && json.message.trim()) {
+            message = json.message;
+          }
+        } catch {}
+        setMindMapError(message);
+        return;
+      }
+
+      if (!response.ok) {
+        let message = 'Failed to generate mind map.';
+        const contentType = response.headers.get('content-type') || '';
+        if (contentType.includes('application/json')) {
+          try {
+            const json = await response.json();
+            if (json && typeof json.error === 'string' && json.error.trim()) {
+              message = json.error;
+            }
+          } catch {}
+        } else {
+          try {
+            const text = await response.text();
+            if (text.trim()) message = text.trim();
+          } catch {}
+        }
+        setMindMapError(message);
+        return;
+      }
+
+      const contentType = response.headers.get('content-type') || '';
+      let accumulated = '';
+      let hasMountedMindMap = false;
+
+      if (!response.body || !contentType.includes('text/plain')) {
+        accumulated = await response.text();
+        if (mindMapRequestRef.current !== requestId) return;
+        setMindMapMarkdown(accumulated);
+        dispatchMindMapStreamUpdate(requestId, accumulated, true);
+      } else {
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        while (true) {
+          const { value, done } = await reader.read();
+          if (mindMapRequestRef.current !== requestId) {
+            try { await reader.cancel(); } catch {}
+            return;
+          }
+          if (done) break;
+          const chunk = decoder.decode(value, { stream: true });
+          if (chunk) {
+            accumulated += chunk;
+            if (!hasMountedMindMap) {
+              if (accumulated.trim().length === 0) {
+                continue;
+              }
+              hasMountedMindMap = true;
+              setMindMapMarkdown(accumulated);
+              dispatchMindMapStreamUpdate(requestId, accumulated, false);
+            } else {
+              dispatchMindMapStreamUpdate(requestId, accumulated, false);
+            }
+          }
+        }
+        if (mindMapRequestRef.current !== requestId) return;
+        if (!hasMountedMindMap && accumulated.trim().length > 0) {
+          hasMountedMindMap = true;
+          setMindMapMarkdown(accumulated);
+        }
+        dispatchMindMapStreamUpdate(requestId, accumulated, true);
+        setMindMapMarkdown(accumulated);
+      }
+
+      const finalMarkdown = accumulated.trim();
+      if (!finalMarkdown) {
+        setMindMapError('The generated mind map was empty. Please try again.');
+        return;
+      }
+
+      setMindMapMarkdown(accumulated);
+      setMindMapError(null);
+
+      if (typeof window !== 'undefined') {
+        setTimeout(() => {
+          window.dispatchEvent(new CustomEvent('cogniguide:mindmap-stream-complete'));
+        }, 0);
+      }
+
+      if (userId) {
+        try {
+          const insertTitle = deriveMindMapTitle(finalMarkdown);
+          await supabase.from('mindmaps').insert({ user_id: userId, title: insertTitle, markdown: finalMarkdown });
+          if (typeof window !== 'undefined') window.dispatchEvent(new CustomEvent('cogniguide:generation-complete'));
+        } catch (insertError) {
+          console.error('Failed to save generated mind map:', insertError);
+        }
+
+        try {
+          const { data: creditsData } = await supabase
+            .from('user_credits')
+            .select('credits')
+            .eq('user_id', userId)
+            .single();
+          const creditsValue = Number(creditsData?.credits ?? 0);
+          if (Number.isFinite(creditsValue) && typeof window !== 'undefined') {
+            window.dispatchEvent(new CustomEvent('cogniguide:credits-updated', {
+              detail: { credits: creditsValue, display: creditsValue.toFixed(1) },
+            }));
+          }
+        } catch {}
+      }
+
+      posthog.capture('mindmap_generation_from_flashcards_completed', {
+        card_count: cards.length,
+        model_choice: mindMapModelChoice,
+        deck_id: deckId,
+      });
+    } catch (err) {
+      if (mindMapRequestRef.current !== requestId) return;
+      const message = err instanceof Error ? err.message : 'Failed to generate mind map.';
+      setMindMapError(message);
+    } finally {
+      if (mindMapRequestRef.current === requestId) {
+        setIsMindMapGenerating(false);
+        setActiveMindMapRequestId(null);
+      }
+    }
+  }, [cards, deckId, deriveMindMapTitle, mindMapMarkdown, mindMapModelChoice, onRequireUpgrade, title, userId, isMindMapGenerating, dispatchMindMapStreamUpdate]);
 
   const renderMath = React.useCallback((isCancelled?: () => boolean) => {
     if (typeof window === 'undefined') return;
@@ -334,6 +570,12 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
       event.preventDefault();
       event.stopPropagation();
     }
+    mindMapRequestRef.current += 1;
+    setActiveMindMapRequestId(null);
+    setIsMindMapView(false);
+    setMindMapMarkdown(null);
+    setMindMapError(null);
+    setIsMindMapGenerating(false);
     // Show popup only if user is not signed in, has generated cards, and is not viewing a saved deck
     if (!userId && !deckId && cards && cards.length > 0) {
       setShowLossAversionPopup(true);
@@ -356,8 +598,23 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
       setAnswerShownTime(null);
       setDueNowIndices([]);
       setImmediateReviewIndices([]);
+      mindMapRequestRef.current += 1;
+      setActiveMindMapRequestId(null);
+      setIsMindMapView(false);
+      setMindMapMarkdown(null);
+      setMindMapError(null);
+      setIsMindMapGenerating(false);
     }
   }, [open, resetExplanation]);
+
+  React.useEffect(() => {
+    mindMapRequestRef.current += 1;
+    setActiveMindMapRequestId(null);
+    setIsMindMapView(false);
+    setMindMapMarkdown(null);
+    setMindMapError(null);
+    setIsMindMapGenerating(false);
+  }, [cards, deckId]);
 
   React.useEffect(() => {
     let isMounted = true;
@@ -871,6 +1128,42 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
       ? `You finished this deck, but ${dueAgainText}. Let’s review them now while they’re fresh.`
       : 'You have finished this deck for now. For best results with spaced repetition, be sure to come back for future review sessions.';
 
+    if (isMindMapView) {
+      return (
+        <div
+          className={`relative w-full rounded-[1.5rem] flex flex-col ${
+            isEmbedded
+              ? 'h-auto overflow-visible !bg-transparent !border-0 !ring-0 !shadow-none'
+              : 'h-full overflow-hidden bg-background border border-border ring-1 ring-black/5 shadow-2xl'
+          }`}
+        >
+          <div className="flex-1 flex flex-col h-full">
+            {mindMapError ? (
+              <div className="flex-1 flex items-center justify-center px-6 text-sm text-red-600">
+                {mindMapError}
+              </div>
+            ) : mindMapMarkdown ? (
+              <div className="flex-1 min-h-0">
+                <MindMapModal
+                  markdown={mindMapMarkdown}
+                  onClose={handleBackToFlashcardsView}
+                  embedded
+                  disableSignupPrompts
+                  onBackToFlashcards={handleBackToFlashcardsView}
+                  streamingRequestId={activeMindMapRequestId ?? undefined}
+                />
+              </div>
+            ) : (
+              <div className="flex-1 flex flex-col items-center justify-center gap-2 text-muted-foreground px-6 py-10">
+                <Loader2 className="h-5 w-5 animate-spin" />
+                <span>{isMindMapGenerating ? 'Generating mind map…' : 'Preparing mind map…'}</span>
+              </div>
+            )}
+          </div>
+        </div>
+      );
+    }
+
     return (
       <div
         className={`relative w-full rounded-[1.5rem] flex flex-col ${
@@ -881,23 +1174,43 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
       >
       {!isEmbedded && (
         <div className="absolute top-2 right-2 z-30 flex items-center gap-2">
+          {!isMindMapView && hasCards && (
+            <button
+              onClick={handleGenerateMindMap}
+              disabled={isMindMapGenerating}
+              className="inline-flex items-center gap-2 h-8 px-3 rounded-full border border-border bg-background text-sm font-medium text-foreground hover:bg-muted/50 dark:hover:bg-muted/80 disabled:opacity-60 disabled:cursor-not-allowed focus:outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400/50"
+            >
+              {isMindMapGenerating ? <Loader2 className="h-4 w-4 animate-spin" /> : <MapIcon className="h-4 w-4" />}
+              <span>Mind map</span>
+            </button>
+          )}
           {onShare && (
             <ShareTriggerButton onClick={onShare} showText={true} />
           )}
-          <button
-            onClick={handleClose}
-            className="inline-flex items-center justify-center w-8 h-8 bg-background text-foreground rounded-full border border-border shadow-sm hover:bg-muted/50 dark:hover:bg-muted/80 focus:outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400/50"
-            aria-label="Close"
-          >
-            <X className="h-4 w-4" />
-          </button>
+          {isMindMapView ? (
+            <button
+              onClick={handleBackToFlashcardsView}
+              className="inline-flex items-center gap-2 h-8 px-3 rounded-full border border-border bg-background text-sm font-medium text-foreground hover:bg-muted/50 dark:hover:bg-muted/80 focus:outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400/50"
+            >
+              <ChevronLeft className="h-4 w-4" />
+              <span>Back to flashcards</span>
+            </button>
+          ) : (
+            <button
+              onClick={handleClose}
+              className="inline-flex items-center justify-center w-8 h-8 bg-background text-foreground rounded-full border border-border shadow-sm hover:bg-muted/50 dark:hover:bg-muted/80 focus:outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400/50"
+              aria-label="Close"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          )}
         </div>
       )}
 
       <div
         className={`w-full grid grid-rows-[auto,1fr,auto] bg-background gap-y-3 ${
           isEmbedded ? 'pb-8 sm:pb-10' : 'pb-4 sm:pb-6'
-        } ${!isEmbedded ? 'h-full pt-14 sm:pt-4 md:pt-0' : 'h-auto pt-4 md:pt-0'}`}
+        } ${!isEmbedded ? 'h-full pt-14 sm:pt-4 md:pt-6' : 'h-auto pt-4 md:pt-6'}`}
       >
         <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 items-center gap-2 sm:gap-3 px-4 sm:px-6 md:px-0 mt-10">
           <div className="text-center md:text-left text-sm font-medium truncate text-foreground">{studyInterleaved ? (current?.deckTitle || title) : (title || 'Flashcards')}</div>
@@ -923,26 +1236,26 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
           </div>
           <div className="text-sm text-muted-foreground text-center md:hidden">{hasCards ? (finished ? 'Completed' : studyDueOnly ? `${originalDueList.indexOf(index) + 1} / ${originalDueCount} due` : `${index + 1} / ${cards!.length}`) : ''}</div>
         </div>
-        {hasCards ? (
-        <div className="w-full max-w-5xl mx-auto mt-6 px-4 sm:px-6 md:px-0">
-          <div className="h-1.5 rounded-full bg-muted overflow-hidden">
-              <div
-                className="h-full bg-gradient-to-r from-indigo-500 via-sky-500 to-emerald-500"
-                style={{
-                  width: `${
-                    finished
-                      ? 100
-                      : studyDueOnly
-                      ? originalDueCount > 0
-                        ? ((originalDueList.indexOf(index) + 1) / originalDueCount) * 100
-                        : 0
-                      : ((index + 1) / cards!.length) * 100
-                  }%`,
-                }}
-              />
+        {hasCards && !isMindMapView && (
+          <div className="w-full max-w-5xl mx-auto mt-6 px-4 sm:px-6 md:px-0">
+            <div className="h-1.5 rounded-full bg-muted overflow-hidden">
+                <div
+                  className="h-full bg-gradient-to-r from-indigo-500 via-sky-500 to-emerald-500"
+                  style={{
+                    width: `${
+                      finished
+                        ? 100
+                        : studyDueOnly
+                        ? originalDueCount > 0
+                          ? ((originalDueList.indexOf(index) + 1) / originalDueCount) * 100
+                          : 0
+                        : ((index + 1) / cards!.length) * 100
+                    }%`,
+                  }}
+                />
+              </div>
             </div>
-          </div>
-        ) : null}
+        )}
 
         <div className="w-full max-w-3xl mx-auto overflow-auto py-2 mt-0 sm:mt-0 sm:flex sm:items-start sm:justify-center px-4 sm:px-6 md:px-0">
           {error ? (
@@ -1150,7 +1463,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
           )}
         </div>
 
-        {hasCards && !finished ? (
+        {hasCards && !finished && !isMindMapView ? (
           <div className="w-full max-w-3xl mx-auto mt-4 grid grid-cols-3 items-center gap-2 sm:gap-3">
             {!showAnswer ? (
               <div className="justify-self-start">
@@ -1169,7 +1482,9 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
                   <span className="hidden sm:inline">Prev</span>
                 </button>
               </div>
-            ) : <div />}
+            ) : (
+              <div />
+            )}
             <div className="justify-self-center flex flex-col items-center gap-2">
               {showAnswer ? (
                 showExplanation ? (
@@ -1270,7 +1585,9 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
                   <ChevronRight className="h-5 w-5 sm:ml-2" />
                 </button>
               </div>
-            ) : <div />}
+            ) : (
+              <div />
+            )}
           </div>
         ) : (
           <div />
