@@ -276,9 +276,9 @@ ${outputFormat}
 
 3.  **Foster Deeper Understanding:** Go beyond simple definitions. Create questions that prompt for explanations, comparisons, or the "why" behind a concept.
 
-4.  **Keep Answers Concise:** Answers should be clear, direct, and AS BRIEF AS POSSIBLE while remaining accurate. Use markdown bullet points for lists. Prefer one-word answers if possible.
-    - GOOD: Q: "What is 1+1?" A: "2"
-    - BAD: Q: "What is 1+1?" A: "The result of adding 1 and 1 is 2."
+- Keep them simple: One concept per card. Avoid cramming multiple facts onto a single flashcard.
+- Be specific: Vague questions produce vague answers. Instead of "What is photosynthesis?" try "What are the three main stages of photosynthesis and where does each occur?"
+- Include context: Sometimes a trigger word or phrase helps jog your memory. Adding brief context to your questions can make recall easier and more meaningful.
 
 ${languageAndCount}
 ${imagesNote ? `- ${imagesNote}` : ''}

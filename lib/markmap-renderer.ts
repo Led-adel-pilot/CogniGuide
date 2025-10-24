@@ -1284,6 +1284,7 @@ export function collapseToMainBranches(options?: { animate?: boolean }) {
     transformAnimationToken++;
     // Ensure root stays visible
     mindMapTree.isCollapsed = false;
+    const shouldAutoFit = !userHasInteracted;
 
     if (animate) {
         // Collapse each immediate child's subtree (child stays visible) with animations
@@ -1304,7 +1305,9 @@ export function collapseToMainBranches(options?: { animate?: boolean }) {
                 });
             }
             rerenderMindMap();
-            autoFitToCurrentTree();
+            if (shouldAutoFit) {
+                autoFitToCurrentTree();
+            }
         }, 0);
         return;
     }
@@ -1319,7 +1322,9 @@ export function collapseToMainBranches(options?: { animate?: boolean }) {
         }
     });
     rerenderMindMap();
-    autoFitToCurrentTree();
+    if (shouldAutoFit) {
+        autoFitToCurrentTree();
+    }
 }
 /**
  * Cleans up event listeners to prevent memory leaks.

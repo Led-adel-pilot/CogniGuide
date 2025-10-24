@@ -115,7 +115,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
   const [explanation, setExplanation] = React.useState('');
   const [isExplaining, setIsExplaining] = React.useState(false);
   const [explanationError, setExplanationError] = React.useState<string | null>(null);
-  const [isMindMapView, setIsMindMapView] = React.useState(false);
+  const [isMindMapModalOpen, setIsMindMapModalOpen] = React.useState(false);
   const [mindMapMarkdown, setMindMapMarkdown] = React.useState<string | null>(null);
   const [mindMapError, setMindMapError] = React.useState<string | null>(null);
   const [isMindMapGenerating, setIsMindMapGenerating] = React.useState(false);
@@ -272,7 +272,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
   const handleBackToFlashcardsView = React.useCallback(() => {
     mindMapRequestRef.current += 1;
     setActiveMindMapRequestId(null);
-    setIsMindMapView(false);
+    setIsMindMapModalOpen(false);
     setIsMindMapGenerating(false);
     setMindMapError(null);
   }, []);
@@ -283,21 +283,21 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
     }
 
     if (isMindMapGenerating) {
-      setIsMindMapView(true);
+      setIsMindMapModalOpen(true);
       return;
     }
 
     const hasExisting = typeof mindMapMarkdown === 'string' && mindMapMarkdown.trim().length > 0;
     if (hasExisting) {
       setMindMapError(null);
-      setIsMindMapView(true);
+      setIsMindMapModalOpen(true);
       return;
     }
 
     const requestId = mindMapRequestRef.current + 1;
     mindMapRequestRef.current = requestId;
 
-    setIsMindMapView(true);
+    setIsMindMapModalOpen(true);
     setMindMapError(null);
     setMindMapMarkdown(null);
     setIsMindMapGenerating(true);
@@ -339,6 +339,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
         } catch {}
         setMindMapError(message);
         if (onRequireUpgrade) onRequireUpgrade();
+        setIsMindMapModalOpen(false);
         return;
       }
 
@@ -351,6 +352,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
           }
         } catch {}
         setMindMapError(message);
+        setIsMindMapModalOpen(false);
         return;
       }
 
@@ -371,6 +373,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
           } catch {}
         }
         setMindMapError(message);
+        setIsMindMapModalOpen(false);
         return;
       }
 
@@ -420,6 +423,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
       const finalMarkdown = accumulated.trim();
       if (!finalMarkdown) {
         setMindMapError('The generated mind map was empty. Please try again.');
+        setIsMindMapModalOpen(false);
         return;
       }
 
@@ -465,6 +469,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
       if (mindMapRequestRef.current !== requestId) return;
       const message = err instanceof Error ? err.message : 'Failed to generate mind map.';
       setMindMapError(message);
+      setIsMindMapModalOpen(false);
     } finally {
       if (mindMapRequestRef.current === requestId) {
         setIsMindMapGenerating(false);
@@ -572,7 +577,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
     }
     mindMapRequestRef.current += 1;
     setActiveMindMapRequestId(null);
-    setIsMindMapView(false);
+    setIsMindMapModalOpen(false);
     setMindMapMarkdown(null);
     setMindMapError(null);
     setIsMindMapGenerating(false);
@@ -600,7 +605,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
       setImmediateReviewIndices([]);
       mindMapRequestRef.current += 1;
       setActiveMindMapRequestId(null);
-      setIsMindMapView(false);
+      setIsMindMapModalOpen(false);
       setMindMapMarkdown(null);
       setMindMapError(null);
       setIsMindMapGenerating(false);
@@ -610,7 +615,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
   React.useEffect(() => {
     mindMapRequestRef.current += 1;
     setActiveMindMapRequestId(null);
-    setIsMindMapView(false);
+    setIsMindMapModalOpen(false);
     setMindMapMarkdown(null);
     setMindMapError(null);
     setIsMindMapGenerating(false);
@@ -1128,42 +1133,6 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
       ? `You finished this deck, but ${dueAgainText}. Let’s review them now while they’re fresh.`
       : 'You have finished this deck for now. For best results with spaced repetition, be sure to come back for future review sessions.';
 
-    if (isMindMapView) {
-      return (
-        <div
-          className={`relative w-full rounded-[1.5rem] flex flex-col ${
-            isEmbedded
-              ? 'h-auto overflow-visible !bg-transparent !border-0 !ring-0 !shadow-none'
-              : 'h-full overflow-hidden bg-background border border-border ring-1 ring-black/5 shadow-2xl'
-          }`}
-        >
-          <div className="flex-1 flex flex-col h-full">
-            {mindMapError ? (
-              <div className="flex-1 flex items-center justify-center px-6 text-sm text-red-600">
-                {mindMapError}
-              </div>
-            ) : mindMapMarkdown ? (
-              <div className="flex-1 min-h-0">
-                <MindMapModal
-                  markdown={mindMapMarkdown}
-                  onClose={handleBackToFlashcardsView}
-                  embedded
-                  disableSignupPrompts
-                  onBackToFlashcards={handleBackToFlashcardsView}
-                  streamingRequestId={activeMindMapRequestId ?? undefined}
-                />
-              </div>
-            ) : (
-              <div className="flex-1 flex flex-col items-center justify-center gap-2 text-muted-foreground px-6 py-10">
-                <Loader2 className="h-5 w-5 animate-spin" />
-                <span>{isMindMapGenerating ? 'Generating mind map…' : 'Preparing mind map…'}</span>
-              </div>
-            )}
-          </div>
-        </div>
-      );
-    }
-
     return (
       <div
         className={`relative w-full rounded-[1.5rem] flex flex-col ${
@@ -1174,7 +1143,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
       >
       {!isEmbedded && (
         <div className="absolute top-2 right-2 z-30 flex items-center gap-2">
-          {!isMindMapView && hasCards && (
+          {hasCards && (
             <button
               onClick={handleGenerateMindMap}
               disabled={isMindMapGenerating}
@@ -1187,23 +1156,21 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
           {onShare && (
             <ShareTriggerButton onClick={onShare} showText={true} />
           )}
-          {isMindMapView ? (
-            <button
-              onClick={handleBackToFlashcardsView}
-              className="inline-flex items-center gap-2 h-8 px-3 rounded-full border border-border bg-background text-sm font-medium text-foreground hover:bg-muted/50 dark:hover:bg-muted/80 focus:outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400/50"
-            >
-              <ChevronLeft className="h-4 w-4" />
-              <span>Back to flashcards</span>
-            </button>
-          ) : (
-            <button
-              onClick={handleClose}
-              className="inline-flex items-center justify-center w-8 h-8 bg-background text-foreground rounded-full border border-border shadow-sm hover:bg-muted/50 dark:hover:bg-muted/80 focus:outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400/50"
-              aria-label="Close"
-            >
-              <X className="h-4 w-4" />
-            </button>
-          )}
+          <button
+            onClick={handleClose}
+            className="inline-flex items-center justify-center w-8 h-8 bg-background text-foreground rounded-full border border-border shadow-sm hover:bg-muted/50 dark:hover:bg-muted/80 focus:outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400/50"
+            aria-label="Close"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+      )}
+
+      {mindMapError && (
+        <div className="w-full max-w-5xl mx-auto mt-4 px-4 sm:px-6 md:px-0">
+          <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-2 text-sm text-red-600 dark:border-red-900/40 dark:bg-red-950/50 dark:text-red-200">
+            {mindMapError}
+          </div>
         </div>
       )}
 
@@ -1236,7 +1203,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
           </div>
           <div className="text-sm text-muted-foreground text-center md:hidden">{hasCards ? (finished ? 'Completed' : studyDueOnly ? `${originalDueList.indexOf(index) + 1} / ${originalDueCount} due` : `${index + 1} / ${cards!.length}`) : ''}</div>
         </div>
-        {hasCards && !isMindMapView && (
+        {hasCards && (
           <div className="w-full max-w-5xl mx-auto mt-6 px-4 sm:px-6 md:px-0">
             <div className="h-1.5 rounded-full bg-muted overflow-hidden">
                 <div
@@ -1463,7 +1430,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
           )}
         </div>
 
-        {hasCards && !finished && !isMindMapView ? (
+        {hasCards && !finished ? (
           <div className="w-full max-w-3xl mx-auto mt-4 grid grid-cols-3 items-center gap-2 sm:gap-3">
             {!showAnswer ? (
               <div className="justify-self-start">
@@ -1621,10 +1588,29 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
 
   return (
     <>
-      <div className="fixed inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center z-[100] p-3 font-sans">
+      <div className="fixed inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center z-[90] p-3 font-sans">
         <AuthModal open={showAuthModal} />
         <ModalContent />
       </div>
+      {isMindMapModalOpen && (
+        <MindMapModal
+          markdown={mindMapMarkdown}
+          onClose={handleBackToFlashcardsView}
+          onBackToFlashcards={handleBackToFlashcardsView}
+          disableSignupPrompts
+          streamingRequestId={activeMindMapRequestId ?? undefined}
+          onRequireUpgrade={onRequireUpgrade}
+          isPaidUser={isPaidUser}
+        />
+      )}
+      {isMindMapModalOpen && !mindMapMarkdown && isMindMapGenerating && (
+        <div className="fixed inset-0 z-[120] flex items-center justify-center bg-background/90 backdrop-blur-sm">
+          <div className="flex flex-col items-center gap-3 text-sm text-muted-foreground">
+            <Loader2 className="h-6 w-6 animate-spin" />
+            <span>Generating mind map…</span>
+          </div>
+        </div>
+      )}
       <style jsx global>{katexAlignmentStyles}</style>
       {showLossAversionPopup && (
         <div className="absolute inset-0 flex items-center justify-center z-[110]">

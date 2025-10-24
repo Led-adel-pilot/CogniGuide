@@ -41,6 +41,7 @@ export default function MindMapModal({ markdown, onClose, onShareMindMap, onShar
   const containerRef = useRef<HTMLDivElement>(null);
   const [isDropdownOpen, setDropdownOpen] = useState(false);
   const collapseRequestedRef = useRef(false);
+  const hasAutoCollapsedRef = useRef(false);
 
   // NEW: ref and state to size the dropdown to the trigger width
   const triggerGroupRef = useRef<HTMLDivElement>(null);
@@ -866,11 +867,20 @@ export default function MindMapModal({ markdown, onClose, onShareMindMap, onShar
       return;
     }
 
+    if (hasAutoCollapsedRef.current) {
+      collapseRequestedRef.current = false;
+      return;
+    }
+
     collapseRequestedRef.current = true;
 
     const attempt = () => {
       if (!collapseRequestedRef.current) return;
       if (!shouldAutoCollapseRef.current) {
+        collapseRequestedRef.current = false;
+        return;
+      }
+      if (hasAutoCollapsedRef.current) {
         collapseRequestedRef.current = false;
         return;
       }
@@ -888,7 +898,10 @@ export default function MindMapModal({ markdown, onClose, onShareMindMap, onShar
         }, 120);
         return;
       }
-      try { collapseToMainBranches({ animate: false }); } catch {}
+      try {
+        collapseToMainBranches({ animate: false });
+        hasAutoCollapsedRef.current = true;
+      } catch {}
       collapseRequestedRef.current = false;
     };
 
@@ -897,6 +910,7 @@ export default function MindMapModal({ markdown, onClose, onShareMindMap, onShar
 
   useEffect(() => {
     finalizedRequestIdRef.current = null;
+    hasAutoCollapsedRef.current = false;
     if (!streamingRequestId) return;
     if (typeof window === 'undefined') return;
 
@@ -928,6 +942,7 @@ export default function MindMapModal({ markdown, onClose, onShareMindMap, onShar
   // Reset renderer when modal is closed (markdown becomes null)
   useEffect(() => {
     if (!markdown) {
+      hasAutoCollapsedRef.current = false;
       initializedRef.current = false;
       setHasGeneratedContent(false);
       setShowLossAversionPopup(false);
