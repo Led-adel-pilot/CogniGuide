@@ -1421,7 +1421,7 @@ const handleMindMapLinked = useCallback(
       const allSchedules = await loadAllDeckSchedulesAsync();
       const bulkToSave: Array<{ deckId: string; data: StoredDeckSchedule }> = [];
       const dueMap: Record<string, number[]> = {};
-      const queue: Array<{ id: string; title: string | null; cards: FlashcardType[] }> = [];
+      const queue: Array<{ id: string; title: string | null; cards: FlashcardType[]; mindmap_id?: string | null; mindmap_markdown?: string | null }> = [];
       let totalDue = 0;
       for (const f of fcRecords) {
         const deckId = f.id;
@@ -1493,7 +1493,7 @@ const handleMindMapLinked = useCallback(
   const recomputeDueFromCache = (fcRecords: FlashcardsRecord[]) => {
     const now = new Date();
     const dueMap: Record<string, number[]> = {};
-    const queue: Array<{ id: string; title: string | null; cards: FlashcardType[] }> = [];
+    const queue: Array<{ id: string; title: string | null; cards: FlashcardType[]; mindmap_id?: string | null; mindmap_markdown?: string | null }> = [];
     let totalDue = 0;
     for (const f of fcRecords) {
       const deckId = f.id;
