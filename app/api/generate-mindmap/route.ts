@@ -25,6 +25,9 @@ const TIER_CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
 const SUPABASE_IMAGE_PREFIX = 'supabase://';
 
+// Reasoning effort control: if true, use default; if false/unset, use 'none' for faster responses
+const ENABLE_REASONING = process.env.ENABLE_REASONING === 'true';
+
 type FlashcardInput = { question?: unknown; answer?: unknown };
 
 function serializeDeck(cards: FlashcardInput[], deckTitle?: string | null) {
@@ -433,10 +436,10 @@ export async function POST(req: NextRequest) {
 
       let stream;
       try {
+        // @ts-expect-error - OpenAI types don't properly support reasoning_effort with stream options
         stream = await openai.chat.completions.create({
           model: MODEL_NAMES[modelChoice],
-          // @ts-ignore
-          //reasoning_effort: 'none', // Reduce thinking time for faster responses
+          ...(ENABLE_REASONING ? {} : { reasoning_effort: 'none' }),
           messages: [{ role: 'user', content: userContent }],
           stream: true,
           stream_options: { include_usage: false }, // Reduce overhead

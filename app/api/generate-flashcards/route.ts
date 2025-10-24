@@ -22,6 +22,9 @@ const supabaseAdmin = (supabaseUrl && supabaseServiceKey)
 
 const SUPABASE_IMAGE_PREFIX = 'supabase://';
 
+// Reasoning effort control: if true, use default; if false/unset, use 'none' for faster responses
+const ENABLE_REASONING = process.env.ENABLE_REASONING === 'true';
+
 async function resolveImageInputs(rawImages: string[]): Promise<{ resolved: string[]; cleanupPaths: string[] }> {
   const resolved: string[] = [];
   const cleanupPaths = new Set<string>();
@@ -369,13 +372,12 @@ function logLlmInput(kind: string, prompt: string, modelChoice?: ModelChoice) {
 async function generateJsonFromModel(userContent: any, modelChoice: ModelChoice): Promise<{ title: string | null; cards: Flashcard[] }> {
   let completion;
   try {
+    // @ts-expect-error - OpenAI types don't properly support reasoning_effort with response_format
     completion = await openai.chat.completions.create({
       model: MODEL_NAMES[modelChoice],
-      // @ts-ignore
-      //reasoning_effort: 'none',
+      ...(ENABLE_REASONING ? {} : { reasoning_effort: 'none' }),
       messages: [{ role: 'user', content: userContent }],
       stream: false,
-      // @ts-ignore
       response_format: { type: 'json_object' },
     });
   } catch (apiError) {
@@ -440,10 +442,10 @@ export async function POST(req: NextRequest) {
       const streamStartedAt = Date.now();
       let stream: AsyncIterable<ChatCompletionChunk>;
       try {
+        // @ts-expect-error - OpenAI types don't properly support reasoning_effort with stream options
         stream = await openai.chat.completions.create({
           model: MODEL_NAMES[modelChoice],
-          // @ts-ignore
-          //reasoning_effort: 'none', // Reduce thinking time for faster responses
+          ...(ENABLE_REASONING ? {} : { reasoning_effort: 'none' }),
           messages: [{ role: 'user', content: promptContent }],
           stream: true,
           stream_options: { include_usage: false }, // Reduce overhead

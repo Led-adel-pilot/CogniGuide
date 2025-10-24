@@ -20,6 +20,9 @@ const supabaseAdmin = (supabaseUrl && supabaseServiceKey)
 const FAST_MODEL = process.env.GEMINI_MODEL_FAST || 'gemini-2.5-flash-lite';
 const EXPLANATION_CREDIT_COST = 0.1;
 
+// Reasoning effort control: if true, use default; if false/unset, use 'none' for faster responses
+const ENABLE_REASONING = process.env.ENABLE_REASONING === 'true';
+
 type UserTier = 'non-auth' | 'free' | 'paid';
 
 const userTierCache = new Map<string, { tier: UserTier; expiresAt: number }>();
@@ -270,10 +273,10 @@ export async function POST(req: NextRequest) {
   const prompt = buildExplanationPrompt(question, answer, deckTitle);
 
   try {
+    // @ts-expect-error - OpenAI types don't properly support reasoning_effort with stream options
     const stream = await openai.chat.completions.create({
       model: FAST_MODEL,
-      // @ts-ignore
-      //reasoning_effort: 'none',
+      ...(ENABLE_REASONING ? {} : { reasoning_effort: 'none' }),
       messages: [{ role: 'user', content: prompt }],
       stream: true,
       stream_options: { include_usage: false },
