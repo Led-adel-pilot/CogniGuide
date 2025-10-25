@@ -131,7 +131,6 @@ export default function PromptForm({
           maxHeight: '200px',
         }}
         rows={1}
-        disabled={disabled}
         aria-label="Prompt input"
         onFocus={() => {
           // Optionally fire on focus as well, harmless if it opens once
