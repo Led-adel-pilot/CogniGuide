@@ -190,10 +190,18 @@ function isPointNearNodeText(nodeEl: HTMLElement, clientX: number, clientY: numb
     return false;
 }
 
-function shouldBlockPanAtPoint(target: EventTarget | null, clientX: number, clientY: number): boolean {
+function shouldBlockPanAtPoint(target: EventTarget | null, clientX: number, clientY: number, isTouchEvent = false): boolean {
     if (!(target instanceof Element)) return false;
     const nodeEl = target.closest('.mindmap-node') as HTMLElement | null;
     if (!nodeEl) return false;
+    
+    // On mobile touch events only, don't block panning even over text
+    // Mobile users use press-and-hold for text selection, so they should be able to pan freely
+    // Desktop mouse events should still block panning to allow text selection
+    if (isTouchEvent) {
+        return false;
+    }
+    
     return isPointNearNodeText(nodeEl, clientX, clientY);
 }
 
@@ -1115,7 +1123,7 @@ function getMidpoint(touches: TouchList): { x: number, y: number } {
 
 function handleTouchStart(e: TouchEvent) {
     const primaryTouch = e.touches[0];
-    if (primaryTouch && e.touches.length === 1 && shouldBlockPanAtPoint(e.target, primaryTouch.clientX, primaryTouch.clientY)) {
+    if (primaryTouch && e.touches.length === 1 && shouldBlockPanAtPoint(e.target, primaryTouch.clientX, primaryTouch.clientY, true)) {
         isPanning = false;
         isPinching = false;
         return;
