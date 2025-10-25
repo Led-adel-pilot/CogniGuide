@@ -542,7 +542,7 @@ export default function FlashcardGeneratorLanding({ page }: FlashcardGeneratorLa
 
           {page.seoSection ? (
             <section className="pt-8 md:pt-12 pb-16 bg-muted/20 border-t">
-              <div className="container prose prose-slate dark:prose-invert max-w-none">
+              <div className="container rich-text rich-text--full">
                 <h2
                   id={page.slug.replace(/[^a-z0-9-]/gi, '-')}
                   className="text-2xl md:text-3xl font-bold font-heading tracking-tight mb-6"

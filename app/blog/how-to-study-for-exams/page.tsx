@@ -55,7 +55,7 @@ export default function HowToStudyForExamsPage() {
 
       <main>
         <article className="mx-auto max-w-3xl px-4 py-12 sm:px-6 lg:px-0">
-          <header className="not-prose mb-12 space-y-6">
+          <header className="mb-12 space-y-6">
             <p className="text-xs font-semibold uppercase tracking-[0.3em] text-muted-foreground">
               Study Skills
             </p>
@@ -74,7 +74,7 @@ export default function HowToStudyForExamsPage() {
             </p>
           </header>
 
-          <div className="prose prose-lg prose-headings:font-semibold prose-headings:text-foreground prose-p:text-muted-foreground prose-blockquote:border-l-2 prose-blockquote:border-primary prose-blockquote:text-foreground prose-strong:text-foreground prose-a:text-primary max-w-none">
+          <div className="rich-text rich-text--lg rich-text--full">
             <blockquote>
               <p>
                 Studying is a craft. The more intentionally you design your process, the more your brain rewards you with lasting
@@ -180,7 +180,7 @@ export default function HowToStudyForExamsPage() {
             <h2 className="mt-20 scroll-m-20 text-3xl font-semibold tracking-tight text-foreground sm:text-4xl mb-8">
               Frequently asked questions
             </h2>
-            <div className="not-prose divide-y divide-border/60 overflow-hidden rounded-3xl border border-border/60 bg-background">
+            <div className="divide-y divide-border/60 overflow-hidden rounded-3xl border border-border/60 bg-background">
               <details className="group">
                 <summary className="flex cursor-pointer list-none items-center justify-between gap-4 px-6 py-5 text-left text-lg font-semibold text-foreground transition-colors hover:text-primary group-open:text-primary">
                   <span>What is the most effective method for studying?</span>
@@ -262,7 +262,7 @@ export default function HowToStudyForExamsPage() {
             </div>
           </div>
 
-          <section className="not-prose mt-16 rounded-3xl border border-border bg-muted/40 p-10">
+          <section className="mt-16 rounded-3xl border border-border bg-muted/40 p-10">
             <h2 className="text-2xl font-semibold tracking-tight text-foreground mb-6">
               Keep your momentum going
             </h2>

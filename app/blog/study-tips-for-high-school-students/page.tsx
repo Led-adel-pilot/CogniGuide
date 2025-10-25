@@ -240,7 +240,7 @@ export default function StudyTipsForHighSchoolStudentsPage() {
           <meta itemProp="dateModified" content={UPDATED_AT_ISO} />
           <meta itemProp="author" content="CogniGuide Editorial Team" />
 
-          <header className="not-prose mb-12 space-y-6">
+          <header className="mb-12 space-y-6">
             <p className="text-xs font-semibold uppercase tracking-[0.3em] text-muted-foreground">High School Success</p>
             <h1 className="mb-6 text-4xl font-bold tracking-tight sm:text-5xl" itemProp="headline">
               Study Tips for High School Students: Your Friendly 2025 Playbook
@@ -260,7 +260,7 @@ export default function StudyTipsForHighSchoolStudentsPage() {
             </p>
           </header>
 
-          <div className="prose prose-lg prose-headings:font-semibold prose-headings:text-foreground prose-p:text-muted-foreground prose-a:text-primary prose-strong:text-foreground max-w-none">
+          <div className="rich-text rich-text--lg rich-text--full">
             <p>
               Whether you are juggling AP classes, sports, or part-time work, the right study habits can make your schedule feel manageable. The strategies below combine research-backed techniques like active recall and spaced repetition with realistic planning tools you can start using this week. Sprinkle in a supportive mindset, a strong study environment, and a few smart tech helpers, and you will notice how quickly your confidence grows.
             </p>
@@ -553,7 +553,7 @@ export default function StudyTipsForHighSchoolStudentsPage() {
               <SectionHeading number="9" className="mt-0" id="faqs-heading">
                 FAQs: study strategies for teens
               </SectionHeading>
-              <div className="not-prose divide-y divide-border/60 overflow-hidden rounded-3xl border border-border/60 bg-background">
+              <div className="divide-y divide-border/60 overflow-hidden rounded-3xl border border-border/60 bg-background">
                 {faqItems.map((faq) => (
                   <details key={faq.question} className="group">
                     <summary className="flex cursor-pointer list-none items-center justify-between gap-4 px-6 py-5 text-left text-lg font-semibold text-foreground transition-colors hover:text-primary group-open:text-primary">

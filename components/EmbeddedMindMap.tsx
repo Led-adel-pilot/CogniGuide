@@ -1,5 +1,6 @@
 'use client';
 
+import '@/styles/mindmap.css';
 import { useCallback, useEffect, useRef } from 'react';
 import { initializeMindMap, cleanup } from '@/lib/markmap-renderer';
 import { ensureKatexAssets } from '@/lib/katex-loader';
