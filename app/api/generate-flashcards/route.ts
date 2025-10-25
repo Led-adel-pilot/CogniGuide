@@ -254,7 +254,7 @@ function buildFlashcardPrompt(opts: {
 
   const scopeLine = `You will be given source content. Generate high-quality active-recall flashcards that help a learner master the content.`;
 
-  const languageAndCount = `- Produce about 20 to 100 cards depending on content size.
+  const languageAndCount = `- Produce about 20 to 100 cards.
 - The flashcards MUST be in the same language as the source content.`;
 
   const body = `You are an expert instructional designer.
@@ -263,15 +263,10 @@ ${scopeLine}${userLine}
 ${outputFormat}
 
 ### Card Creation Principles
-1.  **Promote Active Recall:** Questions must be open-ended to force the learner to retrieve information from memory.
-    - GOOD: "What are the three core principles of spaced repetition?"
-    - BAD: "Are there three core principles of spaced repetition?"
 
-2.  **Ensure Atomicity:** Each card must focus on ONE SINGLE, ISOLATED CONCEPT. DO NOT combine multiple questions or answers on a single card.
-    - GOOD: Q: "What is the primary benefit of active recall?" A: "It strengthens neural pathways, improving long-term memory."
-    - BAD: Q: "What are active recall and spaced repetition?" A: "Active recall is... and spaced repetition is..."
-
-3.  **Foster Deeper Understanding:** Go beyond simple definitions. Create questions that prompt for explanations, comparisons, or the "why" behind a concept.
+- Ensure Atomicity: Each card must focus on ONE SINGLE, ISOLATED CONCEPT. DO NOT combine multiple questions or answers on a single card.
+  - GOOD: Q: "What is the primary benefit of active recall?" A: "It strengthens neural pathways, improving long-term memory."
+  - BAD: Q: "What are active recall and spaced repetition?" A: "Active recall is... and spaced repetition is..."
 
 - Keep them simple: One concept per card. Avoid cramming multiple facts onto a single flashcard.
 - Be specific: Vague questions produce vague answers. Instead of "What is photosynthesis?" try "What are the three main stages of photosynthesis and where does each occur?"
