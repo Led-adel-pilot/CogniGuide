@@ -74,14 +74,13 @@ ON-PAGE SEO REQUIREMENTS:
 5) H1 (hero.heading): must include the target keyword. H1 ≈ title but not identical.
 6) Headings hierarchy: Use concise H2/H3s; avoid keyword stuffing. Every section must be meaningfully different.
 7) Semantic coverage: Naturally weave related_terms and subject-specific subtopics (if given). Include spaced repetition, active recall, tagging, and study workflow concepts where relevant.
-8) Internal linking guidance: Provide two distinct anchor text variations for this page and two succinct descriptions (≤120 characters each) that other editors can use when linking to it from elsewhere on the site.
-9) Accessibility: Any example references should describe content plainly so screen readers convey value (no images required in output).
+8) Accessibility: Any example references should describe content plainly so screen readers convey value (no images required in output).
 
 CONVERSION (CTAs):
-10) Use action-oriented, consistent CTAs (3-4 words max). Pick ONE primary label and reuse it consistently across the page. The CTAs in question will open the sign up for free account page.
+9) Use action-oriented, consistent CTAs (3-4 words max). Pick ONE primary label and reuse it consistently across the page. The CTAs in question will open the sign up for free account page.
 
 EMBEDDED FLASHCARDS PREVIEW:
-11) Craft exactly three topic-specific flashcards that would be what the user wanted if he searched for the target keyword with the intent of finding ready-made Flashcards.
+10) Craft exactly three topic-specific flashcards that would be what the user wanted if he searched for the target keyword with the intent of finding ready-made Flashcards.
     - The ready-made flashcard samples should be on the subject/topic of the target keyword.
     - If the target keyword is not a learning/studying topic, then come up with a relevant topic to the assumed audience that searches for such a keyword (assume high-school/college students).
     - Questions must be open-ended and atomic (less than 80 characters).
@@ -89,7 +88,7 @@ EMBEDDED FLASHCARDS PREVIEW:
     - Mirror the language of the page (e.g., same locale, terminology).
 
 STRUCTURED DATA:
-12) Include FAQPage JSON-LD that mirrors the FAQ items. Breadcrumb trails are generated automatically, so do not add them.
+11) Include FAQPage JSON-LD that mirrors the FAQ items. Breadcrumb trails are generated automatically, so do not add them.
 
 OUTPUT FORMAT (STRICT):
 Return ONLY a single valid JSON object with this shape (no markdown, no commentary). The slug and path are managed externally, so do not include them:
@@ -103,7 +102,8 @@ Return ONLY a single valid JSON object with this shape (no markdown, no commenta
   },
   "hero": {
     "heading": string,          // H1, contains target keyword/variant
-    "subheading": string,       // 1–2 sentences: Explains what the tool does and how it could be helpful for someone searching for that target keyword (essentially Upload X or ask for X using a prompt and get flashcards, in contexts where asking the AI (prompting) is more suited start mentioning that, in contexts when uploading study materials is more suited mention that mainly).mentioning    "primaryCta": { "type": "modal", "label": string }
+    "subheading": string,       // 1–2 sentences: Explains what the tool does and how it could be helpful for someone searching for that target keyword (essentially Upload X or ask for X using a prompt and get flashcards, in contexts where asking the AI (prompting) is more suited start mentioning that, in contexts when uploading study materials is more suited mention that mainly).mentioning    
+    "primaryCta": { "type": "modal", "label": string }
   },
   "featuresSection": {
     "heading": string,          // H2
@@ -119,7 +119,7 @@ Return ONLY a single valid JSON object with this shape (no markdown, no commenta
   "seoSection": {
     "heading": string,          // H2 (e.g., “Study Better with AI Flashcards”)
     "body": [
-      { "type": "paragraph", "html": string }, // 180 words, contains target keyword/variant at the beginning.
+      { "type": "paragraph", "html": string }, // 180 words, Naturally places the target keyword/variant at the beginning.
       { "type": "list", "items": string[] },   // semantic/long-tail variants or use-cases
       { "type": "paragraph", "html": string }  // examples tailored to topic/subtopics
     ]
@@ -131,8 +131,8 @@ Return ONLY a single valid JSON object with this shape (no markdown, no commenta
     "cta": { "type": "modal", "label": string }
   },
   "linkingRecommendations": {
-    "anchorTextVariants": [string, string],    // exactly 2 anchor texts variants, both 3-5 words, both variants must contain the target keyword/variant.
-    "descriptionVariants": [string, string]    // exactly 2 short descriptions of the page you made, both variants must contain the target keyword/variant.
+    "anchorTextVariants": [string, string],    // exactly 2 anchor text variants. First is a 3-5 word versions of H1 (hero.heading). Second is a 3-5 word version of seoSection.heading.
+    "descriptionVariants": [string, string]    // exactly 2 short descriptions of the page you made, similar to H1, both variants must include the target keyword/variant.
   },
   "embeddedFlashcards": [
     { "question": string, "answer": string },
