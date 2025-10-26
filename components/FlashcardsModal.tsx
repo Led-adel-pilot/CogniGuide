@@ -1493,7 +1493,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
                     <>
                       <div
                         ref={questionRef}
-                        className="text-foreground text-xl sm:text-2xl font-semibold leading-7 sm:leading-8 break-words flashcard-katex-content"
+                        className="text-foreground text-lg sm:text-[22px] font-semibold leading-7 sm:leading-snug break-words flashcard-katex-content"
                       >
                         {questionContent}
                       </div>
@@ -1568,7 +1568,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
                 showExplanation ? (
                   <button
                     onClick={handleExplanationBack}
-                    className="inline-flex items-center h-10 px-5 rounded-full text-white bg-gradient-primary shadow-sm hover:bg-gradient-primary-hover transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/50 whitespace-nowrap"
+                    className="inline-flex items-center h-10 px-5 rounded-full text-white bg-primary hover:bg-primary/90 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/50 whitespace-nowrap"
                   >
                     Back
                   </button>
@@ -1641,7 +1641,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
                       return newCount;
                     });
                   }
-                }} className="inline-flex items-center h-10 px-5 rounded-full text-white bg-gradient-primary shadow-sm hover:bg-gradient-primary-hover transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/50 whitespace-nowrap">
+                }} className="inline-flex items-center h-10 px-5 rounded-full text-white bg-primary hover:bg-primary/90 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/50 whitespace-nowrap">
                   <Eye className="h-5 w-5 mr-2" /> Show Answer
                 </button>
               )}
