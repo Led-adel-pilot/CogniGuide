@@ -275,7 +275,7 @@ export async function POST(req: NextRequest) {
     const stream = await openai.chat.completions.create({
       model: SMART_MODEL,
       // @ts-expect-error - OpenAI types don't properly support reasoning_effort with stream options
-      reasoning_effort = 'none',
+      reasoning_effort: 'none',
       messages: [{ role: 'user', content: prompt }],
       stream: true,
       stream_options: { include_usage: false },
