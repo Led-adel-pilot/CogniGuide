@@ -139,6 +139,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
   const [showLossAversionPopup, setShowLossAversionPopup] = React.useState(false);
   const [showSignupPopup, setShowSignupPopup] = React.useState(false);
   const [showExamDatePopup, setShowExamDatePopup] = React.useState(false);
+  const [isExamDatePopupReady, setIsExamDatePopupReady] = React.useState(false);
   const [, setCardsViewedCount] = React.useState(0);
   const [answerShownTime, setAnswerShownTime] = React.useState<number | null>(null);
   const [originalDueCount, setOriginalDueCount] = React.useState(0);
@@ -1625,6 +1626,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
                   const shouldShowExamDatePopup = !isEmbedded && isCurrentDeckExamReady && !deckExamDate && !hasExamDatePopupBeenShown(deckIdentifier);
                   if (shouldShowExamDatePopup) {
                     setShowExamDatePopup(true);
+                    setTimeout(() => setIsExamDatePopupReady(true), 0);
                   } else {
                     setShowAnswer(true);
                     setAnswerShownTime(Date.now());
@@ -1792,7 +1794,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
       )}
 
       {showExamDatePopup && (
-        <div className="absolute inset-0 flex items-center justify-center z-[110] sm:items-start sm:pt-16">
+        <div className={`absolute inset-0 flex items-center justify-center z-[110] sm:items-start sm:pt-16 transition-opacity duration-300 ${isExamDatePopupReady ? 'opacity-100' : 'opacity-0'}`}>
           {/* Black transparent background */}
           <div className="absolute inset-0 bg-black/40 dark:bg-black/60 z-0"></div>
           <div className="bg-background border p-8 rounded-2xl shadow-xl max-w-md w-full text-center relative z-10">

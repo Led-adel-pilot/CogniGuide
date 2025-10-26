@@ -29,9 +29,10 @@ interface GeneratorProps {
   modelChoice?: ModelChoice;
   isPaidSubscriber?: boolean;
   onRequireUpgrade?: () => void;
+  onShareRequest?: (item: { id: string; type: 'mindmap' | 'flashcards'; title: string | null }) => void;
 }
 
-export default function Generator({ redirectOnAuth = false, showTitle = true, compact = false, modelChoice = 'fast', isPaidSubscriber, onRequireUpgrade }: GeneratorProps) {
+export default function Generator({ redirectOnAuth = false, showTitle = true, compact = false, modelChoice = 'fast', isPaidSubscriber, onRequireUpgrade, onShareRequest }: GeneratorProps) {
   // Enforce a client-side per-file size cap to avoid server 413s (Vercel ~4.5MB)
   const MAX_FILE_BYTES = Math.floor(50 * 1024 * 1024); // 50MB per file when using Supabase Storage
   const [files, setFiles] = useState<File[]>([]);
@@ -73,6 +74,8 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
   const [flashcardsCards, setFlashcardsCards] = useState<FlashcardType[] | null>(null);
   const [flashcardsError, setFlashcardsError] = useState<string | null>(null);
   const [flashcardsDeckId, setFlashcardsDeckId] = useState<string | undefined>(undefined);
+  const [activeMindMapId, setActiveMindMapId] = useState<string | null>(null);
+  const [activeMindMapTitle, setActiveMindMapTitle] = useState<string | null>(null);
   const [authChecked, setAuthChecked] = useState(false);
   const [allowedNameSizes, setAllowedNameSizes] = useState<{ name: string; size: number }[] | undefined>(undefined);
   const [previewLoading, setPreviewLoading] = useState(false);
@@ -1035,13 +1038,14 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
               const { data: ins, error: insErr } = await supabase
                 .from('flashcards')
                 .insert({ user_id: userId, title: titleToSave, markdown: '', cards: accumulated })
-                .select('id')
+                .select('id, title')
                 .single();
               if (!insErr) {
                 const inserted = (ins ?? null) as Record<string, unknown> | null;
                 const insertedId = inserted && typeof inserted['id'] === 'string' ? inserted['id'] : null;
                 if (insertedId) {
                   setFlashcardsDeckId(insertedId);
+                  setFlashcardsTitle(titleToSave);
                   if (typeof window !== 'undefined') window.dispatchEvent(new CustomEvent('cogniguide:generation-complete'));
                 }
               }
@@ -1176,8 +1180,21 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
             return 'mindmap';
           })();
           try {
-            await supabase.from('mindmaps').insert({ user_id: userId, title, markdown: md });
-            if (typeof window !== 'undefined') window.dispatchEvent(new CustomEvent('cogniguide:generation-complete'));
+            const { data: ins, error: insErr } = await supabase
+              .from('mindmaps')
+              .insert({ user_id: userId, title, markdown: md })
+              .select('id, title')
+              .single();
+
+            if (!insErr) {
+              const inserted = (ins ?? null) as Record<string, unknown> | null;
+              const insertedId = inserted && typeof inserted['id'] === 'string' ? inserted['id'] : null;
+              if (insertedId) {
+                setActiveMindMapId(insertedId);
+                setActiveMindMapTitle(title);
+                if (typeof window !== 'undefined') window.dispatchEvent(new CustomEvent('cogniguide:generation-complete'));
+              }
+            }
           } catch {}
         }
         // Mindmap stream completion event (non-stream path mimics completion)
@@ -1219,8 +1236,21 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
           return 'mindmap';
         })();
         try {
-          await supabase.from('mindmaps').insert({ user_id: userId, title, markdown: md });
-          if (typeof window !== 'undefined') window.dispatchEvent(new CustomEvent('cogniguide:generation-complete'));
+          const { data: ins, error: insErr } = await supabase
+            .from('mindmaps')
+            .insert({ user_id: userId, title, markdown: md })
+            .select('id, title')
+            .single();
+
+          if (!insErr) {
+            const inserted = (ins ?? null) as Record<string, unknown> | null;
+            const insertedId = inserted && typeof inserted['id'] === 'string' ? inserted['id'] : null;
+            if (insertedId) {
+              setActiveMindMapId(insertedId);
+              setActiveMindMapTitle(title);
+              if (typeof window !== 'undefined') window.dispatchEvent(new CustomEvent('cogniguide:generation-complete'));
+            }
+          }
         } catch {}
       }
       // Mindmap stream completion event (stream path)
@@ -1234,9 +1264,18 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
     }
   };
 
-  const handleCloseModal = () => setMarkdown(null);
-  const handleCloseFlashcards = () => { setFlashcardsOpen(false); setFlashcardsCards(null); setFlashcardsError(null); setFlashcardsDeckId(undefined); };
-  
+  const handleCloseModal = () => {
+    setMarkdown(null);
+    setActiveMindMapId(null);
+    setActiveMindMapTitle(null);
+  };
+  const handleCloseFlashcards = () => {
+    setFlashcardsOpen(false);
+    setFlashcardsCards(null);
+    setFlashcardsError(null);
+    setFlashcardsDeckId(undefined);
+    setFlashcardsTitle(null);
+  };
   const handleUpgradeClick = () => {
     posthog.capture('upgrade_clicked', {
       source: 'generator_insufficient_credits',
@@ -1261,6 +1300,9 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
       <MindMapModal
         markdown={markdown}
         onClose={handleCloseModal}
+        onShareMindMap={activeMindMapId && onShareRequest
+          ? () => onShareRequest({ id: activeMindMapId, type: 'mindmap', title: activeMindMapTitle ?? null })
+          : undefined}
         isPaidUser={resolvedIsPaidSubscriber}
         onRequireUpgrade={onRequireUpgrade ?? handleUpgradeClick}
       />
@@ -1272,6 +1314,9 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
         error={flashcardsError}
         onClose={handleCloseFlashcards}
         deckId={flashcardsDeckId}
+        onShare={flashcardsDeckId && onShareRequest
+          ? () => onShareRequest({ id: flashcardsDeckId, type: 'flashcards', title: flashcardsTitle ?? null })
+          : undefined}
         isPaidUser={resolvedIsPaidSubscriber}
         onRequireUpgrade={onRequireUpgrade ?? handleUpgradeClick}
         mindMapModelChoice={modelChoice}
