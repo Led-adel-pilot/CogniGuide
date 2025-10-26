@@ -9,8 +9,8 @@ import { join } from 'path';
 const CHARS_PER_CREDIT = 3800;
 const TIER_LIMITS = {
   'non-auth': 15 * CHARS_PER_CREDIT, // 57,000 characters
-  'free': 32 * CHARS_PER_CREDIT,     // 121,600 characters
-  'paid': 50 * CHARS_PER_CREDIT     // 190,000 characters
+  'free': 50 * CHARS_PER_CREDIT,     
+  'paid': 124 * CHARS_PER_CREDIT    
 } as const;
 
 /**
