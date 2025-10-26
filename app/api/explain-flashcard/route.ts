@@ -17,8 +17,8 @@ const supabaseAdmin = (supabaseUrl && supabaseServiceKey)
   ? createClient(supabaseUrl, supabaseServiceKey)
   : null;
 
-const FAST_MODEL = process.env.GEMINI_MODEL_FAST || 'gemini-2.5-flash-lite';
-const EXPLANATION_CREDIT_COST = 0.1;
+const SMART_MODEL = 'gemini-flash-latest'; // || process.env.GEMINI_MODEL_SMART ;
+const EXPLANATION_CREDIT_COST = 0.5;
 
 // Reasoning effort control: if true, use default; if false/unset, use 'none' for faster responses
 const ENABLE_REASONING = process.env.ENABLE_REASONING === 'true';
@@ -147,16 +147,15 @@ function buildExplanationPrompt(question: string, answer: string, deckTitle?: st
   const contextLine = deckTitle ? `\n\nDeck context: This flashcard is from the "${deckTitle}" study deck.` : '';
   return `You are helping a student understand their flashcards.
 Explain the following flashcard concisely so the learner grasps why the answer is correct.
-- For technical terms write next to them between () a simpler synonyme or a short explanation.
 - Use simple language. Avoid jargon. If you must use a technical term, you're forced to define it in the simplest way possible.
 - Your explanation should use the same outline and format as the provided answer (e.g., if the answer is a 3-point list, your explanation must also be a 3-point list).
 - Dont use labels like 'Question:' or 'Explanation:'.
 - Your explanation should be at maximum 2 times the length of the answer.
-- Your explanation MUST BE in the SAME LANGUAGE as the provided answer.
+- Your explanation MUST BE in the SAME LANGUAGE as the provided flashcard.
 
 ${contextLine}
 Question: ${question}
-Answer: ${answer}`;
+Answer: ${answer}`; 
 }
 
 function extractDeltaText(delta: ChatCompletionChunk.Choice['delta'] | undefined): string {
@@ -273,10 +272,10 @@ export async function POST(req: NextRequest) {
   const prompt = buildExplanationPrompt(question, answer, deckTitle);
 
   try {
-    // @ts-expect-error - OpenAI types don't properly support reasoning_effort with stream options
     const stream = await openai.chat.completions.create({
-      model: FAST_MODEL,
-      ...(ENABLE_REASONING ? {} : { reasoning_effort: 'none' }),
+      model: SMART_MODEL,
+      // @ts-expect-error - OpenAI types don't properly support reasoning_effort with stream options
+      reasoning_effort = 'none',
       messages: [{ role: 'user', content: prompt }],
       stream: true,
       stream_options: { include_usage: false },
