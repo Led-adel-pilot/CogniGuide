@@ -139,6 +139,12 @@ let isPanning = false, startX = 0, startY = 0;
 // Touch gesture state
 let isPinching = false, initialDistance = 0;
 let lastTouchX = 0, lastTouchY = 0; // For single-finger panning
+// Touch gesture state for distinguishing taps from drags
+let touchStartTime = 0;
+let touchStartX = 0;
+let touchStartY = 0;
+let ignoreTap = false;
+const TAP_DISTANCE_THRESHOLD = 10; // pixels
 // Transform animation state
 let transformAnimationToken = 0;
 
@@ -816,6 +822,24 @@ function renderNodeAndChildren(node: MindMapNode, container: HTMLElement, svgEl:
         e.stopPropagation();
         if (node.children.length > 0) toggleNodeCollapse(node);
     });
+
+    // Add touch event handler for mobile tap detection
+    nodeEl.addEventListener('touchend', (e) => {
+        if ((e.target as HTMLElement).tagName.toLowerCase() === 'a') return;
+
+        // Check if this was a tap (not part of panning)
+        const touch = e.changedTouches[0];
+        if (touch && !ignoreTap) {
+            const selection = window.getSelection();
+            if (selection && !selection.isCollapsed && selection.anchorNode && nodeEl.contains(selection.anchorNode)) {
+                return;
+            }
+
+            e.stopPropagation();
+            e.preventDefault();
+            if (node.children.length > 0) toggleNodeCollapse(node);
+        }
+    }, { passive: false });
     
     container.appendChild(nodeEl);
 
@@ -1122,12 +1146,6 @@ function getMidpoint(touches: TouchList): { x: number, y: number } {
 }
 
 function handleTouchStart(e: TouchEvent) {
-    const primaryTouch = e.touches[0];
-    if (primaryTouch && e.touches.length === 1 && shouldBlockPanAtPoint(e.target, primaryTouch.clientX, primaryTouch.clientY, true)) {
-        isPanning = false;
-        isPinching = false;
-        return;
-    }
     e.preventDefault();
     userHasInteracted = true;
     // Cancel ongoing transform animation on user interaction
@@ -1135,10 +1153,15 @@ function handleTouchStart(e: TouchEvent) {
 
     if (e.touches.length === 2) {
         isPinching = true;
-        isPanning = false; // Ensure mouse panning is off
+        isPanning = false; // Ensure single-finger panning is off
         initialDistance = getDistance(e.touches);
     } else if (e.touches.length === 1) {
-        isPanning = true;
+        // Record touch start for gesture detection
+        touchStartTime = performance.now();
+        touchStartX = e.touches[0].clientX;
+        touchStartY = e.touches[0].clientY;
+        ignoreTap = false;
+        isPanning = false; // Don't start panning immediately
         isPinching = false;
         lastTouchX = e.touches[0].clientX;
         lastTouchY = e.touches[0].clientY;
@@ -1146,7 +1169,26 @@ function handleTouchStart(e: TouchEvent) {
 }
 
 function handleTouchMove(e: TouchEvent) {
-    if (!isPanning && !isPinching) return;
+    if (!isPanning && !isPinching) {
+        // Check if this is a single touch that has moved beyond threshold
+        if (e.touches.length === 1) {
+            const touch = e.touches[0];
+            const deltaX = Math.abs(touch.clientX - touchStartX);
+            const deltaY = Math.abs(touch.clientY - touchStartY);
+            const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+
+            if (distance > TAP_DISTANCE_THRESHOLD) {
+                // This is a drag, not a tap - start panning
+                ignoreTap = true;
+                isPanning = true;
+            } else {
+                return; // Still within tap threshold, don't prevent default yet
+            }
+        } else {
+            return; // Not a single touch
+        }
+    }
+
     e.preventDefault();
 
     if (isPinching && e.touches.length === 2) { // Zooming
@@ -1177,7 +1219,14 @@ function handleTouchMove(e: TouchEvent) {
 
 function handleTouchEnd(e: TouchEvent) {
     if (e.touches.length < 2) isPinching = false;
-    if (e.touches.length < 1) isPanning = false;
+    if (e.touches.length < 1) {
+        isPanning = false;
+        // Reset touch gesture state
+        touchStartTime = 0;
+        touchStartX = 0;
+        touchStartY = 0;
+        ignoreTap = false;
+    }
 }
 
 // ============== PUBLIC API ==============
@@ -1469,4 +1518,3 @@ export function recommendPrintScaleMultiplier(
     const bias = clamp(options?.zoomBias ?? 1.0, 0.5, 3) * globalPrintZoomBias;
     return clamp(base * bias, minMul, maxMul);
 }
-
