@@ -270,7 +270,6 @@ ${outputFormat}
 
 - Keep them simple: One concept per card. Avoid cramming multiple facts onto a single flashcard.
 - Be specific: Vague questions produce vague answers. Instead of "What is photosynthesis?" try "What are the three main stages of photosynthesis and where does each occur?"
-- Include context: Sometimes a trigger word or phrase helps jog your memory. Adding brief context to your questions can make recall easier and more meaningful.
 
 ${languageAndCount}
 ${imagesNote ? `- ${imagesNote}` : ''}

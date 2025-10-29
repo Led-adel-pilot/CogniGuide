@@ -8,12 +8,7 @@ TypeScript so that every generated page can be statically rendered by Next.js.
 
 Example usage::
 
-    python scripts/generate_programmatic_flashcards.py \
-        --input data/flashcard_pages.csv \
-        --output lib/programmatic/generated/flashcardPages.ts \
-        --model gemini-2.5-flash-lite \
-        --temperature 2.0 \
-        --reasoning-effort high
+python scripts/generate_programmatic_flashcards.py --input data/flashcard_pages.csv --output lib/programmatic/generated/flashcardPages.ts --model gemini-flash-latest --max-rows 350 --concurrency 5
 
 The input CSV must include, at minimum, the columns ``slug`` and
 ``target_keyword``. Every other column becomes context that is injected into the
@@ -131,7 +126,7 @@ Return ONLY a single valid JSON object with this shape (no markdown, no commenta
     "cta": { "type": "modal", "label": string }
   },
   "linkingRecommendations": {
-    "anchorTextVariants": [string, string],    // exactly 2 anchor text variants. First is a 3-5 word versions of H1 (hero.heading). Second is a 3-5 word version of seoSection.heading.
+    "anchorTextVariants": [string, string],    // exactly 2 anchor text variants. First is a 3-5 word versions of H1 (hero.heading). Second is a 3-5 word version of H1 synonyms.
     "descriptionVariants": [string, string]    // exactly 2 short descriptions of the page you made, similar to H1, both variants must include the target keyword/variant.
   },
   "embeddedFlashcards": [
