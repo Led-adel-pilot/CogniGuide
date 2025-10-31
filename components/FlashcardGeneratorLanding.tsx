@@ -238,7 +238,7 @@ export default function FlashcardGeneratorLanding({ page }: FlashcardGeneratorLa
       desktopRem = maxFontSize - ratio * (maxFontSize - minFontSize);
     }
 
-    const mobileRem = Math.max(1.9, Math.min(desktopRem - 0.3, 2.0));
+    const mobileRem = Math.max(1.9, Math.min(desktopRem - 0.14, 4.0));
 
     const desktop = Number(desktopRem.toFixed(3));
     const mobile = Number(mobileRem.toFixed(3));
