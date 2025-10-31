@@ -239,7 +239,7 @@ export default function FlashcardGeneratorLanding({ page }: FlashcardGeneratorLa
     }
 
     const desktop = Number(desktopRem.toFixed(3));
-    const mobile = Number(Math.min(Math.max(2.4, desktopRem), 3).toFixed(3));
+    const mobile = Number(Math.min(Math.max(2.4, desktopRem), 2.5).toFixed(3));
 
     return {
       desktop: `${desktop}rem`,
@@ -446,7 +446,7 @@ export default function FlashcardGeneratorLanding({ page }: FlashcardGeneratorLa
 
         <main className="flex-1">
           <section className="relative pt-4 pb-16 md:pt-9 md:pb-20 overflow-hidden">
-            <div className="absolute inset-0 bg-grid-pattern opacity-5 pointer-events-none"></div>
+            <div className="absolute inset-0 -z-10 bg-grid-pattern opacity-5 pointer-events-none"></div>
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[40rem] h-[40rem] bg-primary/10 rounded-full blur-3xl -z-10 pointer-events-none"></div>
             <div className="container">
               <div className="flex flex-col lg:flex-row gap-12 lg:gap-16 items-start">

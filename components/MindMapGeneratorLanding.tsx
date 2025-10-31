@@ -336,7 +336,7 @@ export default function MindMapGeneratorLanding() {
 
       <main className="flex-1">
         <section className="relative overflow-hidden pt-6 pb-16 md:pt-12 md:pb-24">
-          <div className="absolute inset-0 bg-grid-pattern opacity-5 pointer-events-none" aria-hidden="true" />
+          <div className="absolute inset-0 -z-10 bg-grid-pattern opacity-5 pointer-events-none" aria-hidden="true" />
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[40rem] h-[40rem] bg-primary/10 rounded-full blur-3xl -z-10 pointer-events-none" aria-hidden="true" />
           <div className="container">
             <div className="flex flex-col lg:flex-row gap-12 lg:gap-16 items-start">
