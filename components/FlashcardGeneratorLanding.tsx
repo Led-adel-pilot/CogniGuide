@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
+import type { CSSProperties } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
@@ -221,24 +222,31 @@ export default function FlashcardGeneratorLanding({ page }: FlashcardGeneratorLa
     return sanitized.length > 0 ? sanitized : null;
   }, [page.embeddedFlashcards]);
 
-  const headingFontSize = useMemo(() => {
+  const headingFontSizes = useMemo(() => {
     const minChars = 51;
     const maxChars = 59;
     const maxFontSize = 3;
     const minFontSize = 2.8;
     const headingLength = page.hero.heading.length;
 
-    if (headingLength <= minChars) {
-      return `${maxFontSize}rem`;
-    }
+    let desktopRem = maxFontSize;
 
     if (headingLength >= maxChars) {
-      return `${minFontSize}rem`;
+      desktopRem = minFontSize;
+    } else if (headingLength > minChars) {
+      const ratio = (headingLength - minChars) / (maxChars - minChars);
+      desktopRem = maxFontSize - ratio * (maxFontSize - minFontSize);
     }
 
-    const ratio = (headingLength - minChars) / (maxChars - minChars);
-    const interpolated = maxFontSize - ratio * (maxFontSize - minFontSize);
-    return `${interpolated}rem`;
+    const mobileRem = Math.max(1.9, Math.min(desktopRem - 0.3, 2.0));
+
+    const desktop = Number(desktopRem.toFixed(3));
+    const mobile = Number(mobileRem.toFixed(3));
+
+    return {
+      desktop: `${desktop}rem`,
+      mobile: `${mobile}rem`,
+    };
   }, [page.hero.heading]);
 
   useEffect(() => {
@@ -449,7 +457,15 @@ export default function FlashcardGeneratorLanding({ page }: FlashcardGeneratorLa
                     {page.hero.eyebrow ? (
                       <p className="text-sm font-semibold uppercase tracking-widest text-primary/80">{page.hero.eyebrow}</p>
                     ) : null}
-                    <h1 className="font-bold font-heading tracking-tighter md:leading-tight mb-4" style={{ fontSize: headingFontSize }}>
+                    <h1
+                      className="font-bold font-heading tracking-tighter md:leading-tight mb-4 text-[length:var(--hero-heading-mobile)] md:text-[length:var(--hero-heading-desktop)]"
+                      style={
+                        {
+                          '--hero-heading-desktop': headingFontSizes.desktop,
+                          '--hero-heading-mobile': headingFontSizes.mobile,
+                        } as CSSProperties
+                      }
+                    >
                       {page.hero.heading}
                     </h1>
                     <p className="mt-6 text-xl text-muted-foreground leading-relaxed max-w-2xl mx-auto lg:mx-0">
@@ -460,7 +476,7 @@ export default function FlashcardGeneratorLanding({ page }: FlashcardGeneratorLa
                         <CTAButton
                           cta={page.hero.primaryCta}
                           onOpenAuth={() => setShowAuth(true)}
-                          className="inline-flex items-center justify-center rounded-full bg-primary px-10 py-3.5 text-lg font-semibold text-primary-foreground shadow-xl shadow-primary/30 transition-transform hover:-translate-y-0.5 hover:shadow-primary/40 z-10 relative"
+                          className="inline-flex items-center justify-center rounded-full bg-primary px-6 py-3 text-base font-semibold text-primary-foreground shadow-xl shadow-primary/30 transition-transform hover:-translate-y-0.5 hover:shadow-primary/40 md:px-10 md:py-3.5 md:text-lg z-10 relative"
                         />
                         <p className="text-sm text-muted-foreground">No credit card required</p>
                       </div>
