@@ -239,7 +239,7 @@ export default function FlashcardGeneratorLanding({ page }: FlashcardGeneratorLa
     }
 
     const desktop = Number(desktopRem.toFixed(3));
-    const mobile = Number(Math.min(desktopRem, 3.75).toFixed(3));
+    const mobile = Number(Math.min(Math.max(2.4, desktopRem), 3).toFixed(3));
 
     return {
       desktop: `${desktop}rem`,
@@ -456,11 +456,11 @@ export default function FlashcardGeneratorLanding({ page }: FlashcardGeneratorLa
                       <p className="text-sm font-semibold uppercase tracking-widest text-primary/80">{page.hero.eyebrow}</p>
                     ) : null}
                     <h1
-                      className="font-bold font-heading tracking-tighter md:leading-tight mb-4 text-[length:var(--hero-heading-mobile)] md:text-[length:var(--hero-heading-desktop)]"
+                      className="font-bold font-heading tracking-tighter leading-tight md:leading-tight mb-4 md:text-[length:var(--hero-heading-desktop)]"
                       style={
                         {
+                          fontSize: headingFontSizes.mobile,
                           '--hero-heading-desktop': headingFontSizes.desktop,
-                          '--hero-heading-mobile': headingFontSizes.mobile,
                         } as CSSProperties
                       }
                     >
