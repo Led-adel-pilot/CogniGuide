@@ -1307,6 +1307,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
                     placeholder="Select date"
                     className="h-7 text-xs"
                     showTimeOnButton={false}
+                    showTimeSelector={false}
                   />
                 </div>
               </div>
@@ -1823,6 +1824,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
                     }
                   }}
                   placeholder="Select date (optional)"
+                  showTimeSelector={false}
                 />
               </div>
 

@@ -37,6 +37,7 @@ interface DatePickerProps {
   placeholder?: string;
   className?: string;
   showTimeOnButton?: boolean;
+  showTimeSelector?: boolean;
 }
 
 export function DatePicker({
@@ -44,7 +45,8 @@ export function DatePicker({
   onDateChange,
   placeholder = "Select date",
   className,
-  showTimeOnButton = true
+  showTimeOnButton = true,
+  showTimeSelector = true
 }: DatePickerProps) {
   const [isOpen, setIsOpen] = React.useState(false);
   const [timeValue, setTimeValue] = React.useState<string>("08:00:00");
@@ -53,17 +55,22 @@ export function DatePicker({
 
   // Initialize time value from existing date
   React.useEffect(() => {
-    if (date) {
+    if (date && showTimeSelector) {
       const hours = date.getHours().toString().padStart(2, '0');
       const minutes = date.getMinutes().toString().padStart(2, '0');
       const seconds = date.getSeconds().toString().padStart(2, '0');
       setTimeValue(`${hours}:${minutes}:${seconds}`);
     }
-  }, [date]);
+  }, [date, showTimeSelector]);
 
   const handleDateSelect = (newDate: Date | undefined) => {
     if (!newDate) {
       onDateChange?.(undefined);
+      return;
+    }
+
+    if (!showTimeSelector) {
+      onDateChange?.(newDate);
       return;
     }
 
@@ -76,6 +83,7 @@ export function DatePicker({
   };
 
   const handleTimeChange = (newTime: string) => {
+    if (!showTimeSelector) return;
     setTimeValue(newTime);
 
     // Only update the date when not actively typing (to prevent premature submissions)
@@ -88,6 +96,11 @@ export function DatePicker({
   };
 
   const handleClose = () => {
+    if (!showTimeSelector) {
+      setIsOpen(false);
+      return;
+    }
+
     // Commit any pending time changes when closing
     if (date) {
       const [hours, minutes, seconds] = timeValue.split(':').map(Number);
@@ -100,7 +113,7 @@ export function DatePicker({
 
   const formatDateTime = (date: Date) => {
     const dateStr = formatDate(date);
-    if (!showTimeOnButton) {
+    if (!showTimeOnButton || !showTimeSelector) {
       return dateStr;
     }
     const timeStr = formatTime(date, { hour: '2-digit', minute: '2-digit' });
@@ -137,37 +150,39 @@ export function DatePicker({
             onSelect={handleDateSelect}
             initialFocus
           />
-          <div className="border-t p-3">
-            <div className="flex items-center gap-3">
-              <Label htmlFor="time-input" className="text-xs">
-                Enter time
-              </Label>
-              <div className="relative grow">
-                <Input
-                  id="time-input"
-                  type="time"
-                  step="1"
-                  value={timeValue}
-                  onChange={(e) => handleTimeChange(e.target.value)}
-                  onFocus={() => setIsTimeInputFocused(true)}
-                  onBlur={() => {
-                    setIsTimeInputFocused(false);
-                    // Commit changes when focus leaves the input
-                    if (date) {
-                      const [hours, minutes, seconds] = timeValue.split(':').map(Number);
-                      const updatedDate = new Date(date);
-                      updatedDate.setHours(hours, minutes, seconds);
-                      onDateChange?.(updatedDate);
-                    }
-                  }}
-                  className="peer appearance-none ps-9 [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
-                />
-                <div className="text-muted-foreground/80 pointer-events-none absolute inset-y-0 start-0 flex items-center justify-center ps-3 peer-disabled:opacity-50">
-                  <ClockIcon size={16} aria-hidden="true" />
+          {showTimeSelector && (
+            <div className="border-t p-3">
+              <div className="flex items-center gap-3">
+                <Label htmlFor="time-input" className="text-xs">
+                  Enter time
+                </Label>
+                <div className="relative grow">
+                  <Input
+                    id="time-input"
+                    type="time"
+                    step="1"
+                    value={timeValue}
+                    onChange={(e) => handleTimeChange(e.target.value)}
+                    onFocus={() => setIsTimeInputFocused(true)}
+                    onBlur={() => {
+                      setIsTimeInputFocused(false);
+                      // Commit changes when focus leaves the input
+                      if (date) {
+                        const [hours, minutes, seconds] = timeValue.split(':').map(Number);
+                        const updatedDate = new Date(date);
+                        updatedDate.setHours(hours, minutes, seconds);
+                        onDateChange?.(updatedDate);
+                      }
+                    }}
+                    className="peer appearance-none ps-9 [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
+                  />
+                  <div className="text-muted-foreground/80 pointer-events-none absolute inset-y-0 start-0 flex items-center justify-center ps-3 peer-disabled:opacity-50">
+                    <ClockIcon size={16} aria-hidden="true" />
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
+          )}
         </div>
       </PopoverContent>
     </Popover>
