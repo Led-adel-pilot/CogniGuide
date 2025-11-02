@@ -8,7 +8,7 @@ TypeScript so that every generated page can be statically rendered by Next.js.
 
 Example usage::
 
-python scripts/generate_programmatic_flashcards.py --input data/flashcard_pages.csv --output lib/programmatic/generated/flashcardPages.ts --model gemini-flash-latest --max-rows 350 --concurrency 5
+python scripts/generate_programmatic_flashcards.py --input data/flashcard_pages.csv --output lib/programmatic/generated/flashcardPages.ts --model gemini-flash-lite-latest --max-api-calls 3 --concurrency 5
 
 The input CSV must include, at minimum, the columns ``slug`` and
 ``target_keyword``. Every other column becomes context that is injected into the
@@ -50,7 +50,7 @@ PLACEHOLDER_RELATED_LINKS = [
 
 PROMPT_TEMPLATE = """
 You will generate a complete landing page JSON for an AI flashcards generator app, suitable for static rendering.
-Info on app: You upload your PDFs, DOCX, powerpoint, images, or you can type a prompt eg "make flashcards on X", and the AI generates flashcards with spaced-repetition scheduling, you can also select the exam date, share flashcards with other through a public link. The app is free to use and also has a paid plan with more generation credits and the ability to use a more advanced AI model. Do not hallucinate other features (e.g. the app does not automatically tag concepts, or allow editing cards at the momment). 
+Info on app: You upload your PDFs, DOCX, powerpoint, images, or you can type a prompt eg "make flashcards on X", and the AI generates flashcards with spaced-repetition scheduling, you can also select the exam date, share flashcards with other through a public link. The app is free to use and also has a paid plan with more generation credits and the ability to use a more advanced AI model. Do not hallucinate other features (e.g. the app does not automatically tag concepts, or allow editing cards at the moment). 
 
 You will receive structured CSV data for one landing page. Follow these requirements precisely:
 
@@ -92,8 +92,7 @@ Return ONLY a single valid JSON object with this shape (no markdown, no commenta
   "metadata": {
     "title": string,            // ≤60 chars, includes target keyword
     "description": string,      // 140–155 chars
-    "keywords": string[],       // 5–10 semantic variants (for internal use; not meta keywords)
-    "canonical": string         // base_url + "/flashcards/" + slug if not provided
+    "keywords": string[]        // 5–10 semantic variants (for internal use; not meta keywords). Canonical URL is added automatically; omit this field.
   },
   "hero": {
     "heading": string,          // H1, contains target keyword/variant
@@ -126,7 +125,7 @@ Return ONLY a single valid JSON object with this shape (no markdown, no commenta
     "cta": { "type": "modal", "label": string }
   },
   "linkingRecommendations": {
-    "anchorTextVariants": [string, string],    // exactly 2 anchor text variants. First is a 3-5 word versions of H1 (hero.heading). Second is a 3-5 word version of H1 synonyms.
+    "anchorText": string,       // 3-5 word version of H1, must contain the target keyword.
     "descriptionVariants": [string, string]    // exactly 2 short descriptions of the page you made, similar to H1, both variants must include the target keyword/variant.
   },
   "embeddedFlashcards": [
@@ -160,7 +159,7 @@ QUALITY GATES (the model must self-check BEFORE returning JSON):
   * Ask open-ended, atomic questions tailored to the topic.
   * Provide concise answers (≤2 sentences) that support active recall.
   * Avoid markdown unless needed for short lists.
-- Linking recommendations must contain exactly two items in each array and stay focused on this page's value proposition.
+- Linking recommendations must contain exactly two description variants and stay focused on this page's value proposition.
 
 Return ONLY the JSON object. Ensure the first sentence of seoSection.body[0].html begins with the target keyword or its closest natural variant.
 """
@@ -273,10 +272,10 @@ def parse_args(argv: Iterable[str] | None = None) -> argparse.Namespace:
     help="Sampling temperature for creative variation",
   )
   parser.add_argument(
-    "--max-rows",
+    "--max-api-calls",
     type=int,
-    default=None,
-    help="Optional maximum number of rows to process (for testing)",
+    default=500,
+    help="Optional maximum number of Gemini API calls to make (for testing)",
   )
   parser.add_argument(
     "--concurrency",
@@ -325,7 +324,7 @@ class CsvRow:
     return json.dumps(payload, ensure_ascii=False, indent=2)
 
 
-def read_csv_rows(path: Path, max_rows: int | None = None) -> List[CsvRow]:
+def read_csv_rows(path: Path) -> List[CsvRow]:
   with path.open(newline="", encoding="utf-8") as handle:
     reader = csv.DictReader(handle)
     if "slug" not in reader.fieldnames:
@@ -335,8 +334,6 @@ def read_csv_rows(path: Path, max_rows: int | None = None) -> List[CsvRow]:
 
     rows: List[CsvRow] = []
     for idx, raw in enumerate(reader):
-      if max_rows is not None and idx >= max_rows:
-        break
       slug = (raw.get("slug") or "").strip()
       if not slug:
         raise ValueError(f"Row {idx + 2} is missing a slug")
@@ -384,12 +381,7 @@ def call_model(
             "linkingRecommendations": {
               "type": "object",
               "properties": {
-                "anchorTextVariants": {
-                  "type": "array",
-                  "items": {"type": "string"},
-                  "minItems": 2,
-                  "maxItems": 2,
-                },
+                "anchorText": {"type": "string"},
                 "descriptionVariants": {
                   "type": "array",
                   "items": {"type": "string"},
@@ -397,7 +389,7 @@ def call_model(
                   "maxItems": 2,
                 },
               },
-              "required": ["anchorTextVariants", "descriptionVariants"],
+              "required": ["anchorText", "descriptionVariants"],
               "additionalProperties": False,
             },
             "embeddedFlashcards": {
@@ -565,12 +557,13 @@ def build_structured_data(row: CsvRow, payload: Dict[str, Any]) -> Dict[str, Any
 
 
 def normalise_page(row: CsvRow, payload: Dict[str, Any]) -> Dict[str, Any]:
-  canonical = payload.get("metadata", {}).get("canonical")
-  if not canonical:
-    canonical = f"{row.base_url.rstrip('/')}{row.path}"
-    payload.setdefault("metadata", {})["canonical"] = canonical
+  metadata = payload.get("metadata")
+  if not isinstance(metadata, dict):
+    raise ValueError(f"Model response for slug '{row.slug}' is missing metadata")
 
-  payload.setdefault("path", row.path)
+  metadata["canonical"] = f"{row.base_url.rstrip('/')}{row.path}"
+
+  payload["path"] = row.path
   payload["slug"] = row.slug
 
   linking_recs = payload.get("linkingRecommendations")
@@ -579,18 +572,26 @@ def normalise_page(row: CsvRow, payload: Dict[str, Any]) -> Dict[str, Any]:
       f"Model response for slug '{row.slug}' is missing linkingRecommendations"
     )
 
-  for key in ("anchorTextVariants", "descriptionVariants"):
-    values = linking_recs.get(key)
-    if not isinstance(values, list) or len(values) < 2:
-      raise ValueError(
-        f"linkingRecommendations.{key} must include two entries for slug '{row.slug}'"
-      )
-    cleaned = [str(item).strip() for item in values if isinstance(item, str)][:2]
-    if len(cleaned) < 2:
-      raise ValueError(
-        f"linkingRecommendations.{key} contained invalid entries for slug '{row.slug}'"
-      )
-    linking_recs[key] = cleaned
+  anchor_text = linking_recs.get("anchorText")
+  if not isinstance(anchor_text, str) or not anchor_text.strip():
+    raise ValueError(
+      f"linkingRecommendations.anchorText must be a non-empty string for slug '{row.slug}'"
+    )
+  linking_recs["anchorText"] = anchor_text.strip()
+
+  description_variants = linking_recs.get("descriptionVariants")
+  if not isinstance(description_variants, list) or len(description_variants) < 2:
+    raise ValueError(
+      f"linkingRecommendations.descriptionVariants must include two entries for slug '{row.slug}'"
+    )
+  cleaned_descriptions = [
+    str(item).strip() for item in description_variants if isinstance(item, str)
+  ][:2]
+  if len(cleaned_descriptions) < 2:
+    raise ValueError(
+      f"linkingRecommendations.descriptionVariants contained invalid entries for slug '{row.slug}'"
+    )
+  linking_recs["descriptionVariants"] = cleaned_descriptions
 
   placeholder_section = {
     "heading": payload.get("relatedTopicsSection", {}).get("heading")
@@ -709,7 +710,7 @@ def main(argv: Iterable[str] | None = None) -> int:
   input_path = Path(args.input)
   output_path = Path(args.output)
 
-  rows = read_csv_rows(input_path, max_rows=args.max_rows)
+  rows = read_csv_rows(input_path)
   if not rows:
     print("No rows found in input CSV", file=sys.stderr)
     return 1
@@ -736,6 +737,13 @@ def main(argv: Iterable[str] | None = None) -> int:
       print(f"Skipping slug '{row.slug}' (already present in {output_path})")
       continue
     rows_to_generate.append(row)
+
+  max_api_calls = args.max_api_calls
+  if max_api_calls is not None:
+    if max_api_calls <= 0:
+      rows_to_generate = []
+    else:
+      rows_to_generate = rows_to_generate[: max_api_calls]
 
   if rows_to_generate:
     with ThreadPoolExecutor(max_workers=max(1, args.concurrency)) as executor:

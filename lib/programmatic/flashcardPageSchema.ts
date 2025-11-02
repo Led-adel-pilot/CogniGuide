@@ -53,7 +53,7 @@ export interface ProgrammaticRelatedLink {
 }
 
 export interface ProgrammaticLinkingRecommendations {
-  anchorTextVariants: [string, string];
+  anchorText: string;
   descriptionVariants: [string, string];
 }
 

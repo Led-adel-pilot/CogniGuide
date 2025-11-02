@@ -178,6 +178,8 @@ interface ProgrammaticFlashcardPage {
 2. **Regenerate Content**: Run `python scripts/generate_programmatic_flashcards.py`
 3. **Deploy**: Generated pages automatically included in build
 
+Canonical URLs are derived automatically from the CSV input (combining `base_url` and each row's `path` or default `/flashcards/{slug}`), so neither the CSV nor the LLM output needs to supply `metadata.canonical` manually.
+
 ### Customization Options
 - **Model Selection**: Change AI model via `--model` parameter
 - **Creativity Control**: Adjust temperature via `--temperature` parameter
