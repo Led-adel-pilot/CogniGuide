@@ -18,6 +18,7 @@ LLM prompt so you can steer copy for different audiences, intents, CTAs, etc.
 from __future__ import annotations
 
 import argparse
+import copy
 import csv
 import json
 import random
@@ -62,10 +63,25 @@ CRITICAL WRITING RULES (people-first + E-E-A-T):
     * **Expertise:** Weave in semantically related keywords and concepts naturally (e.g., "spaced repetition," "learning algorithms," "smarter studying," "cognitive science") to build topical authority.
     * **Evidence & Claims Policy (no hard citations required):** You may state general, experience-based benefits without sources. **Do not** include precise numeric claims (percent improvements, time reductions), named studies, or quotes **unless** you can provide a clear, verifiable source URL to a reputable site. If unsure, rewrite conservatively and favor specific examples over statistics.
 
+PSYCHOLOGY-DRIVEN CTR GUIDANCE FOR METADATA:
+- Curiosity gap: Hint at a unique insight or shortcut the reader will uncover by clicking (e.g., "what med students skip"), without overpromising. Keep this confined to the meta title/description.
+- Loss aversion & FOMO: When appropriate, warn about missed opportunities or mistakes the audience wants to avoid (e.g., "Don’t fall behind before exams"), then show how CogniGuide prevents that outcome—again, only within the metadata.
+- Emotional resonance: Use emotionally charged yet professional wording that mirrors the searcher’s pain point or aspiration (frustrated, effortless, confident, etc.) in the metadata while keeping the page body explanatory.
+
+3) Title: <=60 characters
+- Include the Target Keyword Early, 
+- Match User Intent & Be Specific.
+- Appeal to Emotion and Benefits: Wherever possible, highlight a clear benefit or pain point resolution in the title. This ties into emotion – users often click because a title promises to solve a problem or improve something in their life. For example, “Master A-Level Biology Fast – AQA Flashcards with AI” speaks to a student’s desire to learn faster (benefit). An emotional hook could be “Stressed about the Bar Exam? Pass with These AI-Powered Flashcards” – it acknowledges the stress (emotion) and offers a solution. Titles that empathize with the user’s situation or goals can create an instant connection, increasing CTR. Just be careful to keep it brief and on-topic even when being emotive.
+- Leverage Questions (When Relevant): Phrasing your title as a question AND including a question mark can increase engagement. A study by Backlinko/ClickFlow found that titles containing a question mark had a 14 percent higher CTR than non-questions. This works especially well for queries that are themselves questions or problems. For instance, for a query like “best AI for making flashcards?”, you might use a title like “What’s the Best AI for Making Flashcards? Discover CogniGuide”. The question format mirrors the user’s query, and invites them to find the answer on your page. Pro tip: If using a question, ensure the rest of the title or the description provides a hint that you have the answer (so users are confident clicking).
+- Use Title Case and Separators for Readability
+
+4) Meta description: Write one sentence 120–155 chars that contains [KEYWORD] once, states the real outcome (upload PDF/DOCX/PPT/images or type a topic → AI generates flashcards), mentions 2 benefits max (e.g spaced repetition, time saving), and ends with a soft CTA (Try free, Create now, Start today).
+- Tool intent: time-saving + input types → “Upload a PDF or notes—AI generates flashcards in seconds with spaced repetition. Try CogniGuide free.”
+- Ready-made flashcard deck seeker topics: bridge without misleading → “Need [KEYWORD]? Create your own AI flashcards in minutes with spaced repetition and sharing. Start now.”
+- Best/Top intent: reframe as best way → “Looking for the best [KEYWORD]? Turn your materials into AI flashcards with spaced repetition. Create yours today.”
+- Competitor/brand intent: emphasize automation → “Using [KEYWORD]? Skip manual entry, upload files and let the AI generate spaced repetition flashcards. Try it free.”
 
 ON-PAGE SEO REQUIREMENTS:
-3) Title: ≤60 characters, must contain the target keyword or closest variant. Make it benefit-led.
-4) Meta description: 140–155 characters, must begin with the target keyword or closest variant and promise the outcome without hype.
 5) H1 (hero.heading): must include the target keyword. H1 ≈ title but not identical.
 6) Headings hierarchy: Use concise H2/H3s; avoid keyword stuffing. Every section must be meaningfully different.
 7) Semantic coverage: Naturally weave related_terms and subject-specific subtopics (if given). Include spaced repetition, active recall, tagging, and study workflow concepts where relevant.
@@ -163,6 +179,12 @@ QUALITY GATES (the model must self-check BEFORE returning JSON):
 
 Return ONLY the JSON object. Ensure the first sentence of seoSection.body[0].html begins with the target keyword or its closest natural variant.
 """
+
+REASONING_EFFORT_BUDGETS = {
+  "low": 512,
+  "medium": 1024,
+  "high": 8192,
+}
 
 
 SCRIPT_DIR = Path(__file__).resolve().parent
@@ -296,7 +318,7 @@ def parse_args(argv: Iterable[str] | None = None) -> argparse.Namespace:
   parser.add_argument(
     "--reasoning-effort",
     choices=["low", "medium", "high", "none"],
-    default="none",
+    default="low",
     help="Reasoning effort for Gemini 2.5 models: low (1,024 tokens), medium (8,192 tokens), high (24,576 tokens), or none (disable thinking).",
   )
   return parser.parse_args(argv)
@@ -341,6 +363,26 @@ def read_csv_rows(path: Path) -> List[CsvRow]:
         raise ValueError(f"Row {idx + 2} is missing a target_keyword")
       rows.append(CsvRow(slug=slug, data={k: str(v or '').strip() for k, v in raw.items()}))
     return rows
+
+
+def _inject_thinking_budget(
+  request_params: Dict[str, Any],
+  reasoning_effort: str,
+) -> Dict[str, Any]:
+  """Fallback for SDKs that do not expose reasoning_effort."""
+
+  budget = REASONING_EFFORT_BUDGETS.get(reasoning_effort)
+  if not budget:
+    return request_params
+
+  extra_body = copy.deepcopy(request_params.get("extra_body") or {})
+  nested_extra = extra_body.setdefault("extra_body", {})
+  google_section = nested_extra.setdefault("google", {})
+  thinking_config = google_section.setdefault("thinking_config", {})
+  thinking_config.setdefault("thinking_budget", budget)
+  google_section["thinking_config"] = thinking_config
+  request_params["extra_body"] = extra_body
+  return request_params
 
 
 def call_model(
@@ -424,10 +466,22 @@ def call_model(
   }
 
   # Add reasoning_effort if provided and not "none"
-  if reasoning_effort and reasoning_effort != "none":
+  use_reasoning = reasoning_effort and reasoning_effort != "none"
+  if use_reasoning:
     request_params["reasoning_effort"] = reasoning_effort
 
-  response = client.chat.completions.create(**request_params)
+  try:
+    response = client.chat.completions.create(**request_params)
+  except TypeError as exc:
+    if not use_reasoning or "reasoning_effort" not in str(exc):
+      raise
+
+    # Some older OpenAI SDK builds reject reasoning_effort; fall back to thinking budget.
+    assert reasoning_effort is not None
+    fallback_params = copy.deepcopy(request_params)
+    fallback_params.pop("reasoning_effort", None)
+    fallback_params = _inject_thinking_budget(fallback_params, reasoning_effort)
+    response = client.chat.completions.create(**fallback_params)
 
   if not response.choices or not response.choices[0].message.content:
     raise RuntimeError("Model returned an empty response")
