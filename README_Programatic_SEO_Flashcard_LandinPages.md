@@ -74,7 +74,7 @@ interface ProgrammaticFlashcardPage {
 - **How It Works Section**: Exactly 3 sequential steps customized to topic
 - **SEO Section**: Mix of paragraphs and bullet lists with HTML markup for emphasis and internal links
 - **FAQ Section**: 4 topic-specific questions with helpful answers
-- **Related Topics Section**: Placeholder entries (`/` and `/flashcards`) inserted for later manual curation
+- **Related Topics Section**: Generated with placeholder links that `scripts/update_related_topics.py` replaces using data-driven internal linking recommendations
 - **Linking Recommendations**: Two anchor text variations and two short descriptions to guide future internal links
 
 **SEO Optimization Features**:
@@ -149,6 +149,17 @@ interface ProgrammaticFlashcardPage {
 - Priority assignment based on page importance
 - Weekly change frequency settings
 - Canonical URL usage for sitemap URLs
+
+### 10. Related Topics Link Updater (`scripts/update_related_topics.py`)
+
+**Purpose**: Converts placeholder related topic links into relevant internal links
+
+**Features**:
+- Detects pages that still reference `/` or `/flashcards` in their related links
+- Scores topical similarity using metadata keywords, slug tokens, and linking recommendations
+- Generates interlinks with anchor text and descriptions sourced from each target page's `linkingRecommendations`
+- Ensures every updated page maintains at least two outbound links and at least one inbound recommendation, avoiding orphan destinations
+- Writes changes directly into `lib/programmatic/generated/flashcardPages.ts` for immediate reuse
 
 ## SEO Strategy Implementation
 
