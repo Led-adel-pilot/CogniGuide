@@ -13,6 +13,7 @@ import type AuthModalComponent from '@/components/AuthModal';
 import type MindMapModalComponent from '@/components/MindMapModal';
 import type FlashcardsModalComponent from '@/components/FlashcardsModal';
 import type { Flashcard as FlashcardType } from '@/components/FlashcardsModal';
+import ShareLinkDialog from '@/components/ShareLinkDialog';
 
 type AuthModalProps = ComponentProps<typeof AuthModalComponent>;
 type MindMapModalProps = ComponentProps<typeof MindMapModalComponent>;
@@ -73,6 +74,9 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
   const [flashcardsCards, setFlashcardsCards] = useState<FlashcardType[] | null>(null);
   const [flashcardsError, setFlashcardsError] = useState<string | null>(null);
   const [flashcardsDeckId, setFlashcardsDeckId] = useState<string | undefined>(undefined);
+  const [mindMapId, setMindMapId] = useState<string | null>(null);
+  const [mindMapTitle, setMindMapTitle] = useState<string | null>(null);
+  const [shareItem, setShareItem] = useState<{ id: string; type: 'mindmap' | 'flashcards'; title: string | null } | null>(null);
   const [authChecked, setAuthChecked] = useState(false);
   const [allowedNameSizes, setAllowedNameSizes] = useState<{ name: string; size: number }[] | undefined>(undefined);
   const [previewLoading, setPreviewLoading] = useState(false);
@@ -818,6 +822,7 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
       non_auth_generations_allowed: false,
       model_choice: modelChoice,
     });
+    setShareItem(null);
     if (mode === 'flashcards') {
       const hasFiles = files.length > 0;
       // Require either files or a prompt topic for flashcards generation
@@ -833,6 +838,7 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
       setFlashcardsError(null);
       setFlashcardsCards(null);
       setFlashcardsTitle(null);
+      setFlashcardsDeckId(undefined);
 
       try {
         const { data: sessionData } = await supabase.auth.getSession();
@@ -1065,6 +1071,8 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
     }
 
     // Only clear error and start loading if we pass the validation checks
+    setMindMapId(null);
+    setMindMapTitle(null);
     setIsLoading(true);
     setError(null);
     setMarkdown(null);
@@ -1175,9 +1183,26 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
             if (fm) return fm;
             return 'mindmap';
           })();
+          setMindMapTitle(title);
           try {
-            await supabase.from('mindmaps').insert({ user_id: userId, title, markdown: md });
-            if (typeof window !== 'undefined') window.dispatchEvent(new CustomEvent('cogniguide:generation-complete'));
+            const { data: insertData, error: insertError } = await supabase
+              .from('mindmaps')
+              .insert({ user_id: userId, title, markdown: md })
+              .select('id, title')
+              .single();
+            if (!insertError && insertData) {
+              const insertedId = typeof insertData.id === 'string' ? insertData.id : null;
+              if (insertedId) {
+                setMindMapId(insertedId);
+              }
+              const insertedTitle = typeof insertData.title === 'string' ? insertData.title : null;
+              if (insertedTitle) {
+                setMindMapTitle(insertedTitle);
+              }
+              if (typeof window !== 'undefined') {
+                window.dispatchEvent(new CustomEvent('cogniguide:generation-complete'));
+              }
+            }
           } catch {}
         }
         // Mindmap stream completion event (non-stream path mimics completion)
@@ -1218,9 +1243,26 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
           if (fm) return fm;
           return 'mindmap';
         })();
+        setMindMapTitle(title);
         try {
-          await supabase.from('mindmaps').insert({ user_id: userId, title, markdown: md });
-          if (typeof window !== 'undefined') window.dispatchEvent(new CustomEvent('cogniguide:generation-complete'));
+          const { data: insertData, error: insertError } = await supabase
+            .from('mindmaps')
+            .insert({ user_id: userId, title, markdown: md })
+            .select('id, title')
+            .single();
+          if (!insertError && insertData) {
+            const insertedId = typeof insertData.id === 'string' ? insertData.id : null;
+            if (insertedId) {
+              setMindMapId(insertedId);
+            }
+            const insertedTitle = typeof insertData.title === 'string' ? insertData.title : null;
+            if (insertedTitle) {
+              setMindMapTitle(insertedTitle);
+            }
+            if (typeof window !== 'undefined') {
+              window.dispatchEvent(new CustomEvent('cogniguide:generation-complete'));
+            }
+          }
         } catch {}
       }
       // Mindmap stream completion event (stream path)
@@ -1263,6 +1305,7 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
         onClose={handleCloseModal}
         isPaidUser={resolvedIsPaidSubscriber}
         onRequireUpgrade={onRequireUpgrade ?? handleUpgradeClick}
+        onShareMindMap={mindMapId ? () => setShareItem({ id: mindMapId, type: 'mindmap', title: mindMapTitle ?? null }) : undefined}
       />
       <FlashcardsModal
         open={flashcardsOpen}
@@ -1275,6 +1318,14 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
         isPaidUser={resolvedIsPaidSubscriber}
         onRequireUpgrade={onRequireUpgrade ?? handleUpgradeClick}
         mindMapModelChoice={modelChoice}
+        onShare={flashcardsDeckId ? () => setShareItem({ id: flashcardsDeckId, type: 'flashcards', title: flashcardsTitle ?? null }) : undefined}
+      />
+      <ShareLinkDialog
+        open={Boolean(shareItem?.id)}
+        onClose={() => setShareItem(null)}
+        resourceId={shareItem?.id ?? null}
+        resourceType={shareItem?.type ?? 'mindmap'}
+        resourceTitle={shareItem?.title ?? null}
       />
       <AuthModal open={showAuth} />
       <section id="generator" className={showTitle ? (compact ? 'pt-3 pb-5' : 'pt-4 pb-8') : (compact ? 'pb-12' : 'pb-20')}>

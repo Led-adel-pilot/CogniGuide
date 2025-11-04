@@ -1,14 +1,14 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { createPortal } from 'react-dom';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { supabase, MindmapRecord, FlashcardsRecord } from '@/lib/supabaseClient';
 import Generator from '@/components/Generator';
 import MindMapModal from '@/components/MindMapModal';
 import FlashcardsModal, { Flashcard as FlashcardType } from '@/components/FlashcardsModal';
-import { BrainCircuit, LogOut, Loader2, Map as MapIcon, Coins, Zap, Sparkles, CalendarClock, Menu, X, ChevronRight, MoreHorizontal, Edit, Trash2, Share2, Link2, Copy, Check, Gift, TrendingUp, Mail, FileText, Lock, ChevronDown } from 'lucide-react';
+import ShareLinkDialog from '@/components/ShareLinkDialog';
+import { BrainCircuit, LogOut, Loader2, Map as MapIcon, Coins, Zap, Sparkles, CalendarClock, Menu, X, ChevronRight, MoreHorizontal, Edit, Trash2, Share2, Copy, Check, Gift, TrendingUp, Mail, FileText, Lock, ChevronDown } from 'lucide-react';
 import FlashcardIcon from '@/components/FlashcardIcon';
 import { loadDeckSchedule, saveDeckSchedule, loadDeckScheduleAsync, saveDeckScheduleAsync, loadAllDeckSchedulesAsync, upsertDeckSchedulesBulkAsync, type StoredDeckSchedule } from '@/lib/sr-store';
 import { createInitialSchedule } from '@/lib/spaced-repetition';
@@ -20,6 +20,7 @@ import posthog from 'posthog-js';
 import ThemeToggle from '@/components/ThemeToggle';
 import { cn, formatDate, formatTime } from '@/lib/utils';
 import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
+import { copyTextToClipboard } from '@/lib/copy-to-clipboard';
 
 type SessionUser = {
   id: string;
@@ -222,11 +223,6 @@ export default function DashboardClient() {
   const [menuPosition, setMenuPosition] = useState<{ x: number; y: number } | null>(null);
   const [renamingItem, setRenamingItem] = useState<{ id: string; type: 'mindmap' | 'flashcards'; title: string } | null>(null);
   const [shareItem, setShareItem] = useState<{ id: string; type: 'mindmap' | 'flashcards'; title: string | null } | null>(null);
-  const [shareLink, setShareLink] = useState<string | null>(null);
-  const [shareError, setShareError] = useState<string | null>(null);
-  const [shareLoading, setShareLoading] = useState(false);
-  const [shareCopied, setShareCopied] = useState(false);
-  const [isSharePortalReady, setIsSharePortalReady] = useState(false);
   const [isReferralOpen, setIsReferralOpen] = useState(false);
   const [referralLink, setReferralLink] = useState<string | null>(null);
   const [referralCode, setReferralCode] = useState<string | null>(null);
@@ -242,39 +238,9 @@ export default function DashboardClient() {
   const referralRewardSeenRef = useRef<Set<string>>(new Set());
   const userIdRef = useRef<string | null>(null);
   const referralLastSeenIdRef = useRef<string | null>(null);
-  const shareLinkInputRef = useRef<HTMLInputElement | null>(null);
-  const shareCopiedTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const referralCopyTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const referralRewardTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const shareLinksCacheRef = useRef<Map<string, string>>(new Map());
-  const sharePortalContainerRef = useRef<HTMLElement | null>(null);
   const lastUpgradeTriggerRef = useRef<string | null>(null);
-
-  useEffect(() => {
-    if (typeof document === 'undefined') return;
-
-    let container = document.getElementById('share-portal-root') as HTMLElement | null;
-    let createdContainer = false;
-
-    if (!container) {
-      container = document.createElement('div');
-      container.id = 'share-portal-root';
-      container.style.position = 'relative';
-      container.style.zIndex = '2147483647';
-      document.body.appendChild(container);
-      createdContainer = true;
-    }
-
-    sharePortalContainerRef.current = container;
-    setIsSharePortalReady(true);
-
-    return () => {
-      sharePortalContainerRef.current = null;
-      if (createdContainer && container?.parentNode) {
-        container.parentNode.removeChild(container);
-      }
-    };
-  }, []);
 
   const displayName = getDisplayName(user);
   const displayInitials = getInitials(displayName);
@@ -329,33 +295,7 @@ const handleMindMapLinked = useCallback(
   [activeDeckId],
 );
   useEffect(() => {
-    if (shareItem) {
-      const key = `${shareItem.type}:${shareItem.id}`;
-      const cached = shareLinksCacheRef.current.get(key) || null;
-      setShareLink(cached);
-      setShareError(null);
-      if (shareCopiedTimeoutRef.current) {
-        clearTimeout(shareCopiedTimeoutRef.current);
-        shareCopiedTimeoutRef.current = null;
-      }
-      setShareCopied(false);
-    } else {
-      setShareLink(null);
-      setShareError(null);
-      setShareLoading(false);
-      if (shareCopiedTimeoutRef.current) {
-        clearTimeout(shareCopiedTimeoutRef.current);
-        shareCopiedTimeoutRef.current = null;
-      }
-      setShareCopied(false);
-    }
-  }, [shareItem]);
-
-  useEffect(() => {
     return () => {
-      if (shareCopiedTimeoutRef.current) {
-        clearTimeout(shareCopiedTimeoutRef.current);
-      }
       if (referralCopyTimeoutRef.current) {
         clearTimeout(referralCopyTimeoutRef.current);
       }
@@ -438,54 +378,6 @@ const handleMindMapLinked = useCallback(
     } catch {}
     void fetchReferralDetails();
   }, [isReferralOpen, fetchReferralDetails]);
-
-  const copyTextToClipboard = async (value: string): Promise<boolean> => {
-    try {
-      if (typeof navigator !== 'undefined' && navigator.clipboard?.writeText) {
-        await navigator.clipboard.writeText(value);
-        return true;
-      }
-      if (typeof document === 'undefined') return false;
-      const textArea = document.createElement('textarea');
-      textArea.value = value;
-      textArea.style.position = 'fixed';
-      textArea.style.left = '-999999px';
-      textArea.style.top = '-999999px';
-      document.body.appendChild(textArea);
-      textArea.focus();
-      textArea.select();
-      try {
-        return document.execCommand('copy');
-      } catch {
-        return false;
-      } finally {
-        document.body.removeChild(textArea);
-      }
-    } catch {
-      return false;
-    }
-  };
-
-  const copyShareLink = async (link: string) => {
-    const success = await copyTextToClipboard(link);
-
-    if (success) {
-      if (shareCopiedTimeoutRef.current) {
-        clearTimeout(shareCopiedTimeoutRef.current);
-      }
-      setShareCopied(true);
-      shareCopiedTimeoutRef.current = setTimeout(() => {
-        setShareCopied(false);
-        shareCopiedTimeoutRef.current = null;
-      }, 2000);
-    } else {
-      if (shareCopiedTimeoutRef.current) {
-        clearTimeout(shareCopiedTimeoutRef.current);
-        shareCopiedTimeoutRef.current = null;
-      }
-      setShareCopied(false);
-    }
-  };
 
   const refreshUserTier = useCallback(
     async (userIdOverride?: string, options?: { skipLoadingState?: boolean }) => {
@@ -798,57 +690,6 @@ const handleMindMapLinked = useCallback(
       } catch {}
     }
   }, [showReferralRewardNotice]);
-
-  const handleCreateShareLink = async () => {
-    if (!shareItem) return;
-    setShareLoading(true);
-    setShareError(null);
-    try {
-      const { data: sessionData } = await supabase.auth.getSession();
-      const accessToken = sessionData?.session?.access_token;
-      const response = await fetch('/api/share-link', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
-        },
-        body: JSON.stringify({ itemId: shareItem.id, itemType: shareItem.type })
-      });
-      const result = await response.json().catch(() => ({}));
-      if (!response.ok || !result?.ok || !result?.token) {
-        throw new Error(result?.error || 'Failed to create share link.');
-      }
-      const origin = typeof window !== 'undefined' ? window.location.origin : '';
-      const link = typeof result.url === 'string' && result.url.length > 0
-        ? result.url
-        : origin
-          ? `${origin.replace(/\/$/, '')}/share/${shareItem.type}/${result.token}`
-          : `/share/${shareItem.type}/${result.token}`;
-      const key = `${shareItem.type}:${shareItem.id}`;
-      shareLinksCacheRef.current.set(key, link);
-      setShareLink(link);
-      await copyShareLink(link);
-    } catch (error) {
-      const message = error instanceof Error ? error.message : 'Failed to create share link.';
-      setShareError(message);
-    } finally {
-      setShareLoading(false);
-    }
-  };
-
-  const handleCopyShareLink = async () => {
-    if (!shareLink) return;
-    await copyShareLink(shareLink);
-  };
-
-  const handleShareButtonClick = () => {
-    if (shareLoading) return;
-    if (shareLink) {
-      void handleCopyShareLink();
-    } else {
-      void handleCreateShareLink();
-    }
-  };
 
   const handleClosePricingModal = () => {
     setIsPricingModalOpen(false);
@@ -2523,74 +2364,13 @@ const handleMindMapLinked = useCallback(
         </div>
       )}
 
-      {shareItem && isSharePortalReady && typeof document !== 'undefined' && sharePortalContainerRef.current
-        ? createPortal(
-            <div
-              className="fixed inset-0 bg-black/40 dark:bg-black/60 z-[2147483647] flex items-center justify-center p-4"
-              onClick={() => setShareItem(null)}
-            >
-              <div
-                className="relative bg-background rounded-[1.5rem] p-6 w-full max-w-md border"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <button
-                  onClick={() => setShareItem(null)}
-                  className="absolute top-4 right-4 inline-flex items-center justify-center w-8 h-8 rounded-full border border-border hover:bg-muted/60"
-                >
-                  <X className="h-4 w-4" />
-                </button>
-                <div className="mb-1">
-                  <h2 className="text-lg font-bold">
-                    Share public link to {shareItem.type === 'mindmap' ? 'Mind Map' : 'Flashcards'}
-                  </h2>
-                </div>
-                <p className="text-xs text-muted-foreground mb-4">
-                  Anyone with the link can view this {shareItem.type === 'mindmap' ? 'mind map' : 'flashcard deck'}.
-                </p>
-                {shareError && <div className="mb-3 text-sm text-red-600">{shareError}</div>}
-                <div className="space-y-3">
-                  <div className="flex flex-col gap-2 rounded-3xl border border-border/40 bg-background p-2 shadow-inner focus-within:outline-none focus-within:ring-2 focus-within:ring-primary/40 sm:flex-row sm:items-center sm:gap-0 sm:rounded-full sm:p-0">
-                    <input
-                      ref={shareLinkInputRef}
-                      value={shareLink ?? ''}
-                      readOnly
-                      placeholder="https://cogniguide.app/share/…"
-                      className="flex-1 border-none bg-transparent px-4 py-3 text-sm font-medium text-foreground outline-none focus:ring-0"
-                    />
-                    <button
-                      type="button"
-                      onClick={handleShareButtonClick}
-                      disabled={shareLoading}
-                      className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground transition hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto sm:rounded-full sm:mr-1 sm:my-1"
-                    >
-                      {shareLoading ? (
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                      ) : shareLink ? (
-                        shareCopied ? (
-                          <Check className="h-4 w-4" />
-                        ) : (
-                          <Copy className="h-4 w-4" />
-                        )
-                      ) : (
-                        <Link2 className="h-4 w-4" />
-                      )}
-                      <span>
-                        {shareLoading
-                          ? 'Creating…'
-                          : shareLink
-                            ? shareCopied
-                              ? 'Copied!'
-                              : 'Copy link'
-                            : 'Create link'}
-                      </span>
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>,
-            sharePortalContainerRef.current
-          )
-        : null}
+      <ShareLinkDialog
+        open={Boolean(shareItem?.id)}
+        onClose={() => setShareItem(null)}
+        resourceId={shareItem?.id ?? null}
+        resourceType={shareItem?.type ?? 'mindmap'}
+        resourceTitle={shareItem?.title ?? null}
+      />
     </div>
   );
 }
