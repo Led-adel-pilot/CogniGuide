@@ -141,6 +141,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
   const [showLossAversionPopup, setShowLossAversionPopup] = React.useState(false);
   const [showExamDatePopup, setShowExamDatePopup] = React.useState(false);
   const [, setCardsViewedCount] = React.useState(0);
+  const lastViewedIndexRef = React.useRef<number | null>(null);
   const [answerShownTime, setAnswerShownTime] = React.useState<number | null>(null);
   const [originalDueCount, setOriginalDueCount] = React.useState(0);
   const [originalDueList, setOriginalDueList] = React.useState<number[]>([]);
@@ -726,6 +727,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
       setShowAuthModal(false);
       setShowExamDatePopup(false);
       setCardsViewedCount(0);
+      lastViewedIndexRef.current = null;
       setAnswerShownTime(null);
       setDueNowIndices([]);
       setImmediateReviewIndices([]);
@@ -770,6 +772,26 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
       sub.subscription.unsubscribe();
     };
   }, []);
+
+  React.useEffect(() => {
+    if (!open) return;
+    if (isEmbedded) return;
+    if (userId) return;
+    if (!cards || cards.length === 0) return;
+    if (lastViewedIndexRef.current === index) return;
+
+    lastViewedIndexRef.current = index;
+
+    setCardsViewedCount((prev) => {
+      const newCount = prev + 1;
+      if (newCount >= 3 && !signupPromptTriggered) {
+        setSignupPromptTriggered(true);
+        storePendingDeckForSignup();
+        openAuthModal('Sign up to save this flashcard deck and keep your study progress.');
+      }
+      return newCount;
+    });
+  }, [open, index, cards, userId, isEmbedded, signupPromptTriggered, storePendingDeckForSignup, openAuthModal]);
 
   React.useEffect(() => {
     setImmediateReviewIndices([]);
@@ -1676,19 +1698,6 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
                   } else {
                     setShowAnswer(true);
                     setAnswerShownTime(Date.now());
-                  }
-
-                  // Track cards viewed for non-auth users (skip prompts for embedded mode)
-                  if (!userId && !isEmbedded) {
-                    setCardsViewedCount(prev => {
-                      const newCount = prev + 1;
-                      if (newCount >= 10 && !signupPromptTriggered) {
-                        setSignupPromptTriggered(true);
-                        storePendingDeckForSignup();
-                        openAuthModal('Sign up to save this flashcard deck and keep your study progress.');
-                      }
-                      return newCount;
-                    });
                   }
                 }} className="inline-flex items-center h-10 px-5 rounded-full text-white bg-primary hover:bg-primary/90 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/50 whitespace-nowrap">
                   <Eye className="h-5 w-5 mr-2" /> Show Answer
