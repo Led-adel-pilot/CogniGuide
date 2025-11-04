@@ -946,6 +946,16 @@ export default function MindMapModal({ markdown, onClose, onShareMindMap, isPaid
                 className="opacity-100 translate-x-0 transition-all duration-200 ease-in-out"
               />
             )}
+            {!userId && !disableSignupPrompts && (
+              <button
+                onClick={() => setShowAuthModal(true)}
+                className="inline-flex items-center justify-center h-8 px-4 text-sm font-medium text-foreground rounded-full border border-border shadow-sm hover:bg-muted/50 focus:outline-none opacity-100 translate-x-0 transition-all duration-200 ease-in-out"
+                style={{ backgroundColor: 'var(--color-background)' }}
+                aria-label="Sign up"
+              >
+                Sign up
+              </button>
+            )}
 
             {onBackToFlashcards ? (
               <button

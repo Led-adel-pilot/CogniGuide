@@ -1282,6 +1282,15 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
           {onShare && (
             <ShareTriggerButton onClick={onShare} showText={true} />
           )}
+          {!userId && (
+            <button
+              onClick={() => setShowAuthModal(true)}
+              className="inline-flex items-center justify-center h-8 px-4 rounded-full border border-border bg-background text-sm font-medium text-foreground hover:bg-muted/50 dark:hover:bg-muted/80 focus:outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400/50"
+              aria-label="Sign up"
+            >
+              Sign up
+            </button>
+          )}
           <button
             onClick={handleClose}
             className="inline-flex items-center justify-center w-8 h-8 bg-background text-foreground rounded-full border border-border shadow-sm hover:bg-muted/50 dark:hover:bg-muted/80 focus:outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400/50"
