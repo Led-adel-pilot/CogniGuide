@@ -1221,12 +1221,27 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
   const getPrevIndex = () => {
     if (studyDueOnly && dueList.length > 0) {
       const pos = dueList.indexOf(index);
-      const prevPos = (pos - 1 + dueList.length) % dueList.length;
-      return dueList[prevPos];
+      if (pos <= 0) return index;
+      return dueList[pos - 1];
     }
-    if (scheduledCards && scheduledCards.length > 0) return (index - 1 + scheduledCards.length) % scheduledCards.length;
-    return index;
+    if (scheduledCards && scheduledCards.length > 0) {
+      if (index <= 0) return 0;
+      return index - 1;
+    }
+    return Math.max(0, index - 1);
   };
+
+  const canGoPrev = React.useMemo(() => {
+    if (!hasCards) return false;
+    if (studyDueOnly && dueList.length > 0) {
+      const pos = dueList.indexOf(index);
+      return pos > 0;
+    }
+    if (scheduledCards && scheduledCards.length > 0) {
+      return index > 0;
+    }
+    return index > 0;
+  }, [hasCards, studyDueOnly, dueList, index, scheduledCards]);
 
   if (!open && !isEmbedded) return null;
 
@@ -1548,6 +1563,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
               <div className="justify-self-start">
                 <button
                   onClick={() => {
+                    if (!canGoPrev) return;
                     const prevIndex = getPrevIndex();
                     setIndex(prevIndex);
                     setShowAnswer(false);
@@ -1555,7 +1571,8 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
                     setPredictedDueByGrade({});
                     setAnswerShownTime(null);
                   }}
-                  className="inline-flex items-center justify-center h-10 w-10 sm:w-auto sm:px-4 rounded-full border border-border bg-background text-foreground hover:bg-muted/50 dark:hover:bg-muted/80 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400/50"
+                  disabled={!canGoPrev}
+                  className="inline-flex items-center justify-center h-10 w-10 sm:w-auto sm:px-4 rounded-full border border-border bg-background text-foreground hover:bg-muted/50 dark:hover:bg-muted/80 disabled:opacity-60 disabled:cursor-not-allowed transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400/50"
                 >
                   <ChevronLeft className="h-5 w-5 sm:mr-2" />
                   <span className="hidden sm:inline">Prev</span>
