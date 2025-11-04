@@ -7,9 +7,10 @@ import posthog from 'posthog-js';
 
 interface AuthModalProps {
   open: boolean;
+  subtitle?: string;
 }
 
-export default function AuthModal({ open }: AuthModalProps) {
+export default function AuthModal({ open, subtitle }: AuthModalProps) {
   const [email, setEmail] = useState('');
   const [isSending, setIsSending] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
@@ -68,7 +69,7 @@ export default function AuthModal({ open }: AuthModalProps) {
     <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/40 dark:bg-black/60">
       <div className="bg-background border w-full max-w-[460px] rounded-[1.5rem] shadow-2xl p-6 relative">
         <h2 className="text-xl font-bold mb-2">Create a free account</h2>
-        <p className="text-sm text-muted-foreground mb-4">Sign up to continue generating and save your history.</p>
+        <p className="text-sm text-muted-foreground mb-4">{subtitle ?? 'Sign up to continue generating and save your history.'}</p>
 
         {message && <div className="mb-3 text-sm text-green-100 bg-green-600 border border-green-700 dark:text-green-800 dark:bg-green-100 dark:border-green-200 rounded p-2">{message}</div>}
         {error && <div className="mb-3 text-sm text-red-700 dark:text-red-400 bg-red-50 dark:bg-red-950/50 border border-red-200 dark:border-red-800 rounded p-2">{error}</div>}

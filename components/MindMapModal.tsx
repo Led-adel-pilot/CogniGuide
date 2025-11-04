@@ -508,8 +508,9 @@ export default function MindMapModal({ markdown, onClose, onShareMindMap, isPaid
 
   const [userId, setUserId] = useState<string | null>(null);
   const [showLossAversionPopup, setShowLossAversionPopup] = useState(false);
-  const [showTimeBasedPopup, setShowTimeBasedPopup] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const [authModalSubtitleOverride, setAuthModalSubtitleOverride] = useState<string | undefined>(undefined);
+  const [signupPromptTriggered, setSignupPromptTriggered] = useState(false);
   const [hasGeneratedContent, setHasGeneratedContent] = useState(false);
   // Gate auto-collapse: allow for non-auth users, and for auth users only if they have never generated a mind map before
   const [shouldAutoCollapse, setShouldAutoCollapse] = useState<boolean>(false);
@@ -522,6 +523,23 @@ export default function MindMapModal({ markdown, onClose, onShareMindMap, isPaid
   const katexReadyRef = useRef<boolean>(false);
   const ensuringKatexPromiseRef = useRef<Promise<void> | null>(null);
   const renderedMarkdownRef = useRef<string | null>(null);
+
+  const storePendingMindMapForSignup = useCallback(() => {
+    if (!markdown) return;
+    if (typeof window === 'undefined') return;
+    try {
+      localStorage.setItem('cogniguide:pending_mindmap', markdown);
+    } catch (error) {
+      if (process.env.NODE_ENV !== 'production') {
+        console.error('Failed to cache pending mind map for signup', error);
+      }
+    }
+  }, [markdown]);
+
+  const openAuthModal = useCallback((subtitle?: string) => {
+    setAuthModalSubtitleOverride(subtitle);
+    setShowAuthModal(true);
+  }, []);
 
   const handleClose = (event?: React.MouseEvent) => {
     // Prevent any automatic triggers
@@ -716,7 +734,9 @@ export default function MindMapModal({ markdown, onClose, onShareMindMap, isPaid
       initializedRef.current = false;
       setHasGeneratedContent(false);
       setShowLossAversionPopup(false);
-      setShowTimeBasedPopup(false);
+      setSignupPromptTriggered(false);
+      setAuthModalSubtitleOverride(undefined);
+      setShowAuthModal(false);
       // Reset collapse request state so future generations don't inherit it
       collapseRequestedRef.current = false;
       if (collapseRetryTimeoutRef.current !== null) {
@@ -727,16 +747,18 @@ export default function MindMapModal({ markdown, onClose, onShareMindMap, isPaid
     }
   }, [markdown]);
 
-  // Timer for time-based signup popup for non-auth users
+  // Timer for time-based auth prompt for non-auth users
   useEffect(() => {
-    if (!markdown || userId || showTimeBasedPopup || disableSignupPrompts) return;
+    if (!markdown || userId || signupPromptTriggered || disableSignupPrompts) return;
 
     const timer = setTimeout(() => {
-      setShowTimeBasedPopup(true);
+      setSignupPromptTriggered(true);
+      storePendingMindMapForSignup();
+      openAuthModal('Sign up to save this mind map and keep exploring.');
     }, 120000); // 120 seconds
 
     return () => clearTimeout(timer);
-  }, [markdown, userId, showTimeBasedPopup, disableSignupPrompts]);
+  }, [markdown, userId, signupPromptTriggered, disableSignupPrompts, storePendingMindMapForSignup, openAuthModal]);
 
   useEffect(() => {
     return () => {
@@ -889,7 +911,7 @@ export default function MindMapModal({ markdown, onClose, onShareMindMap, isPaid
           box-shadow: 0 0 0 0.1em rgba(255, 225, 35, 0.55);
         }
       `}</style>
-      <AuthModal open={showAuthModal} />
+      <AuthModal open={showAuthModal} subtitle={authModalSubtitleOverride} />
       <div className={rootClassName} style={rootStyle}>
         <div className={containerClassName} style={{ backgroundColor: 'var(--color-background)' }}>
           <div className="absolute top-2 right-2 z-30 group inline-flex items-center gap-1.5">
@@ -948,7 +970,7 @@ export default function MindMapModal({ markdown, onClose, onShareMindMap, isPaid
             )}
             {!userId && !disableSignupPrompts && (
               <button
-                onClick={() => setShowAuthModal(true)}
+                onClick={() => openAuthModal()}
                 className="inline-flex items-center justify-center h-8 px-4 text-sm font-medium text-foreground rounded-full border border-border shadow-sm hover:bg-muted/50 focus:outline-none opacity-100 translate-x-0 transition-all duration-200 ease-in-out"
                 style={{ backgroundColor: 'var(--color-background)' }}
                 aria-label="Sign up"
@@ -1001,11 +1023,9 @@ export default function MindMapModal({ markdown, onClose, onShareMindMap, isPaid
               <div className="flex flex-col gap-3 w-full max-w-md">
                 <button
                   onClick={() => {
-                    if (markdown) {
-                      localStorage.setItem('cogniguide:pending_mindmap', markdown);
-                    }
+                    storePendingMindMapForSignup();
                     setShowLossAversionPopup(false);
-                    setShowAuthModal(true);
+                    openAuthModal();
                   }}
                   className="w-full h-10 px-6 text-sm font-bold text-white bg-gradient-to-r from-blue-600 via-cyan-500 to-teal-500 rounded-full hover:opacity-90 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/50 whitespace-nowrap"
                 >
@@ -1016,39 +1036,6 @@ export default function MindMapModal({ markdown, onClose, onShareMindMap, isPaid
                   className="w-full h-10 px-6 text-sm font-medium text-muted-foreground bg-muted rounded-full hover:bg-muted/80 transition-colors whitespace-nowrap"
                 >
                   Continue without saving
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {showTimeBasedPopup && !disableSignupPrompts && (
-          <div className="absolute inset-0 flex items-center justify-center z-[110]">
-            {/* Black transparent background */}
-            <div className="absolute inset-0 bg-black/40 dark:bg-black/60 z-0"></div>
-            <div className="border p-8 rounded-2xl shadow-xl max-w-md w-full text-center relative z-10" style={{ backgroundColor: 'var(--color-background)' }}>
-              <h2 className="text-2xl font-bold mb-4">Sign Up to Save Your Mind Map!</h2>
-              <p className="text-muted-foreground mb-6">
-                Sign up to continue reading and save your mind map.
-              </p>
-              <div className="flex flex-col gap-3 w-full max-w-md">
-                <button
-                  onClick={() => {
-                    if (markdown) {
-                      localStorage.setItem('cogniguide:pending_mindmap', markdown);
-                    }
-                    setShowTimeBasedPopup(false);
-                    setShowAuthModal(true);
-                  }}
-                  className="w-full h-10 px-6 text-sm font-bold text-white bg-gradient-to-r from-blue-600 via-cyan-500 to-teal-500 rounded-full hover:opacity-90 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/50 whitespace-nowrap"
-                >
-                  Save & Continue
-                </button>
-                <button
-                  onClick={onClose}
-                  className="w-full h-10 px-6 text-sm font-medium text-muted-foreground bg-muted rounded-full hover:bg-muted/80 transition-colors whitespace-nowrap"
-                >
-                  Close Mind Map
                 </button>
               </div>
             </div>

@@ -136,8 +136,9 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
   const [userId, setUserId] = React.useState<string | null>(null);
   const [isCurrentDeckExamReady, setIsCurrentDeckExamReady] = React.useState(!studyInterleaved);
   const [showAuthModal, setShowAuthModal] = React.useState(false);
+  const [authModalSubtitleOverride, setAuthModalSubtitleOverride] = React.useState<string | undefined>(undefined);
+  const [signupPromptTriggered, setSignupPromptTriggered] = React.useState(false);
   const [showLossAversionPopup, setShowLossAversionPopup] = React.useState(false);
-  const [showSignupPopup, setShowSignupPopup] = React.useState(false);
   const [showExamDatePopup, setShowExamDatePopup] = React.useState(false);
   const [, setCardsViewedCount] = React.useState(0);
   const [answerShownTime, setAnswerShownTime] = React.useState<number | null>(null);
@@ -174,6 +175,24 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
     setExplanation('');
     setExplanationError(null);
     setIsExplaining(false);
+  }, []);
+
+  const storePendingDeckForSignup = React.useCallback(() => {
+    if (!title || !cards) return;
+    if (typeof window === 'undefined') return;
+    try {
+      const pendingDeck = { title, cards };
+      localStorage.setItem('cogniguide:pending_flashcards', JSON.stringify(pendingDeck));
+    } catch (error) {
+      if (process.env.NODE_ENV !== 'production') {
+        console.error('Failed to cache pending flashcards for signup', error);
+      }
+    }
+  }, [title, cards]);
+
+  const openAuthModal = React.useCallback((subtitle?: string) => {
+    setAuthModalSubtitleOverride(subtitle);
+    setShowAuthModal(true);
   }, []);
 
   const deriveMindMapTitle = React.useCallback((markdownText: string) => {
@@ -246,7 +265,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
       if (onRequireUpgrade) {
         onRequireUpgrade();
       } else {
-        setShowAuthModal(true);
+        openAuthModal();
       }
       return;
     }
@@ -702,7 +721,9 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
       setPredictedDueByGrade({});
       setFinished(false);
       setShowLossAversionPopup(false);
-      setShowSignupPopup(false);
+      setSignupPromptTriggered(false);
+      setAuthModalSubtitleOverride(undefined);
+      setShowAuthModal(false);
       setShowExamDatePopup(false);
       setCardsViewedCount(0);
       setAnswerShownTime(null);
@@ -1284,7 +1305,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
           )}
           {!userId && (
             <button
-              onClick={() => setShowAuthModal(true)}
+              onClick={() => openAuthModal()}
               className="inline-flex items-center justify-center h-8 px-4 rounded-full border border-border bg-background text-sm font-medium text-foreground hover:bg-muted/50 dark:hover:bg-muted/80 focus:outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400/50"
               aria-label="Sign up"
             >
@@ -1396,7 +1417,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
                             setPredictedDueByGrade({});
                             setImmediateReviewIndices([]);
                             setCardsViewedCount(0);
-                            setShowSignupPopup(false);
+                            setSignupPromptTriggered(false);
                             setAnswerShownTime(null);
                             onReviewDueCards?.(nextDueList);
                           } else {
@@ -1423,7 +1444,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
                             const pendingDeck = { title, cards };
                             localStorage.setItem('cogniguide:pending_flashcards', JSON.stringify(pendingDeck));
                           }
-                          setShowAuthModal(true);
+                          openAuthModal();
                         }}
                         className="flex-1 h-auto sm:h-10 py-2 sm:py-0 px-6 text-base font-bold text-white bg-gradient-primary rounded-full hover:bg-gradient-primary-hover transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/50 whitespace-nowrap inline-flex items-center justify-center"
                       >
@@ -1437,7 +1458,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
                           resetExplanation();
                           setPredictedDueByGrade({});
                           setCardsViewedCount(0);
-                          setShowSignupPopup(false);
+                          setSignupPromptTriggered(false);
                           setAnswerShownTime(null);
                         }}
                         className="flex-1 h-auto sm:h-10 py-2 sm:py-0 px-6 text-base font-medium text-muted-foreground bg-muted rounded-full hover:bg-muted/70 transition-colors"
@@ -1461,7 +1482,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
                             const pendingDeck = { title, cards };
                             localStorage.setItem('cogniguide:pending_flashcards', JSON.stringify(pendingDeck));
                           }
-                          setShowAuthModal(true);
+                          openAuthModal();
                         }}
                         className="flex-1 h-auto sm:h-10 py-2 sm:py-0 px-6 text-base font-bold text-white bg-gradient-primary rounded-full hover:bg-gradient-primary-hover transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/50 whitespace-nowrap"
                       >
@@ -1475,7 +1496,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
                           resetExplanation();
                           setPredictedDueByGrade({});
                           setCardsViewedCount(0);
-                          setShowSignupPopup(false);
+                          setSignupPromptTriggered(false);
                           setAnswerShownTime(null);
                         }}
                         className="flex-1 h-auto sm:h-10 py-2 sm:py-0 px-6 text-base font-medium text-muted-foreground bg-muted rounded-full hover:bg-muted/70 transition-colors"
@@ -1657,13 +1678,14 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
                     setAnswerShownTime(Date.now());
                   }
 
-                  // Track cards viewed for non-auth users (skip popups for embedded mode)
+                  // Track cards viewed for non-auth users (skip prompts for embedded mode)
                   if (!userId && !isEmbedded) {
                     setCardsViewedCount(prev => {
                       const newCount = prev + 1;
-                      // Show signup popup after viewing 10 cards
-                      if (newCount >= 10 && !showSignupPopup) {
-                        setShowSignupPopup(true);
+                      if (newCount >= 10 && !signupPromptTriggered) {
+                        setSignupPromptTriggered(true);
+                        storePendingDeckForSignup();
+                        openAuthModal('Sign up to save this flashcard deck and keep your study progress.');
                       }
                       return newCount;
                     });
@@ -1718,7 +1740,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
     return (
       <>
         <ModalContent />
-        <AuthModal open={showAuthModal} />
+        <AuthModal open={showAuthModal} subtitle={authModalSubtitleOverride} />
         <style jsx global>{katexAlignmentStyles}</style>
       </>
     );
@@ -1727,7 +1749,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
   return (
     <>
       <div className="fixed inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center z-[90] p-1 font-sans">
-        <AuthModal open={showAuthModal} />
+        <AuthModal open={showAuthModal} subtitle={authModalSubtitleOverride} />
         <ModalContent />
       </div>
       {isMindMapModalOpen && (
@@ -1767,7 +1789,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
                     localStorage.setItem('cogniguide:pending_flashcards', JSON.stringify(pendingDeck));
                   }
                   setShowLossAversionPopup(false);
-                  setShowAuthModal(true);
+                  openAuthModal();
                 }}
                 className="w-full h-10 px-6 text-sm font-bold text-white bg-gradient-primary rounded-full hover:bg-gradient-primary-hover transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/50 whitespace-nowrap"
               >
@@ -1783,41 +1805,6 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
           </div>
         </div>
       )}
-
-      {showSignupPopup && (
-        <div className="absolute inset-0 flex items-center justify-center z-[110]">
-          {/* Black transparent background */}
-          <div className="absolute inset-0 bg-black/40 dark:bg-black/60 z-0"></div>
-          <div className="bg-background border p-8 rounded-2xl shadow-xl max-w-md w-full text-center relative z-10">
-            <h2 className="text-foreground text-2xl font-bold mb-4">Sign Up to Save Your Flashcards!</h2>
-            <p className="text-muted-foreground mb-6">
-              Sign up to save your flashcard deck and get scheduled reviews based on the spaced repetition algorithm.
-            </p>
-            <div className="flex flex-col gap-3 w-full max-w-md">
-              <button
-                onClick={() => {
-                  if (title && cards) {
-                    const pendingDeck = { title, cards };
-                    localStorage.setItem('cogniguide:pending_flashcards', JSON.stringify(pendingDeck));
-                  }
-                  setShowSignupPopup(false);
-                  setShowAuthModal(true);
-                }}
-                className="w-full h-10 px-6 text-sm font-bold text-white bg-gradient-primary rounded-full hover:bg-gradient-primary-hover transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/50 whitespace-nowrap"
-              >
-                Sign Up & Save Progress
-              </button>
-              <button
-                onClick={onClose}
-                className="w-full h-10 px-6 text-sm font-medium text-muted-foreground bg-muted rounded-full hover:bg-muted/70 transition-colors whitespace-nowrap"
-              >
-                Close Flashcard Deck
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
       {showExamDatePopup && (
         <div className="fixed inset-0 flex items-center justify-center z-[110] sm:items-start sm:pt-16">
           {/* Black transparent background */}
