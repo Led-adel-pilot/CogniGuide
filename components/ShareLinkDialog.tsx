@@ -32,7 +32,6 @@ export default function ShareLinkDialog({
   onClose,
   resourceId,
   resourceType,
-  resourceTitle,
 }: ShareLinkDialogProps) {
   const [shareLink, setShareLink] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -166,7 +165,7 @@ export default function ShareLinkDialog({
           </h2>
         </div>
         <p className="text-xs text-muted-foreground mb-4">
-          Anyone with the link can view this {resourceType === 'mindmap' ? 'mind map' : 'flashcard deck'}{resourceTitle ? ` (${resourceTitle})` : ''}.
+          Anyone with the link can view this {resourceType === 'mindmap' ? 'mind map' : 'flashcard deck'}.
         </p>
         {error ? <div className="mb-3 text-sm text-red-600">{error}</div> : null}
         <div className="space-y-3">

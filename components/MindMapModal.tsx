@@ -755,7 +755,7 @@ export default function MindMapModal({ markdown, onClose, onShareMindMap, isPaid
       setSignupPromptTriggered(true);
       storePendingMindMapForSignup();
       openAuthModal('Sign up to save this mind map and keep exploring.');
-    }, 120000); // 120 seconds
+    }, 20000); // 20 seconds
 
     return () => clearTimeout(timer);
   }, [markdown, userId, signupPromptTriggered, disableSignupPrompts, storePendingMindMapForSignup, openAuthModal]);
