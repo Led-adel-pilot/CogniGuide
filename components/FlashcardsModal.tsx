@@ -1255,7 +1255,6 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
         setFinished(true);
         return nextIndex; // Return the next index (0)
       } else {
-        setIndex(nextIndex);
         return nextIndex;
       }
     }
@@ -1285,6 +1284,118 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
     }
     return index > 0;
   }, [hasCards, studyDueOnly, dueList, index, scheduledCards]);
+
+  const handlePrevCard = React.useCallback(() => {
+    if (!canGoPrev) return;
+    const prevIndex = getPrevIndex();
+    setIndex(prevIndex);
+    setShowAnswer(false);
+    resetExplanation();
+    setPredictedDueByGrade({});
+    setAnswerShownTime(null);
+  }, [canGoPrev, getPrevIndex, resetExplanation]);
+
+  const handleNextCard = React.useCallback(() => {
+    const nextIndex = getNextIndex();
+    setIndex(nextIndex);
+    setShowAnswer(false);
+    resetExplanation();
+    setPredictedDueByGrade({});
+    setAnswerShownTime(null);
+  }, [getNextIndex, resetExplanation]);
+
+  const handleShowAnswer = React.useCallback(() => {
+    resetExplanation();
+    posthog.capture('flashcard_answer_shown', {
+      deckId: deckId,
+      card_index: index,
+      study_due_only: studyDueOnly,
+    });
+
+    // Check if we should show exam date popup (skip for embedded mode)
+    const shouldShowExamDatePopup =
+      !isEmbedded && isCurrentDeckExamReady && !deckExamDate && !hasExamDatePopupBeenShown(deckIdentifier);
+    if (shouldShowExamDatePopup) {
+      setShowExamDatePopup(true);
+    } else {
+      setShowAnswer(true);
+      setAnswerShownTime(Date.now());
+    }
+  }, [
+    deckId,
+    deckExamDate,
+    deckIdentifier,
+    hasExamDatePopupBeenShown,
+    index,
+    isCurrentDeckExamReady,
+    isEmbedded,
+    resetExplanation,
+    studyDueOnly,
+  ]);
+
+  React.useEffect(() => {
+    if (!open || isEmbedded) return;
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.defaultPrevented) return;
+      if (event.metaKey || event.ctrlKey || event.altKey) return;
+
+      const target = event.target as HTMLElement | null;
+      if (target) {
+        const tagName = target.tagName;
+        if (tagName === 'INPUT' || tagName === 'TEXTAREA' || target.isContentEditable) {
+          return;
+        }
+        const role = target.getAttribute('role');
+        if (role === 'textbox') return;
+      }
+
+      // Ignore shortcuts when another modal/dialog is active
+      if (isMindMapModalOpen || showAuthModal || showLossAversionPopup || showExamDatePopup) {
+        return;
+      }
+
+      switch (event.key) {
+        case 'Enter':
+          if (!showAnswer) {
+            event.preventDefault();
+            handleShowAnswer();
+          }
+          break;
+        case 'ArrowRight':
+          if (!showAnswer) {
+            event.preventDefault();
+            handleNextCard();
+          }
+          break;
+        case 'ArrowLeft':
+          if (!showAnswer && canGoPrev) {
+            event.preventDefault();
+            handlePrevCard();
+          }
+          break;
+        default:
+          break;
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [
+    canGoPrev,
+    handleNextCard,
+    handlePrevCard,
+    handleShowAnswer,
+    isEmbedded,
+    isMindMapModalOpen,
+    open,
+    showAnswer,
+    showAuthModal,
+    showExamDatePopup,
+    showLossAversionPopup,
+  ]);
 
   if (!open && !isEmbedded) return null;
 
@@ -1614,15 +1725,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
             {!showAnswer ? (
               <div className="justify-self-start">
                 <button
-                  onClick={() => {
-                    if (!canGoPrev) return;
-                    const prevIndex = getPrevIndex();
-                    setIndex(prevIndex);
-                    setShowAnswer(false);
-                    resetExplanation();
-                    setPredictedDueByGrade({});
-                    setAnswerShownTime(null);
-                  }}
+                  onClick={handlePrevCard}
                   disabled={!canGoPrev}
                   className="inline-flex items-center justify-center h-10 w-10 sm:w-auto sm:px-4 rounded-full border border-border bg-background text-foreground hover:bg-muted/50 dark:hover:bg-muted/80 disabled:opacity-60 disabled:cursor-not-allowed transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400/50"
                 >
@@ -1683,23 +1786,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
                   </div>
                 )
               ) : (
-                <button onClick={() => {
-                  resetExplanation();
-                  posthog.capture('flashcard_answer_shown', {
-                    deckId: deckId,
-                    card_index: index,
-                    study_due_only: studyDueOnly,
-                  });
-
-                  // Check if we should show exam date popup (skip for embedded mode)
-                  const shouldShowExamDatePopup = !isEmbedded && isCurrentDeckExamReady && !deckExamDate && !hasExamDatePopupBeenShown(deckIdentifier);
-                  if (shouldShowExamDatePopup) {
-                    setShowExamDatePopup(true);
-                  } else {
-                    setShowAnswer(true);
-                    setAnswerShownTime(Date.now());
-                  }
-                }} className="inline-flex items-center h-10 px-5 rounded-full text-white bg-primary hover:bg-primary/90 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/50 whitespace-nowrap">
+                <button onClick={handleShowAnswer} className="inline-flex items-center h-10 px-5 rounded-full text-white bg-primary hover:bg-primary/90 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/50 whitespace-nowrap">
                   <Eye className="h-5 w-5 mr-2" /> Show Answer
                 </button>
               )}
@@ -1707,14 +1794,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
             {!showAnswer ? (
               <div className="justify-self-end">
                 <button
-                  onClick={() => {
-                    const nextIndex = getNextIndex();
-                    setIndex(nextIndex);
-                    setShowAnswer(false);
-                    resetExplanation();
-                    setPredictedDueByGrade({});
-                    setAnswerShownTime(null);
-                  }}
+                  onClick={handleNextCard}
                   className="inline-flex items-center justify-center h-10 w-10 sm:w-auto sm:px-4 rounded-full border border-border bg-background text-foreground hover:bg-muted/50 dark:hover:bg-muted/80 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400/50"
                 >
                   <span className="hidden sm:inline">Next</span>
