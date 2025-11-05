@@ -263,17 +263,29 @@ export default function FlashcardGeneratorLanding({ page }: FlashcardGeneratorLa
     };
   }, [page.hero.heading]);
 
-  const renderEmbeddedFlashcardsShowcase = () => (
-    <div className="bg-background rounded-[2rem] border shadow-xl shadow-slate-200/50 dark:shadow-slate-700/50 overflow-hidden">
-      <div className="w-full" style={embeddedFlashcardHeight ? { height: `${embeddedFlashcardHeight}px` } : undefined}>
-        <EmbeddedFlashcards
-          cards={embeddedFlashcardDeck}
-          title="AI Generated Samples"
-          onHeightChange={handleEmbeddedFlashcardHeight}
-        />
+  const renderEmbeddedFlashcardsShowcase = (options?: { wrapperClassName?: string; cardContainerClassName?: string }) => {
+    const wrapperClassName = ['mx-auto w-full max-w-[1040px]', options?.wrapperClassName].filter(Boolean).join(' ');
+    const cardContainerClassName = [
+      'bg-background rounded-[2rem] border shadow-xl shadow-slate-200/50 dark:shadow-slate-700/50 overflow-hidden',
+      options?.cardContainerClassName,
+    ]
+      .filter(Boolean)
+      .join(' ');
+
+    return (
+      <div className={wrapperClassName}>
+        <div className={cardContainerClassName}>
+          <div className="w-full" style={embeddedFlashcardHeight ? { height: `${embeddedFlashcardHeight}px` } : undefined}>
+            <EmbeddedFlashcards
+              cards={embeddedFlashcardDeck}
+              title="AI Generated Samples"
+              onHeightChange={handleEmbeddedFlashcardHeight}
+            />
+          </div>
+        </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   useEffect(() => {
     try {
@@ -542,7 +554,10 @@ export default function FlashcardGeneratorLanding({ page }: FlashcardGeneratorLa
                   {isGeneratorAboveTheFold ? (
                     <GeneratorWidget redirectOnAuth showTitle={false} />
                   ) : (
-                    renderEmbeddedFlashcardsShowcase()
+                    renderEmbeddedFlashcardsShowcase({
+                      wrapperClassName: 'h-full flex items-stretch justify-center',
+                      cardContainerClassName: 'flex-1',
+                    })
                   )}
                 </div>
               </div>
