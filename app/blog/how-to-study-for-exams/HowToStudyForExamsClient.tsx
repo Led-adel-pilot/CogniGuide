@@ -6,7 +6,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import CogniGuideLogo from '@/CogniGuide_logo.png';
-import { useCaseHubs } from '@/lib/programmatic/useCaseData';
+import { useCaseMenuHubs } from '@/lib/programmatic/useCaseMenuData';
 import { broadcastAuthState, readSignedInFromCookies, writeCgAuthedCookie } from '@/lib/authCookie';
 
 const AuthModal = dynamic(() => import('@/components/AuthModal'), { ssr: false });
@@ -216,7 +216,7 @@ export default function HowToStudyForExamsClient() {
                         Featured hubs
                       </div>
                       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                        {useCaseHubs.map((hub) => (
+                        {useCaseMenuHubs.map((hub) => (
                           <Link
                             key={hub.slug}
                             href={hub.path}
@@ -278,7 +278,7 @@ export default function HowToStudyForExamsClient() {
                           Featured hubs
                         </div>
                         <div className="grid gap-2">
-                          {useCaseHubs.map((hub) => (
+                          {useCaseMenuHubs.map((hub) => (
                             <Link
                               key={hub.slug}
                               href={hub.path}

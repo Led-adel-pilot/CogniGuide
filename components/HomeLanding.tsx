@@ -6,7 +6,7 @@ import Link from 'next/link';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 import CogniGuideLogo from '../CogniGuide_logo.png';
-import { useCaseHubs } from '@/lib/programmatic/useCaseData';
+import { useCaseMenuHubs } from '@/lib/programmatic/useCaseMenuData';
 import { broadcastAuthState, readSignedInFromCookies, writeCgAuthedCookie } from '@/lib/authCookie';
 
 const AuthModal = dynamic(() => import('@/components/AuthModal'), { ssr: false });
@@ -278,7 +278,7 @@ export default function HomeLanding() {
                     <div className="absolute left-0 z-50 mt-3 w-screen max-w-3xl rounded-2xl border border-border bg-background/95 p-4 shadow-xl backdrop-blur">
                       <div className="mb-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Featured hubs</div>
                       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                        {useCaseHubs.map((hub) => (
+                        {useCaseMenuHubs.map((hub) => (
                           <Link
                             key={hub.slug}
                             href={hub.path}
@@ -333,7 +333,7 @@ export default function HomeLanding() {
                       <div className="mt-2 space-y-2 rounded-xl border border-border bg-background/95 p-3 shadow">
                         <div className="text-[0.65rem] font-semibold uppercase tracking-wide text-muted-foreground">Featured hubs</div>
                         <div className="grid gap-2">
-                          {useCaseHubs.map((hub) => (
+                          {useCaseMenuHubs.map((hub) => (
                             <Link
                               key={hub.slug}
                               href={hub.path}
