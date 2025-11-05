@@ -5,6 +5,7 @@ import {
   getProgrammaticFlashcardPage,
 } from '@/lib/programmatic/flashcardPages';
 import { buildProgrammaticMetadata } from '@/lib/programmatic/metadata';
+import { ensureAbsoluteUrl } from '@/lib/seo/sitemap';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
@@ -27,6 +28,14 @@ const defaultBreadcrumbs: FlashcardBreadcrumbSegment[] = [
 type FlashcardsCatchAllParams = {
   slug?: string[];
 };
+
+const withCanonical = (metadata: Metadata, path: string): Metadata => ({
+  ...metadata,
+  alternates: {
+    ...(metadata.alternates ?? {}),
+    canonical: ensureAbsoluteUrl(path),
+  },
+});
 
 const buildBreadcrumbs = (
   segments: FlashcardBreadcrumbSegment[]
@@ -154,7 +163,7 @@ export async function generateMetadata({
   const segments = await getSegments(params);
 
   if (segments.length === 0) {
-    return flashcardsPillarMetadata;
+    return withCanonical(flashcardsPillarMetadata, '/flashcards');
   }
 
   if (segments.length === 1) {
@@ -166,31 +175,33 @@ export async function generateMetadata({
 
     const hub = getHubBySlug(slug);
     if (hub) {
+      const baseMetadata = withCanonical(flashcardHierarchyMetadataBase, hub.path);
       return {
-        ...flashcardHierarchyMetadataBase,
+        ...baseMetadata,
         title: `${hub.name} Flashcard Hub | CogniGuide`,
         description: hub.metaDescription,
       };
     }
 
-    return flashcardHierarchyMetadataBase;
+    return withCanonical(flashcardHierarchyMetadataBase, '/flashcards');
   }
 
   if (segments.length === 2) {
     const [hubSlug, subhubSlug] = segments;
     const resolved = getSubhubBySlugs(hubSlug, subhubSlug);
     if (resolved) {
+      const baseMetadata = withCanonical(flashcardHierarchyMetadataBase, resolved.subhub.path);
       return {
-        ...flashcardHierarchyMetadataBase,
+        ...baseMetadata,
         title: `${resolved.subhub.name} Flashcards | ${resolved.hub.name} | CogniGuide`,
         description: resolved.subhub.metaDescription,
       };
     }
 
-    return flashcardHierarchyMetadataBase;
+    return withCanonical(flashcardHierarchyMetadataBase, '/flashcards');
   }
 
-  return flashcardHierarchyMetadataBase;
+  return withCanonical(flashcardHierarchyMetadataBase, '/flashcards');
 }
 
 export default async function FlashcardsCatchAllPage({
