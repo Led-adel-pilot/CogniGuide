@@ -238,30 +238,119 @@ export default function FlashcardGeneratorLanding({ page }: FlashcardGeneratorLa
     return sanitized.length > 0 ? sanitized : null;
   }, [page.embeddedFlashcards]);
 
-  const headingFontSizes = useMemo(() => {
-    const minChars = 51;
-    const maxChars = 59;
-    const maxFontSize = 3;
-    const minFontSize = 2.8;
-    const headingLength = page.hero.heading.length;
+  const hasHeroSubheading = Boolean(page.hero.subheading?.trim());
 
-    let desktopRem = maxFontSize;
+  const heroTypography = useMemo(() => {
+    const clamp = (value: number, min: number, max: number) => Math.min(Math.max(value, min), max);
+    const normalize = (value: number, lower: number, upper: number) => {
+      if (upper <= lower) return 0;
+      return clamp((upper - value) / (upper - lower), 0, 1);
+    };
 
-    if (headingLength >= maxChars) {
-      desktopRem = minFontSize;
-    } else if (headingLength > minChars) {
-      const ratio = (headingLength - minChars) / (maxChars - minChars);
-      desktopRem = maxFontSize - ratio * (maxFontSize - minFontSize);
+    const headingText = page.hero.heading.trim();
+    const subheadingText = hasHeroSubheading ? page.hero.subheading!.trim() : '';
+
+    const headingChars = headingText.length;
+    const headingWords = headingText.split(/\s+/u).filter(Boolean).length || 1;
+    const headingDensity = headingChars / Math.max(headingWords, 1);
+    const headingCharRatio = normalize(headingChars, 30, 120);
+    const headingWordRatio = normalize(headingWords, 6, 18);
+    const headingBlend = headingCharRatio * 0.6 + headingWordRatio * 0.4;
+
+    let desktopHeadingRem = 1.98 + headingBlend * 0.38;
+    const densityPenalty = clamp((headingDensity - 5.3) / 3.2, 0, 0.22);
+    desktopHeadingRem = clamp(desktopHeadingRem - densityPenalty * 0.82, 1.9, 2.36);
+    const mobileHeadingRem = clamp(desktopHeadingRem - 0.24, 1.72, 2.0);
+
+    const headingLineEstimate = clamp(headingChars / 22, 1.1, 3.6);
+    const headingLineHeight =
+      headingLineEstimate <= 1.6 ? 1.1 : headingLineEstimate <= 2.3 ? 1.16 : headingLineEstimate <= 3 ? 1.2 : 1.24;
+    const headingMarginBottomRem = clamp(0.68 + (headingLineEstimate - 1.5) * 0.12, 0.64, 1.02);
+    const headingMaxWidth = `${(27.5 - headingBlend * 6.2).toFixed(2)}ch`;
+
+    const scaledDesktopHeadingRem = clamp(desktopHeadingRem * 1.6, 2.4, 3.9);
+    const scaledMobileHeadingRem = clamp(mobileHeadingRem * 1.6, 2.1, 3.2);
+    const scaledHeadingLineHeight = Number(Math.max(1.08, headingLineHeight - 0.06).toFixed(3));
+    const scaledHeadingMarginBottom = `${clamp(headingMarginBottomRem * 1.05, 0.74, 1.18).toFixed(3)}rem`;
+
+    const subheadingChars = subheadingText.length;
+    const subheadingWords = subheadingText.split(/\s+/u).filter(Boolean).length || 1;
+    const hasSubheading = hasHeroSubheading;
+
+    let subheadingTypography:
+      | {
+          mobileSize: string;
+          desktopSize: string;
+          lineHeight: number;
+          marginTop: string;
+          maxWidth: string;
+          ctaSpacing: number;
+        }
+      | null = null;
+
+    if (hasSubheading) {
+      const subCharRatio = normalize(subheadingChars, 110, 320);
+      const subWordRatio = normalize(subheadingWords, 18, 60);
+      const subBlend = subCharRatio * 0.55 + subWordRatio * 0.45;
+
+      const subheadingDesktopRem = clamp(1.05 + subBlend * 0.18, 1.03, 1.2);
+      const subheadingMobileRem = clamp(subheadingDesktopRem - 0.14, 0.92, 1.06);
+      const subheadingLineHeight = Number((1.48 + (1 - subBlend) * 0.16).toFixed(3));
+      const subheadingMarginTopRem = clamp(0.74 + subBlend * 0.22, 0.72, 1.0);
+      const subheadingMaxWidth = `${(36 + subBlend * 6).toFixed(2)}rem`;
+      const subheadingLineEstimate = clamp(subheadingChars / 38, 1.4, 4.6);
+      const ctaSpacing = clamp(1.24 + Math.max(0, subheadingLineEstimate - 2.1) * 0.12, 1.24, 1.84);
+
+      // Make subheading ~20% bigger than current
+      const scaledSubheadingDesktop = clamp(subheadingDesktopRem * 1.6 * 0.84, 1.32, 1.78);
+      const scaledSubheadingMobile = clamp(subheadingMobileRem * 1.6 * 0.84, 1.1, 1.45);
+      const scaledSubheadingLineHeight = Number(Math.max(1.44, subheadingLineHeight - 0.08).toFixed(3));
+      const scaledSubheadingMarginTop = `${clamp(parseFloat(subheadingMarginTopRem.toFixed(3)) * 1.05, 0.78, 1.1).toFixed(
+        3
+      )}rem`;
+      const scaledSubheadingMaxWidth = `${Math.max(36, parseFloat(subheadingMaxWidth) * 0.98).toFixed(2)}rem`;
+      const scaledCtaSpacing = clamp(ctaSpacing * 1.02, 1.24, 1.9);
+
+      subheadingTypography = {
+        mobileSize: `${scaledSubheadingMobile.toFixed(3)}rem`,
+        desktopSize: `${scaledSubheadingDesktop.toFixed(3)}rem`,
+        lineHeight: scaledSubheadingLineHeight,
+        marginTop: scaledSubheadingMarginTop,
+        maxWidth: scaledSubheadingMaxWidth,
+        ctaSpacing: scaledCtaSpacing,
+      };
     }
 
-    const desktop = Number(desktopRem.toFixed(3));
-    const mobile = Number(Math.min(Math.max(2.4, desktopRem), 2.5).toFixed(3));
+    const baseCtaMargin = subheadingTypography ? subheadingTypography.ctaSpacing : 1.16 * 1.1;
+    const headingInfluence = clamp(1.18 + (headingLineEstimate - 1.5) * 0.08, 1.14, 1.74) * 1.08;
+    const ctaMarginTopRem = clamp(
+      subheadingTypography ? Math.max(baseCtaMargin, headingInfluence) : 1.14 + (headingLineEstimate - 1.5) * 0.14,
+      subheadingTypography ? 1.2 : 1.1,
+      subheadingTypography ? 1.9 : 1.84
+    );
 
     return {
-      desktop: `${desktop}rem`,
-      mobile: `${mobile}rem`,
+      heading: {
+        mobileSize: `${scaledMobileHeadingRem.toFixed(3)}rem`,
+        desktopSize: `${scaledDesktopHeadingRem.toFixed(3)}rem`,
+        lineHeight: scaledHeadingLineHeight,
+        marginBottom: scaledHeadingMarginBottom,
+        maxWidth: headingMaxWidth,
+      },
+      subheading: subheadingTypography
+        ? {
+            mobileSize: subheadingTypography.mobileSize,
+            desktopSize: subheadingTypography.desktopSize,
+            lineHeight: subheadingTypography.lineHeight,
+            marginTop: subheadingTypography.marginTop,
+            maxWidth: subheadingTypography.maxWidth,
+          }
+        : null,
+      cta: {
+        marginTop: `${ctaMarginTopRem.toFixed(3)}rem`,
+      },
     };
-  }, [page.hero.heading]);
+  }, [hasHeroSubheading, page.hero.heading, page.hero.subheading]);
 
   const renderEmbeddedFlashcardsShowcase = (options?: { wrapperClassName?: string; cardContainerClassName?: string }) => {
     const wrapperClassName = ['mx-auto w-full max-w-[1040px]', options?.wrapperClassName].filter(Boolean).join(' ');
@@ -524,20 +613,45 @@ export default function FlashcardGeneratorLanding({ page }: FlashcardGeneratorLa
                       <p className="text-sm font-semibold uppercase tracking-widest text-primary/80">{page.hero.eyebrow}</p>
                     ) : null}
                     <h1
-                      className="font-bold font-heading tracking-tighter leading-tight md:leading-tight mb-4 md:text-[length:var(--hero-heading-desktop)]"
+                      className="font-bold font-heading tracking-tighter md:text-[length:var(--hero-heading-desktop)]"
                       style={
                         {
-                          fontSize: headingFontSizes.mobile,
-                          '--hero-heading-desktop': headingFontSizes.desktop,
+                          fontSize: heroTypography.heading.mobileSize,
+                          '--hero-heading-desktop': heroTypography.heading.desktopSize,
+                          lineHeight: heroTypography.heading.lineHeight,
+                          marginBottom: heroTypography.heading.marginBottom,
+                          textWrap: 'balance',
+                          maxWidth: heroTypography.heading.maxWidth,
                         } as CSSProperties
                       }
                     >
                       {page.hero.heading}
                     </h1>
-                    <p className="mt-6 text-xl text-muted-foreground leading-relaxed max-w-2xl mx-auto lg:mx-0">
-                      {page.hero.subheading}
-                    </p>
-                    <div className="mt-6 flex justify-center lg:justify-start">
+                    {hasHeroSubheading ? (
+                      <p
+                        className="text-muted-foreground md:text-[length:var(--hero-subheading-desktop)] leading-relaxed mx-auto lg:mx-0"
+                        style={
+                          {
+                            fontSize: heroTypography.subheading?.mobileSize ?? '1.28rem',
+                            '--hero-subheading-desktop': heroTypography.subheading?.desktopSize ?? '1.58rem',
+                            lineHeight: heroTypography.subheading?.lineHeight ?? 1.5,
+                            marginTop: heroTypography.subheading?.marginTop ?? '0.94rem',
+                            maxWidth: heroTypography.subheading?.maxWidth ?? '38rem',
+                            textWrap: 'balance',
+                          } as CSSProperties
+                        }
+                      >
+                        {page.hero.subheading}
+                      </p>
+                    ) : null}
+                    <div
+                      className="flex justify-center lg:justify-start"
+                      style={
+                        {
+                          marginTop: heroTypography.cta.marginTop,
+                        } as CSSProperties
+                      }
+                    >
                       <div className="inline-flex flex-col items-center gap-1 sm:items-center">
                         <CTAButton
                           cta={page.hero.primaryCta}
