@@ -6,6 +6,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
+import posthog from 'posthog-js';
 import type { ProgrammaticCTA, ProgrammaticFlashcardPage, RichTextBlock } from '@/lib/programmatic/flashcardPageSchema';
 import CogniGuideLogo from '../CogniGuide_logo.png';
 import type { Flashcard } from '@/components/FlashcardsModal';
@@ -16,6 +17,16 @@ const AuthModal = dynamic(() => import('@/components/AuthModal'), { ssr: false }
 const EmbeddedFlashcards = dynamic(() => import('@/components/EmbeddedFlashcards'), {
   ssr: false,
   loading: () => <div className="w-full h-full animate-pulse bg-muted/40" aria-hidden="true" />,
+});
+
+const GeneratorWidget = dynamic(() => import('@/components/Generator'), {
+  ssr: false,
+  loading: () => (
+    <div className="flex h-full min-h-[420px] w-full items-center justify-center rounded-3xl border border-dashed border-muted/60 bg-muted/20">
+      <div className="h-20 w-20 animate-spin rounded-full border-4 border-muted border-t-primary" aria-hidden="true" />
+      <span className="sr-only">Loading generator…</span>
+    </div>
+  ),
 });
 
 type FlashcardGeneratorLandingProps = {
@@ -76,13 +87,18 @@ const renderRichTextBlock = (block: RichTextBlock, index: number) => {
   );
 };
 
+type ExperimentVariant = 'control' | 'generator-above-the-fold';
+const EXPERIMENT_FLAG_KEY = 'generator-vs-deck-samples';
+
 export default function FlashcardGeneratorLanding({ page }: FlashcardGeneratorLandingProps) {
   const [showAuth, setShowAuth] = useState(false);
   const [isAuthed, setIsAuthed] = useState(false);
   const [useCasesOpen, setUseCasesOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [embeddedFlashcardHeight, setEmbeddedFlashcardHeight] = useState<number | null>(null);
+  const [experimentVariant, setExperimentVariant] = useState<ExperimentVariant>('control');
   const router = useRouter();
+  const isGeneratorAboveTheFold = experimentVariant === 'generator-above-the-fold';
   const lastMeasuredEmbedHeightRef = useRef<number>(0);
   const lastSyncedAuthRef = useRef<boolean | null>(null);
   const useCaseMenuRef = useRef<HTMLDivElement | null>(null);
@@ -247,6 +263,18 @@ export default function FlashcardGeneratorLanding({ page }: FlashcardGeneratorLa
     };
   }, [page.hero.heading]);
 
+  const renderEmbeddedFlashcardsShowcase = () => (
+    <div className="bg-background rounded-[2rem] border shadow-xl shadow-slate-200/50 dark:shadow-slate-700/50 overflow-hidden">
+      <div className="w-full" style={embeddedFlashcardHeight ? { height: `${embeddedFlashcardHeight}px` } : undefined}>
+        <EmbeddedFlashcards
+          cards={embeddedFlashcardDeck}
+          title="AI Generated Samples"
+          onHeightChange={handleEmbeddedFlashcardHeight}
+        />
+      </div>
+    </div>
+  );
+
   useEffect(() => {
     try {
       if (typeof window !== 'undefined') {
@@ -306,6 +334,34 @@ export default function FlashcardGeneratorLanding({ page }: FlashcardGeneratorLa
   useEffect(() => {
     setEmbeddedFlashcardHeight((prev) => prev ?? computeEmbeddedBaseHeight());
   }, [computeEmbeddedBaseHeight]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const evaluateExperiment = () => {
+      if (cancelled) {
+        return;
+      }
+
+      try {
+        const flagValue = posthog.getFeatureFlag?.(EXPERIMENT_FLAG_KEY);
+        setExperimentVariant(flagValue === 'generator-above-the-fold' ? 'generator-above-the-fold' : 'control');
+      } catch {
+        setExperimentVariant('control');
+      }
+    };
+
+    evaluateExperiment();
+    const unsubscribe = posthog.onFeatureFlags?.(() => evaluateExperiment());
+    posthog.reloadFeatureFlags?.();
+
+    return () => {
+      cancelled = true;
+      if (typeof unsubscribe === 'function') {
+        unsubscribe();
+      }
+    };
+  }, []);
 
   return (
     <>
@@ -483,22 +539,21 @@ export default function FlashcardGeneratorLanding({ page }: FlashcardGeneratorLa
                 </div>
 
                 <div className="flex-1 w-full min-h-[28rem]">
-                  <div className="bg-background rounded-[2rem] border shadow-xl shadow-slate-200/50 dark:shadow-slate-700/50 overflow-hidden">
-                    <div
-                      className="w-full"
-                      style={embeddedFlashcardHeight ? { height: `${embeddedFlashcardHeight}px` } : undefined}
-                    >
-                      <EmbeddedFlashcards
-                        cards={embeddedFlashcardDeck}
-                        title="AI Generated Samples"
-                        onHeightChange={handleEmbeddedFlashcardHeight}
-                      />
-                    </div>
-                  </div>
+                  {isGeneratorAboveTheFold ? (
+                    <GeneratorWidget redirectOnAuth showTitle={false} />
+                  ) : (
+                    renderEmbeddedFlashcardsShowcase()
+                  )}
                 </div>
               </div>
             </div>
           </section>
+
+          {isGeneratorAboveTheFold ? (
+            <section className="pt-10 md:pt-12 pb-12 bg-muted/20 border-t">
+              <div className="container">{renderEmbeddedFlashcardsShowcase()}</div>
+            </section>
+          ) : null}
 
           <section className="pt-10 md:pt-12 pb-12 bg-muted/30 border-y">
             <div className="container">
