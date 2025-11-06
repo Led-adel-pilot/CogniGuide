@@ -53,20 +53,20 @@ function Calendar({
         ),
         button_previous: cn(
           buttonVariants({ variant: buttonVariant }),
-          "size-(--cell-size) aria-disabled:opacity-50 p-0 select-none",
+          "h-[var(--cell-size)] w-[var(--cell-size)] aria-disabled:opacity-50 p-0 select-none",
           defaultClassNames.button_previous
         ),
         button_next: cn(
           buttonVariants({ variant: buttonVariant }),
-          "size-(--cell-size) aria-disabled:opacity-50 p-0 select-none",
+          "h-[var(--cell-size)] w-[var(--cell-size)] aria-disabled:opacity-50 p-0 select-none",
           defaultClassNames.button_next
         ),
         month_caption: cn(
-          "flex items-center justify-center h-(--cell-size) w-full px-(--cell-size)",
+          "flex items-center justify-center h-[var(--cell-size)] w-full px-[var(--cell-size)]",
           defaultClassNames.month_caption
         ),
         dropdowns: cn(
-          "w-full flex items-center text-sm font-medium justify-center h-(--cell-size) gap-1.5",
+          "w-full flex items-center text-sm font-medium justify-center h-[var(--cell-size)] gap-1.5",
           defaultClassNames.dropdowns
         ),
         dropdown_root: cn(
@@ -92,7 +92,7 @@ function Calendar({
         ),
         week: cn("flex w-full mt-2", defaultClassNames.week),
         week_number_header: cn(
-          "select-none w-(--cell-size)",
+          "select-none w-[var(--cell-size)]",
           defaultClassNames.week_number_header
         ),
         week_number: cn(
@@ -161,7 +161,7 @@ function Calendar({
         WeekNumber: ({ children, ...props }) => {
           return (
             <td {...props}>
-              <div className="flex size-(--cell-size) items-center justify-center text-center">
+              <div className="flex h-[var(--cell-size)] w-[var(--cell-size)] items-center justify-center text-center">
                 {children}
               </div>
             </td>
@@ -203,7 +203,7 @@ function CalendarDayButton({
       data-range-end={modifiers.range_end}
       data-range-middle={modifiers.range_middle}
       className={cn(
-        "flex aspect-square size-auto w-full min-w-(--cell-size) flex-col gap-1 leading-none font-normal",
+        "flex aspect-square w-full min-w-[var(--cell-size)] h-[var(--cell-size)] flex-col gap-1 leading-none font-normal",
         "hover:bg-muted/50",
         "group-data-[focused=true]/day:relative group-data-[focused=true]/day:z-10 group-data-[focused=true]/day:ring-[3px] group-data-[focused=true]/day:border-ring group-data-[focused=true]/day:ring-ring/50",
         "data-[range-middle=true]:bg-primary/10 data-[range-middle=true]:text-foreground",
