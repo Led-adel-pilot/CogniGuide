@@ -3,7 +3,7 @@
 import '@/styles/mindmap.css';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
-import { initializeMindMap, cleanup, getFullMindMapBounds, updateMindMap, recommendPrintScaleMultiplier, getPrintZoomBias, collapseToMainBranches } from '@/lib/markmap-renderer';
+import { initializeMindMap, cleanup, getFullMindMapBounds, updateMindMap, recommendPrintScaleMultiplier, getPrintZoomBias, collapseToMainBranches, focusMindMapNode } from '@/lib/markmap-renderer';
 import { ensureKatexAssets } from '@/lib/katex-loader';
 import { Download, X, FileImage, Loader2, Map as MapIcon, ChevronLeft } from 'lucide-react';
 import ShareTriggerButton from '@/components/ShareTriggerButton';
@@ -23,6 +23,7 @@ interface MindMapModalProps {
   onBackToFlashcards?: () => void;
   disableSignupPrompts?: boolean;
   streamingRequestId?: number | null;
+  initialFocusNodeId?: string | null;
 }
 
 type MindMapStreamEventDetail = {
@@ -32,12 +33,13 @@ type MindMapStreamEventDetail = {
   source?: string;
 };
 
-export default function MindMapModal({ markdown, onClose, onShareMindMap, isPaidUser = false, onRequireUpgrade, embedded = false, onBackToFlashcards, disableSignupPrompts = false, streamingRequestId = null }: MindMapModalProps) {
+export default function MindMapModal({ markdown, onClose, onShareMindMap, isPaidUser = false, onRequireUpgrade, embedded = false, onBackToFlashcards, disableSignupPrompts = false, streamingRequestId = null, initialFocusNodeId = null }: MindMapModalProps) {
   const viewportRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [isDropdownOpen, setDropdownOpen] = useState(false);
   const collapseRequestedRef = useRef(false);
   const hasAutoCollapsedRef = useRef(false);
+  const pendingFocusNodeIdRef = useRef<string | null>(null);
 
   // NEW: ref and state to size the dropdown to the trigger width
   const triggerGroupRef = useRef<HTMLDivElement>(null);
@@ -603,6 +605,16 @@ export default function MindMapModal({ markdown, onClose, onShareMindMap, isPaid
       updateMindMap(content);
     }
     renderedMarkdownRef.current = content;
+    if (pendingFocusNodeIdRef.current) {
+      const targetId = pendingFocusNodeIdRef.current;
+      requestAnimationFrame(() => {
+        if (!pendingFocusNodeIdRef.current) return;
+        const focused = focusMindMapNode(targetId, { paddingScale: 0.5 });
+        if (focused) {
+          pendingFocusNodeIdRef.current = null;
+        }
+      });
+    }
   }, []);
 
   const queueRendererUpdate = useCallback(() => {
@@ -651,6 +663,23 @@ export default function MindMapModal({ markdown, onClose, onShareMindMap, isPaid
     }
     queueRendererUpdate();
   }, [markdown, queueRendererUpdate]);
+
+  useEffect(() => {
+    if (!initialFocusNodeId) {
+      pendingFocusNodeIdRef.current = null;
+      return;
+    }
+    pendingFocusNodeIdRef.current = initialFocusNodeId;
+    if (initializedRef.current) {
+      requestAnimationFrame(() => {
+        if (!pendingFocusNodeIdRef.current) return;
+        const focused = focusMindMapNode(initialFocusNodeId, { paddingScale: 0.5 });
+        if (focused) {
+          pendingFocusNodeIdRef.current = null;
+        }
+      });
+    }
+  }, [initialFocusNodeId]);
 
   const requestCollapse = useCallback(() => {
     if (!shouldAutoCollapseRef.current) {

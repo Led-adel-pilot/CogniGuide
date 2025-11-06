@@ -740,6 +740,37 @@ function getTreeBounds(node: MindMapNode): { minX: number, minY: number, width: 
     return { minX, minY, width: maxX - minX, height: maxY - minY, maxY };
 }
 
+function findNodeById(node: MindMapNode | null, id: string): MindMapNode | null {
+    if (!node) return null;
+    if (node.id === id) return node;
+    for (const child of node.children) {
+        const match = findNodeById(child, id);
+        if (match) return match;
+    }
+    return null;
+}
+
+function getSubtreeBounds(node: MindMapNode): { minX: number, minY: number, width: number, height: number } {
+    let minX = node.x;
+    let maxX = node.x + node.width;
+    let minY = node.y;
+    let maxY = node.y + node.height;
+
+    const traverse = (current: MindMapNode) => {
+        minX = Math.min(minX, current.x);
+        maxX = Math.max(maxX, current.x + current.width);
+        minY = Math.min(minY, current.y);
+        maxY = Math.max(maxY, current.y + current.height);
+        if (!current.isCollapsed) {
+            current.children.forEach(traverse);
+        }
+    };
+
+    traverse(node);
+
+    return { minX, minY, width: maxX - minX, height: maxY - minY };
+}
+
 function drawConnector(parent: MindMapNode, child: MindMapNode, svgEl: SVGSVGElement, xOffset: number, yOffset: number, isExpanding: boolean): SVGPathElement {
     const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
     path.setAttribute('class', 'connector-path');
@@ -1444,6 +1475,56 @@ export function getFullMindMapBounds(markdown: string): { minX: number, minY: nu
         console.error("Error calculating full mind map bounds:", error);
         return null;
     }
+}
+
+export interface FocusMindMapNodeOptions {
+    animate?: boolean;
+    paddingScale?: number;
+}
+
+export function focusMindMapNode(nodeId: string, options?: FocusMindMapNodeOptions): boolean {
+    if (!mindMapTree || !viewport) return false;
+    if (!nodeId) return false;
+
+    const targetNode = findNodeById(mindMapTree, nodeId);
+    if (!targetNode) return false;
+
+    const bounds = getSubtreeBounds(targetNode);
+    if (bounds.width === 0 && bounds.height === 0) return false;
+
+    const viewportWidth = viewport.clientWidth;
+    const viewportHeight = viewport.clientHeight;
+    if (viewportWidth === 0 || viewportHeight === 0) return false;
+
+    const paddingFactor = options?.paddingScale ?? 0.6;
+    const horizontalPadding = PADDING * Math.max(0, paddingFactor);
+    const verticalPadding = PADDING * Math.max(0, paddingFactor);
+
+    const contentWidth = bounds.width + horizontalPadding * 2;
+    const contentHeight = bounds.height + verticalPadding * 2;
+
+    const scaleX = (viewportWidth * 0.9) / Math.max(contentWidth, 1);
+    const scaleY = (viewportHeight * 0.9) / Math.max(contentHeight, 1);
+    const targetScale = Math.min(scaleX, scaleY, 3);
+
+    const contentCenterX = bounds.minX + bounds.width / 2 + PADDING;
+    const contentCenterY = bounds.minY + bounds.height / 2 + PADDING;
+
+    const targetPanX = viewportWidth / 2 - contentCenterX * targetScale;
+    const targetPanY = viewportHeight / 2 - contentCenterY * targetScale;
+
+    userHasInteracted = true;
+
+    if (options?.animate === false) {
+        scale = targetScale;
+        panX = targetPanX;
+        panY = targetPanY;
+        applyTransform();
+    } else {
+        animateTransformTo(targetScale, targetPanX, targetPanY, ANIMATION_DURATION + 100);
+    }
+
+    return true;
 }
 
 // ============== PRINT SCALE RECOMMENDER ==============
