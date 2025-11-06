@@ -274,7 +274,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
     if (!questionContent || !answerContent) return;
     const requestId = explainRequestRef.current + 1;
     explainRequestRef.current = requestId;
-    setShowExplanation(true);
+    setShowExplanation(false);
     setExplanation('');
     setExplanationError(null);
     setIsExplaining(true);
@@ -316,6 +316,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
       }
 
       let accumulatedText = '';
+      let streamStarted = false;
       while (true) {
         const { done, value } = await reader.read();
         if (explainRequestRef.current !== requestId) {
@@ -323,7 +324,12 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
           return;
         }
         if (done) break;
-        
+
+        if (!streamStarted) {
+          streamStarted = true;
+          setShowExplanation(true);
+        }
+
         const chunk = decoder.decode(value, { stream: true });
         accumulatedText += chunk;
         // Prepend the question in bold format to the explanation
@@ -1681,7 +1687,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
                           <button
                             onClick={handleExplain}
                             disabled={isExplaining}
-                            className="inline-flex items-center gap-1.5 h-6 px-3 rounded-full border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-300/50 flashcard-grade-good disabled:opacity-60 disabled:cursor-not-allowed"
+                            className="inline-flex items-center gap-1.5 h-6 px-3 rounded-full border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-300/50 flashcard-grade-good disabled:cursor-not-allowed"
                           >
                             {isExplaining ? (
                               <Loader2 className="h-3.5 w-3.5 animate-spin" />

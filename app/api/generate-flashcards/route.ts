@@ -270,6 +270,7 @@ ${outputFormat}
 
 - Keep them simple: One concept per card. Avoid cramming multiple facts onto a single flashcard.
 - Be specific: Vague questions produce vague answers. Instead of "What is photosynthesis?" try "What are the three main stages of photosynthesis and where does each occur?"
+- In the answer, If you had to make a list, make it a numbered list.
 
 ${languageAndCount}
 ${imagesNote ? `- ${imagesNote}` : ''}

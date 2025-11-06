@@ -8,7 +8,7 @@
 
 ## 2. Global Application Shell & Theming
 - **Root Layout**: `app/layout.tsx` establishes global metadata (OpenGraph, Twitter, robots), structured data for a SoftwareApplication, Google verification, favicon links, and preconnects for PostHog assets. It injects an inline script that restores the saved theme before hydration and wraps the app in a Poppins font body with a modal root container.【F:app/layout.tsx†L1-L162】
-- **Site Metadata**: Shared SEO text, URLs, contact email, and keyword arrays live in `lib/siteMetadata.ts` and are imported wherever metadata is constructed.【F:lib/siteMetadata.ts†L1-L23】
+- **Site Metadata**: Shared SEO text, URLs, contact email, the OpenGraph/Twitter preview image (`Cogniguide_dashboard.png`), and keyword arrays live in `lib/siteMetadata.ts` and are imported wherever metadata is constructed.【F:lib/siteMetadata.ts†L1-L23】
 - **Theme Control**: `components/ThemeToggle.tsx` persists user theme selections in localStorage, synchronises the `<html>` `data-theme` attribute, listens for system preference changes, and renders a dropdown selector with Lucide icons.【F:components/ThemeToggle.tsx†L1-L129】
 
 ## 3. Routing & Page Modules
