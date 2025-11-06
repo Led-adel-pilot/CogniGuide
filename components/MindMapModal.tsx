@@ -3,7 +3,17 @@
 import '@/styles/mindmap.css';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
-import { initializeMindMap, cleanup, getFullMindMapBounds, updateMindMap, recommendPrintScaleMultiplier, getPrintZoomBias, collapseToMainBranches } from '@/lib/markmap-renderer';
+import {
+  initializeMindMap,
+  cleanup,
+  getFullMindMapBounds,
+  updateMindMap,
+  recommendPrintScaleMultiplier,
+  getPrintZoomBias,
+  collapseToMainBranches,
+  focusMindMapOnContext,
+  type MindMapFocusContextSegment
+} from '@/lib/markmap-renderer';
 import { ensureKatexAssets } from '@/lib/katex-loader';
 import { Download, X, FileImage, Loader2, Map as MapIcon, ChevronLeft } from 'lucide-react';
 import ShareTriggerButton from '@/components/ShareTriggerButton';
@@ -23,6 +33,8 @@ interface MindMapModalProps {
   onBackToFlashcards?: () => void;
   disableSignupPrompts?: boolean;
   streamingRequestId?: number | null;
+  focusContextSegments?: MindMapFocusContextSegment[] | null;
+  focusContextRequestId?: number | null;
 }
 
 type MindMapStreamEventDetail = {
@@ -32,12 +44,15 @@ type MindMapStreamEventDetail = {
   source?: string;
 };
 
-export default function MindMapModal({ markdown, onClose, onShareMindMap, isPaidUser = false, onRequireUpgrade, embedded = false, onBackToFlashcards, disableSignupPrompts = false, streamingRequestId = null }: MindMapModalProps) {
+export default function MindMapModal({ markdown, onClose, onShareMindMap, isPaidUser = false, onRequireUpgrade, embedded = false, onBackToFlashcards, disableSignupPrompts = false, streamingRequestId = null, focusContextSegments = null, focusContextRequestId = null }: MindMapModalProps) {
   const viewportRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [isDropdownOpen, setDropdownOpen] = useState(false);
   const collapseRequestedRef = useRef(false);
   const hasAutoCollapsedRef = useRef(false);
+  const focusSegmentsRef = useRef<MindMapFocusContextSegment[] | null>(null);
+  const lastAppliedFocusRequestRef = useRef<number | null>(null);
+  const focusRetryTimeoutRef = useRef<number | null>(null);
 
   // NEW: ref and state to size the dropdown to the trigger width
   const triggerGroupRef = useRef<HTMLDivElement>(null);
@@ -652,6 +667,10 @@ export default function MindMapModal({ markdown, onClose, onShareMindMap, isPaid
     queueRendererUpdate();
   }, [markdown, queueRendererUpdate]);
 
+  useEffect(() => {
+    focusSegmentsRef.current = focusContextSegments ?? null;
+  }, [focusContextSegments]);
+
   const requestCollapse = useCallback(() => {
     if (!shouldAutoCollapseRef.current) {
       collapseRequestedRef.current = false;
@@ -727,6 +746,45 @@ export default function MindMapModal({ markdown, onClose, onShareMindMap, isPaid
     };
   }, [streamingRequestId, queueRendererUpdate, requestCollapse, embedded]);
 
+  useEffect(() => {
+    if (focusRetryTimeoutRef.current !== null) {
+      window.clearTimeout(focusRetryTimeoutRef.current);
+      focusRetryTimeoutRef.current = null;
+    }
+    if (!focusContextRequestId) return;
+    if (!hasGeneratedContent) return;
+    if (!initializedRef.current) return;
+    if (lastAppliedFocusRequestRef.current === focusContextRequestId) return;
+
+    const segments = focusSegmentsRef.current;
+    if (!segments || segments.length === 0) return;
+
+    const normalizedSegments = segments
+      .map((segment) => ({
+        text: segment.text.trim(),
+        weight: segment.weight,
+      }))
+      .filter((segment) => segment.text.length > 0);
+
+    if (normalizedSegments.length === 0) return;
+
+    lastAppliedFocusRequestRef.current = focusContextRequestId;
+
+    const attempt = () => {
+      const success = focusMindMapOnContext(normalizedSegments, { animate: true });
+      if (!success) {
+        focusRetryTimeoutRef.current = window.setTimeout(() => {
+          focusRetryTimeoutRef.current = null;
+          focusMindMapOnContext(normalizedSegments, { animate: true });
+        }, 180);
+      }
+    };
+
+    requestAnimationFrame(() => {
+      requestAnimationFrame(attempt);
+    });
+  }, [focusContextRequestId, hasGeneratedContent]);
+
   // Reset renderer when modal is closed (markdown becomes null)
   useEffect(() => {
     if (!markdown) {
@@ -743,6 +801,11 @@ export default function MindMapModal({ markdown, onClose, onShareMindMap, isPaid
         window.clearTimeout(collapseRetryTimeoutRef.current);
         collapseRetryTimeoutRef.current = null;
       }
+      if (focusRetryTimeoutRef.current !== null) {
+        window.clearTimeout(focusRetryTimeoutRef.current);
+        focusRetryTimeoutRef.current = null;
+      }
+      lastAppliedFocusRequestRef.current = null;
       cleanup();
     }
   }, [markdown]);
@@ -1016,7 +1079,7 @@ export default function MindMapModal({ markdown, onClose, onShareMindMap, isPaid
             {/* Black transparent background */}
             <div className="absolute inset-0 bg-black/40 dark:bg-black/60 z-0"></div>
             <div className="border p-8 rounded-2xl shadow-xl max-w-md w-full text-center relative z-10" style={{ backgroundColor: 'var(--color-background)' }}>
-              <h2 className="text-2xl font-bold mb-4">Don't Lose Your Mind Map!</h2>
+              <h2 className="text-2xl font-bold mb-4">Don&apos;t Lose Your Mind Map!</h2>
               <p className="text-muted-foreground mb-6">
                 Sign up to save your mind map and access it anytime, anywhere.
               </p>

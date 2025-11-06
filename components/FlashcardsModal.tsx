@@ -58,6 +58,8 @@ type KatexRenderOptions = { throwOnError?: boolean; displayMode?: boolean };
 type KatexRenderer = { render?: (expression: string, element: HTMLElement, options?: KatexRenderOptions) => void };
 type KatexLikeWindow = Window & { renderMathInElement?: RenderMathInElement; katex?: KatexRenderer };
 
+type MindMapFocusSegment = { text: string; weight?: number };
+
 const MATH_DELIMITER_PATTERN = /\$|\\\(|\\\[|\\begin\{/;
 const UNDELIMITED_MATH_HINT_PATTERN = /(?:[_^]|\\[a-zA-Z]+)/;
 const BLOCK_MATH_TAGS = new Set(['DIV', 'LI', 'P', 'TD', 'TH']);
@@ -125,6 +127,8 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
   const [mindMapError, setMindMapError] = React.useState<string | null>(null);
   const [isMindMapGenerating, setIsMindMapGenerating] = React.useState(false);
   const [activeMindMapRequestId, setActiveMindMapRequestId] = React.useState<number | null>(null);
+  const [mindMapFocusSegments, setMindMapFocusSegments] = React.useState<MindMapFocusSegment[] | null>(null);
+  const [mindMapFocusRequestId, setMindMapFocusRequestId] = React.useState(0);
   const [scheduledCards, setScheduledCards] = React.useState<CardWithSchedule[] | null>(null);
   const [deckExamDate, setDeckExamDate] = React.useState<string>('');
   const [examDateInput, setExamDateInput] = React.useState<Date | undefined>(undefined);
@@ -161,6 +165,31 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
       }),
     );
   }, []);
+
+  const triggerMindMapFocus = React.useCallback(() => {
+    if (!cards || cards.length === 0) return;
+    const card = cards[index];
+    if (!card) return;
+
+    const segments: MindMapFocusSegment[] = [];
+    const questionText = typeof card.question === 'string' ? card.question.trim() : '';
+    if (questionText) {
+      segments.push({ text: questionText, weight: 1.6 });
+    }
+    const answerText = typeof card.answer === 'string' ? card.answer.trim() : '';
+    if (answerText) {
+      segments.push({ text: answerText, weight: 1 });
+    }
+    const deckLabelSource = studyInterleaved ? current?.deckTitle : title;
+    const deckLabel = typeof deckLabelSource === 'string' ? deckLabelSource.trim() : '';
+    if (deckLabel) {
+      segments.push({ text: deckLabel, weight: 0.6 });
+    }
+
+    if (segments.length === 0) return;
+    setMindMapFocusSegments(segments);
+    setMindMapFocusRequestId((prev) => prev + 1);
+  }, [cards, index, current, studyInterleaved, title]);
 
   const hasCards = Boolean(cards && cards.length > 0);
 
@@ -369,6 +398,8 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
       return;
     }
 
+    setMindMapFocusSegments(null);
+
     if (isMindMapGenerating) {
       setIsMindMapModalOpen(true);
       return;
@@ -377,6 +408,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
     const trimmedCurrentMarkdown = typeof mindMapMarkdown === 'string' ? mindMapMarkdown.trim() : '';
     if (trimmedCurrentMarkdown.length > 0) {
       setMindMapError(null);
+      triggerMindMapFocus();
       setIsMindMapModalOpen(true);
       return;
     }
@@ -385,6 +417,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
     if (trimmedPersistedMarkdown.length > 0) {
       setMindMapError(null);
       setMindMapMarkdown(persistedMindMapMarkdown);
+      triggerMindMapFocus();
       setIsMindMapModalOpen(true);
       return;
     }
@@ -402,6 +435,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
           setPersistedMindMapMarkdown(fetchedMarkdown);
           setMindMapMarkdown(fetchedMarkdown);
           setMindMapError(null);
+          triggerMindMapFocus();
           setIsMindMapModalOpen(true);
           try {
             onMindMapLinked?.(persistedMindMapId, fetchedMarkdown);
@@ -607,7 +641,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
         setActiveMindMapRequestId(null);
       }
     }
-  }, [cards, deckId, dispatchMindMapStreamUpdate, isMindMapGenerating, mindMapMarkdown, mindMapModelChoice, onRequireUpgrade, persistedMindMapId, persistedMindMapMarkdown, persistMindMapLink, title, userId]);
+  }, [cards, deckId, dispatchMindMapStreamUpdate, isMindMapGenerating, mindMapMarkdown, mindMapModelChoice, onRequireUpgrade, persistedMindMapId, persistedMindMapMarkdown, persistMindMapLink, title, triggerMindMapFocus, userId]);
 
   const renderMath = React.useCallback((isCancelled?: () => boolean) => {
     if (typeof window === 'undefined') return;
@@ -1856,6 +1890,8 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
           streamingRequestId={activeMindMapRequestId ?? undefined}
           onRequireUpgrade={onRequireUpgrade}
           isPaidUser={isPaidUser}
+          focusContextSegments={mindMapFocusSegments}
+          focusContextRequestId={mindMapFocusRequestId}
         />
       )}
       {isMindMapModalOpen && !mindMapMarkdown && !persistedMindMapMarkdown && isMindMapGenerating && (
