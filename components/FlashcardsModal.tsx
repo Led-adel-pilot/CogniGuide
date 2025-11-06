@@ -15,6 +15,7 @@ import { DatePicker } from '@/components/DatePicker';
 import { ensureKatexAssets } from '@/lib/katex-loader';
 import ShareTriggerButton from '@/components/ShareTriggerButton';
 import type { ModelChoice } from '@/lib/plans';
+import { parseMarkmap, type MindMapNode } from '@/lib/markmap-renderer';
 
 const MindMapModal = dynamic(() => import('@/components/MindMapModal'), { ssr: false });
 const getDeckIdentifier = (deckId?: string, title?: string | null, cards?: Flashcard[] | null): string | null => {
@@ -61,6 +62,57 @@ type KatexLikeWindow = Window & { renderMathInElement?: RenderMathInElement; kat
 const MATH_DELIMITER_PATTERN = /\$|\\\(|\\\[|\\begin\{/;
 const UNDELIMITED_MATH_HINT_PATTERN = /(?:[_^]|\\[a-zA-Z]+)/;
 const BLOCK_MATH_TAGS = new Set(['DIV', 'LI', 'P', 'TD', 'TH']);
+
+const MINDMAP_STOP_WORDS = new Set([
+  'the',
+  'and',
+  'for',
+  'with',
+  'that',
+  'this',
+  'from',
+  'into',
+  'have',
+  'will',
+  'your',
+  'when',
+  'then',
+  'what',
+  'which',
+  'them',
+  'they',
+  'their',
+  'there',
+  'been',
+  'were',
+  'also',
+  'some',
+  'such',
+  'each',
+  'more',
+  'than',
+  'because',
+  'while',
+  'where',
+  'these',
+  'those',
+  'using',
+  'used',
+  'about',
+  'after',
+  'before',
+  'between',
+  'among',
+  'within',
+  'through',
+  'other',
+  'make',
+  'made',
+  'many',
+  'much',
+  'very',
+  'even',
+]);
 
 const tryRenderUndelimitedMath = (element: HTMLElement, katex: KatexRenderer) => {
   if (!katex?.render) return;
@@ -125,6 +177,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
   const [mindMapError, setMindMapError] = React.useState<string | null>(null);
   const [isMindMapGenerating, setIsMindMapGenerating] = React.useState(false);
   const [activeMindMapRequestId, setActiveMindMapRequestId] = React.useState<number | null>(null);
+  const [mindMapFocusNodeId, setMindMapFocusNodeId] = React.useState<string | null>(null);
   const [scheduledCards, setScheduledCards] = React.useState<CardWithSchedule[] | null>(null);
   const [deckExamDate, setDeckExamDate] = React.useState<string>('');
   const [examDateInput, setExamDateInput] = React.useState<Date | undefined>(undefined);
@@ -204,6 +257,104 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
     if (typeof title === 'string' && title.trim().length > 0) return title.trim();
     return 'mindmap';
   }, [title]);
+
+  const computeMindMapFocusNodeId = React.useCallback((markdownText: string | null, card: Flashcard | null) => {
+    if (!markdownText || !card) return null;
+    const trimmedMarkdown = markdownText.trim();
+    if (!trimmedMarkdown) return null;
+
+    const baseText = `${card.question ?? ''}\n${card.answer ?? ''}`.trim();
+    if (!baseText) return null;
+
+    const sanitizeText = (text: string) =>
+      text
+        .replace(/<!--.*?-->/g, ' ')
+        .replace(/\[(.*?)\]\((?:.*?)\)/g, '$1')
+        .replace(/`{1,3}[^`]*`/g, ' ')
+        .replace(/[*_~>#-]/g, ' ')
+        .replace(/<[^>]*>/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+
+    const tokenize = (text: string): string[] => {
+      const cleaned = sanitizeText(text);
+      if (!cleaned) return [];
+      const matches = cleaned.toLowerCase().match(/[a-z0-9]+/g);
+      if (!matches) return [];
+      return matches.filter((token) => token.length > 2 && !MINDMAP_STOP_WORDS.has(token));
+    };
+
+    const toTokenSet = (text: string): Set<string> => {
+      const set = new Set<string>();
+      const tokens = tokenize(text);
+      for (const token of tokens) {
+        set.add(token);
+      }
+      return set;
+    };
+
+    const gatherBranchText = (node: MindMapNode): string => {
+      const stack: MindMapNode[] = [node];
+      const parts: string[] = [];
+      while (stack.length > 0) {
+        const currentNode = stack.pop();
+        if (!currentNode) continue;
+        if (currentNode.text) {
+          parts.push(currentNode.text);
+        }
+        for (let i = currentNode.children.length - 1; i >= 0; i -= 1) {
+          const child = currentNode.children[i];
+          if (child) stack.push(child);
+        }
+      }
+      return parts.join(' ');
+    };
+
+    try {
+      const root = parseMarkmap(trimmedMarkdown);
+      if (!root.children || root.children.length === 0) return null;
+
+      const cardTokens = toTokenSet(baseText);
+      if (cardTokens.size === 0) return null;
+
+      let bestNodeId: string | null = null;
+      let bestScore = 0;
+
+      const computeScore = (branchTokens: Set<string>) => {
+        if (branchTokens.size === 0) return 0;
+        let overlap = 0;
+        branchTokens.forEach((token) => {
+          if (cardTokens.has(token)) overlap += 1;
+        });
+        if (overlap === 0) return 0;
+        const unionSize = cardTokens.size + branchTokens.size - overlap;
+        const jaccard = unionSize > 0 ? overlap / unionSize : 0;
+        const coverage = overlap / cardTokens.size;
+        return jaccard * 0.6 + coverage * 0.4;
+      };
+
+      for (const branch of root.children) {
+        const branchText = gatherBranchText(branch);
+        if (!branchText) continue;
+        const branchTokens = toTokenSet(branchText);
+        const score = computeScore(branchTokens);
+        if (score > bestScore) {
+          bestScore = score;
+          bestNodeId = branch.id;
+        }
+      }
+
+      if (bestScore > 0 && bestNodeId) {
+        return bestNodeId;
+      }
+      return null;
+    } catch (focusError) {
+      if (process.env.NODE_ENV !== 'production') {
+        console.error('Failed to determine mind map focus node:', focusError);
+      }
+      return null;
+    }
+  }, []);
 
   React.useEffect(() => {
     setPersistedMindMapId(linkedMindMapId ?? null);
@@ -362,6 +513,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
     setIsMindMapModalOpen(false);
     setIsMindMapGenerating(false);
     setMindMapError(null);
+    setMindMapFocusNodeId(null);
   }, []);
 
   const handleGenerateMindMap = React.useCallback(async () => {
@@ -374,9 +526,12 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
       return;
     }
 
+    const activeCard = cards[index] ?? null;
+
     const trimmedCurrentMarkdown = typeof mindMapMarkdown === 'string' ? mindMapMarkdown.trim() : '';
     if (trimmedCurrentMarkdown.length > 0) {
       setMindMapError(null);
+      setMindMapFocusNodeId(computeMindMapFocusNodeId(trimmedCurrentMarkdown, activeCard ?? null));
       setIsMindMapModalOpen(true);
       return;
     }
@@ -385,6 +540,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
     if (trimmedPersistedMarkdown.length > 0) {
       setMindMapError(null);
       setMindMapMarkdown(persistedMindMapMarkdown);
+      setMindMapFocusNodeId(computeMindMapFocusNodeId(trimmedPersistedMarkdown, activeCard ?? null));
       setIsMindMapModalOpen(true);
       return;
     }
@@ -402,6 +558,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
           setPersistedMindMapMarkdown(fetchedMarkdown);
           setMindMapMarkdown(fetchedMarkdown);
           setMindMapError(null);
+          setMindMapFocusNodeId(computeMindMapFocusNodeId(fetchedMarkdown, activeCard ?? null));
           setIsMindMapModalOpen(true);
           try {
             onMindMapLinked?.(persistedMindMapId, fetchedMarkdown);
@@ -438,6 +595,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
     setMindMapError(null);
     setMindMapMarkdown(null);
     setIsMindMapGenerating(true);
+    setMindMapFocusNodeId(null);
     setActiveMindMapRequestId(requestId);
 
     try {
@@ -607,7 +765,22 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
         setActiveMindMapRequestId(null);
       }
     }
-  }, [cards, deckId, dispatchMindMapStreamUpdate, isMindMapGenerating, mindMapMarkdown, mindMapModelChoice, onRequireUpgrade, persistedMindMapId, persistedMindMapMarkdown, persistMindMapLink, title, userId]);
+  }, [
+    cards,
+    computeMindMapFocusNodeId,
+    deckId,
+    dispatchMindMapStreamUpdate,
+    index,
+    isMindMapGenerating,
+    mindMapMarkdown,
+    mindMapModelChoice,
+    onRequireUpgrade,
+    persistedMindMapId,
+    persistedMindMapMarkdown,
+    persistMindMapLink,
+    title,
+    userId,
+  ]);
 
   const renderMath = React.useCallback((isCancelled?: () => boolean) => {
     if (typeof window === 'undefined') return;
@@ -712,6 +885,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
     setMindMapMarkdown(null);
     setMindMapError(null);
     setIsMindMapGenerating(false);
+    setMindMapFocusNodeId(null);
     // Show popup only if user is not signed in, has generated cards, and is not viewing a saved deck
     if (!userId && !deckId && cards && cards.length > 0) {
       setShowLossAversionPopup(true);
@@ -743,6 +917,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
       setMindMapMarkdown(null);
       setMindMapError(null);
       setIsMindMapGenerating(false);
+      setMindMapFocusNodeId(null);
     }
   }, [open, resetExplanation]);
 
@@ -753,6 +928,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
     setMindMapMarkdown(null);
     setMindMapError(null);
     setIsMindMapGenerating(false);
+    setMindMapFocusNodeId(null);
   }, [cards, deckId]);
 
   React.useEffect(() => {
@@ -1856,6 +2032,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
           streamingRequestId={activeMindMapRequestId ?? undefined}
           onRequireUpgrade={onRequireUpgrade}
           isPaidUser={isPaidUser}
+          initialFocusNodeId={mindMapFocusNodeId ?? undefined}
         />
       )}
       {isMindMapModalOpen && !mindMapMarkdown && !persistedMindMapMarkdown && isMindMapGenerating && (
