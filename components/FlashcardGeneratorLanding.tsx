@@ -827,6 +827,9 @@ export default function FlashcardGeneratorLanding({ page }: FlashcardGeneratorLa
               <Link href="/ai-flashcard-generator" className="text-xs text-muted-foreground/70 hover:underline">
                 Flashcard Generator
               </Link>
+              <Link href="/flashcards" className="text-xs text-muted-foreground/70 hover:underline">
+                Flashcards Use Cases
+              </Link>
               <Link href="/contact" className="text-xs text-muted-foreground/70 hover:underline">
                 Contact
               </Link>

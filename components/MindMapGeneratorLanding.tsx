@@ -553,6 +553,9 @@ export default function MindMapGeneratorLanding() {
             >
               Flashcard Generator
             </Link>
+            <Link href="/flashcards" className="text-xs text-muted-foreground/70 hover:underline">
+              Flashcards Use Cases
+            </Link>
             <Link href="/contact" className="text-xs text-muted-foreground/70 hover:underline">
               Contact
             </Link>
