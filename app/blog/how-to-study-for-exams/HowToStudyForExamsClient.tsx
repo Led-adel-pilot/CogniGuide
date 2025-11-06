@@ -532,6 +532,25 @@ export default function HowToStudyForExamsClient() {
                 >
                   <img src="https://goodaitools.com/assets/images/badge.png" alt="Good AI Tools" height="54" />
                 </a>
+                <a
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  href="https://saasfield.com"
+                  className="inline-flex justify-center"
+                >
+                  <img
+                    src="https://saasfield.com/assets/images/badge.png"
+                    alt="SaaS Field"
+                    height="54"
+                    className="dark:hidden"
+                  />
+                  <img
+                    src="https://saasfield.com/assets/images/badge-dark.png"
+                    alt="SaaS Field"
+                    height="54"
+                    className="hidden dark:block"
+                  />
+                </a>
               </div>
             </section>
           </article>
