@@ -6,6 +6,8 @@
  * node collapsing/expanding with animations.
  */
 
+/* eslint-disable prefer-const, @typescript-eslint/no-explicit-any */
+
 // ============== TYPE DEFINITIONS ==============
 
 export interface MindMapNode {
@@ -40,6 +42,11 @@ export interface InitializeOptions {
     initialPanXOffset?: number;
     initialPanYOffset?: number;
     disableInteractions?: boolean;
+}
+
+export interface MindMapFocusContextSegment {
+    text: string;
+    weight?: number;
 }
 
 interface RgbColor { r: number; g: number; b: number; }
@@ -149,6 +156,17 @@ const TAP_DISTANCE_THRESHOLD = 10; // pixels
 let transformAnimationToken = 0;
 
 const TEXT_PROXIMITY_THRESHOLD = 1;
+
+const TOKEN_REGEX = /[\p{L}\p{N}]+/gu;
+const COMMON_STOP_WORDS = new Set([
+    'the', 'and', 'for', 'are', 'with', 'that', 'this', 'from', 'have', 'your', 'about', 'into', 'their', 'there', 'which',
+    'will', 'been', 'were', 'when', 'what', 'would', 'could', 'should', 'them', 'then', 'than', 'each', 'such', 'while',
+    'also', 'only', 'very', 'some', 'more', 'most', 'much', 'many', 'through', 'where', 'every', 'other', 'because', 'during',
+    'after', 'before', 'between', 'within', 'those', 'these', 'does', 'doing', 'done', 'onto', 'over', 'under', 'again',
+    'upon', 'per', 'via', 'made', 'make', 'makes', 'used', 'using'
+]);
+
+let subtreeVectorCache = new WeakMap<MindMapNode, Map<string, number>>();
 
 function getTextClientRects(nodeEl: HTMLElement): DOMRect[] {
     const rects: DOMRect[] = [];
@@ -702,6 +720,97 @@ function autoFitToCurrentTree() {
 }
 
 
+export function focusMindMapOnContext(
+    segments: MindMapFocusContextSegment[],
+    options?: { animate?: boolean; minSimilarity?: number; viewportPaddingRatio?: number }
+): boolean {
+    if (!mindMapTree || !viewport) return false;
+    if (!segments || segments.length === 0) return false;
+
+    const filteredSegments = segments.filter(segment => segment.text && segment.text.trim().length > 0);
+    if (filteredSegments.length === 0) return false;
+
+    const contextVector = buildContextVector(filteredSegments);
+    if (contextVector.size === 0) return false;
+
+    const candidates: MindMapNode[] = [];
+    const collectCandidates = (node: MindMapNode) => {
+        if (!node.isRoot) {
+            candidates.push(node);
+        }
+        node.children.forEach(collectCandidates);
+    };
+    collectCandidates(mindMapTree);
+
+    let bestNode: MindMapNode | null = null;
+    let bestScore = 0;
+
+    for (const candidate of candidates) {
+        const vector = buildSubtreeVector(candidate);
+        if (vector.size === 0) continue;
+        const similarity = computeCosineSimilarity(contextVector, vector);
+        if (similarity > bestScore) {
+            bestScore = similarity;
+            bestNode = candidate;
+        }
+    }
+
+    const minSimilarity = options?.minSimilarity ?? 0.01;
+    if (!bestNode || bestScore < minSimilarity) {
+        return false;
+    }
+
+    ensureNodePathExpanded(bestNode);
+    rerenderMindMap();
+
+    const bounds = getSubtreeBounds(bestNode);
+    if (bounds.width === 0 || bounds.height === 0) {
+        return false;
+    }
+
+    const viewportWidth = viewport.clientWidth;
+    const viewportHeight = viewport.clientHeight;
+    if (viewportWidth === 0 || viewportHeight === 0) {
+        return false;
+    }
+
+    const viewportRatio = options?.viewportPaddingRatio ?? 0.75;
+    const effectiveWidth = viewportWidth * viewportRatio;
+    const effectiveHeight = viewportHeight * viewportRatio;
+
+    const contentWidth = bounds.width + PADDING * 2;
+    const contentHeight = bounds.height + PADDING * 2;
+
+    const scaleX = effectiveWidth / contentWidth;
+    const scaleY = effectiveHeight / contentHeight;
+    const targetScale = Math.max(0.2, Math.min(Math.min(scaleX, scaleY), 3));
+
+    const contentCenterX = bounds.minX + PADDING + bounds.width / 2;
+    const contentCenterY = bounds.minY + PADDING + bounds.height / 2;
+
+    const targetPanX = (viewportWidth / 2) - (contentCenterX * targetScale);
+    const targetPanY = (viewportHeight / 2) - (contentCenterY * targetScale);
+
+    userHasInteracted = true;
+
+    if (options?.animate === false) {
+        transformAnimationToken++;
+        scale = targetScale;
+        panX = targetPanX;
+        panY = targetPanY;
+        applyTransform();
+        if (mindMapTree) {
+            stableRootY = mindMapTree.y;
+        }
+    } else {
+        requestAnimationFrame(() => {
+            animateTransformTo(targetScale, targetPanX, targetPanY, ANIMATION_DURATION + 120);
+        });
+    }
+
+    return true;
+}
+
 function measureNodeSizes(node: MindMapNode) {
     const { width, height } = measureHtmlSize(node.html, !!node.isRoot);
     node.width = width;
@@ -738,6 +847,112 @@ function getTreeBounds(node: MindMapNode): { minX: number, minY: number, width: 
     }
     traverse(node);
     return { minX, minY, width: maxX - minX, height: maxY - minY, maxY };
+}
+
+function normalizeTextForTokenization(text: string): string {
+    return text
+        .replace(/<!--.*?-->/g, ' ')
+        .replace(/\[(.+?)\]\([^)]*\)/g, '$1')
+        .replace(/<[^>]+>/g, ' ')
+        .replace(/[`*_~]/g, ' ')
+        .replace(/[#>]/g, ' ');
+}
+
+function addTextToVector(vector: Map<string, number>, rawText: string | null | undefined, weight: number) {
+    if (!rawText) return;
+    const normalized = normalizeTextForTokenization(rawText);
+    const matches = normalized.toLowerCase().match(TOKEN_REGEX);
+    if (!matches) return;
+    for (const token of matches) {
+        if (!token) continue;
+        if (COMMON_STOP_WORDS.has(token)) continue;
+        if (token.length <= 2 && !/^\d+$/.test(token)) continue;
+        const current = vector.get(token) ?? 0;
+        vector.set(token, current + weight);
+    }
+}
+
+function buildContextVector(segments: MindMapFocusContextSegment[]): Map<string, number> {
+    const vector = new Map<string, number>();
+    for (const segment of segments) {
+        const weight = segment.weight ?? 1;
+        if (!segment.text || segment.text.trim().length === 0 || weight <= 0) continue;
+        addTextToVector(vector, segment.text, weight);
+    }
+    return vector;
+}
+
+function buildSubtreeVector(node: MindMapNode): Map<string, number> {
+    const cached = subtreeVectorCache.get(node);
+    if (cached) return cached;
+    const vector = new Map<string, number>();
+    const traverse = (current: MindMapNode, isRoot: boolean) => {
+        const baseWeight = isRoot ? 1.8 : 1;
+        addTextToVector(vector, current.text, baseWeight);
+        current.children.forEach(child => traverse(child, false));
+    };
+    traverse(node, true);
+    subtreeVectorCache.set(node, vector);
+    return vector;
+}
+
+function computeVectorMagnitude(vector: Map<string, number>): number {
+    let sumSquares = 0;
+    vector.forEach(value => {
+        sumSquares += value * value;
+    });
+    return Math.sqrt(sumSquares);
+}
+
+function computeCosineSimilarity(a: Map<string, number>, b: Map<string, number>): number {
+    let dotProduct = 0;
+    a.forEach((value, token) => {
+        const other = b.get(token);
+        if (other !== undefined) {
+            dotProduct += value * other;
+        }
+    });
+    if (dotProduct === 0) return 0;
+    const magA = computeVectorMagnitude(a);
+    const magB = computeVectorMagnitude(b);
+    if (magA === 0 || magB === 0) return 0;
+    return dotProduct / (magA * magB);
+}
+
+function ensureNodePathExpanded(node: MindMapNode) {
+    let current: MindMapNode | null = node;
+    while (current) {
+        if (current.isCollapsed) {
+            current.isCollapsed = false;
+        }
+        current = current.parent;
+    }
+}
+
+function getSubtreeBounds(node: MindMapNode): { minX: number; minY: number; width: number; height: number } {
+    let minX = node.x;
+    let maxX = node.x + node.width;
+    let minY = node.y;
+    let maxY = node.y + node.height;
+
+    const traverse = (current: MindMapNode) => {
+        minX = Math.min(minX, current.x);
+        maxX = Math.max(maxX, current.x + current.width);
+        minY = Math.min(minY, current.y);
+        maxY = Math.max(maxY, current.y + current.height);
+        if (!current.isCollapsed) {
+            current.children.forEach(traverse);
+        }
+    };
+
+    traverse(node);
+
+    return {
+        minX,
+        minY,
+        width: Math.max(0, maxX - minX),
+        height: Math.max(0, maxY - minY)
+    };
 }
 
 function drawConnector(parent: MindMapNode, child: MindMapNode, svgEl: SVGSVGElement, xOffset: number, yOffset: number, isExpanding: boolean): SVGPathElement {
@@ -1269,6 +1484,7 @@ export function initializeMindMap(
     cleanup();
 
     try {
+        subtreeVectorCache = new WeakMap();
         mindMapTree = parseMarkmap(markdown);
         // Apply color variations only to children of the root, not the root itself
         mindMapTree.children.forEach(child => applyColorVariations(child));
@@ -1315,6 +1531,7 @@ export function updateMindMap(markdown: string) {
     if (!mapContainer || !viewport) return;
     try {
         lastMarkdown = markdown;
+        subtreeVectorCache = new WeakMap();
         mindMapTree = parseMarkmap(markdown);
         mindMapTree.children.forEach(child => applyColorVariations(child));
         // Do not reset pan/zoom or stableRootY; rerender preserves position and animates connectors
@@ -1324,7 +1541,6 @@ export function updateMindMap(markdown: string) {
         }
     } catch (error) {
         // Fail quietly during partial streams
-        // eslint-disable-next-line no-console
         console.warn('Incremental render failed for current partial markdown:', error);
     }
 }
