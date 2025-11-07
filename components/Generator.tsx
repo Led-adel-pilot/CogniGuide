@@ -1348,6 +1348,7 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
                       setMode('mindmap');
                     }}
                     className={`px-4 py-1.5 text-sm font-semibold rounded-full transition-colors ${mode==='mindmap' ? 'bg-background text-primary shadow' : 'text-muted-foreground hover:text-primary'}`}
+                    title="Switch to mind map mode"
                   >Mind Map</button>
                   <button
                     onClick={() => {
@@ -1355,6 +1356,7 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
                       setMode('flashcards');
                     }}
                     className={`px-4 py-1.5 text-sm font-semibold rounded-full transition-colors ${mode==='flashcards' ? 'bg-background text-primary shadow' : 'text-muted-foreground hover:text-primary'}`}
+                    title="Switch to flashcards mode"
                   >Flashcards</button>
                 </div>
               </div>
@@ -1417,6 +1419,7 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
                           type="button"
                           onClick={handleUpgradeClick}
                           className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-full bg-primary/10 text-primary hover:bg-primary/20 border border-primary/20 transition-colors"
+                          title="Upgrade your plan"
                         >
                           <Sparkles className="h-4 w-4" />
                           <span>Upload your Plan</span>
@@ -1430,6 +1433,7 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
                           type="button"
                           onClick={() => setShowAuth(true)}
                           className="underline hover:no-underline font-semibold text-primary"
+                          title="Open sign up modal"
                         >
                           sign up
                         </button>{' '}

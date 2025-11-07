@@ -22,7 +22,7 @@
 
 ### 3.3 Dashboard Experience
 - `app/dashboard/page.tsx` wraps `DashboardClient` in a suspense boundary with a spinner fallback.【F:app/dashboard/page.tsx†L1-L16】
-- `DashboardClient` is a comprehensive client module managing Supabase-authenticated state, credit balances, Paddle upgrade flows, mode switching between fast/smart models, referral tracking, share link generation, spaced repetition modals, and streaming history. It orchestrates Spaced Repetition queue state (`dueQueue`, `dueIndices`), referral link fetches, clipboard utilities, PostHog instrumentation, and share link caching. Flashcard history now carries linked mind map metadata so previously generated diagrams reopen instantly rather than regenerating.【F:app/dashboard/DashboardClient.tsx†L1-L400】
+- `DashboardClient` is a comprehensive client module managing Supabase-authenticated state, credit balances, Paddle upgrade flows, mode switching between fast/smart models, referral tracking, share link generation, spaced repetition modals, and streaming history. It orchestrates Spaced Repetition queue state (`dueQueue`, `dueIndices`), referral link fetches, clipboard utilities, PostHog instrumentation, and share link caching. Flashcard history now carries linked mind map metadata so previously generated diagrams reopen instantly rather than regenerating, and the mode tooltip now spells out that the upgraded model delivers the most detailed outputs while consuming more credits than the baseline option.【F:app/dashboard/DashboardClient.tsx†L1-L400】
 
 ### 3.4 Pricing
 - The `/pricing` route renders `PricingHeader` plus the interactive `PricingClient`. Metadata introduces plan descriptions.【F:app/pricing/page.tsx†L1-L20】
@@ -216,4 +216,3 @@ create table public.user_credits (
   constraint user_credits_nonnegative check ((credits >= (0)::numeric))
 ) TABLESPACE pg_default;
 ```
-

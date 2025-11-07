@@ -1586,12 +1586,17 @@ const handleMindMapLinked = useCallback(
             >
               <Image src={CogniGuideLogo} alt="CogniGuide" width={24} height={24} className="h-6 w-6" />
             </button>
-            <button onClick={() => setIsSidebarOpen(false)} className="p-1 rounded-full hover:bg-muted md:hidden">
+            <button
+              onClick={() => setIsSidebarOpen(false)}
+              className="p-1 rounded-full hover:bg-muted md:hidden"
+              title="Close sidebar"
+            >
               <X className="h-5 w-5" />
             </button>
           </div>
           <div className="mb-4 pl-0 pr-2">
             <button
+              title="Open spaced repetition decks"
               onClick={async () => {
                 setSpacedOpen(true);
                 setSpacedError(null);
@@ -1636,6 +1641,7 @@ const handleMindMapLinked = useCallback(
               return (
                 <div key={itemKey} className="relative group">
                   <button
+                    title={`Open ${item.title || (item.type === 'mindmap' ? 'mindmap' : 'flashcards')} ${item.type}`}
                     onClick={() => {
                       if (openMenuId === itemKey || isRenaming) return;
                       posthog.capture('history_item_opened', {
@@ -1714,6 +1720,7 @@ const handleMindMapLinked = useCallback(
                   </button>
                   <div className={`absolute top-1/2 -translate-y-1/2 right-2 ${openMenuId === itemKey ? 'visible' : 'invisible group-hover:visible'}`} onClick={(e) => e.stopPropagation()}>
                     <button
+                      title="Show actions"
                       onClick={(e) => {
                         const rect = e.currentTarget.getBoundingClientRect();
                         if (openMenuId === itemKey) {
@@ -1744,6 +1751,7 @@ const handleMindMapLinked = useCallback(
         </div>
         <div className="border-t pt-2 space-y-2 pl-0 pr-2">
           <button
+            title="Open settings"
             onClick={() => setIsSettingsOpen(true)}
             className="w-full text-left pl-2 pr-2 py-2 rounded-xl hover:bg-muted/50 flex items-center gap-3 transition-colors"
           >
@@ -1783,6 +1791,7 @@ const handleMindMapLinked = useCallback(
             }}
           >
             <button
+              title="Share link with friends"
               onClick={() => {
                 const [type, id] = openMenuId.split(':');
                 const currentItem = combinedHistory.find(item => item.id === id && item.type === type);
@@ -1796,6 +1805,7 @@ const handleMindMapLinked = useCallback(
               Share
             </button>
             <button
+              title="Rename item"
               onClick={() => {
                 const [type, id] = openMenuId.split(':');
                 // Find the current title from the combinedHistory
@@ -1811,6 +1821,7 @@ const handleMindMapLinked = useCallback(
               Rename
             </button>
             <button
+              title="Delete item"
               onClick={() => {
                 const [type, id] = openMenuId.split(':');
                 setOpenMenuId(null);
@@ -1837,6 +1848,7 @@ const handleMindMapLinked = useCallback(
                 className="group inline-flex items-center gap-2 rounded-full bg-background px-3 py-2 text-sm font-medium text-foreground transition hover:bg-muted/70"
                 aria-haspopup="listbox"
                 aria-expanded={isModeMenuOpen}
+                title="Change generation mode"
               >
                 <div className="flex items-center gap-1">
                   <span className="text-lg font-semibold">{modelDetails[selectedModel].label}</span>
@@ -1860,8 +1872,13 @@ const handleMindMapLinked = useCallback(
                   const locked = choice === 'smart' && !isPaidUser;
                   const optionLabel = locked ? 'Smart' : modelDetails[choice].label;
                   const shortDescription = choice === 'fast' ? 'Quick generation' : 'Detailed outputs';
+                  const tooltipText =
+                    choice === 'smart'
+                      ? 'Produces richer, more structured outputs and consumes more credits.'
+                      : 'Baseline model responds quickly and uses the fewest credits.';
                   return (
                     <button
+                      title={tooltipText}
                       key={choice}
                       type="button"
                       onClick={() => handleSelectModel(choice)}
@@ -1897,7 +1914,11 @@ const handleMindMapLinked = useCallback(
         </div>
 
         <header className="md:hidden flex items-center justify-between sticky top-0 bg-background/80 backdrop-blur-sm px-6 py-3 border-b z-10">
-          <button onClick={() => setIsSidebarOpen(true)} className="p-2 -ml-2">
+          <button
+            onClick={() => setIsSidebarOpen(true)}
+            className="p-2 -ml-2"
+            title="Open sidebar"
+          >
             <Menu className="h-6 w-6" />
           </button>
           <div className="flex items-center gap-2">
@@ -1914,6 +1935,7 @@ const handleMindMapLinked = useCallback(
                 return shouldShowButton ? (
                   <div className="flex justify-center w-full">
                     <button
+                      title="View pricing plans"
                       onClick={() => setIsPricingModalOpen(true)}
                       className="upgrade-plan-btn inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary text-primary-foreground hover:bg-primary/90 transition-colors mx-auto"
                     >
@@ -2002,7 +2024,13 @@ const handleMindMapLinked = useCallback(
           <div className="bg-background rounded-[2rem] p-6 w-full max-w-2xl border" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-bold">Spaced repetition</h2>
-              <button onClick={() => setSpacedOpen(false)} className="px-3 py-1.5 rounded-full border hover:bg-muted/50 transition-colors">Close</button>
+              <button
+                onClick={() => setSpacedOpen(false)}
+                className="px-3 py-1.5 rounded-full border hover:bg-muted/50 transition-colors"
+                title="Close spaced repetition panel"
+              >
+                Close
+              </button>
             </div>
             {spacedError && (
               <div className="mb-3 text-sm text-red-600">{spacedError}</div>
@@ -2026,6 +2054,7 @@ const handleMindMapLinked = useCallback(
                     <div className="text-xs text-muted-foreground">Shuffle cards from multiple decks for better retention and learning efficiency</div>
                   </div>
                   <button
+                    title="Start interleaved study session"
                     className="px-3 py-1.5 text-xs rounded-full border bg-primary text-primary-foreground hover:bg-primary/90"
                     onClick={() => {
                       const dueMap = (typeof window !== 'undefined' && (window as any).__cogniguide_due_map) || {};
@@ -2116,6 +2145,7 @@ const handleMindMapLinked = useCallback(
                     </div>
                     <div className="flex items-center gap-2">
                       <button
+                        title="Remove deck from due list"
                         className={cn(
                           'px-3 py-1.5 text-xs rounded-full border hover:bg-muted/50 transition-colors',
                           isCancelling ? 'opacity-60 cursor-not-allowed' : '',
@@ -2126,6 +2156,7 @@ const handleMindMapLinked = useCallback(
                         Cancel
                       </button>
                       <button
+                        title="Study this deck"
                         className={cn(
                           'px-3 py-1.5 text-xs rounded-full border bg-primary text-primary-foreground hover:bg-primary/90',
                           isCancelling ? 'opacity-60 cursor-not-allowed' : '',
@@ -2185,6 +2216,7 @@ const handleMindMapLinked = useCallback(
                 <ul className="space-y-2 text-sm">
                   <li>
                     <button
+                      title="Open referral rewards"
                       type="button"
                       onClick={() => {
                         setLegalOpen(false);
@@ -2199,6 +2231,7 @@ const handleMindMapLinked = useCallback(
                   </li>
                   <li>
                     <button
+                      title="Open upgrade options"
                       type="button"
                       onClick={() => setIsPricingModalOpen(true)}
                       className="w-full text-left p-3 rounded-[1.25rem] border bg-background hover:bg-muted/50 flex items-center gap-3"
@@ -2215,6 +2248,7 @@ const handleMindMapLinked = useCallback(
                   </li>
                   <li className="relative">
                     <button
+                      title="Show legal links"
                       onClick={() => setLegalOpen(!legalOpen)}
                       className="w-full text-left p-3 rounded-[1.25rem] border bg-background hover:bg-muted/50 flex items-center gap-3"
                     >
@@ -2237,7 +2271,11 @@ const handleMindMapLinked = useCallback(
               </nav>
             </div>
 
-            <button onClick={handleSignOut} className="w-full text-left p-3 rounded-[1.25rem] border bg-background hover:bg-red-50 hover:border-red-200 dark:hover:bg-red-900/20 dark:hover:border-red-800 flex items-center gap-3 text-red-600 flex-shrink-0 mt-4">
+            <button
+              onClick={handleSignOut}
+              className="w-full text-left p-3 rounded-[1.25rem] border bg-background hover:bg-red-50 hover:border-red-200 dark:hover:bg-red-900/20 dark:hover:border-red-800 flex items-center gap-3 text-red-600 flex-shrink-0 mt-4"
+              title="Sign out of CogniGuide"
+            >
               <LogOut className="h-5 w-5" />
               <span className="font-medium">Sign out</span>
             </button>
@@ -2259,6 +2297,7 @@ const handleMindMapLinked = useCallback(
             <button
               onClick={() => setIsReferralOpen(false)}
               className="absolute top-4 right-4 inline-flex items-center justify-center w-8 h-8 rounded-full border border-border hover:bg-muted/60"
+              title="Close referral modal"
             >
               <X className="h-4 w-4" />
             </button>
@@ -2293,6 +2332,7 @@ const handleMindMapLinked = useCallback(
                     onClick={handleCopyReferralLink}
                     disabled={referralLoading || !referralLink}
                     className="inline-flex items-center justify-center gap-2 rounded-full bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground transition hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50 mr-1 my-1"
+                    title="Copy referral link"
                   >
                     {referralLoading ? (
                       <Loader2 className="h-4 w-4 animate-spin" />
@@ -2357,6 +2397,7 @@ const handleMindMapLinked = useCallback(
               onClick={dismissReferralRewardNotice}
               className="ml-2 inline-flex h-8 w-8 items-center justify-center rounded-full border border-transparent text-muted-foreground transition hover:bg-muted/80 hover:text-foreground"
               aria-label="Dismiss referral bonus notice"
+              title="Dismiss notice"
             >
               <X className="h-4 w-4" />
             </button>

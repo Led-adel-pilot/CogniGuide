@@ -955,6 +955,7 @@ export default function MindMapModal({ markdown, onClose, onShareMindMap, isPaid
                   style={{ backgroundColor: 'var(--color-background)' }}
                   aria-haspopup="menu"
                   aria-expanded={isDropdownOpen}
+                  title="Download mind map"
                 >
                   <Download className="h-4 w-4" />
                   <svg className="h-4 w-4 ml-1 -mr-0.5" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" /></svg>
@@ -975,6 +976,7 @@ export default function MindMapModal({ markdown, onClose, onShareMindMap, isPaid
                       type="button"
                       onClick={() => { posthog.capture('mindmap_exported', { format: 'png' }); handleDownload('png'); setDropdownOpen(false); }}
                       className="w-full flex items-center gap-2 px-3 py-1.5 text-sm text-foreground hover:bg-muted rounded-xl focus:outline-none"
+                      title="Download as PNG"
                     >
                       <FileImage className="h-4 w-4" /> PNG
                     </button>
@@ -982,6 +984,7 @@ export default function MindMapModal({ markdown, onClose, onShareMindMap, isPaid
                       type="button"
                       onClick={() => { posthog.capture('mindmap_exported', { format: 'pdf' }); handleDownload('pdf'); setDropdownOpen(false); }}
                       className="w-full flex items-center gap-2 px-3 py-1.5 text-sm text-foreground hover:bg-muted rounded-xl focus:outline-none"
+                      title="Download as PDF"
                     >
                       <FileImage className="h-4 w-4" /> PDF
                     </button>
@@ -995,6 +998,7 @@ export default function MindMapModal({ markdown, onClose, onShareMindMap, isPaid
               <ShareTriggerButton
                 onClick={onShareMindMap}
                 className="opacity-100 translate-x-0 transition-all duration-200 ease-in-out"
+                title="Share a link to this mind map with friends"
               />
             )}
             {!userId && !disableSignupPrompts && (
@@ -1003,6 +1007,7 @@ export default function MindMapModal({ markdown, onClose, onShareMindMap, isPaid
                 className="inline-flex items-center justify-center h-8 px-4 text-sm font-medium text-foreground rounded-full border border-border shadow-sm hover:bg-muted/50 focus:outline-none opacity-100 translate-x-0 transition-all duration-200 ease-in-out"
                 style={{ backgroundColor: 'var(--color-background)' }}
                 aria-label="Sign up"
+                title="Sign up to save your mind maps"
               >
                 Sign up
               </button>
@@ -1014,6 +1019,7 @@ export default function MindMapModal({ markdown, onClose, onShareMindMap, isPaid
                 className="inline-flex items-center justify-center w-8 h-8 text-foreground rounded-full border border-border shadow-sm hover:bg-muted/50 focus:outline-none opacity-100 translate-x-0 transition-all duration-200 ease-in-out"
                 style={{ backgroundColor: 'var(--color-background)' }}
                 aria-label="Back to flashcards"
+                title="Back to flashcards"
               >
                 <ChevronLeft className="h-4 w-4" />
               </button>
@@ -1023,6 +1029,7 @@ export default function MindMapModal({ markdown, onClose, onShareMindMap, isPaid
                 className="inline-flex items-center justify-center w-8 h-8 text-foreground rounded-full border border-border shadow-sm hover:bg-muted/50 focus:outline-none opacity-100 translate-x-0 transition-all duration-200 ease-in-out"
                 style={{ backgroundColor: 'var(--color-background)' }}
                 aria-label="Close"
+                title="Close mind map"
               >
                 <X className="h-4 w-4" />
               </button>
@@ -1057,12 +1064,14 @@ export default function MindMapModal({ markdown, onClose, onShareMindMap, isPaid
                     openAuthModal();
                   }}
                   className="w-full h-10 px-6 text-sm font-bold text-white bg-gradient-to-r from-blue-600 via-cyan-500 to-teal-500 rounded-full hover:opacity-90 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/50 whitespace-nowrap"
+                  title="Save this mind map and continue"
                 >
                   Save & Continue
                 </button>
                 <button
                   onClick={onClose}
                   className="w-full h-10 px-6 text-sm font-medium text-muted-foreground bg-muted rounded-full hover:bg-muted/80 transition-colors whitespace-nowrap"
+                  title="Close without saving"
                 >
                   Continue without saving
                 </button>
