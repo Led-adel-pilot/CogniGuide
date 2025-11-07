@@ -86,7 +86,7 @@ export default function TooltipLayer() {
   const tooltipRef = useRef<HTMLDivElement | null>(null);
   const mountedRef = useRef(false);
   const activeElementRef = useRef<HTMLElement | null>(null);
-  const rafRef = useRef<number>();
+  const rafRef = useRef<number | null>(null);
 
   useEffect(() => {
     mountedRef.current = true;

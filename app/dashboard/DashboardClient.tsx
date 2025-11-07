@@ -1641,7 +1641,12 @@ const handleMindMapLinked = useCallback(
               return (
                 <div key={itemKey} className="relative group">
                   <button
-                    title={`Open ${item.title || (item.type === 'mindmap' ? 'mindmap' : 'flashcards')} ${item.type}`}
+                    title={(function() {
+                      const cleaned = removeFirstEmoji(item.title);
+                      return cleaned && cleaned.length > 0
+                        ? cleaned
+                        : (item.type === 'mindmap' ? 'mindmap' : 'flashcards');
+                    })()}
                     onClick={() => {
                       if (openMenuId === itemKey || isRenaming) return;
                       posthog.capture('history_item_opened', {
