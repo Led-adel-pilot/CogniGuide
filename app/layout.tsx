@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import TooltipLayer from "@/components/TooltipLayer";
 import { siteMetadata } from "@/lib/siteMetadata";
 
 const googleSiteVerification = process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION;
@@ -137,8 +138,9 @@ export default function RootLayout({
         />
       </head>
       <body className="flex min-h-screen flex-col bg-background text-foreground">
+        <TooltipLayer />
         <main className="flex-1">{children}</main>
-        
+
         <div id="modal-root" />
       </body>
     </html>
