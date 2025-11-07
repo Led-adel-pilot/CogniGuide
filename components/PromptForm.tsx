@@ -13,6 +13,7 @@ interface PromptFormProps {
   disabled: boolean;
   filesLength: number;
   ctaLabel?: string;
+  ctaTooltip?: string;
   mode?: 'mindmap' | 'flashcards';
   onInteract?: () => void;
   previewLoading?: boolean;
@@ -26,12 +27,14 @@ export default function PromptForm({
   disabled,
   filesLength,
   ctaLabel,
+  ctaTooltip,
   mode = 'mindmap',
   onInteract,
   previewLoading = false,
 }: PromptFormProps) {
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const formRef = useRef<HTMLFormElement | null>(null);
+  const tooltipText = ctaTooltip ?? ctaLabel ?? 'Send prompt';
 
   const getPlaceholder = () => {
     const hasFiles = filesLength > 0;
@@ -143,7 +146,8 @@ export default function PromptForm({
         className={`flex-shrink-0 inline-flex items-center justify-center w-10 h-10 text-white bg-primary rounded-full shadow hover:bg-primary/90 transition-all duration-300 disabled:opacity-60 disabled:cursor-not-allowed relative overflow-hidden ${
           previewLoading && !isLoading ? 'button-attention' : ''
         }`}
-        aria-label={ctaLabel ?? 'Send prompt'}
+        aria-label={tooltipText}
+        data-tooltip={tooltipText}
       >
         {isLoading ? (
           <svg

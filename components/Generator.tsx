@@ -89,6 +89,8 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
     allowedNameSizes: { name: string; size: number }[] | undefined;
     error: string | null;
   } | null>(null);
+  const ctaLabel = mode === 'flashcards' ? 'Generate Flashcards' : 'Generate Mind Map';
+  const ctaTooltip = mode === 'flashcards' ? 'Generate flashcards' : 'Generate mind map';
 
   type UploadedFileMetadata = {
     bucket: string;
@@ -1348,7 +1350,6 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
                       setMode('mindmap');
                     }}
                     className={`px-4 py-1.5 text-sm font-semibold rounded-full transition-colors ${mode==='mindmap' ? 'bg-background text-primary shadow' : 'text-muted-foreground hover:text-primary'}`}
-                    title="Switch to mind map mode"
                   >Mind Map</button>
                   <button
                     onClick={() => {
@@ -1356,7 +1357,6 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
                       setMode('flashcards');
                     }}
                     className={`px-4 py-1.5 text-sm font-semibold rounded-full transition-colors ${mode==='flashcards' ? 'bg-background text-primary shadow' : 'text-muted-foreground hover:text-primary'}`}
-                    title="Switch to flashcards mode"
                   >Flashcards</button>
                 </div>
               </div>
@@ -1401,7 +1401,8 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
                 setPrompt={setPrompt}
                 disabled={!canSubmit}
                 filesLength={files.length}
-                ctaLabel={mode==='flashcards' ? 'Generate Flashcards' : 'Generate Mind Map'}
+                ctaLabel={ctaLabel}
+                ctaTooltip={ctaTooltip}
                 mode={mode}
                 previewLoading={previewLoading}
                 onInteract={() => {

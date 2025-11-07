@@ -1596,7 +1596,7 @@ const handleMindMapLinked = useCallback(
           </div>
           <div className="mb-4 pl-0 pr-2">
             <button
-              title="Open spaced repetition decks"
+              title="Review due decks"
               onClick={async () => {
                 setSpacedOpen(true);
                 setSpacedError(null);
@@ -1725,7 +1725,6 @@ const handleMindMapLinked = useCallback(
                   </button>
                   <div className={`absolute top-1/2 -translate-y-1/2 right-2 ${openMenuId === itemKey ? 'visible' : 'invisible group-hover:visible'}`} onClick={(e) => e.stopPropagation()}>
                     <button
-                      title="Show actions"
                       onClick={(e) => {
                         const rect = e.currentTarget.getBoundingClientRect();
                         if (openMenuId === itemKey) {
@@ -1756,7 +1755,7 @@ const handleMindMapLinked = useCallback(
         </div>
         <div className="border-t pt-2 space-y-2 pl-0 pr-2">
           <button
-            title="Open settings"
+            title="Settings"
             onClick={() => setIsSettingsOpen(true)}
             className="w-full text-left pl-2 pr-2 py-2 rounded-xl hover:bg-muted/50 flex items-center gap-3 transition-colors"
           >
@@ -1853,7 +1852,7 @@ const handleMindMapLinked = useCallback(
                 className="group inline-flex items-center gap-2 rounded-full bg-background px-3 py-2 text-sm font-medium text-foreground transition hover:bg-muted/70"
                 aria-haspopup="listbox"
                 aria-expanded={isModeMenuOpen}
-                title="Change generation mode"
+                title="Change AI model"
               >
                 <div className="flex items-center gap-1">
                   <span className="text-lg font-semibold">{modelDetails[selectedModel].label}</span>
@@ -1879,7 +1878,7 @@ const handleMindMapLinked = useCallback(
                   const shortDescription = choice === 'fast' ? 'Quick generation' : 'Detailed outputs';
                   const tooltipText =
                     choice === 'smart'
-                      ? 'Produces richer, more structured outputs and consumes more credits.'
+                      ? 'Produces richer, more structured outputs. Consumes more credits.'
                       : 'Baseline model responds quickly and uses the fewest credits.';
                   return (
                     <button

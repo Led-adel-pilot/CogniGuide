@@ -276,7 +276,7 @@ export default function TooltipLayer() {
       ref={tooltipRef}
       role="tooltip"
       aria-hidden={!tooltip.visible}
-      className="pointer-events-none fixed z-[9999] max-w-[min(240px,calc(100vw-2rem))] rounded-md bg-foreground/95 px-2.5 py-1.5 text-[11px] font-medium text-background shadow-xl shadow-foreground/15 transition-opacity duration-150"
+      className="pointer-events-none fixed z-[9999] max-w-[min(240px,calc(100vw-2rem))] rounded-md bg-neutral-800 px-2.5 py-1.5 text-[11px] font-medium text-white transition-opacity duration-150 dark:bg-black"
       style={{
         left: position.left,
         top: position.top,

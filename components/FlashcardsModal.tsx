@@ -1614,8 +1614,8 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
                 isMindMapGenerating
                   ? 'Generating an AI mind map from this deck…'
                   : hasMindMapAvailable
-                    ? 'Open the AI mind map linked to these cards'
-                    : 'Generate an AI mind map to visualize these flashcards'
+                    ? 'Mind map linked to this deck'
+                    : 'Generate mind map from flashcards'
               }
             >
               {isMindMapGenerating ? <Loader2 className="h-4 w-4 animate-spin" /> : hasMindMapAvailable ? <MapIcon className="h-4 w-4" /> : <Sparkles className="h-4 w-4" />}
@@ -1626,7 +1626,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
             <ShareTriggerButton
               onClick={onShare}
               showText={true}
-              title="Share a link to this deck with friends"
+              title="Share link with friends"
             />
           )}
           {!userId && (
@@ -1643,7 +1643,6 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
             onClick={handleClose}
             className="inline-flex items-center justify-center w-8 h-8 bg-background text-foreground rounded-full border border-border shadow-sm hover:bg-muted/50 dark:hover:bg-muted/80 focus:outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400/50"
             aria-label="Close"
-            title="Close flashcards"
           >
             <X className="h-4 w-4" />
           </button>
@@ -1879,7 +1878,6 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
                       <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
                         {showAnswer && !showExplanation ? (
                           <button
-                            title={isExplaining ? 'Generating explanation' : 'Explain this answer'}
                             onClick={handleExplain}
                             disabled={isExplaining}
                             className="inline-flex items-center gap-1.5 h-6 px-3 rounded-full border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-300/50 flashcard-grade-good disabled:cursor-not-allowed"
@@ -1953,7 +1951,6 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
                     <div className="flex flex-col items-center">
                       <span className="text-[11px] text-gray-500 dark:text-gray-400 h-4">{predictedDueByGrade[1] || ''}</span>
                       <button
-                        title="Mark this card as Again"
                         onClick={() => handleGrade(1)}
                         className="h-9 px-3 text-xs rounded-full border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-300/50 flashcard-grade-again"
                       >
@@ -1963,7 +1960,6 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
                     <div className="flex flex-col items-center">
                       <span className="text-[11px] text-gray-500 dark:text-gray-400 h-4">{predictedDueByGrade[2] || ''}</span>
                       <button
-                        title="Mark this card as Hard"
                         onClick={() => handleGrade(2)}
                         className="h-9 px-3 text-xs rounded-full border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-300/50 flashcard-grade-hard"
                       >
@@ -1973,7 +1969,6 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
                     <div className="flex flex-col items-center">
                       <span className="text-[11px] text-gray-500 dark:text-gray-400 h-4">{predictedDueByGrade[3] || ''}</span>
                       <button
-                        title="Mark this card as Good"
                         onClick={() => handleGrade(3)}
                         className="h-9 px-3 text-xs rounded-full border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-300/50 flashcard-grade-good"
                       >
@@ -1983,7 +1978,6 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
                     <div className="flex flex-col items-center">
                       <span className="text-[11px] text-gray-500 dark:text-gray-400 h-4">{predictedDueByGrade[4] || ''}</span>
                       <button
-                        title="Mark this card as Easy"
                         onClick={() => handleGrade(4)}
                         className="h-9 px-3 text-xs rounded-full border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/50 flashcard-grade-easy"
                       >
@@ -1996,7 +1990,6 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
                 <button
                   onClick={handleShowAnswer}
                   className="inline-flex items-center h-10 px-5 rounded-full text-white bg-primary hover:bg-primary/90 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/50 whitespace-nowrap"
-                  title="Reveal answer"
                 >
                   <Eye className="h-5 w-5 mr-2" /> Show Answer
                 </button>
@@ -2148,7 +2141,6 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
             </div>
             <div className="flex flex-col gap-3 w-full max-w-md">
               <button
-                title="Skip setting an exam date"
                 onClick={() => {
                   markExamDatePopupAsShown(deckIdentifier);
                   setShowExamDatePopup(false);

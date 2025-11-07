@@ -998,7 +998,7 @@ export default function MindMapModal({ markdown, onClose, onShareMindMap, isPaid
               <ShareTriggerButton
                 onClick={onShareMindMap}
                 className="opacity-100 translate-x-0 transition-all duration-200 ease-in-out"
-                title="Share a link to this mind map with friends"
+                title="Share link with friends"
               />
             )}
             {!userId && !disableSignupPrompts && (
@@ -1029,7 +1029,6 @@ export default function MindMapModal({ markdown, onClose, onShareMindMap, isPaid
                 className="inline-flex items-center justify-center w-8 h-8 text-foreground rounded-full border border-border shadow-sm hover:bg-muted/50 focus:outline-none opacity-100 translate-x-0 transition-all duration-200 ease-in-out"
                 style={{ backgroundColor: 'var(--color-background)' }}
                 aria-label="Close"
-                title="Close mind map"
               >
                 <X className="h-4 w-4" />
               </button>
