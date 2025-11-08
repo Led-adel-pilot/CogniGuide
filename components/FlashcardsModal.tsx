@@ -2194,7 +2194,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
                               type="button"
                               onClick={handleStartEdit}
                               className="inline-flex items-center justify-center h-6 w-6 rounded-full border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-300/50 flashcard-grade-good"
-                              title="Edit question and answer in your language"
+                              title="Edit in your own words"
                               aria-label="Edit question and answer"
                             >
                               <Pencil className="h-3.5 w-3.5" aria-hidden="true" />

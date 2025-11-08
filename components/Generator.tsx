@@ -8,7 +8,7 @@ import Dropzone from '@/components/Dropzone';
 import PromptForm from '@/components/PromptForm';
 import { supabase } from '@/lib/supabaseClient';
 import { type ModelChoice } from '@/lib/plans';
-import { Sparkles } from 'lucide-react';
+import { AlertTriangle, Sparkles } from 'lucide-react';
 import type AuthModalComponent from '@/components/AuthModal';
 import type MindMapModalComponent from '@/components/MindMapModal';
 import type FlashcardsModalComponent from '@/components/FlashcardsModal';
@@ -22,6 +22,9 @@ type FlashcardsModalProps = ComponentProps<typeof FlashcardsModalComponent>;
 const AuthModal = dynamic<AuthModalProps>(() => import('@/components/AuthModal'), { ssr: false });
 const MindMapModal = dynamic<MindMapModalProps>(() => import('@/components/MindMapModal'), { ssr: false });
 const FlashcardsModal = dynamic<FlashcardsModalProps>(() => import('@/components/FlashcardsModal'), { ssr: false });
+
+const LOW_TEXT_CHAR_THRESHOLD = 40;
+const SCANNED_PDF_WARNING = 'We couldn\'t detect much selectable text in your PDF. If it\'s a scanned image, run OCR or upload a text-based copy so the AI can read it.';
 
 interface GeneratorProps {
   redirectOnAuth?: boolean;
@@ -64,6 +67,7 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [markdown, setMarkdown] = useState<string | null>(null);
+  const [uploadWarning, setUploadWarning] = useState<string | null>(null);
   const [showAuth, setShowAuth] = useState(false);
   const [isAuthed, setIsAuthed] = useState(false);
   const [isPaidSubscriberState, setIsPaidSubscriberState] = useState(false);
@@ -91,6 +95,31 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
   } | null>(null);
   const ctaLabel = mode === 'flashcards' ? 'Generate Flashcards' : 'Generate Mind Map';
   const ctaTooltip = mode === 'flashcards' ? 'Generate flashcards' : 'Generate mind map';
+
+  const evaluateLowTextWarning = useCallback((text: string, rawCharCount: number | undefined, fileList?: File[] | null) => {
+    if (!fileList || fileList.length === 0) {
+      setUploadWarning(null);
+      return;
+    }
+    const hasPdfUpload = fileList.some((file) => {
+      const name = (file.name || '').toLowerCase();
+      const type = (file.type || '').toLowerCase();
+      return type === 'application/pdf' || name.endsWith('.pdf');
+    });
+    if (!hasPdfUpload) {
+      setUploadWarning(null);
+      return;
+    }
+    const sanitizedText = typeof text === 'string' ? text : '';
+    const effectiveCharCount = typeof rawCharCount === 'number' && Number.isFinite(rawCharCount)
+      ? rawCharCount
+      : sanitizedText.replace(/\s+/g, '').length;
+    if (effectiveCharCount < LOW_TEXT_CHAR_THRESHOLD) {
+      setUploadWarning(SCANNED_PDF_WARNING);
+    } else {
+      setUploadWarning(null);
+    }
+  }, []);
 
   type UploadedFileMetadata = {
     bucket: string;
@@ -509,6 +538,7 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
       uploadedFilesRef.current.clear();
       fileIdentityCacheRef.current = new WeakMap();
       setAllowedNameSizes(undefined);
+      setUploadWarning(null);
       return;
     }
 
@@ -518,6 +548,11 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
       if (cachedLimitExceeded.signature === incomingSignature) {
         setFiles(selectedFiles);
         setPreParsed(cachedLimitExceeded.preParsed);
+        evaluateLowTextWarning(
+          cachedLimitExceeded.preParsed?.text || '',
+          cachedLimitExceeded.preParsed?.rawCharCount,
+          selectedFiles
+        );
         setAllowedNameSizes(cachedLimitExceeded.allowedNameSizes);
         setError(cachedLimitExceeded.error);
         return;
@@ -571,6 +606,7 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
       const images = Array.isArray(j?.images) ? j.images as string[] : [];
       const rawCharCount = typeof j?.totalRawChars === 'number' ? j.totalRawChars as number : undefined;
       setPreParsed({ text, images, rawCharCount });
+      evaluateLowTextWarning(text, rawCharCount, selectedFiles);
 
       // Handle cumulative pruning feedback from cached result
       const limitExceeded = Boolean(j?.limitExceeded);
@@ -663,6 +699,7 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
         if (hasImages && (reason.toLowerCase().includes('image') || reason.toLowerCase().includes('upload') || reason.toLowerCase().includes('storage'))) {
           setError(`Image upload failed: ${reason}. Please try uploading your images again or use a different image format.`);
           setPreParsed(null);
+          setUploadWarning(null);
           setAllowedNameSizes(undefined);
           setIsPreParsing(false);
           setUploadProgress(undefined);
@@ -672,6 +709,7 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
         if (totalBytes > 4 * 1024 * 1024) {
           setError(`Storage pre-parse failed: ${reason}. Large files cannot be sent directly; please retry later or check storage configuration.`);
           setPreParsed(null);
+          setUploadWarning(null);
           setAllowedNameSizes(undefined);
           setIsPreParsing(false);
           setUploadProgress(undefined);
@@ -703,6 +741,7 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
             setError('Failed to prepare files.');
           }
           setPreParsed(null);
+          setUploadWarning(null);
           setAllowedNameSizes(undefined);
           setIsPreParsing(false);
           setUploadProgress(undefined);
@@ -773,6 +812,7 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
 
       const rawCharCount = combinedRawCharCount;
       setPreParsed({ text: combinedText, images: combinedImages, rawCharCount });
+      evaluateLowTextWarning(combinedText, rawCharCount, selectedFiles);
 
       // Handle cumulative pruning feedback
       const limitExceeded = combinedLimitExceeded;
@@ -801,7 +841,7 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
       setIsPreParsing(false);
       setUploadProgress(undefined);
     }
-  }, [getFileSignature, debugLog, MAX_FILE_BYTES, isAuthed, uploadAndPreparse, getNameSizeSignature, mergeNameSizeLists]);
+  }, [getFileSignature, debugLog, MAX_FILE_BYTES, isAuthed, uploadAndPreparse, getNameSizeSignature, mergeNameSizeLists, evaluateLowTextWarning]);
 
   const requireAuthErrorMessage = 'Please sign up to generate with CogniGuide.';
 
@@ -878,6 +918,7 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
               const rawCharCount = typeof j?.totalRawChars === 'number' ? j.totalRawChars as number : undefined;
               effectivePreParsed = { text, images, rawCharCount };
               setPreParsed(effectivePreParsed);
+              evaluateLowTextWarning(effectivePreParsed.text || '', effectivePreParsed.rawCharCount, files);
             } catch(e) {
               const msg = (e instanceof Error) ? e.message : 'An unknown error occurred during pre-parse.';
               setError(msg);
@@ -1097,6 +1138,7 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
           const rawCharCount = typeof j?.totalRawChars === 'number' ? j.totalRawChars as number : undefined;
           effectivePreParsed = { text, images, rawCharCount };
           setPreParsed(effectivePreParsed);
+          evaluateLowTextWarning(effectivePreParsed.text || '', effectivePreParsed.rawCharCount, files);
         } catch(e) {
             const msg = (e instanceof Error) ? e.message : 'An unknown error occurred during pre-parse.';
             setError(msg);
@@ -1388,6 +1430,7 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
                   setUploadProgress(undefined);
                   // Clear any cached pre-parsed results since file set changed
                   setPreParsed(null);
+                  setUploadWarning(null);
                   setAllowedNameSizes(undefined);
                   // Clear last preparse key to force re-processing
                   lastPreparseKeyRef.current = null;
@@ -1410,6 +1453,12 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
                   if (!isAuthed) setShowAuth(true);
                 }}
               />
+              {uploadWarning && (
+                <div className="flex items-start gap-3 rounded-[1.25rem] border border-amber-200/80 bg-amber-50/80 px-4 py-3 text-left text-sm text-amber-900">
+                  <AlertTriangle className="h-5 w-5 flex-shrink-0 text-amber-500" />
+                  <p className="font-medium">{uploadWarning}</p>
+                </div>
+              )}
               {error && (
                 <div className="mt-4 text-center p-4 bg-muted border border-border text-foreground rounded-[1.25rem]">
                   <div className="flex flex-col sm:flex-row items-center justify-center gap-3">

@@ -11,7 +11,7 @@
 
 ## 3. Authenticated Experience
 - /dashboard is a Suspense-wrapped client entry (app/dashboard/DashboardClient.tsx) that manages Supabase auth, credit balances (cache + localStorage), Paddle checkout flows, referral tracking, share-link creation, spaced-repetition queues, streaming history, and toggles between mind-map vs flashcard generators.
-- The generation UI stitches together components/Dropzone.tsx, PromptForm.tsx, Generator.tsx, EmbeddedMindMap.tsx, and EmbeddedFlashcards.tsx so uploads, prompt overrides, mode switches, and previews happen in one panel; FlashcardsModal.tsx itself handles grading, spaced repetition navigation, Explain Flashcard calls, and credits.
+- The generation UI stitches together components/Dropzone.tsx, PromptForm.tsx, Generator.tsx, EmbeddedMindMap.tsx, and EmbeddedFlashcards.tsx so uploads, prompt overrides, mode switches, and previews happen in one panel; FlashcardsModal.tsx itself handles grading, spaced repetition navigation, Explain Flashcard calls, and credits, and Generator.tsx now surfaces a yellow warning when PDF uploads contain little or no selectable text (scanned images) so users know to run OCR first.
 - components/MindMapModal.tsx renders the Markmap output with lib/markmap-renderer.ts plus styles/mindmap.css, while components/ShareLinkDialog.tsx, ShareTriggerButton.tsx, ShareViewer, and the Flashcard components keep sharing/embedding consistent across dashboards and marketing modals.
 
 ## 4. Client Components & Styling
