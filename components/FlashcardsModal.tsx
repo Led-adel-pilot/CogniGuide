@@ -200,6 +200,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
   const [originalDueList, setOriginalDueList] = React.useState<number[]>([]);
   const [localCards, setLocalCards] = React.useState<Flashcard[] | null>(cards);
   const [isEditingCard, setIsEditingCard] = React.useState(false);
+  const [editedQuestion, setEditedQuestion] = React.useState('');
   const [editedAnswer, setEditedAnswer] = React.useState('');
   const [isSavingEditedAnswer, setIsSavingEditedAnswer] = React.useState(false);
   const [editPersistenceError, setEditPersistenceError] = React.useState<string | null>(null);
@@ -229,7 +230,9 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
 
   const questionRef = React.useRef<HTMLDivElement | null>(null);
   const answerRef = React.useRef<HTMLDivElement | null>(null);
+  const editedQuestionRef = React.useRef<HTMLTextAreaElement | null>(null);
   const editedAnswerRef = React.useRef<HTMLTextAreaElement | null>(null);
+  const editedQuestionSelectionRef = React.useRef<{ start: number; end: number } | null>(null);
   const editedAnswerSelectionRef = React.useRef<{ start: number; end: number } | null>(null);
 
   const resetExplanation = React.useCallback(() => {
@@ -797,7 +800,12 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
     if (!activeCard) return;
     setEditPersistenceError(null);
     setIsEditingCard(true);
+    setEditedQuestion(activeCard.question);
     setEditedAnswer(activeCard.answer);
+    editedQuestionSelectionRef.current = {
+      start: activeCard.question.length,
+      end: activeCard.question.length,
+    };
     editedAnswerSelectionRef.current = {
       start: activeCard.answer.length,
       end: activeCard.answer.length,
@@ -807,7 +815,9 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
   const handleCancelEdit = React.useCallback(() => {
     if (isSavingEditedAnswer) return;
     setIsEditingCard(false);
+    setEditedQuestion('');
     setEditedAnswer('');
+    editedQuestionSelectionRef.current = null;
     editedAnswerSelectionRef.current = null;
     setEditPersistenceError(null);
   }, [isSavingEditedAnswer]);
@@ -817,11 +827,15 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
     const baseCards = displayedCards;
     if (!baseCards || !baseCards[index]) return;
 
+    const previousQuestion = baseCards[index]!.question;
     const previousAnswer = baseCards[index]!.answer;
+    const nextQuestion = editedQuestion;
     const nextAnswer = editedAnswer;
-    if (previousAnswer === nextAnswer) {
+    if (previousQuestion === nextQuestion && previousAnswer === nextAnswer) {
       setIsEditingCard(false);
+      setEditedQuestion('');
       setEditedAnswer('');
+      editedQuestionSelectionRef.current = null;
       editedAnswerSelectionRef.current = null;
       setEditPersistenceError(null);
       return;
@@ -831,14 +845,14 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
     setEditPersistenceError(null);
 
     const updatedCards = baseCards.map((card, cardIndex) =>
-      cardIndex === index ? { ...card, answer: nextAnswer } : card,
+      cardIndex === index ? { ...card, question: nextQuestion, answer: nextAnswer } : card,
     );
 
     setLocalCards(updatedCards);
     setScheduledCards((prev) => {
       if (!prev || !prev[index]) return prev;
       const next = [...prev];
-      next[index] = { ...next[index], answer: nextAnswer };
+      next[index] = { ...next[index], question: nextQuestion, answer: nextAnswer };
       return next;
     });
 
@@ -860,7 +874,9 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
           const sourceDeck = interleavedDecks?.find((deck) => deck.id === targetDeckId);
           if (sourceDeck && Array.isArray(sourceDeck.cards) && sourceDeck.cards[targetCardIndex]) {
             payloadCards = sourceDeck.cards.map((card, cardIdx) =>
-              cardIdx === targetCardIndex ? { ...card, answer: nextAnswer } : card,
+              cardIdx === targetCardIndex
+                ? { ...card, question: nextQuestion, answer: nextAnswer }
+                : card,
             );
           } else {
             const { data: fetchedDeck, error: fetchError } = await supabase
@@ -877,7 +893,9 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
               throw new Error('Unable to locate deck cards for the edited flashcard.');
             }
             payloadCards = fetchedCards.map((card, cardIdx) =>
-              cardIdx === targetCardIndex ? { ...card, answer: nextAnswer } : card,
+              cardIdx === targetCardIndex
+                ? { ...card, question: nextQuestion, answer: nextAnswer }
+                : card,
             );
           }
         } else {
@@ -902,21 +920,23 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
       }
 
       setIsEditingCard(false);
+      setEditedQuestion('');
       setEditedAnswer('');
+      editedQuestionSelectionRef.current = null;
       editedAnswerSelectionRef.current = null;
     } catch (error) {
-      console.error('Failed to persist edited flashcard answer:', error);
+      console.error('Failed to persist edited flashcard question or answer:', error);
       setEditPersistenceError('Failed to save changes. Please try again.');
       setLocalCards((prev) => {
         if (!prev || !prev[index]) return prev;
         const next = prev.slice();
-        next[index] = { ...next[index], answer: previousAnswer };
+        next[index] = { ...next[index], question: previousQuestion, answer: previousAnswer };
         return next;
       });
       setScheduledCards((prev) => {
         if (!prev || !prev[index]) return prev;
         const next = [...prev];
-        next[index] = { ...next[index], answer: previousAnswer };
+        next[index] = { ...next[index], question: previousQuestion, answer: previousAnswer };
         return next;
       });
     } finally {
@@ -926,6 +946,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
     current,
     deckId,
     displayedCards,
+    editedQuestion,
     editedAnswer,
     index,
     interleavedDecks,
@@ -933,6 +954,15 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
     studyInterleaved,
     userId,
   ]);
+
+  const handleEditedQuestionChange = React.useCallback((event: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const { selectionStart, selectionEnd, value } = event.target;
+    editedQuestionSelectionRef.current = {
+      start: typeof selectionStart === 'number' ? selectionStart : value.length,
+      end: typeof selectionEnd === 'number' ? selectionEnd : value.length,
+    };
+    setEditedQuestion(value);
+  }, []);
 
   const handleEditedAnswerChange = React.useCallback((event: React.ChangeEvent<HTMLTextAreaElement>) => {
     const { selectionStart, selectionEnd, value } = event.target;
@@ -942,6 +972,49 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
     };
     setEditedAnswer(value);
   }, []);
+
+  const adjustTextareaHeight = React.useCallback((textarea: HTMLTextAreaElement | null, minRows: number) => {
+    if (!textarea) return;
+    const computedStyles = window.getComputedStyle(textarea);
+    const lineHeight = parseFloat(computedStyles.lineHeight);
+    const paddingTop = parseFloat(computedStyles.paddingTop) || 0;
+    const paddingBottom = parseFloat(computedStyles.paddingBottom) || 0;
+    const borderTop = parseFloat(computedStyles.borderTopWidth) || 0;
+    const borderBottom = parseFloat(computedStyles.borderBottomWidth) || 0;
+    const verticalPadding = paddingTop + paddingBottom;
+    const verticalBorder = borderTop + borderBottom;
+    const minHeight = Number.isFinite(lineHeight) ? lineHeight * minRows + verticalPadding + verticalBorder : 0;
+
+    textarea.style.height = 'auto';
+    const contentHeight = textarea.scrollHeight + verticalBorder;
+    textarea.style.height = `${Math.max(contentHeight, minHeight)}px`;
+  }, []);
+
+  React.useLayoutEffect(() => {
+    if (!isEditingCard) return;
+    adjustTextareaHeight(editedQuestionRef.current, 2);
+  }, [adjustTextareaHeight, editedQuestion, isEditingCard]);
+
+  React.useLayoutEffect(() => {
+    if (!isEditingCard) return;
+    adjustTextareaHeight(editedAnswerRef.current, 3);
+  }, [adjustTextareaHeight, editedAnswer, isEditingCard]);
+
+  React.useLayoutEffect(() => {
+    if (!isEditingCard) return;
+    const textarea = editedQuestionRef.current;
+    if (!textarea) return;
+    if (document.activeElement === textarea) return;
+
+    const selection = editedQuestionSelectionRef.current;
+    textarea.focus({ preventScroll: true });
+    if (typeof textarea.setSelectionRange === 'function') {
+      const length = textarea.value.length;
+      const start = selection ? Math.min(selection.start, length) : length;
+      const end = selection ? Math.min(selection.end, length) : length;
+      textarea.setSelectionRange(start, end);
+    }
+  }, [editedQuestion, isEditingCard]);
 
   React.useLayoutEffect(() => {
     if (!isEditingCard) return;
@@ -961,6 +1034,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
 
   React.useEffect(() => {
     if (!isEditingCard) {
+      editedQuestionSelectionRef.current = null;
       editedAnswerSelectionRef.current = null;
       setEditPersistenceError(null);
     }
@@ -1119,20 +1193,29 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
   React.useEffect(() => {
     setLocalCards(cards);
     setIsEditingCard(false);
+    setEditedQuestion('');
     setEditedAnswer('');
+    editedQuestionSelectionRef.current = null;
+    editedAnswerSelectionRef.current = null;
     setEditPersistenceError(null);
   }, [cards]);
 
   React.useEffect(() => {
     setIsEditingCard(false);
+    setEditedQuestion('');
     setEditedAnswer('');
+    editedQuestionSelectionRef.current = null;
+    editedAnswerSelectionRef.current = null;
     setEditPersistenceError(null);
   }, [index]);
 
   React.useEffect(() => {
     if (!showAnswer || showExplanation) {
       setIsEditingCard(false);
+      setEditedQuestion('');
       setEditedAnswer('');
+      editedQuestionSelectionRef.current = null;
+      editedAnswerSelectionRef.current = null;
       setEditPersistenceError(null);
     }
   }, [showAnswer, showExplanation]);
@@ -2075,12 +2158,23 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
                     </div>
                   ) : (
                     <>
-                      <div
-                        ref={questionRef}
-                        className="text-foreground text-lg sm:text-[22px] font-semibold leading-7 sm:leading-snug break-words flashcard-katex-content"
-                      >
-                        {questionContent}
-                      </div>
+                      {isEditingCard ? (
+                        <textarea
+                          ref={editedQuestionRef}
+                          value={editedQuestion}
+                          onChange={handleEditedQuestionChange}
+                          rows={2}
+                          className="w-full rounded-xl border border-border bg-background px-3 py-2 text-lg sm:text-[22px] font-semibold leading-7 sm:leading-snug focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-300/50 resize-vertical"
+                          aria-label="Question text"
+                        />
+                      ) : (
+                        <div
+                          ref={questionRef}
+                          className="text-foreground text-lg sm:text-[22px] font-semibold leading-7 sm:leading-snug break-words flashcard-katex-content"
+                        >
+                          {questionContent}
+                        </div>
+                      )}
                       <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
                         {showAnswer && !showExplanation && !isEditingCard ? (
                           <>
@@ -2100,11 +2194,11 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
                               type="button"
                               onClick={handleStartEdit}
                               className="inline-flex items-center justify-center h-6 w-6 rounded-full border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-300/50 flashcard-grade-good"
-                              title="Edit answer in your language"
-                              aria-label="Edit answer"
+                              title="Edit question and answer in your language"
+                              aria-label="Edit question and answer"
                             >
                               <Pencil className="h-3.5 w-3.5" aria-hidden="true" />
-                              <span className="sr-only">Edit answer</span>
+                              <span className="sr-only">Edit question and answer</span>
                             </button>
                           </>
                         ) : null}
@@ -2128,7 +2222,8 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
                                 ref={editedAnswerRef}
                                 value={editedAnswer}
                                 onChange={handleEditedAnswerChange}
-                                className="w-full min-h-[160px] rounded-xl border border-border bg-background px-3 py-2 text-sm leading-6 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-300/50 resize-vertical"
+                                rows={3}
+                                className="w-full rounded-xl border border-border bg-background px-3 py-2 text-sm leading-6 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-300/50 resize-vertical"
                                 aria-label="Answer text"
                               />
                             ) : (
