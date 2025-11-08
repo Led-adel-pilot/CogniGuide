@@ -65,8 +65,6 @@ SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
 NEXT_PUBLIC_POSTHOG_KEY=your_posthog_project_api_key
 NEXT_PUBLIC_BASE_URL=your_production_domain # Optional: defaults to deployment URL
 ```
-- Supporting documentation lives in README.md, APP_DOC.md, subscriptions_context.md, file_upload_details.md, event-tracking-report.md, Paddle Docs/, and ts_fsrs_docs/, covering everything from onboarding to Paddle checkout setup to spaced repetition theory.
-
 
 ## Supabase tables:
 

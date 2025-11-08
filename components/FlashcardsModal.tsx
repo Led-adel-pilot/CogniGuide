@@ -9,7 +9,7 @@ import { loadDeckSchedule, saveDeckSchedule, loadDeckScheduleAsync, saveDeckSche
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import type { Components } from 'react-markdown';
-import { ChevronLeft, ChevronRight, Eye, Loader2, Lock, Map as MapIcon, Sparkles, X } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Eye, Loader2, Lock, Map as MapIcon, Pencil, Sparkles, X } from 'lucide-react';
 import posthog from 'posthog-js';
 import { DatePicker } from '@/components/DatePicker';
 import { ensureKatexAssets } from '@/lib/katex-loader';
@@ -198,9 +198,15 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
   const [answerShownTime, setAnswerShownTime] = React.useState<number | null>(null);
   const [originalDueCount, setOriginalDueCount] = React.useState(0);
   const [originalDueList, setOriginalDueList] = React.useState<number[]>([]);
+  const [localCards, setLocalCards] = React.useState<Flashcard[] | null>(cards);
+  const [isEditingCard, setIsEditingCard] = React.useState(false);
+  const [editedAnswer, setEditedAnswer] = React.useState('');
+  const [isSavingEditedAnswer, setIsSavingEditedAnswer] = React.useState(false);
+  const [editPersistenceError, setEditPersistenceError] = React.useState<string | null>(null);
   const explainRequestRef = React.useRef(0);
   const mindMapRequestRef = React.useRef(0);
   const current = scheduledCards && scheduledCards[index] ? scheduledCards[index] : null;
+  const displayedCards = React.useMemo(() => localCards ?? cards, [localCards, cards]);
   const dispatchMindMapStreamUpdate = React.useCallback((requestId: number, markdownPayload: string, isFinal = false) => {
     if (typeof window === 'undefined') return;
     window.dispatchEvent(
@@ -215,13 +221,16 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
     );
   }, []);
 
-  const hasCards = Boolean(cards && cards.length > 0);
+  const hasCards = Boolean(displayedCards && displayedCards.length > 0);
 
-  const questionContent = cards && cards[index] ? cards[index]!.question : '';
-  const answerContent = cards && cards[index] ? cards[index]!.answer : '';
+  const questionContent = displayedCards && displayedCards[index] ? displayedCards[index]!.question : '';
+  const answerContent = displayedCards && displayedCards[index] ? displayedCards[index]!.answer : '';
+  const totalCardCount = displayedCards?.length ?? 0;
 
   const questionRef = React.useRef<HTMLDivElement | null>(null);
   const answerRef = React.useRef<HTMLDivElement | null>(null);
+  const editedAnswerRef = React.useRef<HTMLTextAreaElement | null>(null);
+  const editedAnswerSelectionRef = React.useRef<{ start: number; end: number } | null>(null);
 
   const resetExplanation = React.useCallback(() => {
     explainRequestRef.current += 1;
@@ -232,17 +241,17 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
   }, []);
 
   const storePendingDeckForSignup = React.useCallback(() => {
-    if (!title || !cards) return;
+    if (!title || !displayedCards) return;
     if (typeof window === 'undefined') return;
     try {
-      const pendingDeck = { title, cards };
+      const pendingDeck = { title, cards: displayedCards };
       localStorage.setItem('cogniguide:pending_flashcards', JSON.stringify(pendingDeck));
     } catch (error) {
       if (process.env.NODE_ENV !== 'production') {
         console.error('Failed to cache pending flashcards for signup', error);
       }
     }
-  }, [title, cards]);
+  }, [title, displayedCards]);
 
   const openAuthModal = React.useCallback((subtitle?: string) => {
     setAuthModalSubtitleOverride(subtitle);
@@ -517,7 +526,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
   }, []);
 
   const handleGenerateMindMap = React.useCallback(async () => {
-    if (!cards || cards.length === 0) {
+    if (!displayedCards || displayedCards.length === 0) {
       return;
     }
 
@@ -526,7 +535,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
       return;
     }
 
-    const activeCard = cards[index] ?? null;
+    const activeCard = displayedCards[index] ?? null;
 
     const trimmedCurrentMarkdown = typeof mindMapMarkdown === 'string' ? mindMapMarkdown.trim() : '';
     if (trimmedCurrentMarkdown.length > 0) {
@@ -603,12 +612,12 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
       const token = data.session?.access_token;
 
       posthog.capture('mindmap_generation_from_flashcards_started', {
-        card_count: cards.length,
+        card_count: displayedCards.length,
         model_choice: mindMapModelChoice,
         deck_id: deckId,
       });
 
-      const payloadCards = cards.map((card) => ({ question: card.question, answer: card.answer }));
+      const payloadCards = displayedCards.map((card) => ({ question: card.question, answer: card.answer }));
       const response = await fetch('/api/generate-mindmap', {
         method: 'POST',
         headers: {
@@ -750,7 +759,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
       }
 
       posthog.capture('mindmap_generation_from_flashcards_completed', {
-        card_count: cards.length,
+        card_count: displayedCards.length,
         model_choice: mindMapModelChoice,
         deck_id: deckId,
       });
@@ -766,7 +775,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
       }
     }
   }, [
-    cards,
+    displayedCards,
     computeMindMapFocusNodeId,
     deckId,
     dispatchMindMapStreamUpdate,
@@ -781,6 +790,181 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
     title,
     userId,
   ]);
+
+  const handleStartEdit = React.useCallback(() => {
+    if (!showAnswer || showExplanation) return;
+    const activeCard = displayedCards && displayedCards[index] ? displayedCards[index] : null;
+    if (!activeCard) return;
+    setEditPersistenceError(null);
+    setIsEditingCard(true);
+    setEditedAnswer(activeCard.answer);
+    editedAnswerSelectionRef.current = {
+      start: activeCard.answer.length,
+      end: activeCard.answer.length,
+    };
+  }, [displayedCards, index, showAnswer, showExplanation]);
+
+  const handleCancelEdit = React.useCallback(() => {
+    if (isSavingEditedAnswer) return;
+    setIsEditingCard(false);
+    setEditedAnswer('');
+    editedAnswerSelectionRef.current = null;
+    setEditPersistenceError(null);
+  }, [isSavingEditedAnswer]);
+
+  const handleSaveEdit = React.useCallback(async () => {
+    if (isSavingEditedAnswer) return;
+    const baseCards = displayedCards;
+    if (!baseCards || !baseCards[index]) return;
+
+    const previousAnswer = baseCards[index]!.answer;
+    const nextAnswer = editedAnswer;
+    if (previousAnswer === nextAnswer) {
+      setIsEditingCard(false);
+      setEditedAnswer('');
+      editedAnswerSelectionRef.current = null;
+      setEditPersistenceError(null);
+      return;
+    }
+
+    setIsSavingEditedAnswer(true);
+    setEditPersistenceError(null);
+
+    const updatedCards = baseCards.map((card, cardIndex) =>
+      cardIndex === index ? { ...card, answer: nextAnswer } : card,
+    );
+
+    setLocalCards(updatedCards);
+    setScheduledCards((prev) => {
+      if (!prev || !prev[index]) return prev;
+      const next = [...prev];
+      next[index] = { ...next[index], answer: nextAnswer };
+      return next;
+    });
+
+    const targetDeckId = studyInterleaved ? current?.deckId : deckId;
+    const targetCardIndex = studyInterleaved
+      ? typeof current?.cardIndex === 'number'
+        ? current.cardIndex
+        : undefined
+      : index;
+
+    try {
+      if (
+        targetDeckId &&
+        targetDeckId !== 'interleaved-session' &&
+        typeof targetCardIndex === 'number'
+      ) {
+        let payloadCards: Flashcard[] | null = null;
+        if (studyInterleaved) {
+          const sourceDeck = interleavedDecks?.find((deck) => deck.id === targetDeckId);
+          if (sourceDeck && Array.isArray(sourceDeck.cards) && sourceDeck.cards[targetCardIndex]) {
+            payloadCards = sourceDeck.cards.map((card, cardIdx) =>
+              cardIdx === targetCardIndex ? { ...card, answer: nextAnswer } : card,
+            );
+          } else {
+            const { data: fetchedDeck, error: fetchError } = await supabase
+              .from('flashcards')
+              .select('cards')
+              .eq('id', targetDeckId)
+              .maybeSingle();
+            if (fetchError) throw fetchError;
+            const fetchedCardsData = (fetchedDeck?.cards ?? null) as unknown;
+            const fetchedCards = Array.isArray(fetchedCardsData)
+              ? (fetchedCardsData as Flashcard[])
+              : null;
+            if (!fetchedCards || !fetchedCards[targetCardIndex]) {
+              throw new Error('Unable to locate deck cards for the edited flashcard.');
+            }
+            payloadCards = fetchedCards.map((card, cardIdx) =>
+              cardIdx === targetCardIndex ? { ...card, answer: nextAnswer } : card,
+            );
+          }
+        } else {
+          payloadCards = updatedCards as Flashcard[];
+        }
+
+        if (payloadCards) {
+          const sanitizedCards = payloadCards.map((card) => ({
+            question: card.question,
+            answer: card.answer,
+          }));
+          let updateQuery = supabase
+            .from('flashcards')
+            .update({ cards: sanitizedCards })
+            .eq('id', targetDeckId);
+          if (userId) {
+            updateQuery = updateQuery.eq('user_id', userId);
+          }
+          const { error: updateError } = await updateQuery;
+          if (updateError) throw updateError;
+        }
+      }
+
+      setIsEditingCard(false);
+      setEditedAnswer('');
+      editedAnswerSelectionRef.current = null;
+    } catch (error) {
+      console.error('Failed to persist edited flashcard answer:', error);
+      setEditPersistenceError('Failed to save changes. Please try again.');
+      setLocalCards((prev) => {
+        if (!prev || !prev[index]) return prev;
+        const next = prev.slice();
+        next[index] = { ...next[index], answer: previousAnswer };
+        return next;
+      });
+      setScheduledCards((prev) => {
+        if (!prev || !prev[index]) return prev;
+        const next = [...prev];
+        next[index] = { ...next[index], answer: previousAnswer };
+        return next;
+      });
+    } finally {
+      setIsSavingEditedAnswer(false);
+    }
+  }, [
+    current,
+    deckId,
+    displayedCards,
+    editedAnswer,
+    index,
+    interleavedDecks,
+    isSavingEditedAnswer,
+    studyInterleaved,
+    userId,
+  ]);
+
+  const handleEditedAnswerChange = React.useCallback((event: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const { selectionStart, selectionEnd, value } = event.target;
+    editedAnswerSelectionRef.current = {
+      start: typeof selectionStart === 'number' ? selectionStart : value.length,
+      end: typeof selectionEnd === 'number' ? selectionEnd : value.length,
+    };
+    setEditedAnswer(value);
+  }, []);
+
+  React.useLayoutEffect(() => {
+    if (!isEditingCard) return;
+    const textarea = editedAnswerRef.current;
+    if (!textarea) return;
+    if (document.activeElement === textarea) return;
+
+    const selection = editedAnswerSelectionRef.current;
+    textarea.focus({ preventScroll: true });
+    if (typeof textarea.setSelectionRange === 'function') {
+      const length = textarea.value.length;
+      const start = selection ? Math.min(selection.start, length) : length;
+      const end = selection ? Math.min(selection.end, length) : length;
+      textarea.setSelectionRange(start, end);
+    }
+  }, [editedAnswer, isEditingCard]);
+
+  React.useEffect(() => {
+    if (!isEditingCard) {
+      editedAnswerSelectionRef.current = null;
+      setEditPersistenceError(null);
+    }
+  }, [isEditingCard]);
 
   const renderMath = React.useCallback((isCancelled?: () => boolean) => {
     if (typeof window === 'undefined') return;
@@ -832,6 +1016,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
 
   React.useEffect(() => {
     if (!open) return;
+    if (isEditingCard) return;
     let cancelled = false;
 
     const run = () => {
@@ -846,7 +1031,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
       window.cancelAnimationFrame(id);
       window.clearTimeout(timeout);
     };
-  });
+  }, [answerContent, isEditingCard, open, questionContent, renderMath]);
 
   React.useEffect(() => {
     resetExplanation();
@@ -930,6 +1115,27 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
     setIsMindMapGenerating(false);
     setMindMapFocusNodeId(null);
   }, [cards, deckId]);
+
+  React.useEffect(() => {
+    setLocalCards(cards);
+    setIsEditingCard(false);
+    setEditedAnswer('');
+    setEditPersistenceError(null);
+  }, [cards]);
+
+  React.useEffect(() => {
+    setIsEditingCard(false);
+    setEditedAnswer('');
+    setEditPersistenceError(null);
+  }, [index]);
+
+  React.useEffect(() => {
+    if (!showAnswer || showExplanation) {
+      setIsEditingCard(false);
+      setEditedAnswer('');
+      setEditPersistenceError(null);
+    }
+  }, [showAnswer, showExplanation]);
 
   React.useEffect(() => {
     let isMounted = true;
@@ -1664,7 +1870,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
       >
         <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 items-center gap-2 sm:gap-3 px-4 sm:px-6 md:px-0 mt-4">
           <div className="text-center md:text-left text-sm font-medium truncate text-foreground">{studyInterleaved ? (current?.deckTitle || title) : (title || 'Flashcards')}</div>
-          <div className="text-sm text-muted-foreground text-center hidden md:block">{hasCards ? (finished ? 'Completed' : studyDueOnly ? `${originalDueList.indexOf(index) + 1} / ${originalDueCount} due` : `${index + 1} / ${cards!.length}`) : ''}</div>
+          <div className="text-sm text-muted-foreground text-center hidden md:block">{hasCards ? (finished ? 'Completed' : studyDueOnly ? `${originalDueList.indexOf(index) + 1} / ${originalDueCount} due` : `${index + 1} / ${totalCardCount}`) : ''}</div>
           <div className="justify-self-center md:justify-self-end">
             {hasCards && (
               <div className="inline-flex items-center gap-2 text-sm">
@@ -1685,7 +1891,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
               </div>
             )}
           </div>
-          <div className="text-sm text-muted-foreground text-center md:hidden">{hasCards ? (finished ? 'Completed' : studyDueOnly ? `${originalDueList.indexOf(index) + 1} / ${originalDueCount} due` : `${index + 1} / ${cards!.length}`) : ''}</div>
+          <div className="text-sm text-muted-foreground text-center md:hidden">{hasCards ? (finished ? 'Completed' : studyDueOnly ? `${originalDueList.indexOf(index) + 1} / ${originalDueCount} due` : `${index + 1} / ${totalCardCount}`) : ''}</div>
         </div>
         {hasCards && (
           <div className="w-full max-w-5xl mx-auto mt-6 px-4 sm:px-6 md:px-0">
@@ -1700,7 +1906,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
                         ? originalDueCount > 0
                           ? ((originalDueList.indexOf(index) + 1) / originalDueCount) * 100
                           : 0
-                        : ((index + 1) / cards!.length) * 100
+                        : totalCardCount > 0 ? ((index + 1) / totalCardCount) * 100 : 0
                     }%`,
                   }}
                 />
@@ -1769,8 +1975,8 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
                       <button
                         title="Generate a personalized deck"
                         onClick={() => {
-                          if (title && cards) {
-                            const pendingDeck = { title, cards };
+                          if (title && displayedCards) {
+                            const pendingDeck = { title, cards: displayedCards };
                             localStorage.setItem('cogniguide:pending_flashcards', JSON.stringify(pendingDeck));
                           }
                           openAuthModal();
@@ -1809,8 +2015,8 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
                       <button
                         title="Sign up to save this deck"
                         onClick={() => {
-                          if (title && cards) {
-                            const pendingDeck = { title, cards };
+                          if (title && displayedCards) {
+                            const pendingDeck = { title, cards: displayedCards };
                             localStorage.setItem('cogniguide:pending_flashcards', JSON.stringify(pendingDeck));
                           }
                           openAuthModal();
@@ -1876,19 +2082,31 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
                         {questionContent}
                       </div>
                       <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-                        {showAnswer && !showExplanation ? (
-                          <button
-                            onClick={handleExplain}
-                            disabled={isExplaining}
-                            className="inline-flex items-center gap-1.5 h-6 px-3 rounded-full border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-300/50 flashcard-grade-good disabled:cursor-not-allowed"
-                          >
-                            {isExplaining ? (
-                              <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                            ) : (
-                              !isPaidUser ? <Lock className="h-3.5 w-3.5" aria-hidden="true" /> : null
-                            )}
-                            <span>Explain</span>
-                          </button>
+                        {showAnswer && !showExplanation && !isEditingCard ? (
+                          <>
+                            <button
+                              onClick={handleExplain}
+                              disabled={isExplaining}
+                              className="inline-flex items-center gap-1.5 h-6 px-3 rounded-full border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-300/50 flashcard-grade-good disabled:cursor-not-allowed"
+                            >
+                              {isExplaining ? (
+                                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                              ) : (
+                                !isPaidUser ? <Lock className="h-3.5 w-3.5" aria-hidden="true" /> : null
+                              )}
+                              <span>Explain</span>
+                            </button>
+                            <button
+                              type="button"
+                              onClick={handleStartEdit}
+                              className="inline-flex items-center justify-center h-6 w-6 rounded-full border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-300/50 flashcard-grade-good"
+                              title="Edit answer in your language"
+                              aria-label="Edit answer"
+                            >
+                              <Pencil className="h-3.5 w-3.5" aria-hidden="true" />
+                              <span className="sr-only">Edit answer</span>
+                            </button>
+                          </>
                         ) : null}
                         {showAnswer && explanationError && !isExplaining ? (
                           <span className="text-red-500 dark:text-red-400">{explanationError}</span>
@@ -1900,14 +2118,24 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
                           <div
                             ref={answerRef}
                             className={`${
-                              isEmbedded
+                              isEmbedded || isEditingCard
                                 ? 'max-h-none overflow-visible'
                                 : 'max-h-[45vh] overflow-y-auto'
                             } text-sm text-foreground flashcard-katex-content`}
                           >
-                            <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
-                              {answerContent || ''}
-                            </ReactMarkdown>
+                            {isEditingCard ? (
+                              <textarea
+                                ref={editedAnswerRef}
+                                value={editedAnswer}
+                                onChange={handleEditedAnswerChange}
+                                className="w-full min-h-[160px] rounded-xl border border-border bg-background px-3 py-2 text-sm leading-6 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-300/50 resize-vertical"
+                                aria-label="Answer text"
+                              />
+                            ) : (
+                              <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
+                                {answerContent || ''}
+                              </ReactMarkdown>
+                            )}
                           </div>
                         </div>
                       )}
@@ -1946,6 +2174,39 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
                   >
                     Back
                   </button>
+                ) : isEditingCard ? (
+                  <div className="flex flex-col items-center justify-center gap-2">
+                    <div className="flex items-center justify-center gap-3 flex-nowrap">
+                      <button
+                        type="button"
+                        onClick={handleCancelEdit}
+                        disabled={isSavingEditedAnswer}
+                        className="h-9 px-4 text-xs rounded-full border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400/50 bg-muted hover:bg-muted/80 disabled:opacity-60 disabled:cursor-not-allowed"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        type="button"
+                        onClick={handleSaveEdit}
+                        disabled={isSavingEditedAnswer}
+                        className="inline-flex items-center justify-center gap-2 h-9 px-4 text-xs rounded-full text-white bg-primary hover:bg-primary/90 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/50 disabled:opacity-60 disabled:cursor-not-allowed"
+                      >
+                        {isSavingEditedAnswer ? (
+                          <>
+                            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                            <span>Saving…</span>
+                          </>
+                        ) : (
+                          'Save'
+                        )}
+                      </button>
+                    </div>
+                    {editPersistenceError ? (
+                      <span className="text-[11px] text-red-500 dark:text-red-400 text-center">
+                        {editPersistenceError}
+                      </span>
+                    ) : null}
+                  </div>
                 ) : (
                   <div className="flex items-end justify-center gap-3 flex-nowrap">
                     <div className="flex flex-col items-center">
@@ -2080,8 +2341,8 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
               <button
                 title="Save this deck and keep studying"
                 onClick={() => {
-                  if (title && cards) {
-                    const pendingDeck = { title, cards };
+                  if (title && displayedCards) {
+                    const pendingDeck = { title, cards: displayedCards };
                     localStorage.setItem('cogniguide:pending_flashcards', JSON.stringify(pendingDeck));
                   }
                   setShowLossAversionPopup(false);
