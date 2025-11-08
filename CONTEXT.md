@@ -1,98 +1,71 @@
 # CogniGuide Application Context
 
-## 1. Technology Stack & Build System
-- **Framework & Runtime**: The project is a Next.js 15.4 application running on React 19 with pnpm-managed workspaces. Key scripts expose Turbopack dev, production build, and lint commands.【F:package.json†L2-L57】
-- **Client Libraries**: Core dependencies include Supabase for authentication/storage, OpenAI SDK (used with Gemini endpoints) for LLM streaming, PostHog analytics, TS-FSRS for spaced repetition, Mammoth/PDF-Parse/PPTX parsing utilities, React Markdown + remark-gfm for rendering, Radix UI primitives, and Tailwind merge helpers.【F:package.json†L11-L41】
-- **Tooling**: ESLint 9 with the Next.js shareable config, Tailwind CSS v4 PostCSS tooling, TypeScript 5, and next-sitemap are configured for development workflows.【F:package.json†L43-L55】
-- **CSS Optimization**: Tailwind now ships with an explicit `tailwind.config.js`/`tailwind.config.ts` bridge and production builds run PurgeCSS via `postcss.config.cjs` to strip unused utilities while respecting safelisted dynamic classes.【F:tailwind.config.js†L1-L17】【F:postcss.config.cjs†L1-L34】
+## 1. Product Overview
+- CogniGuide uses Google Gemini-powered reasoning to turn uploaded PDFs, DOCX/PPTX decks, Markdown, and images into interactive, exportable mind maps plus spaced-repetition flashcard decks with hints such as exam-date-aware scheduling, referral bonuses, and shareable links described in README.md and surfaced through components/Generator.tsx and components/FlashcardsModal.tsx.
+- The AI pipeline streams Markmap markdown and flashcard JSON so the UI can render partial results immediately, enforces file caching/credit bookkeeping, surfaces real-time credit balances, handles credit tier switches (fast vs smart models), and offers referral/reward dialogs orchestrated inside app/dashboard/DashboardClient.tsx, components/HomeLanding.tsx, and related modals.
 
-## 2. Global Application Shell & Theming
-- **Root Layout**: `app/layout.tsx` establishes global metadata (OpenGraph, Twitter, robots), structured data for a SoftwareApplication, Google verification, favicon links, and preconnects for PostHog assets. It injects an inline script that restores the saved theme before hydration and wraps the app in a Poppins font body with a modal root container.【F:app/layout.tsx†L1-L162】
-- **Site Metadata**: Shared SEO text, URLs, contact email, the OpenGraph/Twitter preview image (`Cogniguide_dashboard.png`), and keyword arrays live in `lib/siteMetadata.ts` and are imported wherever metadata is constructed.【F:lib/siteMetadata.ts†L1-L23】
-- **Theme Control**: `components/ThemeToggle.tsx` persists user theme selections in localStorage, synchronises the `<html>` `data-theme` attribute, listens for system preference changes, and renders a dropdown selector with Lucide icons.【F:components/ThemeToggle.tsx†L1-L129】
+## 2. Marketing, Programmatic, & Share Surfaces
+- Public marketing content is composed with the App Router: / renders HomeLanding, /ai-mind-map-generator and /ai-flashcard-generator mount rich landing modules, /pricing loads PricingClient/PricingHeader, /blog/* serves static posts, /contact hosts ContactForm.tsx, and /legal/* exposes policy pages; the layout in app/layout.tsx (metadata, structured data, theme-reset script) and lib/siteMetadata.ts supply shared SEO defaults.
+- Programmatic SEO pages live under app/programmatic/flashcards/[slug] but immediately redirect to the canonical URL defined in lib/programmatic/flashcardPages.ts, which reads generated metadata, FAQ JSON-LD, and use-case data produced by scripts/generate_programmatic_flashcards.py, scripts/assign_subhubs.py, and the data/ CSV/JSON assets.
+- Share links and imports are backed by lib/share-links.ts (HMAC tokens) plus app/api/share-link/route.ts and app/api/share-link/import/route.ts, while app/share/[type]/[token]/page.tsx renders ShareViewer.tsx, opens MindMapModal/FlashcardsModal, and optionally mirrors the deck into the authenticated user via supabase helpers.
 
-## 3. Routing & Page Modules
-### 3.1 Home (`app/page.tsx` & `components/HomeLanding.tsx`)
-- The root page is statically rendered and delegates to `HomeLanding`, extending metadata with study-focused keywords.【F:app/page.tsx†L1-L38】
-- `HomeLanding` handles auth state, referral code persistence, and cookie mirroring for middleware via Supabase listeners. It dynamically loads Auth, Mind Map, and Flashcard demo modals while mounting the `Generator`, `EmbeddedMindMap`, and `EmbeddedFlashcards` immediately to prioritise fast-first interaction and lower bounce rates on the marketing surface.【F:components/HomeLanding.tsx†L1-L199】
+## 3. Authenticated Experience
+- /dashboard is a Suspense-wrapped client entry (app/dashboard/DashboardClient.tsx) that manages Supabase auth, credit balances (cache + localStorage), Paddle checkout flows, referral tracking, share-link creation, spaced-repetition queues, streaming history, and toggles between mind-map vs flashcard generators.
+- The generation UI stitches together components/Dropzone.tsx, PromptForm.tsx, Generator.tsx, EmbeddedMindMap.tsx, and EmbeddedFlashcards.tsx so uploads, prompt overrides, mode switches, and previews happen in one panel; FlashcardsModal.tsx itself handles grading, spaced repetition navigation, Explain Flashcard calls, and credits.
+- components/MindMapModal.tsx renders the Markmap output with lib/markmap-renderer.ts plus styles/mindmap.css, while components/ShareLinkDialog.tsx, ShareTriggerButton.tsx, ShareViewer, and the Flashcard components keep sharing/embedding consistent across dashboards and marketing modals.
 
-### 3.2 AI Mind Map Generator Landing
-- `app/ai-mind-map-generator/page.tsx` publishes a dedicated marketing page with extensive SEO metadata, JSON-LD (SoftwareApplication, FAQ, breadcrumbs), and renders `MindMapGeneratorLanding` which hosts product content drawn from `lib/data/mindMapGeneratorFaqs` while mounting its `Generator` preview immediately for a snappier first impression.【F:app/ai-mind-map-generator/page.tsx†L1-L143】【F:lib/data/mindMapGeneratorFaqs.ts†L1-L28】
-- Programmatic flashcard routes render `FlashcardGeneratorLanding`, which now loads the embedded flashcard deck on first paint to honour the fast-loading UX mandate and minimise landing-page bounce.【F:components/FlashcardGeneratorLanding.tsx†L1-L200】
+## 4. Client Components & Styling
+- UI primitives are built on shadcn-like helpers under components/ui/ (button, card, input, label, popover) plus components/ThemeToggle.tsx (localStorage + system detection) and components/TooltipLayer.tsx for layered modal tooltips.
+- Global styling lives in app/globals.css (Tailwind 4 @config/@source directives, imported fonts from public/fonts, custom scrollbar tweaks, button animations), styles/mindmap.css, and styles assets referenced by export buttons for mind maps.
+- Shared utilities such as components/FlashcardIcon.tsx, components/PricingTiers.tsx, components/PricingModal.tsx, and components/ShareViewer.tsx keep the marketing + dashboard UI in sync with the rest of the experience.
 
-### 3.3 Dashboard Experience
-- `app/dashboard/page.tsx` wraps `DashboardClient` in a suspense boundary with a spinner fallback.【F:app/dashboard/page.tsx†L1-L16】
-- `DashboardClient` is a comprehensive client module managing Supabase-authenticated state, credit balances, Paddle upgrade flows, mode switching between fast/smart models, referral tracking, share link generation, spaced repetition modals, and streaming history. It orchestrates Spaced Repetition queue state (`dueQueue`, `dueIndices`), referral link fetches, clipboard utilities, PostHog instrumentation, and share link caching. Flashcard history now carries linked mind map metadata so previously generated diagrams reopen instantly rather than regenerating, and the mode tooltip now spells out that the upgraded model delivers the most detailed outputs while consuming more credits than the baseline option.【F:app/dashboard/DashboardClient.tsx†L1-L400】
+## 5. Library & Document Tooling
+- Document ingestion relies on lib/document-parser.ts (mammoth, pdf-parse, pptx-text-parser, plain text handling, caching, ts-fsrs character budget awareness) together with lib/katex-loader.ts, lib/markmap-renderer.ts, lib/utils.ts, and lib/copy-to-clipboard.ts for rendering and exporting math-heavy nodes.
+- lib/supabaseClient.ts (supabase auth + session persistence) plus lib/siteMetadata.ts, lib/plans.ts, and lib/share-links.ts provide shared constants for SEO, plan costs, credit multipliers, and secure share tokens.
+- Spaced repetition state is managed via lib/spaced-repetition.ts (FSRS scheduling, exam-date clamping) and the lib/sr-store.ts cache/localStorage helpers that mirror flashcards_schedule so the UI always stays synced and minimizes Supabase round-trips.
+- Programmatic content helpers (lib/programmatic/*) expose metadata builders, FAQ/feature structures, and generated slug maps; lib/programmatic/metadata.ts emits structured data, lib/programmatic/useCaseData.ts and scripts/* keep SEO copy aligned with real-world decks.
 
-### 3.4 Pricing
-- The `/pricing` route renders `PricingHeader` plus the interactive `PricingClient`. Metadata introduces plan descriptions.【F:app/pricing/page.tsx†L1-L20】
-- `components/PricingClient.tsx` loads Paddle’s checkout SDK, keeps billing cycle state, fetches previews via `Paddle.PricePreview`, syncs Supabase subscriptions, and coordinates upgrade flow flags. It conditionally launches an `AuthModal` when unauthenticated users attempt to buy.【F:components/PricingClient.tsx†L1-L200】
+## 6. API & Backend Workflows
+- Generation endpoints (app/api/generate-mindmap/route.ts, app/api/generate-flashcards/route.ts) stream from the OpenAI-compatible Gemini endpoint, resolve Supabase storage images, cache user tiers, enforce credit multipliers (lib/plans.ts), and clean up temporary uploads; components/Generator.tsx and FlashcardsModal.tsx consume those streams to show progressive output.
+- app/api/explain-flashcard/route.ts spins up another streaming call when users tap Explain, deducts and refunds credits via the same Supabase tables, enforces paid-tier gating, and streams raw text back so the modal can show the explanation as it arrives.
+- Preparse + storage APIs (app/api/preparse/route.ts, app/api/storage/get-signed-uploads/route.ts, app/api/storage/cleanup/route.ts, app/api/storage/scheduled-cleanup/route.ts) handle multipart/JSON uploads, bucketed file writes, sanitized filenames, one-off cleanup calls, and a Cron-triggerable scheduled job that purges uploads older than 24 hours.
+- Credit management APIs (app/api/ensure-credits/route.ts, app/api/refill-credits/route.ts) guarantee the free plan is refilled monthly (with a Vercel cron hitting /api/refill-credits daily), skipping paid accounts, while app/api/paddle-webhook/route.ts verifies Paddle HMAC signatures, stores subscriptions, and seeds user_credits via lib/plans.ts#getCreditsByPriceId.
+- app/api/share-link/route.ts creates signed share links, app/api/share-link/import/route.ts copies shared decks without duplication, and lib/share-links.ts signs/verifies tokens so app/share/[type]/[token]/page.tsx can safely hydrate ShareViewer.
 
-### 3.5 Contact
-- `/contact` provides static support content and renders `ContactForm`, which currently captures PostHog events and shows a placeholder alert on submission.【F:app/contact/page.tsx†L1-L37】【F:app/contact/ContactForm.tsx†L1-L33】
+## 7. Data, Storage, & Scheduling
+- Tables include flashcards (cards JSON, optional mindmap_id), flashcards_schedule (per-deck FSRS schedules + exam_date), mindmaps, referral_codes, referral_redemptions, subscriptions, user_credits, and the increment_user_credits helper function; indexes protect user lookups and maintain ordering for dashboards.
+- The uploads bucket stores user files; app/api/storage/get-signed-uploads seeds it, preparse pulls multiple files for text/image extraction, and scheduled-cleanup + storage/cleanup keep the bucket lean when Cron jobs run from vercel.json.
+- Spaced repetition settings (difficulty, stability, reps, exam date) are persisted locally via lib/sr-store.ts and centrally in flashcards_schedule; ts_fsrs_docs/ documents the FSRS API for anyone tuning scheduling parameters.
 
-### 3.6 Shareable Views
-- `/share/[type]/[token]` validates signed tokens, fetches public records via Supabase service client, and renders either a `MindMapModal` or `FlashcardsModal` through `ShareViewer`. Invalid tokens fall back to a 404.【F:app/share/[type]/[token]/page.tsx†L1-L112】
-- `ShareViewer` mounts the appropriate modal, auto-imports shared decks into an authenticated user’s Supabase account via `/api/share-link/import`, and redirects home when closed.【F:components/ShareViewer.tsx†L1-L131】
+## 8. Programmatic SEO & Analytics
+- Programmatic flashcard taxonomy is stored in data/flashcard_taxonomy.json, data/interlinking_flashcard_pages.csv, and data/20k_run_cards_keywords.csv; scripts under scripts/ (including generate_programmatic_flashcards.py, extract_flashcard_pages.py, assign_subhubs.py, and update_related_topics.py) manipulate those assets to keep marketing narratives up to date.
+- lib/programmatic/generated/* holds the canonical metadata consumed by the redirecting /programmatic/flashcards/[slug] route, ensuring each slug publishes rich JSON-LD (FAQ, breadcrumb, SoftwareApplication) via buildProgrammaticMetadata.
+- PostHog instrumentation is captured in event-tracking-report.md; key events fire in app/contact/ContactForm.tsx, components/Dropzone.tsx, components/Generator.tsx, components/FlashcardsModal.tsx, components/MindMapModal.tsx, components/PricingClient.tsx, and app/dashboard/DashboardClient.tsx so analytics and dashboards can be kept in sync with UX changes.
+- Visual assets (logo, lockups, OG image) live under public/, public/fonts, and used by app/layout.tsx to supply favicons, manifest, and structured data that reference the siteMetadata preview image.
 
-### 3.7 Legal & Sitemap
-- `app/sitemap.ts` enumerates key static routes and produces weekly updating sitemap entries, prioritising the homepage and pricing page higher for crawlers.【F:app/sitemap.ts†L1-L26】
-
-## 4. Core Client Components
-- **Generator Workflow**: `components/Generator.tsx` coordinates file uploads (via signed Supabase URLs), local cache of pre-parsed text (`/api/preparse`), prompt handling, non-auth throttling experiments, Supabase auth gating, and toggles between mind map and flashcard generation modes with streaming responses. It dynamically loads `AuthModal`, `MindMapModal`, and `FlashcardsModal` to minimise SSR bundles.【F:components/Generator.tsx†L1-L120】
-- **Dropzone**: Handles drag/drop, deduplication, PostHog analytics, upload progress display, and file pruning based on allowed name/size whitelists. It exposes hooks for parent components to block opening or reset state.【F:components/Dropzone.tsx†L1-L200】
-- **PromptForm**: Provides adaptive placeholders per mode, intercepts submit/Enter actions to emit PostHog metrics, auto-resizes the textarea, and exposes call-to-action labelling for both generator modes.【F:components/PromptForm.tsx†L1-L178】
-- **MindMapModal** (not shown above) visualises streamed Markmap Markdown, exporting to SVG/PNG/PDF through html-to-image and jspdf integrations, coordinates KaTeX rendering, node interactions, and share/export affordances. Embedded flashcard-driven streams track a `finalizedRequestIdRef` and now skip auto-fit once a user interacts, preventing post-stream zoom resets. The component can also be launched independently from `FlashcardsModal` with a back/close flow that restores the flashcards view.【F:components/MindMapModal.tsx†L1-L200】
-- **FlashcardsModal**: Implements TS-FSRS scheduling, Supabase persistence, exam date controls, KaTeX rendering for cards, interleaved study queues, analytics for study behaviour, and gating that prompts sign-up when anonymous users close generated decks. The mind map action now opens a standalone `MindMapModal` overlay (instead of embedding it inline) while streaming progress appears inside a spinner layer; an Explain/Back control calls `/api/explain-flashcard` to surface Gemini fast-mode explanations inline with loading and error states. Decks persist a Supabase `mindmap_id`, allowing the modal to reopen the exact mind map that was previously generated without re-streaming.【F:components/FlashcardsModal.tsx†L1-L200】
-- **Embedded Visuals**: `EmbeddedMindMap` bootstraps the canvas-only renderer with interactions disabled and ensures KaTeX assets are present. `EmbeddedFlashcards` ships a sample deck for marketing previews by mounting `FlashcardsModal` in embedded mode.【F:components/EmbeddedMindMap.tsx†L1-L52】【F:components/EmbeddedFlashcards.tsx†L1-L58】
-- **AuthModal**: Offers magic-link and Google OAuth flows, persists upgrade redirect hints, and tracks sign-ups in PostHog. It clears local state when the modal closes.【F:components/AuthModal.tsx†L1-L117】
-
-## 5. API Routes
-### 5.1 Content Preparation & Generation
-- **`/api/preparse`**: Accepts JSON or multipart uploads, determines user tier via Supabase admin auth, downloads Supabase Storage objects, converts supported document types (PDF, DOCX, PPTX, text) to raw text, extracts base64 images, enforces cumulative character limits by tier, and returns combined text/images/metadata for client caching.【F:app/api/preparse/route.ts†L1-L175】
-- **`/api/generate-mindmap`**: Streams Gemini chat completions (OpenAI-compatible) with optional image inputs, enforces credit deductions based on raw character count and model multiplier, handles smart model tier restrictions, cleans up temporary uploads, and surfaces detailed error codes. It supports JSON bodies for pre-parsed content and legacy multipart for direct uploads.【F:app/api/generate-mindmap/route.ts†L1-L713】
-- **`/api/generate-flashcards`**: Mirrors the mind map endpoint but produces NDJSON streams for cards. It shares credit enforcement, tier checks, Supabase integration, and prompt construction tailored for flashcard generation and optional Markmap sources.【F:app/api/generate-flashcards/route.ts†L1-L200】
- - **`/api/explain-flashcard`**: Auth-required JSON endpoint that charges 0.1 credits (fast tier) to request concise Gemini explanations for a given flashcard question/answer pair, ensuring monthly free-credit refresh, refunding on provider errors, and returning plain JSON responses.【F:app/api/explain-flashcard/route.ts†L1-L200】
-
-### 5.2 Credits & Billing
-- **`/api/ensure-credits`**: Authenticates users, checks for active subscriptions, and seeds or monthly-refreshes free credits in `user_credits`, skipping paid accounts whose balances are managed elsewhere.【F:app/api/ensure-credits/route.ts†L1-L123】
-- **`/api/refill-credits`**: Vercel cron-protected endpoint that iterates active Paddle subscriptions, refills `user_credits` using plan-specific allowances when the last refill is older than a month.【F:app/api/refill-credits/route.ts†L1-L66】【F:vercel.json†L2-L10】
-- **`/api/paddle-webhook`**: Verifies Paddle HMAC signatures, handles subscription lifecycle events, updates `customers`/`subscriptions`, and upserts credits using plan metadata. It logs unhandled events and ensures credits align with the latest plan.【F:app/api/paddle-webhook/route.ts†L1-L173】
-
-### 5.3 Sharing & Referrals
-- **`/api/share-link`**: Validates ownership of mind maps or flashcards, then issues signed share tokens plus canonical URLs using HMAC utilities from `lib/share-links.ts`.【F:app/api/share-link/route.ts†L1-L83】【F:lib/share-links.ts†L1-L75】
-- **`/api/share-link/import`**: Auth-required endpoint that clones shared records into the caller’s Supabase tables, deduplicating by content when possible.【F:app/api/share-link/import/route.ts†L1-L168】
-- **`/api/referrals/link`**: Generates or retrieves unique referral codes, enforces monthly redemption limits, and returns shareable referral URLs with usage stats.【F:app/api/referrals/link/route.ts†L1-L123】
-- **`/api/referrals/redeem`**: Validates codes, prevents self-referrals, applies monthly caps, inserts redemption records, and atomically increments credits for both parties via a Supabase RPC function with rollback safety.【F:app/api/referrals/redeem/route.ts†L1-L170】
-
-### 5.4 Storage Utilities
-- **`/api/storage/get-signed-uploads`**: Issues signed Supabase upload URLs with sanitised paths, supports anonymous and authed namespaces, and retries to avoid collisions.【F:app/api/storage/get-signed-uploads/route.ts†L1-L155】
-- **`/api/storage/cleanup`**: Removes temporary uploads after successful generation streams, returning counts but swallowing errors to avoid failing client flows.【F:app/api/storage/cleanup/route.ts†L1-L33】
-- **`/api/storage/scheduled-cleanup`**: Vercel cron endpoint that recursively lists storage prefixes, deletes files older than 24 hours, and reports attempts/deletions with defensive error logging.【F:app/api/storage/scheduled-cleanup/route.ts†L1-L133】【F:vercel.json†L2-L10】
-
-## 6. Libraries & Utilities
-- **Document Parsing**: `lib/document-parser.ts` abstracts DOCX/PDF/PPTX/plain text extraction using Mammoth, pdf-parse, pptx-text-parser, and tier-aware truncation. It enforces per-tier character ceilings, aggregates multi-file uploads, tracks included/excluded files, and returns image data URLs for Gemini processing.【F:lib/document-parser.ts†L1-L198】
-- **Mind Map Renderer**: `lib/markmap-renderer.ts` provides a bespoke Markmap alternative: parsing custom Markdown, measuring nodes with cached hidden DOM, handling zoom/pan gestures, theme-aware colour palettes, KaTeX rendering, animation state, and interaction toggles for collapse/expand behaviours.【F:lib/markmap-renderer.ts†L1-L200】
-- **Spaced Repetition**: `lib/spaced-repetition.ts` configures TS-FSRS, defines schedule state, applies exam date constraints (including 24-hour grace rules), and returns updated schedules after grading.【F:lib/spaced-repetition.ts†L1-L118】
-- **Schedule Persistence**: `lib/sr-store.ts` normalises exam dates, mirrors schedules between localStorage, in-memory caches, and Supabase `flashcards_schedule`. It offers synchronous and async load/save helpers plus bulk upsert utilities.【F:lib/sr-store.ts†L1-L231】
-- **KaTeX Loader**: Lazily loads KaTeX CSS/JS assets with requestIdleCallback support to render math inside mind maps and flashcards.【F:lib/katex-loader.ts†L1-L156】
-- **Supabase Client**: `lib/supabaseClient.ts` initialises the browser Supabase instance with persistent sessions and exports row typings for `mindmaps` and `flashcards` tables.【F:lib/supabaseClient.ts†L1-L28】
-- **Plan Metadata**: `lib/plans.ts` defines credit allowances, Paddle price IDs, and model multipliers/tiers, plus helpers to resolve plans from price IDs.【F:lib/plans.ts†L1-L54】
-- **Utilities**: `lib/utils.ts` exposes Tailwind-aware class merging and locale-aware date/time formatting helpers for dashboards and modals.【F:lib/utils.ts†L1-L33】
-
-## 7. Supabase Schema & Server Assets
-- Migrations define referral program tables, credit increment RPCs, upgrades to `flashcards_schedule.exam_date` to store timestamps with default 8am conversion, and a `flashcards.mindmap_id` link that keeps decks paired with their previously generated mind maps.【F:supabase/migrations/20240404120000_add_referral_program.sql†L1-L65】【F:supabase/migrations/add_exam_time_to_flashcards_schedule.sql†L1-L59】【F:supabase/migrations/20251024100000_add_mindmap_link_to_flashcards.sql†L1-L7】
-
-## 8. Instrumentation, Middleware & Config
-- PostHog is initialised client-side with ingestion rewrites; Next config also rewrites `/ingest` routes, sets immutable caching on static assets, and disables trailing-slash redirects to satisfy PostHog API expectations.【F:instrumentation-client.ts†L1-L9】【F:next.config.ts†L1-L46】
-- `middleware.ts` redirects authenticated users (tracked via lightweight cookie or Supabase session cookie) away from `/` to `/dashboard`, ensuring quick auth gating for marketing pages.【F:middleware.ts†L1-L37】
-- `vercel.json` schedules nightly credit refills and storage cleanup cron jobs, and marks sitemap/robots outputs with `X-Robots-Tag: noindex` headers.【F:vercel.json†L1-L31】
-
-## 9. UI Primitives & Styling
-- The `components/ui` directory wraps Radix primitives with Tailwind variants, providing reusable `Button`, `Popover`, `Card`, `Input`, `Label`, and `Calendar` helpers. Buttons leverage class-variance-authority for variant/size theming, while others expose consistent classNames via the shared `cn` utility.【F:components/ui/button.tsx†L1-L59】【F:lib/utils.ts†L1-L6】
-
-## 10. Ancillary Assets
-- Global styles in `app/globals.css` (not detailed here) supply CSS variables for light/dark themes, typography, and Markmap visuals in conjunction with `lib/markmap-renderer`. The repository also includes marketing assets (`CogniGuide_logo.png`, icons) and documentation (APP_DOC.md, event tracking notes) that describe product strategy.
+## 9. Deployment, Environment, & Supporting Docs
+- The repo uses pnpm (packageManager pin in package.json), Next.js 15.4 with Turbopack dev, React 19, Tailwind CSS 4 + @tailwindcss/postcss, next-sitemap, PurgeCSS, ESLint 9, and TypeScript 5 (package.json, tsconfig.json, next.config.ts, tailwind.config.js, tailwind.config.ts, postcss.config.cjs, purgecss.plugin.cjs).
+- Middleware (middleware.ts) proactively redirects returning authenticated users on / to /dashboard, while app/layout.tsx and app/globals.css manage metadata, fonts, theme restoration, and Tailwind entry points.
+- Deployments rely on vercel.json for cron jobs (/api/refill-credits daily, /api/storage/scheduled-cleanup nightly) and for X-Robots-Tag headers on /robots.txt and /sitemap.xml.
+- Required environment variables (set via .env.local or hosting secrets) are documented in README.md and include:
+```
+GEMINI_API_KEY=your_google_generative_ai_api_key
+GEMINI_MODEL_FAST=gemini-2.5-flash-lite
+GEMINI_MODEL_SMART=gemini-2.5-flash
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+NEXT_PUBLIC_PADDLE_CLIENT_TOKEN=your_paddle_client_side_token
+NEXT_PUBLIC_PADDLE_ENV=sandbox # or production
+NEXT_PUBLIC_PADDLE_PRICE_ID_STUDENT_MONTH=pri_xxx
+NEXT_PUBLIC_PADDLE_PRICE_ID_STUDENT_YEAR=pri_xxx
+NEXT_PUBLIC_PADDLE_PRICE_ID_PRO_MONTH=pri_xxx
+NEXT_PUBLIC_PADDLE_PRICE_ID_PRO_YEAR=pri_xxx
+PADDLE_WEBHOOK_SECRET=your_paddle_webhook_secret
+SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
+NEXT_PUBLIC_POSTHOG_KEY=your_posthog_project_api_key
+NEXT_PUBLIC_BASE_URL=your_production_domain # Optional: defaults to deployment URL
+```
+- Supporting documentation lives in README.md, APP_DOC.md, subscriptions_context.md, file_upload_details.md, event-tracking-report.md, Paddle Docs/, and ts_fsrs_docs/, covering everything from onboarding to Paddle checkout setup to spaced repetition theory.
 
 
 ## Supabase tables:
@@ -129,7 +102,6 @@ create index IF not exists flashcards_mindmap_id_idx on public.flashcards using 
 create index IF not exists flashcards_user_id_created_at_idx on public.flashcards using btree (user_id, created_at desc) TABLESPACE pg_default;
 ```
 
-
 ```flashcards_schedule
 create table public.flashcards_schedule (
   user_id uuid not null,
@@ -156,7 +128,6 @@ create table public.mindmaps (
 
 create index IF not exists mindmaps_user_id_created_at_idx on public.mindmaps using btree (user_id, created_at desc) TABLESPACE pg_default;
 ```
-
 
 ```referral_codes
 create table public.referral_codes (
