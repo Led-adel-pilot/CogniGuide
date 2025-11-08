@@ -25,6 +25,7 @@ const FlashcardsModal = dynamic<FlashcardsModalProps>(() => import('@/components
 
 const LOW_TEXT_CHAR_THRESHOLD = 40;
 const SCANNED_PDF_WARNING = 'We couldn\'t detect much selectable text in your PDF. If it\'s a scanned image, run OCR or upload a text-based copy so the AI can read it.';
+const HIGH_DEMAND_WARNING_MESSAGE = 'We are experiencing high demand right now. Please try again in a few minutes.';
 
 interface GeneratorProps {
   redirectOnAuth?: boolean;
@@ -68,6 +69,7 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
   const [error, setError] = useState<string | null>(null);
   const [markdown, setMarkdown] = useState<string | null>(null);
   const [uploadWarning, setUploadWarning] = useState<string | null>(null);
+  const [rateLimitWarning, setRateLimitWarning] = useState<string | null>(null);
   const [showAuth, setShowAuth] = useState(false);
   const [isAuthed, setIsAuthed] = useState(false);
   const [isPaidSubscriberState, setIsPaidSubscriberState] = useState(false);
@@ -120,6 +122,13 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
       setUploadWarning(null);
     }
   }, []);
+
+  const showHighDemandWarning = useCallback((rawMessage?: string | null) => {
+    const normalized = typeof rawMessage === 'string' && rawMessage.trim()
+      ? rawMessage.trim()
+      : HIGH_DEMAND_WARNING_MESSAGE;
+    setRateLimitWarning(normalized);
+  }, [setRateLimitWarning]);
 
   type UploadedFileMetadata = {
     bucket: string;
@@ -528,6 +537,7 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
   const handleFileChange = useCallback(async (selectedFiles: File[]) => {
     // Clear any previous errors when files change
     setError(null);
+    setRateLimitWarning(null);
     
     if (!selectedFiles || selectedFiles.length === 0) {
       setFiles([]);
@@ -539,6 +549,7 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
       fileIdentityCacheRef.current = new WeakMap();
       setAllowedNameSizes(undefined);
       setUploadWarning(null);
+      setRateLimitWarning(null);
       return;
     }
 
@@ -865,6 +876,7 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
       model_choice: modelChoice,
     });
     setShareItem(null);
+    setRateLimitWarning(null);
     if (mode === 'flashcards') {
       const hasFiles = files.length > 0;
       // Require either files or a prompt topic for flashcards generation
@@ -988,6 +1000,27 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
         }
         if (!res.ok) {
           const contentType = res.headers.get('content-type') || '';
+          if (res.status === 429) {
+            let warningMsg = HIGH_DEMAND_WARNING_MESSAGE;
+            if (contentType.includes('application/json')) {
+              try {
+                const j = await res.json() as Record<string, unknown>;
+                if (typeof j?.message === 'string' && j.message.trim()) {
+                  warningMsg = j.message.trim();
+                } else if (typeof j?.error === 'string' && j.error.trim()) {
+                  warningMsg = j.error.trim();
+                }
+              } catch {}
+            } else {
+              try {
+                const text = (await res.text()).trim();
+                if (text) warningMsg = text;
+              } catch {}
+            }
+            showHighDemandWarning(warningMsg);
+            setError(null);
+            return;
+          }
           if (contentType.includes('application/json')) {
             let errorMsg = 'Failed to generate flashcards.';
             try {
@@ -1101,7 +1134,13 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
         // No longer require sign-in after successful generation
       } catch (err) {
         const errorMessage = err instanceof Error ? err.message : 'Failed to generate flashcards.';
-        setError(errorMessage);
+        const normalized = errorMessage.toLowerCase();
+        if (normalized.includes('rate limit') || normalized.includes('high demand')) {
+          showHighDemandWarning(errorMessage);
+          setError(null);
+        } else {
+          setError(errorMessage);
+        }
       } finally {
         setIsLoading(false);
       }
@@ -1190,6 +1229,27 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
       }
       const contentType = response.headers.get('content-type') || '';
       if (!response.ok) {
+        if (response.status === 429) {
+          let warningMsg = HIGH_DEMAND_WARNING_MESSAGE;
+          if (contentType.includes('application/json')) {
+            try {
+              const j = await response.json();
+              if (typeof j?.message === 'string' && j.message.trim()) {
+                warningMsg = j.message.trim();
+              } else if (typeof j?.error === 'string' && j.error.trim()) {
+                warningMsg = j.error.trim();
+              }
+            } catch {}
+          } else {
+            try {
+              const text = (await response.text()).trim();
+              if (text) warningMsg = text;
+            } catch {}
+          }
+          showHighDemandWarning(warningMsg);
+          setError(null);
+          return;
+        }
         if (contentType.includes('application/json')) {
           let errorMsg = 'Failed to generate mind map.';
           try { const j = await response.json(); errorMsg = j.error || errorMsg; } catch {}
@@ -1314,7 +1374,13 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
       // No longer require sign-in after successful generation
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to generate mind map.';
-      setError(errorMessage);
+      const normalized = errorMessage.toLowerCase();
+      if (normalized.includes('rate limit') || normalized.includes('high demand')) {
+        showHighDemandWarning(errorMessage);
+        setError(null);
+      } else {
+        setError(errorMessage);
+      }
     } finally {
       setIsLoading(false);
     }
@@ -1341,6 +1407,7 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
   };
 
   const canSubmit = (!isLoading && !isPreParsing && markdown === null && !flashcardsOpen);
+  const warningMessages = [uploadWarning, rateLimitWarning].filter((warning): warning is string => Boolean(warning));
 
   return (
     <>
@@ -1431,6 +1498,7 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
                   // Clear any cached pre-parsed results since file set changed
                   setPreParsed(null);
                   setUploadWarning(null);
+                  setRateLimitWarning(null);
                   setAllowedNameSizes(undefined);
                   // Clear last preparse key to force re-processing
                   lastPreparseKeyRef.current = null;
@@ -1453,12 +1521,15 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
                   if (!isAuthed) setShowAuth(true);
                 }}
               />
-              {uploadWarning && (
-                <div className="flex items-start gap-3 rounded-[1.25rem] border border-amber-200/80 bg-amber-50/80 px-4 py-3 text-left text-sm text-amber-900">
+              {warningMessages.map((message, index) => (
+                <div
+                  key={`warning-${index}-${message.slice(0, 12)}`}
+                  className={`${index === 0 ? 'mt-4' : 'mt-2'} flex items-start gap-3 rounded-[1.25rem] border border-amber-200/80 bg-amber-50/80 px-4 py-3 text-left text-sm text-amber-900`}
+                >
                   <AlertTriangle className="h-5 w-5 flex-shrink-0 text-amber-500" />
-                  <p className="font-medium">{uploadWarning}</p>
+                  <p className="font-medium">{message}</p>
                 </div>
-              )}
+              ))}
               {error && (
                 <div className="mt-4 text-center p-4 bg-muted border border-border text-foreground rounded-[1.25rem]">
                   <div className="flex flex-col sm:flex-row items-center justify-center gap-3">

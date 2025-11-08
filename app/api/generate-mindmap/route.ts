@@ -460,8 +460,8 @@ export async function POST(req: NextRequest) {
           // Handle specific OpenAI errors
           if (apiError.message.includes('429') || apiError.message.includes('rate limit')) {
             return NextResponse.json({
-              error: 'Service temporarily busy',
-              message: 'The AI service is currently at capacity. Please wait a moment and try again.',
+              error: 'Experiencing high demand',
+              message: 'We are experiencing high demand right now. Please try again in a few minutes.',
               code: 'API_RATE_LIMITED'
             }, { status: 429 });
           }
@@ -731,8 +731,8 @@ export async function POST(req: NextRequest) {
       // Rate limiting
       if (error.message.includes('rate limit') || error.message.includes('429')) {
         return NextResponse.json({
-          error: 'Service temporarily unavailable',
-          message: 'The AI service is currently busy. Please wait a moment and try again.',
+          error: 'Experiencing high demand',
+          message: 'We are experiencing high demand right now. Please try again in a few minutes.',
           code: 'RATE_LIMITED'
         }, { status: 429 });
       }

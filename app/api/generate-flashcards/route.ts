@@ -381,7 +381,7 @@ async function generateJsonFromModel(userContent: any, modelChoice: ModelChoice)
     if (apiError instanceof Error) {
       // Handle specific OpenAI errors
       if (apiError.message.includes('429') || apiError.message.includes('rate limit')) {
-        throw new Error('Service temporarily busy - rate limit exceeded');
+        throw new Error('Rate limit reached - we are experiencing high demand. Please try again shortly.');
       }
 
       if (apiError.message.includes('401') || apiError.message.includes('unauthorized')) {
@@ -465,7 +465,7 @@ export async function POST(req: NextRequest) {
         if (apiError instanceof Error) {
           // Handle specific OpenAI errors
           if (apiError.message.includes('429') || apiError.message.includes('rate limit')) {
-            throw new Error('Service temporarily busy - rate limit exceeded');
+            throw new Error('Rate limit reached - we are experiencing high demand. Please try again shortly.');
           }
 
           if (apiError.message.includes('401') || apiError.message.includes('unauthorized')) {
@@ -1339,8 +1339,8 @@ export async function POST(req: NextRequest) {
       // Rate limiting
       if (error.message.includes('rate limit') || error.message.includes('429')) {
         return NextResponse.json({
-          error: 'Service temporarily unavailable',
-          message: 'The AI service is currently busy. Please wait a moment and try again.',
+          error: 'Experiencing high demand',
+          message: 'We are experiencing high demand right now. Please try again in a few minutes.',
           code: 'RATE_LIMITED'
         }, { status: 429 });
       }
