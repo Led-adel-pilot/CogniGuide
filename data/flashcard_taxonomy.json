@@ -69,7 +69,10 @@
       "kaplan-gre-flashcards-app",
       "magoosh-gre-flashcards-app",
       "magoosh-gre-flashcards-list",
-      "magoosh-gre-flashcards-pdf"
+      "magoosh-gre-flashcards-pdf",
+      "gre-study-flashcards",
+      "gre-test-flashcards",
+      "quizlet-gre-flashcards"
     ],
     "Medical Specialties & Prep": [
       "medstudy",
@@ -149,7 +152,10 @@
       "netter-s-anatomy-flashcards-3rd-edition",
       "netter-s-anatomy-flashcards-6th-edition",
       "netter-s-anatomy-flashcards-anki",
-      "netter-s-histology-flashcards"
+      "netter-s-histology-flashcards",
+      "pathology-flashcards-pdf",
+      "pharmacology-flashcards-lange-pdf",
+      "phlebotomy-flashcards-quizlet"
     ],
     "Professional & Technical Certs": [
       "bicsi-rcdd",
@@ -234,7 +240,13 @@
       "flashcards-on-earth-day",
       "illinois-driving-test-flashcards",
       "nasm-cpt-flashcards",
-      "nj-driving-test-flashcards"
+      "nj-driving-test-flashcards",
+      "perfect-pmp-exam-flashcards",
+      "pmp-certification-flashcards",
+      "pmp-exam-flashcards-free",
+      "pmp-flashcards-6th-edition-free",
+      "pmp-flashcards-7th-edition",
+      "pmp-flashcards-pdf"
     ],
     "Academic Prep & Science": [
       "ap-biology",
@@ -440,7 +452,16 @@
       "making-flashcards-to-study",
       "medicine-flashcards-free-pdf",
       "microbiology-lab-flashcards",
-      "northeast-states-and-capitals-flashcards"
+      "northeast-states-and-capitals-flashcards",
+      "how-to-make-flashcards-for-upsc",
+      "ocr-a-level-geography-flashcards",
+      "periodic-table-memorization-flashcards",
+      "periodic-table-of-elements-flashcards-game",
+      "periodic-table-of-elements-flashcards-pdf",
+      "periodic-table-quiz-flashcards",
+      "pharmacology-flashcards-free",
+      "psychology-flashcards-chapter-2",
+      "python-flashcards-quizlet"
     ]
   },
   "Language & Culture": {
@@ -544,7 +565,10 @@
       "katakana-mnemonics-flashcards",
       "minna-no-nihongo-flashcards",
       "minna-no-nihongo-flashcards-pdf",
-      "nihongo-flashcards-notion"
+      "nihongo-flashcards-notion",
+      "hindi-vyanjan-flashcards-pdf",
+      "hiragana-alphabet-flashcards",
+      "kanji-flashcards-online"
     ],
     "ESL & English Mastery": [
       "esl",
@@ -758,7 +782,19 @@
       "make-spanish-flashcards-online",
       "make-vocabulary-flashcards",
       "months-flashcards-esl",
-      "nce-exam-flashcards"
+      "nce-exam-flashcards",
+      "hindi-matra-flashcards-pdf",
+      "hindi-varnamala-flashcards-pdf",
+      "how-to-use-flashcards-to-learn-a-language",
+      "opposites-flashcards-pdf",
+      "opposites-flashcards-pdf-free",
+      "ordinal-numbers-1-10-flashcards",
+      "ordinal-numbers-1-31-flashcards",
+      "ordinal-numbers-flashcards-pdf",
+      "pets-flashcards-esl",
+      "phrasal-verbs-flashcards",
+      "quizlet-flashcards-create",
+      "quizlet-nce-flashcards"
     ],
     "Advanced Grammar & Structure": [
       "idioms",
@@ -793,7 +829,8 @@
       "come-fare-flashcards-su-goodnotes",
       "create-flashcards-with-words-and-their-meanings",
       "flashcards-capital-letters",
-      "how-to-make-flashcards-of-antonyms-and-synonyms"
+      "how-to-make-flashcards-of-antonyms-and-synonyms",
+      "flashcards-simple-present-tense"
     ],
     "Social Interaction & Themes": [
       "family-members",
@@ -848,7 +885,8 @@
       "rezi-flashcards",
       "flashcards-for-rbt-exam",
       "free-english-flashcards-pdf",
-      "lower-case-letters-flashcards-pdf"
+      "lower-case-letters-flashcards-pdf",
+      "prek-flashcards"
     ],
     "Food & Apparel Vocab": [
       "food",
@@ -881,7 +919,11 @@
       "vehicle-flashcards-pdf",
       "hot-topics-pmp-exam-flashcards",
       "kitchen-flashcards-pdf",
-      "kitchen-utensils-flashcards"
+      "kitchen-utensils-flashcards",
+      "pmp-exam-flashcards-pdf",
+      "pmp-flashcards-quizlet",
+      "pmp-study-flashcards",
+      "quizlet-geometry-flashcards"
     ]
   },
   "Literacy & Phonics": {
@@ -960,7 +1002,16 @@
       "letter-s-words-flashcards",
       "long-and-short-vowel-flashcards",
       "lowercase-letter-flashcards-online",
-      "lsat-flashcards-pdf"
+      "lsat-flashcards-pdf",
+      "letterland-flashcards-pdf",
+      "phonics-flashcards-pdf",
+      "phonics-flashcards-reception",
+      "phonics-flashcards-usborne",
+      "phonics-reading-flashcards",
+      "phonics-rules-flashcards",
+      "phonics-shed-flashcards",
+      "phonics-sounds-a-to-z-flashcards",
+      "phonics-sounds-flashcards-pdf"
     ],
     "Phonics Programs": [
       "jolly-phonics-group-1",
@@ -1244,7 +1295,69 @@
       "letters-and-sounds-phase-2-flashcards",
       "little-wandle-flashcards-phase-1",
       "make-5-flashcards",
-      "n10-008-flashcards"
+      "n10-008-flashcards",
+      "greek-alphabet-flashcards",
+      "how-to-make-flashcards-for-b-ed",
+      "letter-tracing-flashcards",
+      "letter-u-worksheets-flashcards-coloring-pages",
+      "lowercase-letter-flashcards",
+      "notes-into-flashcards-free",
+      "number-flashcards-1-20",
+      "number-flashcards-1-30",
+      "number-flashcards-1-50-pdf",
+      "number-flashcards-for-preschoolers",
+      "number-flashcards-to-20",
+      "number-flashcards-with-dots",
+      "number-word-flashcards",
+      "numbers-flashcards-1-10-pdf",
+      "opposites-flashcards-kindergarten",
+      "phase-2-and-3-tricky-words-flashcards",
+      "phase-2-sounds-flashcards",
+      "phase-2-tricky-words-flashcards",
+      "phase-3-and-5-flashcards",
+      "phase-3-phonics-sounds-flashcards",
+      "phase-3-sounds-flashcards",
+      "phase-3-tricky-words-flashcards",
+      "phase-4-phonics-flashcards",
+      "phase-4-sounds-flashcards",
+      "phase-4-tricky-words-flashcards",
+      "phonics-blends-flashcards-pdf",
+      "phonics-cvc-flashcards",
+      "phonics-flashcards",
+      "phonics-flashcards-app",
+      "phonics-flashcards-australia",
+      "phonics-flashcards-for-kindergarten",
+      "phonics-flashcards-for-preschoolers",
+      "phonics-flashcards-free",
+      "phonics-flashcards-letters-and-sounds",
+      "phonics-flashcards-little-wandle",
+      "phonics-flashcards-oxford",
+      "phonics-flashcards-phase-1",
+      "phonics-flashcards-phase-2",
+      "phonics-flashcards-phase-3",
+      "phonics-flashcards-phase-4",
+      "phonics-flashcards-phase-5",
+      "phonics-flashcards-powerpoint",
+      "phonics-flashcards-ruth-miskin",
+      "phonics-flashcards-the-works",
+      "phonics-flashcards-year-1",
+      "phonics-song-2-flashcards",
+      "phonics-sounds-flashcards",
+      "phr-flashcards",
+      "phr-flashcards-free",
+      "picture-flashcards-for-kindergarten",
+      "pre-k-sight-words-flashcards",
+      "preschool-abc-flashcards",
+      "preschool-color-flashcards",
+      "preschool-flashcards-free",
+      "preschool-flashcards-online",
+      "preschool-flashcards-pdf",
+      "preschool-learning-flashcards",
+      "preschool-letter-flashcards",
+      "preschool-transportation-flashcards",
+      "preschool-vegetables-flashcards",
+      "preschool-word-flashcards",
+      "queen-flashcards"
     ],
     "Sight & Tricky Words": [
       "sight",
@@ -1280,7 +1393,10 @@
       "how-to-make-flashcards-for-spelling-words",
       "how-to-make-flashcards-to-sell",
       "lines-flashcards",
-      "make-your-own-spelling-flashcards"
+      "make-your-own-spelling-flashcards",
+      "phonics-bloom-flashcards",
+      "phonics-screening-flashcards",
+      "piano-flashcards-game"
     ],
     "Verbs & Tenses": [
       "verb",
@@ -1477,7 +1593,16 @@
       "multistate-bar-exam-flashcards",
       "nce-flashcards-pdf",
       "nce-study-guide-flashcards",
-      "nims-700-flashcards"
+      "nims-700-flashcards",
+      "mark-klimek-flashcards",
+      "nursing-health-education-flashcards-pdf",
+      "ny-bar-exam-flashcards",
+      "ocr-a-level-law-flashcards",
+      "pediatric-health-education-flashcards",
+      "pharmacology-nclex-flashcards",
+      "phase-2-and-3-flashcards",
+      "quizlet-anatomy-and-physiology-flashcards",
+      "quizlet-anatomy-flashcards"
     ]
   },
   "Math, Science & Core K-5": {
@@ -1591,7 +1716,21 @@
       "math-drills-flashcards",
       "math-flashcards-addition-and-subtraction",
       "math-flashcards-target",
-      "math-number-flashcards"
+      "math-number-flashcards",
+      "number-1-5-flashcards",
+      "number-11-20-flashcards",
+      "number-bonds-flashcards",
+      "number-flashcards-1-100-random",
+      "number-flashcards-1-100-with-words",
+      "number-flashcards-1-100-with-words-pdf",
+      "number-flashcards-1-to-100",
+      "numbers-1-20-flashcards-pdf",
+      "numbers-1-to-20-flashcards-free",
+      "numbers-flashcards-free",
+      "numbers-flashcards-pdf-free",
+      "online-addition-flashcards-to-20",
+      "quizlet-comptia-a-plus-flashcards",
+      "quizlet-math-flashcards"
     ],
     "Geometry & Visuals": [
       "shapes",
@@ -1642,7 +1781,8 @@
       "flashcards-with-emergency-numbers",
       "flashcards-with-numbers",
       "graphic-flashcards",
-      "math-dot-flashcards"
+      "math-dot-flashcards",
+      "quizlet-nremt-flashcards"
     ],
     "Early Science & Senses": [
       "science",
@@ -1910,7 +2050,17 @@
       "how-to-use-math-flashcards-effectively",
       "leitner-system-flashcards",
       "make-flashcards-in-goodnotes",
-      "math-cafe-flashcards"
+      "math-cafe-flashcards",
+      "ocr-a-level-chemistry-organic-synthesis-flashcards",
+      "physical-flashcards-vs-digital",
+      "physics-flashcards-jee-pdf",
+      "polyatomic-ions-flashcards-quizlet",
+      "polyatomic-ions-list-flashcards",
+      "psychology-flashcards-a-level-aqa",
+      "psychology-flashcards-chapter-1",
+      "psychology-gre-flashcards",
+      "psychology-revision-flashcards",
+      "question-flashcards"
     ],
     "Early Topics & Themes": [
       "brown-bear",
@@ -1966,7 +2116,8 @@
       "flashcards-for-surgical-instruments",
       "free-surgical-instrument-flashcards",
       "ged-flashcards-pdf",
-      "malaria-flashcards-drawing"
+      "malaria-flashcards-drawing",
+      "kindergarten-color-flashcards"
     ]
   },
   "Nature, Geography & Time": {
@@ -2025,7 +2176,8 @@
       "unacademy-flashcards-jee",
       "vedantu-flashcards-jee",
       "vedantu-flashcards-jee-pdf",
-      "flashcards-measurements"
+      "flashcards-measurements",
+      "number-flashcards-app"
     ],
     "Environment & Space": [
       "countries",
@@ -2119,7 +2271,8 @@
       "flashcards-for-neet-pdf",
       "umrah-flashcards-pdf-free",
       "umrah-guide-flashcards",
-      "make-flashcards-out-of-powerpoint"
+      "make-flashcards-out-of-powerpoint",
+      "ocn-flashcards"
     ]
   },
   "App Integration & System Tools": {
@@ -2270,7 +2423,8 @@
       "letrs-unit-4-flashcards",
       "near-and-far-flashcards",
       "nintendo-switch-2-flashcards",
-      "no-more-flashcards"
+      "no-more-flashcards",
+      "katakana-alphabet-flashcards"
     ],
     "Quizlet Testing & Quizzes": [
       "quizlet-make-private",
@@ -2980,7 +3134,39 @@
       "nclex-rn-q-and-a-flashcards-pdf",
       "nclex-study-flashcards",
       "netter-flashcards-pdf-free",
-      "notability-flashcards-template"
+      "notability-flashcards-template",
+      "how-to-do-flashcards-in-word",
+      "how-to-make-paper-flashcards",
+      "is-there-an-app-to-make-your-own-flashcards",
+      "korean-number-flashcards",
+      "letrs-unit-6-session-2-flashcards",
+      "level-up-rn-flashcards",
+      "level-up-rn-fundamentals-flashcards-pdf",
+      "make-own-flashcards-online",
+      "notes-to-flashcards-ai-free",
+      "notion-flashcards-plugin",
+      "number-1-10-flashcards-pdf",
+      "number-flashcards-1-100",
+      "number-flashcards-1-100-online",
+      "number-flashcards-to-100",
+      "number-names-flashcards-pdf",
+      "numbers-1-30-flashcards-pdf",
+      "numbers-1-to-50-flashcards-pdf",
+      "ocr-a-level-economics-flashcards",
+      "ordinal-numbers-flashcards-pdf-free",
+      "paper-for-flashcards",
+      "personal-hygiene-flashcards-drawing",
+      "phases-of-the-moon-flashcards",
+      "physics-flashcards-paper-1",
+      "picture-flashcards-online",
+      "picture-flashcards-pdf",
+      "picture-flashcards-spotlight-2",
+      "proprofs-flashcards-do-you-like-food",
+      "ptcb-flashcards-pdf",
+      "quizlet-driving-test-flashcards",
+      "quizlet-flashcards-free",
+      "quizlet-live-flashcards",
+      "quizlet-notes-to-flashcards"
     ],
     "Note Conversion": [
       "goodnotes",
@@ -3218,7 +3404,11 @@
       "no-time-for-flashcards-com",
       "norwegian-flashcards",
       "notability-flashcards",
-      "notability-flashcards-update"
+      "notability-flashcards-update",
+      "nyle-flashcards",
+      "pdf-into-flashcards-free",
+      "quizlet-abc-flashcards",
+      "quizlet-for-flashcards"
     ],
     "Creation Process": [
       "create",
@@ -3634,7 +3824,15 @@
       "nfl-logo-flashcards",
       "noji-flashcards-learning",
       "non-tearable-flashcards",
-      "notes-into-flashcards-ai"
+      "notes-into-flashcards-ai",
+      "osmosis-flashcards-pdf",
+      "psychology-flashcards-gcse",
+      "q-flashcards",
+      "quizlet-alphabet-flashcards",
+      "quizlet-flashcards",
+      "quizlet-flashcards-online",
+      "quizlet-how-to-make-flashcards",
+      "quizlet-latin-flashcards"
     ],
     "File Conversion & Utility": [
       "pdf-flashcards",
@@ -4401,7 +4599,47 @@
       "n4-kanji-flashcards-pdf",
       "notebook-flashcards",
       "notebook-lm-flashcards",
-      "notebooklm-create-flashcards"
+      "notebooklm-create-flashcards",
+      "how-to-create-flashcards-for-free",
+      "how-to-make-flashcards-faster",
+      "how-to-use-anki-flashcards-on-laptop",
+      "how-to-use-brainscape-flashcards",
+      "how-to-use-gizmo-flashcards",
+      "l-flashcards",
+      "make-anki-flashcards-with-ai",
+      "make-flashcards-from-google-docs",
+      "make-flashcards-out-of-my-notes",
+      "make-own-flashcards-app",
+      "making-flashcards-on-goodnotes",
+      "notes-to-flashcards-ai",
+      "notes-to-flashcards-app",
+      "notes-to-flashcards-converter",
+      "notes-to-flashcards-free",
+      "notes-to-flashcards-generator",
+      "notion-to-flashcards",
+      "number-flashcards-1-100-app",
+      "number-flashcards-1-100-pdf",
+      "number-word-flashcards-pdf",
+      "numbers-1-to-10-flashcards-pdf",
+      "numbers-from-1-to-20-flashcards-pdf",
+      "paperclips-flashcards",
+      "pdf-to-flashcards-ai-free",
+      "physical-flashcards-vs-digital-reddit",
+      "plural-nouns-flashcards",
+      "ppt-to-flashcards-ai-free",
+      "presentation-flashcards",
+      "presentation-flashcards-template",
+      "programming-flashcards",
+      "psychology-chapter-4-flashcards-quizlet",
+      "python-programming-flashcards",
+      "quizlet-custom-flashcards",
+      "quizlet-export-flashcards",
+      "quizlet-flashcards-ai",
+      "quizlet-how-to-create-flashcards",
+      "quizlet-how-to-make-flashcards-private",
+      "quizlet-learning-tools-and-flashcards-for-free",
+      "quizlet-make-flashcards-from-notes",
+      "quizlet-make-own-flashcards"
     ],
     "Outputs & Formatting": [
       "maker-pictures",
@@ -4440,7 +4678,8 @@
       "zoom-flashcards",
       "flashcards-with-colors",
       "heguru-flashcards-pdf",
-      "non-verbal-flashcards"
+      "non-verbal-flashcards",
+      "publix-flashcards"
     ]
   },
   "Vocabulary & Specialized Concepts": {
@@ -4675,7 +4914,15 @@
       "learning-chinese-flashcards",
       "magoosh-english-vocabulary-flashcards",
       "make-flashcards-expressing-various-types-of-determiners",
-      "news-in-slow-french-flashcards"
+      "news-in-slow-french-flashcards",
+      "italian-flashcards-app-free",
+      "make-vocab-flashcards",
+      "objects-flashcards-pdf",
+      "phase-2-high-frequency-words-flashcards",
+      "plurals-flashcards",
+      "quizlet-cat-vocabulary-flashcards",
+      "quizlet-chinese-flashcards",
+      "quizlet-italian-flashcards"
     ],
     "Efficiency & Utility": [
       "best-maker",
@@ -4738,7 +4985,8 @@
       "flashcards-netter-espanol",
       "flashcards-para-bebes",
       "flashcards-vocabulario-espanol-pdf",
-      "ideas-de-flashcards"
+      "ideas-de-flashcards",
+      "ideas-para-flashcards"
     ],
     "Number Templates": [
       "counting",
@@ -4785,7 +5033,8 @@
       "holiday-flashcards",
       "how-to-use-flashcards-in-teaching-mathematics",
       "integers-flashcards-math-drills",
-      "make-chinese-flashcards"
+      "make-chinese-flashcards",
+      "pictures-to-flashcards"
     ]
   }
 }
