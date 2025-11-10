@@ -2,7 +2,7 @@
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Script from 'next/script';
-import { Check, Lock } from 'lucide-react';
+import { Check, X } from 'lucide-react';
 import { supabase } from '@/lib/supabaseClient';
 import AuthModal from '@/components/AuthModal';
 import { User } from '@supabase/supabase-js';
@@ -412,8 +412,8 @@ export default function PricingClient({ onPurchaseComplete }: PricingClientProps
               <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> {PAID_PLANS.pro.credits} monthly credits</li>
               <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> Mind maps + flashcards</li>
               <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> Spaced repetition</li>
-              <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> AI flashcard explanations</li>
-              <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> Smart model for best results</li>
+              <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> AI Flashcard Explanations</li>
+              <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> Advanced AI Model</li>
             </ul>
             <button
               onClick={() => handleChoosePlan('pro')}
@@ -447,8 +447,8 @@ export default function PricingClient({ onPurchaseComplete }: PricingClientProps
               <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> {PAID_PLANS.student.credits} monthly credits</li>
               <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> Mind maps + flashcards</li>
               <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> Spaced repetition</li>
-              <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> AI flashcard explanations</li>
-              <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> Smart model for best results</li>
+              <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> AI Flashcard Explanations</li>
+              <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> Advanced AI Model</li>
             </ul>
             <button
               onClick={() => handleChoosePlan('student')}
@@ -473,8 +473,14 @@ export default function PricingClient({ onPurchaseComplete }: PricingClientProps
               <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> {FREE_PLAN_CREDITS} monthly credits</li>
               <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> Mind maps + flashcards</li>
               <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> Spaced repetition</li>
-              <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> Fast model generations</li>
-              <li className="flex items-center gap-2 text-muted-foreground"><Lock className="h-4 w-4" /> Flashcard explanations (paid plans only)</li>
+              <li className="flex items-center gap-2 text-muted-foreground">
+                <X className="h-4 w-4" />
+                AI Flashcard Explanations
+              </li>
+              <li className="flex items-center gap-2 text-muted-foreground">
+                <X className="h-4 w-4" />
+                Advanced AI Model
+              </li>
             </ul>
             {user ? (
               <button disabled className="w-full cursor-not-allowed rounded-full border py-2 text-sm text-gray-600">Current plan</button>
