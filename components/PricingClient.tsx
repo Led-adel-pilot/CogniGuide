@@ -392,71 +392,6 @@ export default function PricingClient({ onPurchaseComplete }: PricingClientProps
         </div>
 
         <div className="grid gap-6 md:grid-cols-3">
-          {/* Free */}
-          <div className="relative rounded-[1.25rem] border bg-background p-6 shadow-sm">
-            <h3 className="text-xl font-bold font-heading mb-1">{user ? 'Free' : 'Free forever'}</h3>
-            <p className="text-muted-foreground mb-6">Get started and try the core experience.</p>
-            <div className="mb-6">
-              <div className="text-3xl font-extrabold">$0</div>
-              <div className="text-sm text-muted-foreground">$0 / year</div>
-            </div>
-            <ul className="space-y-2 text-sm mb-6">
-              <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> {FREE_PLAN_CREDITS} monthly credits</li>
-              <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> Mind maps + flashcards</li>
-              <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> Spaced repetition</li>
-              <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> Fast model generations</li>
-              <li className="flex items-center gap-2 text-muted-foreground"><Lock className="h-4 w-4" /> Flashcard explanations (paid plans only)</li>
-            </ul>
-            {user ? (
-              <button disabled className="w-full cursor-not-allowed rounded-full border py-2 text-sm text-gray-600">Current plan</button>
-            ) : (
-              <button
-                onClick={() => {
-                  localStorage.setItem('cogniguide_upgrade_flow', 'true');
-                  setAuthModalOpen(true);
-                }}
-                className="w-full rounded-full bg-primary py-2 text-sm font-semibold text-white shadow transition hover:bg-primary/90"
-              >
-                Sign up
-              </button>
-            )}
-          </div>
-
-          {/* Student (Most Popular) */}
-          <div className="relative rounded-[1.25rem] border bg-primary/5 dark:bg-primary/10 p-6 shadow-sm ring-1 ring-primary/10">
-            <div className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full border bg-primary text-primary-foreground px-3 py-1 text-xs font-semibold shadow">Recommended</div>
-            <h3 className="text-xl font-bold font-heading mb-1">Student</h3>
-            <p className="text-muted-foreground mb-6">Plenty of credits for regular study and exam prep.</p>
-            <div className="mb-6">
-              <div
-                className="text-3xl font-extrabold flex items-baseline gap-2"
-                aria-live="polite"
-                aria-busy={pricesLoading || !prices.student[billingCycle]}
-              >
-                {renderPrimaryPrice('student')}
-              </div>
-              <div className="text-sm text-muted-foreground min-h-[1.25rem]">
-                {renderSecondaryPrice('student')}
-              </div>
-            </div>
-            <ul className="space-y-2 text-sm mb-6">
-              <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> {PAID_PLANS.student.credits} monthly credits</li>
-              <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> Mind maps + flashcards</li>
-              <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> Spaced repetition</li>
-              <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> AI flashcard explanations</li>
-              <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> Smart model for best results</li>
-            </ul>
-            <button
-              onClick={() => handleChoosePlan('student')}
-              disabled={isButtonDisabled('student')}
-              className={`w-full rounded-full bg-primary py-2 text-sm font-semibold text-white shadow transition ${
-                isButtonDisabled('student') ? 'opacity-60 cursor-not-allowed' : 'hover:bg-primary/90'
-              }`}
-            >
-              {getButtonLabel('student')}
-            </button>
-          </div>
-
           {/* Pro */}
           <div className="relative rounded-[1.25rem] border bg-background p-6 shadow-sm">
             <h3 className="text-xl font-bold font-heading mb-1">Pro</h3>
@@ -489,6 +424,71 @@ export default function PricingClient({ onPurchaseComplete }: PricingClientProps
             >
               {getButtonLabel('pro')}
             </button>
+          </div>
+
+          {/* Student (Most Popular) */}
+          <div className="relative rounded-[1.25rem] border bg-primary/5 dark:bg-primary/10 p-6 shadow-sm ring-1 ring-primary/10">
+            <div className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full border bg-primary text-primary-foreground px-3 py-1 text-xs font-semibold shadow">Best value</div>
+            <h3 className="text-xl font-bold font-heading mb-1">Student</h3>
+            <p className="text-muted-foreground mb-6">Plenty of credits for regular study and exam prep.</p>
+            <div className="mb-6">
+              <div
+                className="text-3xl font-extrabold flex items-baseline gap-2"
+                aria-live="polite"
+                aria-busy={pricesLoading || !prices.student[billingCycle]}
+              >
+                {renderPrimaryPrice('student')}
+              </div>
+              <div className="text-sm text-muted-foreground min-h-[1.25rem]">
+                {renderSecondaryPrice('student')}
+              </div>
+            </div>
+            <ul className="space-y-2 text-sm mb-6">
+              <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> {PAID_PLANS.student.credits} monthly credits</li>
+              <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> Mind maps + flashcards</li>
+              <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> Spaced repetition</li>
+              <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> AI flashcard explanations</li>
+              <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> Smart model for best results</li>
+            </ul>
+            <button
+              onClick={() => handleChoosePlan('student')}
+              disabled={isButtonDisabled('student')}
+              className={`w-full rounded-full bg-primary py-2 text-sm font-semibold text-white shadow transition ${
+                isButtonDisabled('student') ? 'opacity-60 cursor-not-allowed' : 'hover:bg-primary/90'
+              }`}
+            >
+              {getButtonLabel('student')}
+            </button>
+          </div>
+
+          {/* Free */}
+          <div className="relative rounded-[1.25rem] border bg-background p-6 shadow-sm">
+            <h3 className="text-xl font-bold font-heading mb-1">{user ? 'Free' : 'Free forever'}</h3>
+            <p className="text-muted-foreground mb-6">Get started and try the core experience.</p>
+            <div className="mb-6">
+              <div className="text-3xl font-extrabold">$0</div>
+              <div className="text-sm text-muted-foreground">$0 / year</div>
+            </div>
+            <ul className="space-y-2 text-sm mb-6">
+              <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> {FREE_PLAN_CREDITS} monthly credits</li>
+              <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> Mind maps + flashcards</li>
+              <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> Spaced repetition</li>
+              <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> Fast model generations</li>
+              <li className="flex items-center gap-2 text-muted-foreground"><Lock className="h-4 w-4" /> Flashcard explanations (paid plans only)</li>
+            </ul>
+            {user ? (
+              <button disabled className="w-full cursor-not-allowed rounded-full border py-2 text-sm text-gray-600">Current plan</button>
+            ) : (
+              <button
+                onClick={() => {
+                  localStorage.setItem('cogniguide_upgrade_flow', 'true');
+                  setAuthModalOpen(true);
+                }}
+                className="w-full rounded-full bg-primary py-2 text-sm font-semibold text-white shadow transition hover:bg-primary/90"
+              >
+                Sign up
+              </button>
+            )}
           </div>
         </div>
 
