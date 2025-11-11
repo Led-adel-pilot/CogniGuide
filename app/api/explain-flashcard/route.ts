@@ -17,8 +17,7 @@ const supabaseAdmin = (supabaseUrl && supabaseServiceKey)
   ? createClient(supabaseUrl, supabaseServiceKey)
   : null;
 
-const SMART_MODEL = 'gemini-flash-latest'; // || process.env.GEMINI_MODEL_SMART ;
-const EXPLANATION_CREDIT_COST = 0.5;
+const EXPLANATION_CREDIT_COST = 0.2;
 
 // Reasoning effort control: if true, use default; if false/unset, use 'none' for faster responses
 const ENABLE_REASONING = process.env.ENABLE_REASONING === 'true';
@@ -372,9 +371,9 @@ export async function POST(req: NextRequest) {
 
   try {
     const stream = await openai.chat.completions.create({
-      model: SMART_MODEL,
       // @ts-expect-error - OpenAI types don't properly support reasoning_effort with stream options
-      reasoning_effort: 'none',
+      model: process.env.GEMINI_MODEL_FAST,
+      reasoning_effort: 'medium',
       messages: [{ role: 'user', content: prompt }],
       stream: true,
       stream_options: { include_usage: false },
