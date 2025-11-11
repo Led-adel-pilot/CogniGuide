@@ -89,6 +89,7 @@ create table public.flashcards (
   cards jsonb not null,
   created_at timestamp with time zone not null default now(),
   mindmap_id uuid null,
+  explanations jsonb not null default '{}'::jsonb,
   constraint flashcards_pkey primary key (id),
   constraint flashcards_mindmap_id_fkey foreign KEY (mindmap_id) references mindmaps (id) on delete set null,
   constraint flashcards_user_id_fkey foreign KEY (user_id) references auth.users (id) on delete CASCADE,
