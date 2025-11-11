@@ -435,6 +435,16 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
     }
 
     if (!questionContent || !answerContent) return;
+    const targetDeckId = studyInterleaved ? current?.deckId : deckId;
+    const normalizedDeckId = targetDeckId && targetDeckId !== 'interleaved-session' ? targetDeckId : undefined;
+    const targetCardIndex = studyInterleaved
+      ? typeof current?.cardIndex === 'number'
+        ? current.cardIndex
+        : undefined
+      : index;
+    const normalizedCardIndex = typeof targetCardIndex === 'number' && targetCardIndex >= 0
+      ? targetCardIndex
+      : undefined;
     const requestId = explainRequestRef.current + 1;
     explainRequestRef.current = requestId;
     setShowExplanation(false);
@@ -452,10 +462,12 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
           'Content-Type': 'application/json',
           ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
-        body: JSON.stringify({ 
-          question: questionContent, 
+        body: JSON.stringify({
+          question: questionContent,
           answer: answerContent,
-          deckTitle: deckTitleToSend 
+          deckTitle: deckTitleToSend,
+          deckId: normalizedDeckId,
+          cardIndex: normalizedCardIndex,
         }),
       });
       if (explainRequestRef.current !== requestId) return;
@@ -512,7 +524,18 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
         setIsExplaining(false);
       }
     }
-  }, [answerContent, questionContent, studyInterleaved, current, title, isPaidUser, onRequireUpgrade]);
+  }, [
+    answerContent,
+    deckId,
+    index,
+    questionContent,
+    studyInterleaved,
+    current,
+    title,
+    isPaidUser,
+    onRequireUpgrade,
+    openAuthModal,
+  ]);
 
   const handleExplanationBack = React.useCallback(() => {
     resetExplanation();

@@ -181,6 +181,39 @@ function extractDeltaText(delta: ChatCompletionChunk.Choice['delta'] | undefined
   return '';
 }
 
+type DeckExplanationEntry = {
+  question: string;
+  answer: string;
+  explanation: string;
+  updated_at?: string;
+};
+
+type DeckExplanationMap = Record<string, DeckExplanationEntry>;
+
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === 'object' && value !== null && !Array.isArray(value);
+
+function parseExplanationMap(raw: unknown): DeckExplanationMap {
+  if (!isRecord(raw)) {
+    return {};
+  }
+
+  const entries: DeckExplanationMap = {};
+  for (const [key, value] of Object.entries(raw)) {
+    if (!isRecord(value)) continue;
+    const { question, answer, explanation, updated_at } = value as Record<string, unknown>;
+    if (typeof question !== 'string' || typeof answer !== 'string' || typeof explanation !== 'string') continue;
+    entries[key] = {
+      question,
+      answer,
+      explanation,
+      ...(typeof updated_at === 'string' ? { updated_at } : {}),
+    };
+  }
+
+  return entries;
+}
+
 export async function POST(req: NextRequest) {
   if (!supabaseAdmin) {
     return NextResponse.json({
@@ -190,7 +223,13 @@ export async function POST(req: NextRequest) {
     }, { status: 503 });
   }
 
-  let payload: { question?: unknown; answer?: unknown; deckTitle?: unknown };
+  let payload: {
+    question?: unknown;
+    answer?: unknown;
+    deckTitle?: unknown;
+    deckId?: unknown;
+    cardIndex?: unknown;
+  };
   try {
     payload = await req.json();
   } catch {
@@ -204,6 +243,16 @@ export async function POST(req: NextRequest) {
   const question = typeof payload.question === 'string' ? payload.question.trim() : '';
   const answer = typeof payload.answer === 'string' ? payload.answer.trim() : '';
   const deckTitle = typeof payload.deckTitle === 'string' ? payload.deckTitle.trim() : undefined;
+  const deckIdRaw = typeof payload.deckId === 'string' ? payload.deckId.trim() : '';
+  const cardIndexRaw = typeof payload.cardIndex === 'number'
+    ? payload.cardIndex
+    : typeof payload.cardIndex === 'string'
+      ? Number.parseInt(payload.cardIndex, 10)
+      : undefined;
+  const deckId = deckIdRaw && deckIdRaw !== 'interleaved-session' ? deckIdRaw : undefined;
+  const cardIndex = typeof cardIndexRaw === 'number' && Number.isInteger(cardIndexRaw) && cardIndexRaw >= 0
+    ? cardIndexRaw
+    : undefined;
 
   if (!question || !answer) {
     return NextResponse.json({
@@ -236,6 +285,56 @@ export async function POST(req: NextRequest) {
     await ensureFreeMonthlyCredits(userId);
   } catch (err) {
     console.warn('Failed to ensure free monthly credits for explanation:', err);
+  }
+
+  let deckContext: { id: string; explanations: DeckExplanationMap } | null = null;
+  let cardIndexForPersistence: number | null = null;
+
+  if (deckId && typeof cardIndex === 'number') {
+    try {
+      const { data: deckData, error: deckError } = await supabaseAdmin
+        .from('flashcards')
+        .select('id, user_id, explanations')
+        .eq('id', deckId)
+        .maybeSingle();
+
+      if (deckError) {
+        console.error('Failed to load deck for flashcard explanation:', deckError);
+      } else if (deckData) {
+        type DeckRow = { id: string; user_id: string; explanations: unknown };
+        const typedDeck = deckData as DeckRow;
+
+        if (typedDeck.user_id !== userId) {
+          return NextResponse.json({
+            error: 'Deck not found',
+            message: 'Unable to locate the requested flashcard deck.',
+            code: 'DECK_NOT_FOUND',
+          }, { status: 404 });
+        }
+
+        const existingExplanations = parseExplanationMap(typedDeck.explanations);
+        const existingEntry = existingExplanations[String(cardIndex)];
+        if (
+          existingEntry &&
+          existingEntry.question === question &&
+          existingEntry.answer === answer &&
+          existingEntry.explanation.trim()
+        ) {
+          return new Response(existingEntry.explanation, {
+            headers: {
+              'Content-Type': 'text/plain; charset=utf-8',
+              'Cache-Control': 'no-cache',
+              'X-Accel-Buffering': 'no',
+            },
+          });
+        }
+
+        deckContext = { id: typedDeck.id, explanations: existingExplanations };
+        cardIndexForPersistence = cardIndex;
+      }
+    } catch (error) {
+      console.error('Failed to check existing flashcard explanation:', error);
+    }
   }
 
   const multiplier = MODEL_CREDIT_MULTIPLIERS.fast ?? 1;
@@ -283,6 +382,7 @@ export async function POST(req: NextRequest) {
 
     const encoder = new TextEncoder();
     let hasContent = false;
+    let generatedText = '';
 
     const readableStream = new ReadableStream({
       async start(controller) {
@@ -292,13 +392,44 @@ export async function POST(req: NextRequest) {
             const token = extractDeltaText(delta);
             if (token) {
               hasContent = true;
+              generatedText += token;
               controller.enqueue(encoder.encode(token));
             }
           }
-          
+
           if (!hasContent) {
             controller.error(new Error('No explanation returned'));
           } else {
+            if (
+              deckContext &&
+              typeof cardIndexForPersistence === 'number' &&
+              generatedText.trim()
+            ) {
+              const explanationEntry: DeckExplanationEntry = {
+                question,
+                answer,
+                explanation: generatedText,
+                updated_at: new Date().toISOString(),
+              };
+              const nextExplanations: DeckExplanationMap = {
+                ...deckContext.explanations,
+                [String(cardIndexForPersistence)]: explanationEntry,
+              };
+              try {
+                const { error: persistError } = await supabaseAdmin
+                  .from('flashcards')
+                  .update({ explanations: nextExplanations })
+                  .eq('id', deckContext.id)
+                  .eq('user_id', userId);
+                if (persistError) {
+                  console.error('Failed to persist flashcard explanation:', persistError);
+                } else {
+                  deckContext = { ...deckContext, explanations: nextExplanations };
+                }
+              } catch (persistError) {
+                console.error('Unexpected error while saving flashcard explanation:', persistError);
+              }
+            }
             controller.close();
           }
         } catch (error) {
