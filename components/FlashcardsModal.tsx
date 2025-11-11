@@ -3,6 +3,7 @@
 import React from 'react';
 import dynamic from 'next/dynamic';
 import { supabase } from '@/lib/supabaseClient';
+import type { FlashcardExplanationMap } from '@/lib/supabaseClient';
 import AuthModal from '@/components/AuthModal';
 import { nextSchedule, createInitialSchedule, type FsrsScheduleState, type Grade } from '@/lib/spaced-repetition';
 import { loadDeckSchedule, saveDeckSchedule, loadDeckScheduleAsync, saveDeckScheduleAsync } from '@/lib/sr-store';
@@ -32,6 +33,13 @@ const getDeckIdentifier = (deckId?: string, title?: string | null, cards?: Flash
 
 export type Flashcard = { question: string; answer: string };
 type CardWithSchedule = Flashcard & { schedule?: FsrsScheduleState; deckId?: string; cardIndex?: number; deckTitle?: string; };
+
+type InterleavedDeck = {
+  id: string;
+  title: string | null;
+  cards: Flashcard[];
+  explanations?: FlashcardExplanationMap | null;
+};
 
 const markdownComponents: Components = {
   ul({ node, ...props }) {
@@ -151,7 +159,7 @@ type Props = {
   initialIndex?: number;
   studyDueOnly?: boolean;
   studyInterleaved?: boolean;
-  interleavedDecks?: Array<{ id: string; title: string | null; cards: Flashcard[] }>;
+  interleavedDecks?: InterleavedDeck[];
   dueIndices?: number[];
   isEmbedded?: boolean;
   onShare?: () => void;
@@ -161,9 +169,10 @@ type Props = {
   linkedMindMapId?: string | null;
   linkedMindMapMarkdown?: string | null;
   onMindMapLinked?: (mindmapId: string | null, markdown: string | null) => void;
+  explanations?: FlashcardExplanationMap | null;
 };
 
-export default function FlashcardsModal({ open, title, cards, isGenerating = false, error, onClose, onReviewDueCards, deckId, initialIndex, studyDueOnly = false, studyInterleaved = false, interleavedDecks, dueIndices, isEmbedded = false, onShare, isPaidUser = false, onRequireUpgrade, mindMapModelChoice = 'fast', linkedMindMapId, linkedMindMapMarkdown, onMindMapLinked }: Props) {
+export default function FlashcardsModal({ open, title, cards, isGenerating = false, error, onClose, onReviewDueCards, deckId, initialIndex, studyDueOnly = false, studyInterleaved = false, interleavedDecks, dueIndices, isEmbedded = false, onShare, isPaidUser = false, onRequireUpgrade, mindMapModelChoice = 'fast', linkedMindMapId, linkedMindMapMarkdown, onMindMapLinked, explanations }: Props) {
   const [index, setIndex] = React.useState(0);
   const [showAnswer, setShowAnswer] = React.useState(false);
   const [showExplanation, setShowExplanation] = React.useState(false);
@@ -227,6 +236,37 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
   const questionContent = displayedCards && displayedCards[index] ? displayedCards[index]!.question : '';
   const answerContent = displayedCards && displayedCards[index] ? displayedCards[index]!.answer : '';
   const totalCardCount = displayedCards?.length ?? 0;
+
+  const persistedExplanationEntry = React.useMemo(() => {
+    const ensureMatch = (entry: FlashcardExplanationMap[string] | undefined | null) => {
+      if (!entry) return null;
+      if (entry.question !== questionContent || entry.answer !== answerContent) return null;
+      if (typeof entry.explanation !== 'string' || !entry.explanation.trim()) return null;
+      return entry;
+    };
+
+    if (studyInterleaved) {
+      if (!current?.deckId || typeof current.cardIndex !== 'number') return null;
+      const sourceDeck = interleavedDecks?.find((deck) => deck.id === current.deckId);
+      if (!sourceDeck) return null;
+      return ensureMatch(sourceDeck.explanations?.[String(current.cardIndex)] ?? null);
+    }
+
+    if (!explanations) return null;
+    return ensureMatch(explanations[String(index)] ?? null);
+  }, [
+    answerContent,
+    current?.cardIndex,
+    current?.deckId,
+    explanations,
+    index,
+    interleavedDecks,
+    questionContent,
+    studyInterleaved,
+  ]);
+
+  const hasPersistedExplanation = Boolean(persistedExplanationEntry);
+  const explanationButtonLabel = hasPersistedExplanation ? 'Explanation' : 'Explain';
 
   const questionRef = React.useRef<HTMLDivElement | null>(null);
   const answerRef = React.useRef<HTMLDivElement | null>(null);
@@ -2211,7 +2251,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
                               ) : (
                                 !isPaidUser ? <Lock className="h-3.5 w-3.5" aria-hidden="true" /> : null
                               )}
-                              <span>Explain</span>
+                              <span>{explanationButtonLabel}</span>
                             </button>
                             <button
                               type="button"

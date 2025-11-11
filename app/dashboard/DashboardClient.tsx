@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { supabase, MindmapRecord, FlashcardsRecord } from '@/lib/supabaseClient';
+import { supabase, MindmapRecord, FlashcardsRecord, type FlashcardExplanationMap } from '@/lib/supabaseClient';
 import Generator from '@/components/Generator';
 import MindMapModal from '@/components/MindMapModal';
 import FlashcardsModal, { Flashcard as FlashcardType } from '@/components/FlashcardsModal';
@@ -142,7 +142,7 @@ export default function DashboardClient() {
   // Sidebar combined history (paginated)
   const [combinedHistory, setCombinedHistory] = useState<Array<
     | { type: 'mindmap'; id: string; title: string | null; created_at: string; markdown: string }
-    | { type: 'flashcards'; id: string; title: string | null; created_at: string; cards: FlashcardType[]; mindmap_id: string | null; markdown: string | null }
+    | { type: 'flashcards'; id: string; title: string | null; created_at: string; cards: FlashcardType[]; mindmap_id: string | null; markdown: string | null; explanations: FlashcardExplanationMap | null }
   >>([]);
   // Pagination state
   const PAGE_SIZE = 10;
@@ -152,7 +152,7 @@ export default function DashboardClient() {
   const [hasMoreFc, setHasMoreFc] = useState(true);
   const [historyBuffer, setHistoryBuffer] = useState<Array<
     | { type: 'mindmap'; id: string; title: string | null; created_at: string; markdown: string }
-    | { type: 'flashcards'; id: string; title: string | null; created_at: string; cards: FlashcardType[]; mindmap_id: string | null; markdown: string | null }
+    | { type: 'flashcards'; id: string; title: string | null; created_at: string; cards: FlashcardType[]; mindmap_id: string | null; markdown: string | null; explanations: FlashcardExplanationMap | null }
   >>([]);
   const [isHistoryInitialLoading, setIsHistoryInitialLoading] = useState(true);
   const [isHistoryLoadingMore, setIsHistoryLoadingMore] = useState(false);
@@ -160,6 +160,7 @@ export default function DashboardClient() {
   const [flashcardsOpen, setFlashcardsOpen] = useState(false);
   const [flashcardsTitle, setFlashcardsTitle] = useState<string | null>(null);
   const [flashcardsCards, setFlashcardsCards] = useState<FlashcardType[] | null>(null);
+  const [flashcardsExplanations, setFlashcardsExplanations] = useState<FlashcardExplanationMap | null>(null);
   const [flashcardsError, setFlashcardsError] = useState<string | null>(null);
   const [activeDeckMindMapId, setActiveDeckMindMapId] = useState<string | null>(null);
   const [activeDeckMindMapMarkdown, setActiveDeckMindMapMarkdown] = useState<string | null>(null);
@@ -204,7 +205,7 @@ export default function DashboardClient() {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isPricingModalOpen, setIsPricingModalOpen] = useState(false);
   const [spacedOpen, setSpacedOpen] = useState(false);
-  const [dueQueue, setDueQueue] = useState<Array<{ id: string; title: string | null; cards: FlashcardType[]; mindmap_id?: string | null; mindmap_markdown?: string | null }>>([]);
+  const [dueQueue, setDueQueue] = useState<Array<{ id: string; title: string | null; cards: FlashcardType[]; mindmap_id?: string | null; mindmap_markdown?: string | null; explanations?: FlashcardExplanationMap | null }>>([]);
   const [studyDueOnly, setStudyDueOnly] = useState(false);
   const [studyInterleaved, setStudyInterleaved] = useState(false);
   const [dueIndices, setDueIndices] = useState<number[] | undefined>(undefined);
@@ -1113,6 +1114,7 @@ const handleMindMapLinked = useCallback(
       cards: (f.cards as any) as FlashcardType[],
       mindmap_id: f.mindmap_id ?? null,
       markdown: f.markdown ?? null,
+      explanations: f.explanations ?? null,
     }));
   };
 
@@ -1210,6 +1212,7 @@ const handleMindMapLinked = useCallback(
             cards: (f.cards as any) as FlashcardType[],
             mindmap_id: f.mindmap_id ?? null,
             markdown: f.markdown ?? null,
+            explanations: f.explanations ?? null,
           })),
         ]).slice(0, PAGE_SIZE);
         setCombinedHistory(merged);
@@ -1262,7 +1265,7 @@ const handleMindMapLinked = useCallback(
       const allSchedules = await loadAllDeckSchedulesAsync();
       const bulkToSave: Array<{ deckId: string; data: StoredDeckSchedule }> = [];
       const dueMap: Record<string, number[]> = {};
-      const queue: Array<{ id: string; title: string | null; cards: FlashcardType[]; mindmap_id?: string | null; mindmap_markdown?: string | null }> = [];
+      const queue: Array<{ id: string; title: string | null; cards: FlashcardType[]; mindmap_id?: string | null; mindmap_markdown?: string | null; explanations?: FlashcardExplanationMap | null }> = [];
       let totalDue = 0;
       for (const f of fcRecords) {
         const deckId = f.id;
@@ -1314,7 +1317,14 @@ const handleMindMapLinked = useCallback(
         dueMap[deckId] = dIdx;
         totalDue += dIdx.length;
         if (!isCancelled && dIdx.length > 0) {
-          queue.push({ id: deckId, title: f.title, cards: cardsArr, mindmap_id: f.mindmap_id ?? null, mindmap_markdown: f.markdown ?? null });
+          queue.push({
+            id: deckId,
+            title: f.title,
+            cards: cardsArr,
+            mindmap_id: f.mindmap_id ?? null,
+            mindmap_markdown: f.markdown ?? null,
+            explanations: f.explanations ?? null,
+          });
         }
       }
       if (bulkToSave.length > 0) {
@@ -1334,7 +1344,7 @@ const handleMindMapLinked = useCallback(
   const recomputeDueFromCache = (fcRecords: FlashcardsRecord[]) => {
     const now = new Date();
     const dueMap: Record<string, number[]> = {};
-    const queue: Array<{ id: string; title: string | null; cards: FlashcardType[]; mindmap_id?: string | null; mindmap_markdown?: string | null }> = [];
+    const queue: Array<{ id: string; title: string | null; cards: FlashcardType[]; mindmap_id?: string | null; mindmap_markdown?: string | null; explanations?: FlashcardExplanationMap | null }> = [];
     let totalDue = 0;
     for (const f of fcRecords) {
       const deckId = f.id;
@@ -1382,7 +1392,16 @@ const handleMindMapLinked = useCallback(
       }
       dueMap[deckId] = dIdx;
       totalDue += dIdx.length;
-      if (!isCancelled && dIdx.length > 0) queue.push({ id: deckId, title: f.title, cards: cardsArr, mindmap_id: f.mindmap_id ?? null, mindmap_markdown: f.markdown ?? null });
+      if (!isCancelled && dIdx.length > 0) {
+        queue.push({
+          id: deckId,
+          title: f.title,
+          cards: cardsArr,
+          mindmap_id: f.mindmap_id ?? null,
+          mindmap_markdown: f.markdown ?? null,
+          explanations: f.explanations ?? null,
+        });
+      }
     }
     setDueQueue(queue);
     if (typeof window !== 'undefined') {
@@ -1666,6 +1685,7 @@ const handleMindMapLinked = useCallback(
                         setActiveDeckMindMapMarkdown(item.markdown ?? null);
                         setActiveDeckId(item.id);
                         setFlashcardsCards(arr as FlashcardType[]);
+                        setFlashcardsExplanations(item.explanations ?? null);
                         setFlashcardsError(null);
                         setFlashcardsOpen(true);
                       }
@@ -1975,11 +1995,13 @@ const handleMindMapLinked = useCallback(
         open={flashcardsOpen}
         title={flashcardsTitle}
         cards={flashcardsCards}
+        explanations={flashcardsExplanations ?? null}
         isGenerating={false}
         error={flashcardsError}
         onClose={() => {
           setFlashcardsOpen(false);
           setFlashcardsCards(null);
+          setFlashcardsExplanations(null);
           setFlashcardsError(null);
           setStudyDueOnly(false);
           setStudyInterleaved(false);
@@ -2122,6 +2144,7 @@ const handleMindMapLinked = useCallback(
 
                       setFlashcardsTitle(interleavedDeck.title);
                       setFlashcardsCards(interleavedDeck.cards as any); // cast needed due to deckId
+                      setFlashcardsExplanations(null);
                       setActiveDeckMindMapId(null);
                       setActiveDeckMindMapMarkdown(null);
                       setActiveDeckId(interleavedDeck.id);
@@ -2182,6 +2205,7 @@ const handleMindMapLinked = useCallback(
                           setSpacedOpen(false);
                           setFlashcardsTitle(f.title || 'flashcards');
                           setFlashcardsCards(arr);
+                          setFlashcardsExplanations(f.explanations ?? null);
                           setFlashcardsError(null);
                           setFlashcardsOpen(true);
                         }}
