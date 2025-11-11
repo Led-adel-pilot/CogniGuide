@@ -475,6 +475,24 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
     }
 
     if (!questionContent || !answerContent) return;
+
+    if (persistedExplanationEntry) {
+      explainRequestRef.current += 1;
+      setExplanationError(null);
+      setIsExplaining(false);
+      setShowExplanation(true);
+
+      const persistedText = persistedExplanationEntry.explanation.trim();
+      const formattedQuestion = `**${questionContent}**`;
+      const normalized = persistedText.startsWith(formattedQuestion)
+        ? persistedText
+        : persistedText
+          ? `${formattedQuestion}\n\n${persistedText}`
+          : formattedQuestion;
+      setExplanation(normalized);
+      return;
+    }
+
     const targetDeckId = studyInterleaved ? current?.deckId : deckId;
     const normalizedDeckId = targetDeckId && targetDeckId !== 'interleaved-session' ? targetDeckId : undefined;
     const targetCardIndex = studyInterleaved
@@ -575,6 +593,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
     isPaidUser,
     onRequireUpgrade,
     openAuthModal,
+    persistedExplanationEntry,
   ]);
 
   const handleExplanationBack = React.useCallback(() => {
