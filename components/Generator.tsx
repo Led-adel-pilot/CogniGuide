@@ -1541,63 +1541,80 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
                 }}
               />
               {warningMessages.map((message, index) => (
-                <div
-                  key={`warning-${index}-${message.slice(0, 12)}`}
-                  className={`${index === 0 ? 'mt-4' : 'mt-2'} flex items-start gap-3 rounded-[1.25rem] border border-amber-200/80 bg-amber-50/80 px-4 py-3 text-left text-sm text-amber-900`}
-                >
-                  <AlertTriangle className="h-5 w-5 flex-shrink-0 text-amber-500" />
-                  <p className="font-medium">{message}</p>
+                <div key={`warning-${index}-${message.slice(0, 12)}`} className={index === 0 ? 'mt-4' : 'mt-2'}>
+                  <div className="flex items-start gap-3 rounded-[1.25rem] border border-amber-200/80 bg-amber-50/80 px-4 py-3 text-left text-sm text-amber-900">
+                    <AlertTriangle className="h-5 w-5 flex-shrink-0 text-amber-500" />
+                    <p className="font-medium leading-snug">{message}</p>
+                  </div>
                 </div>
               ))}
               {error && (
-                <div className="mt-4 text-center p-4 bg-muted border border-border text-foreground rounded-[1.25rem]">
-                  <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-                    {typeof error === 'string'
-                      ? (() => {
-                          if (error === requireAuthErrorMessage) {
-                            return (
-                              <p className="font-medium text-center">
-                                Please{' '}
-                                <button
-                                  type="button"
-                                  onClick={() => setShowAuth(true)}
-                                  className="underline hover:no-underline font-semibold text-primary"
-                                  title="Open sign up modal"
-                                >
-                                  sign up
-                                </button>{' '}
-                                to generate with CogniGuide.
-                              </p>
-                            );
-                          }
+                <div className="mt-4">
+                  {typeof error === 'string'
+                    ? (() => {
+                        if (error === requireAuthErrorMessage) {
+                          return (
+                            <div className="rounded-[1.25rem] border border-primary/30 bg-primary/10 px-4 py-4 text-sm text-primary">
+                              <div className="flex items-start gap-3">
+                                <Sparkles className="h-5 w-5 flex-shrink-0 text-primary" />
+                                <p className="font-medium leading-snug">
+                                  Please{' '}
+                                  <button
+                                    type="button"
+                                    onClick={() => setShowAuth(true)}
+                                    className="underline hover:no-underline font-semibold text-primary"
+                                    title="Open sign up modal"
+                                  >
+                                    sign up
+                                  </button>{' '}
+                                  to generate with CogniGuide.
+                                </p>
+                              </div>
+                            </div>
+                          );
+                        }
 
-                          const lower = error.toLowerCase();
-                          const upgradeRelated = lower.includes('insufficient credits') || lower.includes('generation limit') || lower.includes('monthly generation');
-                          if (upgradeRelated) {
-                            return (
-                              <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-                                <p className="font-medium">{error}</p>
+                        const lower = error.toLowerCase();
+                        const upgradeRelated = lower.includes('insufficient credits') || lower.includes('generation limit') || lower.includes('monthly generation');
+                        if (upgradeRelated) {
+                          return (
+                            <div className="rounded-[1.25rem] border border-primary/30 bg-primary/10 px-4 py-4 text-sm text-primary">
+                              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                                <div className="flex items-start gap-3">
+                                  <Sparkles className="h-5 w-5 flex-shrink-0 text-primary" />
+                                  <p className="font-medium leading-snug">{error}</p>
+                                </div>
                                 <button
                                   type="button"
                                   onClick={handleUpgradeClick}
-                                  className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-full bg-primary/10 text-primary hover:bg-primary/20 border border-primary/20 transition-colors"
+                                  className="inline-flex items-center gap-2 self-start rounded-full border border-primary/20 bg-primary/10 px-4 py-2 text-sm font-semibold text-primary transition-colors hover:bg-primary/20"
                                   title="Upgrade your plan"
                                 >
                                   <Sparkles className="h-4 w-4" />
-                                  <span>Upload your Plan</span>
+                                  <span>Upgrade your plan</span>
                                 </button>
                               </div>
-                            );
-                          }
+                            </div>
+                          );
+                        }
 
-                          if (lower.includes('exceed')) {
-                            return <p className="font-medium">{error}</p>;
-                          }
-
-                          return <p className="font-medium">{error}</p>;
-                        })()
-                      : <p className="font-medium">{String(error)}</p>}
-                  </div>
+                        return (
+                          <div className="rounded-[1.25rem] border border-rose-200/80 bg-rose-50/80 px-4 py-4 text-sm text-rose-900">
+                            <div className="flex items-start gap-3">
+                              <AlertTriangle className="h-5 w-5 flex-shrink-0 text-rose-500" />
+                              <p className="font-medium leading-snug">{error}</p>
+                            </div>
+                          </div>
+                        );
+                      })()
+                    : (
+                        <div className="rounded-[1.25rem] border border-rose-200/80 bg-rose-50/80 px-4 py-4 text-sm text-rose-900">
+                          <div className="flex items-start gap-3">
+                            <AlertTriangle className="h-5 w-5 flex-shrink-0 text-rose-500" />
+                            <p className="font-medium leading-snug">{String(error)}</p>
+                          </div>
+                        </div>
+                      )}
                 </div>
               )}
             </div>
