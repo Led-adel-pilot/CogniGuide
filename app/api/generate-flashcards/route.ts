@@ -3,7 +3,7 @@ import OpenAI from 'openai';
 import type { ChatCompletionChunk } from 'openai/resources/chat/completions';
 import { Buffer } from 'node:buffer';
 import { getTextFromDocx, getTextFromPdf, getTextFromPptx, getTextFromPlainText, processMultipleFiles } from '@/lib/document-parser';
-import { MODEL_CREDIT_MULTIPLIERS, MODEL_REQUIRED_TIER, type ModelChoice } from '@/lib/plans';
+import { FREE_PLAN_GENERATIONS, MODEL_CREDIT_MULTIPLIERS, MODEL_REQUIRED_TIER, type ModelChoice } from '@/lib/plans';
 import { createClient } from '@supabase/supabase-js';
 
 const openai = new OpenAI({
@@ -130,7 +130,7 @@ async function ensureFreeMonthlyCredits(userId: string): Promise<void> {
     .single();
   const nowIso = new Date().toISOString();
   if (!data) {
-    await supabaseAdmin.from('user_credits').insert({ user_id: userId, credits: 8, last_refilled_at: nowIso });
+    await supabaseAdmin.from('user_credits').insert({ user_id: userId, credits: FREE_PLAN_GENERATIONS, last_refilled_at: nowIso });
     return;
   }
   const last = (data as any).last_refilled_at ? new Date((data as any).last_refilled_at) : null;
@@ -138,7 +138,7 @@ async function ensureFreeMonthlyCredits(userId: string): Promise<void> {
   if (!last || !isSameUtcMonth(last, now)) {
     await supabaseAdmin
       .from('user_credits')
-      .update({ credits: 8, last_refilled_at: nowIso, updated_at: nowIso })
+      .update({ credits: FREE_PLAN_GENERATIONS, last_refilled_at: nowIso, updated_at: nowIso })
       .eq('user_id', userId);
   }
 }
@@ -943,35 +943,48 @@ export async function POST(req: NextRequest) {
       if (!text && images.length === 0 && promptText && creditsNeeded < 1) creditsNeeded = 1;
       const multiplier = MODEL_CREDIT_MULTIPLIERS[modelChoice] ?? 1;
       creditsNeeded = Number((creditsNeeded * multiplier).toFixed(3));
-      if (userIdForCredits && creditsNeeded > 0) {
-        const currentCredits = await getCurrentCredits(userIdForCredits);
-        if (currentCredits === null) {
-          return NextResponse.json({
-            error: 'Credits service unavailable',
-            message: 'Unable to check your credit balance. Please try again later.',
-            code: 'CREDITS_SERVICE_ERROR'
-          }, { status: 503 });
-        }
+      const deductionAmount = userTier === 'paid' ? creditsNeeded : 1;
+      if (userIdForCredits) {
+        if (deductionAmount > 0) {
+          const currentCredits = await getCurrentCredits(userIdForCredits);
+          if (currentCredits === null) {
+            return NextResponse.json({
+              error: 'Credits service unavailable',
+              message: 'Unable to check your balance. Please try again later.',
+              code: 'CREDITS_SERVICE_ERROR'
+            }, { status: 503 });
+          }
 
-        if (currentCredits < creditsNeeded) {
-          const shortfall = creditsNeeded - currentCredits;
-          return NextResponse.json({
-            error: 'Insufficient credits',
-            message: `You need ${creditsNeeded.toFixed(1)} credits but only have ${currentCredits.toFixed(1)}. Please upload a smaller file or upgrade your plan.`,
-            code: 'INSUFFICIENT_CREDITS',
-            creditsNeeded: creditsNeeded,
-            creditsAvailable: currentCredits,
-            shortfall: shortfall
-          }, { status: 402 });
-        }
+          if (currentCredits < deductionAmount) {
+            if (userTier === 'paid') {
+              const shortfall = deductionAmount - currentCredits;
+              return NextResponse.json({
+                error: 'Insufficient credits',
+                message: `You need ${deductionAmount.toFixed(1)} credits but only have ${currentCredits.toFixed(1)}. Please upload a smaller file or upgrade your plan.`,
+                code: 'INSUFFICIENT_CREDITS',
+                creditsNeeded: deductionAmount,
+                creditsAvailable: currentCredits,
+                shortfall
+              }, { status: 402 });
+            }
 
-        const ok = await deductCredits(userIdForCredits, creditsNeeded);
-        if (!ok) {
-          return NextResponse.json({
-            error: 'Credit deduction failed',
-            message: 'Failed to deduct credits from your account. Please try again.',
-            code: 'CREDIT_DEDUCTION_ERROR'
-          }, { status: 500 });
+            return NextResponse.json({
+              error: 'Monthly generation limit reached',
+              message: `You have used all ${FREE_PLAN_GENERATIONS} free monthly generations. Upgrade to keep creating mind maps and flashcards without limits.`,
+              code: 'FREE_GENERATION_LIMIT_REACHED',
+              generationsRemaining: currentCredits,
+              generationLimit: FREE_PLAN_GENERATIONS
+            }, { status: 402 });
+          }
+
+          const ok = await deductCredits(userIdForCredits, deductionAmount);
+          if (!ok) {
+            return NextResponse.json({
+              error: 'Credit deduction failed',
+              message: 'Failed to update your balance. Please try again.',
+              code: 'CREDIT_DEDUCTION_ERROR'
+            }, { status: 500 });
+          }
         }
       }
 
@@ -1008,7 +1021,7 @@ export async function POST(req: NextRequest) {
         return streamNdjson(
           userContent,
           modelChoice,
-          (userIdForCredits && creditsNeeded > 0) ? { userId: userIdForCredits, credits: creditsNeeded } : undefined,
+          (userIdForCredits && deductionAmount > 0) ? { userId: userIdForCredits, credits: deductionAmount } : undefined,
           validImages,
           supabaseCleanupPaths,
         );
@@ -1166,6 +1179,7 @@ export async function POST(req: NextRequest) {
     if (imageParts.length > 0 && creditsNeeded < 0.5) creditsNeeded = 0.5;
     const multiplier = MODEL_CREDIT_MULTIPLIERS[modelChoice] ?? 1;
     creditsNeeded = Number((creditsNeeded * multiplier).toFixed(3));
+    const deductionAmount = userTier === 'paid' ? creditsNeeded : 1;
     if (userId) {
       try {
         await ensureFreeMonthlyCredits(userId);
@@ -1175,33 +1189,43 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    if (userId && creditsNeeded > 0) {
+    if (userId && deductionAmount > 0) {
       const currentCredits = await getCurrentCredits(userId);
       if (currentCredits === null) {
         return NextResponse.json({
           error: 'Credits service unavailable',
-          message: 'Unable to check your credit balance. Please try again later.',
+          message: 'Unable to check your balance. Please try again later.',
           code: 'CREDITS_SERVICE_ERROR'
         }, { status: 503 });
       }
 
-      if (currentCredits < creditsNeeded) {
-        const shortfall = creditsNeeded - currentCredits;
+      if (currentCredits < deductionAmount) {
+        if (userTier === 'paid') {
+          const shortfall = deductionAmount - currentCredits;
+          return NextResponse.json({
+            error: 'Insufficient credits',
+            message: `You need ${deductionAmount.toFixed(1)} credits but only have ${currentCredits.toFixed(1)}. Please upload a smaller file or upgrade your plan.`,
+            code: 'INSUFFICIENT_CREDITS',
+            creditsNeeded: deductionAmount,
+            creditsAvailable: currentCredits,
+            shortfall
+          }, { status: 402 });
+        }
+
         return NextResponse.json({
-          error: 'Insufficient credits',
-          message: `You need ${creditsNeeded.toFixed(1)} credits but only have ${currentCredits.toFixed(1)}. Please upload a smaller file or upgrade your plan.`,
-          code: 'INSUFFICIENT_CREDITS',
-          creditsNeeded: creditsNeeded,
-          creditsAvailable: currentCredits,
-          shortfall: shortfall
+          error: 'Monthly generation limit reached',
+          message: `You have used all ${FREE_PLAN_GENERATIONS} free monthly generations. Upgrade to keep creating mind maps and flashcards without limits.`,
+          code: 'FREE_GENERATION_LIMIT_REACHED',
+          generationsRemaining: currentCredits,
+          generationLimit: FREE_PLAN_GENERATIONS
         }, { status: 402 });
       }
 
-      const ok = await deductCredits(userId, creditsNeeded);
+      const ok = await deductCredits(userId, deductionAmount);
       if (!ok) {
         return NextResponse.json({
           error: 'Credit deduction failed',
-          message: 'Failed to deduct credits from your account. Please try again.',
+          message: 'Failed to update your balance. Please try again.',
           code: 'CREDIT_DEDUCTION_ERROR'
         }, { status: 500 });
       }
@@ -1245,7 +1269,7 @@ export async function POST(req: NextRequest) {
       return streamNdjson(
         userContent,
         modelChoice,
-        (userId && creditsNeeded > 0) ? { userId, credits: creditsNeeded } : undefined,
+        (userId && deductionAmount > 0) ? { userId, credits: deductionAmount } : undefined,
         validImageParts.map(img => img.image_url.url),
         [],
       );

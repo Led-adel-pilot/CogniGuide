@@ -171,6 +171,10 @@ export default function DashboardClient() {
   const [isModeMenuOpen, setIsModeMenuOpen] = useState(false);
   const [hoveredModel, setHoveredModel] = useState<ModelChoice | null>(null);
   const isPaidUser = userTier === 'paid';
+  const balanceDisplay = isPaidUser
+    ? (Math.floor(credits * 10) / 10).toFixed(1)
+    : Math.max(0, Math.floor(credits)).toString();
+  const balanceLabel = isPaidUser ? 'Credits' : 'Generations left';
   const modelDetails: Record<
     ModelChoice,
     {
@@ -1797,7 +1801,7 @@ const handleMindMapLinked = useCallback(
               <div className="font-medium line-clamp-1">{displayName}</div>
               <div className="text-xs text-muted-foreground flex items-center gap-1">
                 <Coins className="h-3 w-3" />
-                <span>{(Math.floor(credits * 10) / 10).toFixed(1)} Credits</span>
+                <span>{balanceDisplay} {balanceLabel}</span>
               </div>
             </div>
           </button>
