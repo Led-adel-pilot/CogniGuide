@@ -1979,6 +1979,7 @@ const handleMindMapLinked = useCallback(
               modelChoice={selectedModel}
               isPaidSubscriber={isPaidUser}
               onRequireUpgrade={() => setIsPricingModalOpen(true)}
+              freeGenerationsRemaining={!isPaidUser ? credits : undefined}
             />
           </div>
         </div>

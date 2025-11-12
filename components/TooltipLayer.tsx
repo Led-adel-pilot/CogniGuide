@@ -284,7 +284,7 @@ export default function TooltipLayer() {
         visibility: position.ready ? "visible" : "hidden",
       }}
     >
-      <span className="block break-words text-left leading-snug">{tooltip.text}</span>
+      <span className="block break-words text-center leading-snug whitespace-pre-line">{tooltip.text}</span>
     </div>,
     document.body,
   );

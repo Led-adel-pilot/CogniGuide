@@ -7,7 +7,7 @@ import posthog from 'posthog-js';
 import Dropzone from '@/components/Dropzone';
 import PromptForm from '@/components/PromptForm';
 import { supabase } from '@/lib/supabaseClient';
-import { type ModelChoice } from '@/lib/plans';
+import { FREE_PLAN_GENERATIONS, type ModelChoice } from '@/lib/plans';
 import { AlertTriangle, Sparkles } from 'lucide-react';
 import type AuthModalComponent from '@/components/AuthModal';
 import type MindMapModalComponent from '@/components/MindMapModal';
@@ -34,9 +34,18 @@ interface GeneratorProps {
   modelChoice?: ModelChoice;
   isPaidSubscriber?: boolean;
   onRequireUpgrade?: () => void;
+  freeGenerationsRemaining?: number;
 }
 
-export default function Generator({ redirectOnAuth = false, showTitle = true, compact = false, modelChoice = 'fast', isPaidSubscriber, onRequireUpgrade }: GeneratorProps) {
+export default function Generator({
+  redirectOnAuth = false,
+  showTitle = true,
+  compact = false,
+  modelChoice = 'fast',
+  isPaidSubscriber,
+  onRequireUpgrade,
+  freeGenerationsRemaining,
+}: GeneratorProps) {
   // Enforce a client-side per-file size cap to avoid server 413s (Vercel ~4.5MB)
   const MAX_FILE_BYTES = Math.floor(50 * 1024 * 1024); // 50MB per file when using Supabase Storage
   const [files, setFiles] = useState<File[]>([]);
@@ -89,6 +98,10 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
   const [uploadProgress, setUploadProgress] = useState<number | undefined>(undefined);
   const router = useRouter();
   const resolvedIsPaidSubscriber = typeof isPaidSubscriber === 'boolean' ? isPaidSubscriber : isPaidSubscriberState;
+  const normalizedFreeGenerations =
+    !resolvedIsPaidSubscriber && typeof freeGenerationsRemaining === 'number' && Number.isFinite(freeGenerationsRemaining)
+      ? Math.max(0, Math.min(FREE_PLAN_GENERATIONS, Math.floor(freeGenerationsRemaining)))
+      : null;
   const limitExceededCacheRef = useRef<{
     signature: string;
     preParsed: { text: string; images: string[]; rawCharCount?: number } | null;
@@ -96,7 +109,11 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
     error: string | null;
   } | null>(null);
   const ctaLabel = mode === 'flashcards' ? 'Generate Flashcards' : 'Generate Mind Map';
-  const ctaTooltip = mode === 'flashcards' ? 'Generate flashcards' : 'Generate mind map';
+  const baseCtaTooltip = mode === 'flashcards' ? 'Generate flashcards' : 'Generate mind map';
+  const ctaTooltip =
+    normalizedFreeGenerations !== null
+      ? `${baseCtaTooltip}\n${normalizedFreeGenerations} of ${FREE_PLAN_GENERATIONS} free uses remaining`
+      : baseCtaTooltip;
 
   const evaluateLowTextWarning = useCallback((text: string, rawCharCount: number | undefined, fileList?: File[] | null) => {
     if (!fileList || fileList.length === 0) {
