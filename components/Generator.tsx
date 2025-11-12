@@ -992,7 +992,11 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
           let msg = 'Insufficient credits. Upload a smaller file or';
           try {
             const j = await res.json() as Record<string, unknown>;
-            if (typeof j?.error === 'string') msg = j.error;
+            if (typeof j?.code === 'string' && j.code === 'FREE_GENERATION_LIMIT_REACHED') {
+              msg = typeof j?.message === 'string' ? j.message : 'Monthly generation limit reached. Upgrade to keep creating more.';
+            } else if (typeof j?.error === 'string') {
+              msg = j.error;
+            }
           } catch {}
           setError(msg);
           setIsLoading(false);
@@ -1227,6 +1231,21 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
           headers: headers,
         });
       }
+      if (response.status === 402) {
+        let msg = 'Insufficient credits. Upload a smaller file or upgrade your plan.';
+        try {
+          const j = await response.json() as Record<string, unknown>;
+          if (typeof j?.code === 'string' && j.code === 'FREE_GENERATION_LIMIT_REACHED') {
+            msg = typeof j?.message === 'string' ? j.message : 'Monthly generation limit reached. Upgrade to keep creating more.';
+          } else if (typeof j?.error === 'string') {
+            msg = j.error;
+          }
+        } catch {}
+        setError(msg);
+        setIsLoading(false);
+        return;
+      }
+
       const contentType = response.headers.get('content-type') || '';
       if (!response.ok) {
         if (response.status === 429) {
@@ -1533,43 +1552,51 @@ export default function Generator({ redirectOnAuth = false, showTitle = true, co
               {error && (
                 <div className="mt-4 text-center p-4 bg-muted border border-border text-foreground rounded-[1.25rem]">
                   <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-                    {typeof error === 'string' && error.toLowerCase().includes('insufficient credits') && (
-                      <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-                        <p className="font-medium">{error}</p>
-                        <button
-                          type="button"
-                          onClick={handleUpgradeClick}
-                          className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-full bg-primary/10 text-primary hover:bg-primary/20 border border-primary/20 transition-colors"
-                          title="Upgrade your plan"
-                        >
-                          <Sparkles className="h-4 w-4" />
-                          <span>Upload your Plan</span>
-                        </button>
-                      </div>
-                    )}
-                    {typeof error === 'string' && error === requireAuthErrorMessage && (
-                      <p className="font-medium text-center">
-                        Please{' '}
-                        <button
-                          type="button"
-                          onClick={() => setShowAuth(true)}
-                          className="underline hover:no-underline font-semibold text-primary"
-                          title="Open sign up modal"
-                        >
-                          sign up
-                        </button>{' '}
-                        to generate with CogniGuide.
-                      </p>
-                    )}
-                    {typeof error === 'string' &&
-                     !error.toLowerCase().includes('insufficient credits') &&
-                     error !== requireAuthErrorMessage &&
-                     !error.toLowerCase().includes('exceed') && (
-                      <p className="font-medium">{error}</p>
-                    )}
-                    {typeof error === 'string' && error.toLowerCase().includes('exceed') && (
-                      <p className="font-medium">{error}</p>
-                    )}
+                    {typeof error === 'string'
+                      ? (() => {
+                          if (error === requireAuthErrorMessage) {
+                            return (
+                              <p className="font-medium text-center">
+                                Please{' '}
+                                <button
+                                  type="button"
+                                  onClick={() => setShowAuth(true)}
+                                  className="underline hover:no-underline font-semibold text-primary"
+                                  title="Open sign up modal"
+                                >
+                                  sign up
+                                </button>{' '}
+                                to generate with CogniGuide.
+                              </p>
+                            );
+                          }
+
+                          const lower = error.toLowerCase();
+                          const upgradeRelated = lower.includes('insufficient credits') || lower.includes('generation limit') || lower.includes('monthly generation');
+                          if (upgradeRelated) {
+                            return (
+                              <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+                                <p className="font-medium">{error}</p>
+                                <button
+                                  type="button"
+                                  onClick={handleUpgradeClick}
+                                  className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-full bg-primary/10 text-primary hover:bg-primary/20 border border-primary/20 transition-colors"
+                                  title="Upgrade your plan"
+                                >
+                                  <Sparkles className="h-4 w-4" />
+                                  <span>Upload your Plan</span>
+                                </button>
+                              </div>
+                            );
+                          }
+
+                          if (lower.includes('exceed')) {
+                            return <p className="font-medium">{error}</p>;
+                          }
+
+                          return <p className="font-medium">{error}</p>;
+                        })()
+                      : <p className="font-medium">{String(error)}</p>}
                   </div>
                 </div>
               )}
