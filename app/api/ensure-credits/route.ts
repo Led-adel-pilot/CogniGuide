@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
-import { FREE_PLAN_CREDITS } from '@/lib/plans';
+import { FREE_PLAN_GENERATIONS } from '@/lib/plans';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
@@ -37,7 +37,7 @@ async function hasActiveSubscription(userId: string): Promise<boolean> {
 }
 
 async function ensureInitialOrMonthlyFreeCredits(userId: string): Promise<{ credits: number }> {
-  if (!supabaseAdmin) return { credits: FREE_PLAN_CREDITS };
+  if (!supabaseAdmin) return { credits: FREE_PLAN_GENERATIONS };
   try {
     const active = await hasActiveSubscription(userId);
     if (active) {
@@ -47,8 +47,8 @@ async function ensureInitialOrMonthlyFreeCredits(userId: string): Promise<{ cred
         .select('credits')
         .eq('user_id', userId)
         .single();
-      const credits = Number((data as any)?.credits ?? FREE_PLAN_CREDITS);
-      return { credits: Number.isFinite(credits) ? credits : FREE_PLAN_CREDITS };
+      const credits = Number((data as any)?.credits ?? FREE_PLAN_GENERATIONS);
+      return { credits: Number.isFinite(credits) ? credits : FREE_PLAN_GENERATIONS };
     }
   } catch {}
 
@@ -63,10 +63,10 @@ async function ensureInitialOrMonthlyFreeCredits(userId: string): Promise<{ cred
     // Insert new record and return credits
     await supabaseAdmin.from('user_credits').insert({
       user_id: userId,
-      credits: FREE_PLAN_CREDITS,
+      credits: FREE_PLAN_GENERATIONS,
       last_refilled_at: nowIso,
     });
-    return { credits: FREE_PLAN_CREDITS };
+    return { credits: FREE_PLAN_GENERATIONS };
   }
 
   const last = (data as any).last_refilled_at ? new Date((data as any).last_refilled_at) : null;
@@ -74,9 +74,9 @@ async function ensureInitialOrMonthlyFreeCredits(userId: string): Promise<{ cred
   const now = new Date(nowIso);
 
   if (!last) {
-    const baselineCredits = Number.isFinite(currentCredits) && currentCredits >= FREE_PLAN_CREDITS
+    const baselineCredits = Number.isFinite(currentCredits) && currentCredits >= FREE_PLAN_GENERATIONS
       ? currentCredits
-      : (Number.isFinite(currentCredits) ? currentCredits : 0) + FREE_PLAN_CREDITS;
+      : (Number.isFinite(currentCredits) ? currentCredits : 0) + FREE_PLAN_GENERATIONS;
 
     await supabaseAdmin
       .from('user_credits')
@@ -94,13 +94,13 @@ async function ensureInitialOrMonthlyFreeCredits(userId: string): Promise<{ cred
     // Update credits and return new amount
     await supabaseAdmin
       .from('user_credits')
-      .update({ credits: FREE_PLAN_CREDITS, last_refilled_at: nowIso, updated_at: nowIso })
+      .update({ credits: FREE_PLAN_GENERATIONS, last_refilled_at: nowIso, updated_at: nowIso })
       .eq('user_id', userId);
-    return { credits: FREE_PLAN_CREDITS };
+    return { credits: FREE_PLAN_GENERATIONS };
   }
 
   // Return existing credits
-  return { credits: Number.isFinite(currentCredits) ? currentCredits : FREE_PLAN_CREDITS };
+  return { credits: Number.isFinite(currentCredits) ? currentCredits : FREE_PLAN_GENERATIONS };
 }
 
 export async function POST(req: NextRequest) {

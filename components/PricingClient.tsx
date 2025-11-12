@@ -6,7 +6,7 @@ import { Check, X } from 'lucide-react';
 import { supabase } from '@/lib/supabaseClient';
 import AuthModal from '@/components/AuthModal';
 import { User } from '@supabase/supabase-js';
-import { PAID_PLANS, FREE_PLAN_CREDITS, MODEL_CREDIT_MULTIPLIERS } from '@/lib/plans';
+import { PAID_PLANS, FREE_PLAN_GENERATIONS, MODEL_CREDIT_MULTIPLIERS } from '@/lib/plans';
 
 type BillingCycle = 'month' | 'year';
 
@@ -483,7 +483,7 @@ export default function PricingClient({ onPurchaseComplete }: PricingClientProps
               </button>
             )}
             <ul className="space-y-2 text-sm mb-6">
-              <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> {FREE_PLAN_CREDITS} monthly credits</li>
+              <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> {FREE_PLAN_GENERATIONS} monthly generations</li>
               <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> Mind maps + flashcards</li>
               <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> Spaced repetition</li>
               <li className="flex items-center gap-2 text-muted-foreground">

@@ -8,7 +8,7 @@ CogniGuide is a comprehensive AI-powered study assistant that uses a sophisticat
 The application uses a centralized plan configuration system in `lib/plans.ts` that provides a single source of truth for all subscription and credit settings:
 
 - **PAID_PLANS**: Object defining Student and Pro plan details (credits, price IDs)
-- **FREE_PLAN_CREDITS**: Constant for free tier monthly credits (8)
+- **FREE_PLAN_GENERATIONS**: Constant for free tier monthly generations (8)
 - **Helper Functions**: `getPlanByPriceId()` and `getCreditsByPriceId()` for plan lookups
 
 This approach eliminates hardcoded values throughout the codebase and makes plan management more maintainable.

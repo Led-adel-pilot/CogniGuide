@@ -926,7 +926,7 @@ NEXT_PUBLIC_BASE_URL=your_production_domain # Optional: defaults to deployment U
 - Integration lives in `components/PricingClient.tsx` and is mounted from `app/pricing/page.tsx`.
 - Centralized plan configuration in `lib/plans.ts` for easy maintenance:
   - `PAID_PLANS` object defines all plan details (credits, price IDs)
-  - `FREE_PLAN_CREDITS` constant for authenticated free tier users
+  - `FREE_PLAN_GENERATIONS` constant for authenticated free tier users
   - `NON_AUTH_FREE_LIMIT` constant for non-authenticated users (generation limit)
   - `MODEL_CREDIT_MULTIPLIERS`/`MODEL_REQUIRED_TIER` define fast vs. smart mode pricing and access, with a shared `ModelChoice` type for API handlers
   - Helper functions for plan lookup and credit calculation
@@ -940,7 +940,7 @@ NEXT_PUBLIC_BASE_URL=your_production_domain # Optional: defaults to deployment U
   - Monthly credits are granted based on the authenticated user's plan. Tables used: `customers`, `subscriptions`, and `user_credits` in Supabase.
   - **Non-authenticated users**: Do not use the credit system but have generation limits instead (see `NON_AUTH_FREE_LIMIT` in `lib/plans.ts`).
   - Events handled: `subscription.created`, `subscription.updated`, `subscription.canceled` to provision/update/revoke credits automatically.
-  - **Free Plan**: Users receive 50 credits monthly (configured via `FREE_PLAN_CREDITS` in `lib/plans.ts`)
+  - **Free Plan**: Users receive 8 generations monthly (configured via `FREE_PLAN_GENERATIONS` in `lib/plans.ts`)
   - **Student Plan**: 300 credits monthly
   - **Pro Plan**: 1000 credits monthly
   - **Per‑request deduction (server‑side enforced)**:
