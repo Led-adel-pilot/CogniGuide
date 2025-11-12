@@ -174,7 +174,7 @@ export default function DashboardClient() {
   const balanceDisplay = isPaidUser
     ? (Math.floor(credits * 10) / 10).toFixed(1)
     : Math.max(0, Math.floor(credits)).toString();
-  const balanceLabel = isPaidUser ? 'Credits' : 'Generations left';
+  const balanceLabel = isPaidUser ? 'Credits' : 'Monthly Generations left';
   const modelDetails: Record<
     ModelChoice,
     {
