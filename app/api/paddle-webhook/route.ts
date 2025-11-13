@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import { Readable } from 'stream';
 import crypto from 'crypto';
 import { createClient } from '@supabase/supabase-js';
 import { getCreditsByPriceId, PAID_PLANS, type Plan } from "@/lib/plans";
@@ -34,16 +33,6 @@ interface PaddleCustomData {
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
 const supabase = createClient(supabaseUrl, supabaseServiceKey);
-
-// Helper function to buffer the request stream
-async function buffer(readable: Readable | null): Promise<Buffer> {
-  if (!readable) return Buffer.alloc(0);
-  const chunks: Buffer[] = [];
-  for await (const chunk of readable) {
-    chunks.push(typeof chunk === 'string' ? Buffer.from(chunk) : chunk);
-  }
-  return Buffer.concat(chunks);
-}
 
 function normalizeCustomData(raw: unknown): PaddleCustomData {
   if (!raw) return {};
@@ -83,8 +72,7 @@ function getPlanIdentifier(
 
 export async function POST(req: NextRequest) {
   try {
-    const nodeStream = req.body ? Readable.fromWeb(req.body) : null;
-    const rawBody = await buffer(nodeStream);
+    const rawBody = Buffer.from(await req.arrayBuffer());
     const signature = req.headers.get('paddle-signature') || '';
     const secret = process.env.PADDLE_WEBHOOK_SECRET || '';
 
