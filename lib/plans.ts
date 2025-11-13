@@ -39,6 +39,7 @@ export const FEATURE_REQUIRED_TIER = {
 export type ModelChoice = keyof typeof MODEL_CREDIT_MULTIPLIERS;
 
 export function getPlanByPriceId(priceId: string): Plan | null {
+  if (!priceId) return null;
   for (const plan in PAID_PLANS) {
     const typedPlan = plan as Plan;
     const planDetails = PAID_PLANS[typedPlan];
@@ -49,10 +50,19 @@ export function getPlanByPriceId(priceId: string): Plan | null {
   return null;
 }
 
-export function getCreditsByPriceId(priceId: string): number | null {
-  const plan = getPlanByPriceId(priceId);
+function isPlanKey(value: string): value is Plan {
+  return Boolean(value) && Object.prototype.hasOwnProperty.call(PAID_PLANS, value);
+}
+
+export function getCreditsByPriceId(identifier: string): number | null {
+  if (!identifier) return null;
+  const plan = getPlanByPriceId(identifier);
   if (plan) {
     return PAID_PLANS[plan].credits;
   }
+  if (isPlanKey(identifier)) {
+    return PAID_PLANS[identifier].credits;
+  }
   return null;
 }
+

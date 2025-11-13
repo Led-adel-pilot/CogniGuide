@@ -309,6 +309,8 @@ export default function PricingClient({ onPurchaseComplete }: PricingClientProps
           ],
           customData: {
             user_id: currentUser.id,
+            plan_key: plan,
+            billing_cycle: billingCycle,
           },
           settings: {
             theme: 'light',
