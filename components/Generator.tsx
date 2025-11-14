@@ -26,6 +26,7 @@ const FlashcardsModal = dynamic<FlashcardsModalProps>(() => import('@/components
 const LOW_TEXT_CHAR_THRESHOLD = 40;
 const SCANNED_PDF_WARNING = 'We couldn\'t detect much selectable text in your PDF. If it\'s a scanned image, run OCR or upload a text-based copy so the AI can read it.';
 const HIGH_DEMAND_WARNING_MESSAGE = 'We are experiencing high demand right now. Please try again in a few minutes.';
+const OUT_OF_GENERATIONS_MESSAGE = 'You\'re out of generations for this month. Upgrade your plan so you don\'t lose study momentum before your exam.';
 
 interface GeneratorProps {
   redirectOnAuth?: boolean;
@@ -114,6 +115,7 @@ export default function Generator({
     normalizedFreeGenerations !== null
       ? `${baseCtaTooltip}\n${normalizedFreeGenerations} of ${FREE_PLAN_GENERATIONS} free uses remaining`
       : baseCtaTooltip;
+  const isOutOfFreeGenerations = normalizedFreeGenerations === 0 && !resolvedIsPaidSubscriber;
 
   const evaluateLowTextWarning = useCallback((text: string, rawCharCount: number | undefined, fileList?: File[] | null) => {
     if (!fileList || fileList.length === 0) {
@@ -902,6 +904,11 @@ export default function Generator({
         return;
       }
 
+      if (isOutOfFreeGenerations) {
+        setError(OUT_OF_GENERATIONS_MESSAGE);
+        return;
+      }
+
       // Only clear error and start loading if we pass the validation checks
       setIsLoading(true);
       setError(null);
@@ -1170,6 +1177,11 @@ export default function Generator({
 
     if (files.length === 0 && !trimmedPrompt) {
       setError('Please upload at least one file or enter a text prompt to generate a mind map.');
+      return;
+    }
+
+    if (isOutOfFreeGenerations) {
+      setError(OUT_OF_GENERATIONS_MESSAGE);
       return;
     }
 
