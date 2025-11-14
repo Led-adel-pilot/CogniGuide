@@ -8,7 +8,7 @@ import {
 
 const DAY_IN_MS = 24 * 60 * 60 * 1000;
 const TRIAL_DURATION_MS = REVERSE_TRIAL.durationDays * DAY_IN_MS;
-const PAID_STATUS_SET = new Set(PAID_SUBSCRIPTION_STATUSES);
+const PAID_STATUS_SET = new Set<string>(PAID_SUBSCRIPTION_STATUSES);
 
 type NullableSupabase = SupabaseClient<any, 'public', any> | null;
 
