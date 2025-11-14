@@ -362,6 +362,7 @@ export default function PricingClient({ onPurchaseComplete }: PricingClientProps
   }
 
   const studentDailyCostText = getDailyCostText('student');
+  const studentDeckEstimate = getDeckEstimate(PAID_PLANS.student.credits);
 
   return (
     <section className="py-4 pb-16">
@@ -436,7 +437,7 @@ export default function PricingClient({ onPurchaseComplete }: PricingClientProps
           <div className="relative flex h-full flex-col rounded-[1.25rem] border-2 border-primary bg-primary/5 p-6 shadow-lg ring-2 ring-primary/20 dark:bg-primary/20">
             <div className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full border border-primary bg-primary text-primary-foreground px-3 py-1 text-xs font-semibold shadow">Most popular</div>
             <h3 className="text-xl font-bold font-heading mb-1">Student</h3>
-            <p className="text-muted-foreground mb-6">Everything you need for real exam prep.</p>
+            <p className="text-muted-foreground mb-6">Everything you need to learn a semester’s content before your exam.</p>
             <div className="mb-6">
               <div
                 className="text-3xl font-extrabold flex items-baseline gap-2"
@@ -464,7 +465,15 @@ export default function PricingClient({ onPurchaseComplete }: PricingClientProps
               Cancel anytime. Secure Paddle checkout.
             </p>
             <ul className="space-y-2 text-sm">
-              <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> {PAID_PLANS.student.credits} monthly credits</li>
+              <li className="flex items-center gap-2">
+                <Check className="h-4 w-4 text-primary" />
+                <span className="flex-1">
+                  <span>{PAID_PLANS.student.credits} monthly credits</span>
+                  {studentDeckEstimate > 0 && (
+                    <span className="ml-1">: enough for ~{studentDeckEstimate} monthly generations</span>
+                  )}
+                </span>
+              </li>
               <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> Mind maps + flashcards</li>
               <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> Spaced repetition</li>
               <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> AI Flashcard Explanations</li>
@@ -580,4 +589,10 @@ function parsePriceText(priceText: string | null): { amount: number; prefix: str
   const amount = Number.parseFloat(normalized);
   if (!Number.isFinite(amount)) return null;
   return { amount, prefix, suffix };
+}
+
+function getDeckEstimate(credits: number): number {
+  if (!credits || credits <= 0) return 0;
+  const decks = credits / 3.15;
+  return Math.ceil(decks / 100) * 100;
 }
