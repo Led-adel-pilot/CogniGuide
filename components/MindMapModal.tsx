@@ -40,10 +40,33 @@ export default function MindMapModal({ markdown, onClose, onShareMindMap, isPaid
   const collapseRequestedRef = useRef(false);
   const hasAutoCollapsedRef = useRef(false);
   const pendingFocusNodeIdRef = useRef<string | null>(null);
+  const dropdownCloseTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // NEW: ref and state to size the dropdown to the trigger width
   const triggerGroupRef = useRef<HTMLDivElement>(null);
   const [dropdownWidth, setDropdownWidth] = useState<number | undefined>(undefined);
+
+  const cancelPendingDropdownClose = useCallback(() => {
+    if (dropdownCloseTimeoutRef.current !== null) {
+      clearTimeout(dropdownCloseTimeoutRef.current);
+      dropdownCloseTimeoutRef.current = null;
+    }
+  }, []);
+
+  const scheduleDropdownClose = useCallback(() => {
+    if (!isDropdownOpen) return;
+    cancelPendingDropdownClose();
+    dropdownCloseTimeoutRef.current = setTimeout(() => {
+      setDropdownOpen(false);
+      dropdownCloseTimeoutRef.current = null;
+    }, 150);
+  }, [cancelPendingDropdownClose, isDropdownOpen]);
+
+  useEffect(() => {
+    return () => {
+      cancelPendingDropdownClose();
+    };
+  }, [cancelPendingDropdownClose]);
 
   // Will capture computed font-family to inline during export
   const getComputedFontFamily = () => {
@@ -944,18 +967,24 @@ export default function MindMapModal({ markdown, onClose, onShareMindMap, isPaid
       <div className={rootClassName} style={rootStyle}>
         <div className={containerClassName} style={{ backgroundColor: 'var(--color-background)' }}>
           <div className="absolute top-2 right-2 z-30 group inline-flex items-center gap-1.5">
-            <div className="relative">
+            <div
+              className="relative"
+              onMouseEnter={cancelPendingDropdownClose}
+              onMouseLeave={scheduleDropdownClose}
+            >
               <div
                 ref={triggerGroupRef}
                 className="inline-flex rounded-full opacity-0 translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 ease-in-out pointer-events-none group-hover:pointer-events-auto"
               >
                 <button
+                  key={isDropdownOpen ? 'download-open' : 'download-closed'}
                   onClick={() => setDropdownOpen(!isDropdownOpen)}
                   className="inline-flex items-center gap-1 px-4 py-1.5 rounded-full border border-border text-foreground hover:bg-muted/50 text-sm focus:outline-none min-w-[44px]"
                   style={{ backgroundColor: 'var(--color-background)' }}
                   aria-haspopup="menu"
                   aria-expanded={isDropdownOpen}
-                  title="Download mind map"
+                  aria-label="Download mind map"
+                  data-tooltip={isDropdownOpen ? undefined : 'Download mind map'}
                 >
                   <Download className="h-4 w-4" />
                   <svg className="h-4 w-4 ml-1 -mr-0.5" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" /></svg>
@@ -964,7 +993,7 @@ export default function MindMapModal({ markdown, onClose, onShareMindMap, isPaid
 
               {isDropdownOpen && (
                 <div
-                  className="absolute right-0 mt-2 rounded-3xl shadow-sm z-20 border border-border p-2 min-w-[120px]"
+                  className="absolute right-0 mt-2 rounded-xl shadow-sm z-20 border border-border p-2 min-w-[120px]"
                   style={{
                     backgroundColor: 'var(--color-background)',
                     width: Math.max(dropdownWidth || 0, 120)
@@ -975,16 +1004,14 @@ export default function MindMapModal({ markdown, onClose, onShareMindMap, isPaid
                     <button
                       type="button"
                       onClick={() => { posthog.capture('mindmap_exported', { format: 'png' }); handleDownload('png'); setDropdownOpen(false); }}
-                      className="w-full flex items-center gap-2 px-3 py-1.5 text-sm text-foreground hover:bg-muted rounded-xl focus:outline-none"
-                      title="Download as PNG"
+                      className="w-full flex items-center gap-2 px-3 py-1.5 text-sm text-foreground hover:bg-muted rounded-lg focus:outline-none"
                     >
                       <FileImage className="h-4 w-4" /> PNG
                     </button>
                     <button
                       type="button"
                       onClick={() => { posthog.capture('mindmap_exported', { format: 'pdf' }); handleDownload('pdf'); setDropdownOpen(false); }}
-                      className="w-full flex items-center gap-2 px-3 py-1.5 text-sm text-foreground hover:bg-muted rounded-xl focus:outline-none"
-                      title="Download as PDF"
+                      className="w-full flex items-center gap-2 px-3 py-1.5 text-sm text-foreground hover:bg-muted rounded-lg focus:outline-none"
                     >
                       <FileImage className="h-4 w-4" /> PDF
                     </button>
