@@ -333,7 +333,7 @@ export async function POST(req: NextRequest) {
 
             return NextResponse.json({
               error: 'Monthly generation limit reached',
-              message: `You have used all ${FREE_PLAN_GENERATIONS} free monthly generations. Upgrade to keep creating mind maps and flashcards without limits.`,
+              message: `You're out of generations for this month. Upgrade your plan so you don't lose study momentum before your exam.`,
               code: 'FREE_GENERATION_LIMIT_REACHED',
               generationsRemaining: currentCredits,
               generationLimit: FREE_PLAN_GENERATIONS

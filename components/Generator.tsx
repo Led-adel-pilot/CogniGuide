@@ -1592,7 +1592,12 @@ export default function Generator({
                         }
 
                         const lower = error.toLowerCase();
-                        const upgradeRelated = lower.includes('insufficient credits') || lower.includes('generation limit') || lower.includes('monthly generation');
+                        const upgradeRelated =
+                          lower.includes('insufficient credits') ||
+                          lower.includes('generation limit') ||
+                          lower.includes('monthly generation') ||
+                          lower.includes('out of generations') ||
+                          lower.includes('generations for this month');
                         if (upgradeRelated) {
                           return (
                             <div className="rounded-[1.25rem] border border-primary/30 bg-primary/10 px-4 py-4 text-sm text-primary">
@@ -1604,8 +1609,7 @@ export default function Generator({
                                 <button
                                   type="button"
                                   onClick={handleUpgradeClick}
-                                  className="inline-flex items-center gap-2 self-start rounded-full border border-primary/20 bg-primary/10 px-4 py-2 text-sm font-semibold text-primary transition-colors hover:bg-primary/20"
-                                  title="Upgrade your plan"
+                                  className="inline-flex items-center gap-2 self-start rounded-full border border-primary/20 bg-primary/10 px-4 py-2 text-sm font-semibold text-primary transition-colors hover:bg-primary/20 whitespace-nowrap"
                                 >
                                   <Sparkles className="h-4 w-4" />
                                   <span>Upgrade your plan</span>
