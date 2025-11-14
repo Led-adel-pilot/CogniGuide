@@ -271,19 +271,6 @@ export default function PricingClient({ onPurchaseComplete }: PricingClientProps
     );
   };
 
-const renderSecondaryPrice = (planKey: 'student' | 'pro') => {
-    const alternateCycle: BillingCycle = billingCycle === 'month' ? 'year' : 'month';
-    const price = prices[planKey][alternateCycle];
-    if (!price) {
-      return <span className="inline-flex h-4 w-24 animate-pulse rounded bg-muted" aria-hidden="true" />;
-    }
-    return (
-      <span>
-        {price} / {alternateCycle}
-      </span>
-    );
-  };
-
   const isButtonDisabled = useCallback(
     (planKey: 'student' | 'pro') => {
       if (!isConfigured || !paddleReady) return true;
@@ -423,9 +410,6 @@ const renderSecondaryPrice = (planKey: 'student' | 'pro') => {
               >
                 {renderPrimaryPrice('pro')}
               </div>
-              <div className="text-sm text-muted-foreground min-h-[1.25rem]">
-                {renderSecondaryPrice('pro')}
-              </div>
             </div>
             <button
               onClick={() => handleChoosePlan('pro')}
@@ -449,7 +433,7 @@ const renderSecondaryPrice = (planKey: 'student' | 'pro') => {
           </div>
 
           {/* Student (Most Popular) */}
-          <div className="relative flex h-full flex-col rounded-[1.25rem] border-2 border-primary bg-gradient-to-b from-primary/10 via-primary/5 to-transparent p-6 shadow-lg ring-2 ring-primary/20 dark:from-primary/20 dark:via-primary/10 dark:to-transparent">
+          <div className="relative flex h-full flex-col rounded-[1.25rem] border-2 border-primary bg-primary/5 p-6 shadow-lg ring-2 ring-primary/20 dark:bg-primary/20">
             <div className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full border border-primary bg-primary text-primary-foreground px-3 py-1 text-xs font-semibold shadow">Most popular</div>
             <h3 className="text-xl font-bold font-heading mb-1">Student</h3>
             <p className="text-muted-foreground mb-6">Everything you need for real exam prep.</p>
@@ -460,9 +444,6 @@ const renderSecondaryPrice = (planKey: 'student' | 'pro') => {
                 aria-busy={pricesLoading || !prices.student[billingCycle]}
               >
                 {renderPrimaryPrice('student')}
-              </div>
-              <div className="text-sm text-muted-foreground min-h-[1.25rem]">
-                {renderSecondaryPrice('student')}
               </div>
               {studentDailyCostText && (
                 <div className="mt-2 text-xs font-semibold text-primary">
@@ -500,7 +481,6 @@ const renderSecondaryPrice = (planKey: 'student' | 'pro') => {
             <p className="text-muted-foreground mb-6">Get started and try the core experience.</p>
             <div className="mb-6">
               <div className="text-3xl font-extrabold">$0</div>
-              <div className="text-sm text-muted-foreground">$0 / year</div>
             </div>
             {user ? (
               <button disabled className="mb-6 w-full cursor-not-allowed rounded-full border py-2 text-sm text-gray-600">Current plan</button>
