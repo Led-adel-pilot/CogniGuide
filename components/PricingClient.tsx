@@ -429,7 +429,7 @@ export default function PricingClient({ onPurchaseComplete }: PricingClientProps
           </div>
 
           {/* Student (Most Popular) */}
-          <div className="relative rounded-[1.25rem] border bg-primary/5 dark:bg-primary/10 p-6 shadow-sm ring-1 ring-primary/10">
+          <div className="relative rounded-[1.25rem] border border-primary bg-primary/5 dark:bg-primary/10 p-6 shadow-sm ring-1 ring-primary/10">
             <div className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full border bg-primary text-primary-foreground px-3 py-1 text-xs font-semibold shadow">Best value</div>
             <h3 className="text-xl font-bold font-heading mb-1">Student</h3>
             <p className="text-muted-foreground mb-6">Plenty of credits for exam prep.</p>

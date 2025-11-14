@@ -1874,11 +1874,6 @@ const handleMindMapLinked = useCallback(
               <div className="text-xs text-muted-foreground flex items-center gap-1">
                 <Coins className="h-3 w-3" />
                 <span>{balanceDisplay} {balanceLabel}</span>
-                {userTier === 'trial' && (
-                  <span className="ml-2 rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold uppercase text-primary">
-                    Reverse trial
-                  </span>
-                )}
               </div>
             </div>
           </button>
