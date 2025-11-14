@@ -271,7 +271,7 @@ export default function PricingClient({ onPurchaseComplete }: PricingClientProps
     );
   };
 
-  const renderSecondaryPrice = (planKey: 'student' | 'pro') => {
+const renderSecondaryPrice = (planKey: 'student' | 'pro') => {
     const alternateCycle: BillingCycle = billingCycle === 'month' ? 'year' : 'month';
     const price = prices[planKey][alternateCycle];
     if (!price) {
@@ -325,6 +325,21 @@ export default function PricingClient({ onPurchaseComplete }: PricingClientProps
     [billingCycle, isConfigured, paddleReady]
   );
 
+  const getDailyCostText = useCallback(
+    (planKey: 'student' | 'pro') => {
+      const priceText = prices[planKey][billingCycle];
+      const parsed = parsePriceText(priceText);
+      if (!parsed) return null;
+      const daysInCycle = billingCycle === 'month' ? 30 : 365;
+      const perDay = parsed.amount / daysInCycle;
+      if (!Number.isFinite(perDay)) return null;
+      const formattedValue = perDay.toFixed(2);
+      const currencyValue = `${parsed.prefix ?? ''}${formattedValue}${parsed.suffix ?? ''}`.trim();
+      return `≈ ${currencyValue} per day - Less than one coffee per week`;
+    },
+    [billingCycle, prices]
+  );
+
   const handleChoosePlan = (plan: 'student' | 'pro') => {
     if (!user) {
       localStorage.setItem('cogniguide_upgrade_flow', 'true');
@@ -358,6 +373,8 @@ export default function PricingClient({ onPurchaseComplete }: PricingClientProps
       </section>
     );
   }
+
+  const studentDailyCostText = getDailyCostText('student');
 
   return (
     <section className="py-4 pb-16">
@@ -447,6 +464,11 @@ export default function PricingClient({ onPurchaseComplete }: PricingClientProps
               <div className="text-sm text-muted-foreground min-h-[1.25rem]">
                 {renderSecondaryPrice('student')}
               </div>
+              {studentDailyCostText && (
+                <div className="mt-2 text-xs font-semibold text-primary">
+                  {studentDailyCostText}
+                </div>
+              )}
             </div>
             <button
               onClick={() => handleChoosePlan('student')}
@@ -525,4 +547,57 @@ export default function PricingClient({ onPurchaseComplete }: PricingClientProps
       <AuthModal open={authModalOpen} />
     </section>
   );
+}
+
+function normalizeNumericString(raw: string): string {
+  let value = raw
+    .replace(/[\s\u00A0\u202F\u2007\u2060]/g, '')
+    .replace(/'/g, '')
+    .replace(/[^\d,.\-]/g, '');
+  const hasComma = value.includes(',');
+  const hasDot = value.includes('.');
+  if (hasComma && hasDot) {
+    const lastComma = value.lastIndexOf(',');
+    const lastDot = value.lastIndexOf('.');
+    const decimalSeparator = lastComma > lastDot ? ',' : '.';
+    const thousandSeparator = decimalSeparator === ',' ? '.' : ',';
+    value = value.split(thousandSeparator).join('');
+    value = value.replace(decimalSeparator, '.');
+    return value;
+  }
+  if (hasComma) {
+    const lastComma = value.lastIndexOf(',');
+    const decimals = value.length - lastComma - 1;
+    if (decimals === 3 && /^\d{3}$/.test(value.slice(lastComma + 1))) {
+      return value.replace(/,/g, '');
+    }
+    return value.replace(',', '.');
+  }
+  if (hasDot) {
+    const lastDot = value.lastIndexOf('.');
+    const decimals = value.length - lastDot - 1;
+    if (decimals === 3 && /^\d{3}$/.test(value.slice(lastDot + 1))) {
+      return value.replace(/\./g, '');
+    }
+  }
+  return value;
+}
+
+function parsePriceText(priceText: string | null): { amount: number; prefix: string; suffix: string } | null {
+  if (!priceText) return null;
+  const trimmed = priceText.trim();
+  const firstDigitIndex = trimmed.search(/\d/);
+  if (firstDigitIndex === -1) return null;
+  let endIndex = firstDigitIndex;
+  const allowedChars = /[\d.,'\-\s\u00A0\u202F\u2007\u2060]/;
+  while (endIndex < trimmed.length && allowedChars.test(trimmed[endIndex])) {
+    endIndex += 1;
+  }
+  const numericSegment = trimmed.slice(firstDigitIndex, endIndex);
+  const prefix = trimmed.slice(0, firstDigitIndex);
+  const suffix = trimmed.slice(endIndex);
+  const normalized = normalizeNumericString(numericSegment);
+  const amount = Number.parseFloat(normalized);
+  if (!Number.isFinite(amount)) return null;
+  return { amount, prefix, suffix };
 }
