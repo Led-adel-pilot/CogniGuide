@@ -1,7 +1,7 @@
 'use client';
 
 import { Clock3, Sparkles, Zap, GraduationCap, Coins, X } from 'lucide-react';
-import { REVERSE_TRIAL } from '@/lib/plans';
+import { FREE_PLAN_GENERATIONS, REVERSE_TRIAL } from '@/lib/plans';
 
 interface ReverseTrialModalProps {
   open: boolean;
@@ -9,32 +9,25 @@ interface ReverseTrialModalProps {
   trialEndsAt: string | null;
 }
 
-const DAY_IN_MS = 24 * 60 * 60 * 1000;
-
-function formatTimeRemaining(trialEndsAt: string | null): string {
+function formatTrialEndDate(trialEndsAt: string | null): string {
   if (!trialEndsAt) {
-    return `${REVERSE_TRIAL.durationDays} days remaining`;
+    return '7 days from today';
   }
-  const endsAt = Date.parse(trialEndsAt);
-  if (!Number.isFinite(endsAt)) {
-    return `${REVERSE_TRIAL.durationDays} days remaining`;
+  const date = new Date(trialEndsAt);
+  if (Number.isNaN(date.getTime())) {
+    return '7 days from today';
   }
-  const diffMs = endsAt - Date.now();
-  if (diffMs <= 0) {
-    return 'Trial ending soon';
-  }
-  const wholeDays = Math.floor(diffMs / DAY_IN_MS);
-  if (wholeDays >= 1) {
-    return `${wholeDays} day${wholeDays === 1 ? '' : 's'} remaining`;
-  }
-  const hours = Math.max(1, Math.round(diffMs / (60 * 60 * 1000)));
-  return `${hours} hour${hours === 1 ? '' : 's'} remaining`;
+  return date.toLocaleDateString('en-US', {
+    weekday: 'long',
+    month: 'long',
+    day: 'numeric',
+  });
 }
 
 export default function ReverseTrialModal({ open, onClose, trialEndsAt }: ReverseTrialModalProps) {
   if (!open) return null;
 
-  const timeRemaining = formatTimeRemaining(trialEndsAt);
+  const trialEndDateCopy = formatTrialEndDate(trialEndsAt);
 
   return (
     <div className="fixed inset-0 z-[210] flex items-center justify-center bg-background/95 px-4 py-10 backdrop-blur-sm">
@@ -49,43 +42,45 @@ export default function ReverseTrialModal({ open, onClose, trialEndsAt }: Revers
         </button>
         <div className="flex items-center gap-2 text-sm font-semibold uppercase text-primary">
           <Sparkles className="h-4 w-4" />
-          Reverse trial unlocked
+          Student trial unlocked
         </div>
-        <h2 className="mt-2 text-2xl font-bold text-foreground">
-          Enjoy {REVERSE_TRIAL.credits.toLocaleString()} credits on the Student plan for 7 days
-        </h2>
+        <h2 className="mt-2 text-2xl font-bold text-foreground">You've unlocked 7 days of full access 🎉</h2>
         <p className="mt-2 text-sm text-muted-foreground">
-          You can use Smart Mode and AI flashcard explanations just like a paid subscriber. Explore uploads,
-          shareable mind maps, and flashcard sessions without limits while the trial lasts.
+          Make this week the one where you actually get ahead on exams.
         </p>
         <div className="mt-5 rounded-2xl bg-muted/60 p-4">
-          <div className="flex items-center gap-2 text-sm font-medium text-foreground">
-            <Clock3 className="h-4 w-4 text-primary" />
-            <span>{timeRemaining}</span>
-          </div>
-          <ul className="mt-4 space-y-3 text-sm text-muted-foreground">
+          <p className="text-sm font-medium text-foreground">For the next 7 days you get:</p>
+          <ul className="mt-2 space-y-3 text-sm text-muted-foreground">
             <li className="flex items-start gap-3">
               <Coins className="mt-0.5 h-4 w-4 text-primary" />
               <div>
                 <p className="font-medium text-foreground">{REVERSE_TRIAL.credits.toLocaleString()} credits</p>
-                <p>Upload PDFs, decks, prompts, and more without worrying about limits.</p>
+                <p>Much higher generation limit so you can cover full courses, not just a chapter.</p>
               </div>
             </li>
             <li className="flex items-start gap-3">
               <Zap className="mt-0.5 h-4 w-4 text-primary" />
               <div>
-                <p className="font-medium text-foreground">Smart Mode access</p>
-                <p>Run the high-accuracy Gemini model for richer mind maps and flashcards.</p>
+                <p className="font-medium text-foreground">AI explanations on your cards</p>
+                <p>Get instant help whenever something doesn't click.</p>
               </div>
             </li>
             <li className="flex items-start gap-3">
               <GraduationCap className="mt-0.5 h-4 w-4 text-primary" />
               <div>
-                <p className="font-medium text-foreground">AI flashcard explanations</p>
-                <p>Tap “Explain” on any card to get instant reasoning and study tips.</p>
+                <p className="font-medium text-foreground">Smart AI model</p>
+                <p>Higher-quality mind maps & flashcards on demand.</p>
               </div>
             </li>
           </ul>
+          <div className="mt-4 flex items-start gap-2 text-sm text-muted-foreground">
+            <Clock3 className="mt-0.5 h-4 w-4 text-primary" />
+            <p>
+              Your trial ends on <span className="font-medium text-foreground">{trialEndDateCopy}</span>. After that,
+              you'll go back to the Free plan with {FREE_PLAN_GENERATIONS} free generations/month - everything you
+              create stays saved.
+            </p>
+          </div>
         </div>
         <button
           type="button"
