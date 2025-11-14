@@ -2,7 +2,15 @@ import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
 import { Buffer } from 'node:buffer';
 import { getTextFromDocx, getTextFromPdf, getTextFromPptx, getTextFromPlainText, processMultipleFiles } from '@/lib/document-parser';
-import { FREE_PLAN_GENERATIONS, MODEL_CREDIT_MULTIPLIERS, MODEL_REQUIRED_TIER, type ModelChoice } from '@/lib/plans';
+import {
+  FREE_PLAN_GENERATIONS,
+  MODEL_CREDIT_MULTIPLIERS,
+  MODEL_REQUIRED_TIER,
+  type ModelChoice,
+  type UserTier,
+  isPaidTier,
+} from '@/lib/plans';
+import { ensureFreeCreditsWithTrial, determineUserTier } from '@/lib/server-user-tier';
 import { createClient } from '@supabase/supabase-js';
 
 const openai = new OpenAI({
@@ -20,7 +28,7 @@ const supabaseAdmin = (supabaseUrl && supabaseServiceKey)
   : null;
 
 // In-memory cache for user tiers (userId -> { tier, expiresAt })
-const userTierCache = new Map<string, { tier: 'free' | 'paid'; expiresAt: number }>();
+const userTierCache = new Map<string, { tier: UserTier; expiresAt: number }>();
 const TIER_CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
 const SUPABASE_IMAGE_PREFIX = 'supabase://';
@@ -130,56 +138,6 @@ async function resolveImageInputs(rawImages: string[]): Promise<{ resolved: stri
   return { resolved, cleanupPaths: Array.from(cleanupPaths) };
 }
 
-function isSameUtcMonth(a: Date, b: Date): boolean {
-  return a.getUTCFullYear() === b.getUTCFullYear() && a.getUTCMonth() === b.getUTCMonth();
-}
-
-async function hasActiveSubscription(userId: string): Promise<boolean> {
-  if (!supabaseAdmin) return false;
-  const { data } = await supabaseAdmin
-    .from('subscriptions')
-    .select('status')
-    .eq('user_id', userId)
-    .order('updated_at', { ascending: false })
-    .limit(1);
-  const status = Array.isArray(data) && data.length > 0 ? (data[0] as any).status : null;
-  return status === 'active' || status === 'trialing';
-}
-
-async function ensureFreeMonthlyCredits(userId: string): Promise<void> {
-  if (!supabaseAdmin) return;
-  // Skip if user currently has an active subscription (paid tiers provision via webhook)
-  try {
-    const active = await hasActiveSubscription(userId);
-    if (active) return;
-  } catch {}
-
-  // Ensure a user_credits row exists and is refilled to the free plan allowance once per calendar month
-  const { data } = await supabaseAdmin
-    .from('user_credits')
-    .select('credits, last_refilled_at')
-    .eq('user_id', userId)
-    .single();
-
-  const nowIso = new Date().toISOString();
-  if (!data) {
-    await supabaseAdmin.from('user_credits').insert({
-      user_id: userId,
-      credits: FREE_PLAN_GENERATIONS,
-      last_refilled_at: nowIso,
-    });
-    return;
-  }
-  const last = data.last_refilled_at ? new Date(data.last_refilled_at) : null;
-  const now = new Date(nowIso);
-  if (!last || !isSameUtcMonth(last, now)) {
-    await supabaseAdmin
-      .from('user_credits')
-      .update({ credits: FREE_PLAN_GENERATIONS, last_refilled_at: nowIso, updated_at: nowIso })
-      .eq('user_id', userId);
-  }
-}
-
 async function getUserIdFromAuthHeader(req: NextRequest): Promise<string | null> {
   try {
     const authHeader = req.headers.get('authorization') || '';
@@ -192,7 +150,7 @@ async function getUserIdFromAuthHeader(req: NextRequest): Promise<string | null>
   }
 }
 
-async function getUserTier(userId: string | null): Promise<'non-auth' | 'free' | 'paid'> {
+async function getUserTier(userId: string | null): Promise<UserTier> {
   if (!userId) return 'non-auth';
   if (!supabaseAdmin) return 'free'; // Default to free if we can't check
 
@@ -203,17 +161,7 @@ async function getUserTier(userId: string | null): Promise<'non-auth' | 'free' |
   }
 
   try {
-    const { data } = await supabaseAdmin
-      .from('subscriptions')
-      .select('status')
-      .eq('user_id', userId)
-      .order('updated_at', { ascending: false })
-      .limit(1);
-
-    const status = Array.isArray(data) && data.length > 0 ? (data[0] as any).status : null;
-    const tier = status === 'active' || status === 'trialing' ? 'paid' : 'free';
-
-    // Cache the result
+    const { tier } = await determineUserTier(supabaseAdmin, userId);
     userTierCache.set(userId, {
       tier,
       expiresAt: Date.now() + TIER_CACHE_TTL
@@ -341,26 +289,25 @@ export async function POST(req: NextRequest) {
       creditsNeeded = Number((creditsNeeded * multiplier).toFixed(3));
 
       const userIdResolved = userId || await getUserIdFromAuthHeader(req);
+      if (userIdResolved) {
+        try {
+          await ensureFreeCreditsWithTrial(supabaseAdmin, userIdResolved);
+        } catch (creditError) {
+          console.warn('Failed to ensure baseline credits:', creditError);
+        }
+      }
       const userTier = await getUserTier(userIdResolved);
       const requiredTier = MODEL_REQUIRED_TIER[modelChoice];
-      if (requiredTier === 'paid' && userTier !== 'paid') {
+      if (requiredTier === 'paid' && !isPaidTier(userTier)) {
         return NextResponse.json({
           error: 'Upgrade required for smart mode',
           message: 'Smart mode is available on paid plans. Please upgrade to access the Gemini smart model.',
           code: 'SMART_MODEL_REQUIRES_UPGRADE'
         }, { status: 403 });
       }
-      if (userIdResolved) {
-        try {
-          await ensureFreeMonthlyCredits(userIdResolved);
-        } catch (creditError) {
-          console.warn('Failed to ensure free monthly credits:', creditError);
-          // Continue processing - don't fail the request for credit setup issues
-        }
-      }
 
       if (userIdResolved) {
-        const deductionAmount = userTier === 'paid' ? creditsNeeded : 1;
+        const deductionAmount = isPaidTier(userTier) ? creditsNeeded : 1;
         if (deductionAmount > 0) {
           const currentCredits = await getCurrentCredits(userIdResolved);
           if (currentCredits === null) {
@@ -372,7 +319,7 @@ export async function POST(req: NextRequest) {
           }
 
           if (currentCredits < deductionAmount) {
-            if (userTier === 'paid') {
+            if (isPaidTier(userTier)) {
               const shortfall = deductionAmount - currentCredits;
               return NextResponse.json({
                 error: 'Insufficient credits',
@@ -438,7 +385,7 @@ export async function POST(req: NextRequest) {
 
       // Reserve credit information for potential refunds
       const reservedForUserId = userIdResolved || null;
-      const reservedCredits = userTier === 'paid' ? creditsNeeded : 1;
+      const reservedCredits = isPaidTier(userTier) ? creditsNeeded : 1;
 
       // Log the total text after truncation sent to LLM and its character count
       console.log('=== MINDMAP LLM INPUT ===');
@@ -681,6 +628,13 @@ export async function POST(req: NextRequest) {
     }
     const extractedTexts: string[] = [];
     const userId = await getUserIdFromAuthHeader(req);
+    if (userId) {
+      try {
+        await ensureFreeCreditsWithTrial(supabaseAdmin, userId);
+      } catch (creditError) {
+        console.warn('Failed to ensure baseline credits for multipart upload:', creditError);
+      }
+    }
     const userTier = await getUserTier(userId);
     
     // Use the new cumulative file processing logic

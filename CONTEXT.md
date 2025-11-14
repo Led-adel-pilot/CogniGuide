@@ -22,6 +22,7 @@
 ## 5. Library & Document Tooling
 - Document ingestion relies on lib/document-parser.ts (mammoth, pdf-parse, pptx-text-parser, plain text handling, caching, ts-fsrs character budget awareness) together with lib/katex-loader.ts, lib/markmap-renderer.ts, lib/utils.ts, and lib/copy-to-clipboard.ts for rendering and exporting math-heavy nodes.
 - lib/supabaseClient.ts (supabase auth + session persistence) plus lib/siteMetadata.ts, lib/plans.ts, and lib/share-links.ts provide shared constants for SEO, plan costs, credit multipliers, and secure share tokens.
+- lib/server-user-tier.ts centralizes tier detection, Reverse Trial provisioning, and monthly refills so every API can grant the 7-day/1,000-credit Student experience before falling back to the standard free allowance.
 - Spaced repetition state is managed via lib/spaced-repetition.ts (FSRS scheduling, exam-date clamping) and the lib/sr-store.ts cache/localStorage helpers that mirror flashcards_schedule so the UI always stays synced and minimizes Supabase round-trips.
 - Programmatic content helpers (lib/programmatic/*) expose metadata builders, FAQ/feature structures, and generated slug maps; lib/programmatic/metadata.ts emits structured data, lib/programmatic/useCaseData.ts and scripts/* keep SEO copy aligned with real-world decks.
 
@@ -29,7 +30,7 @@
 - Generation endpoints (app/api/generate-mindmap/route.ts, app/api/generate-flashcards/route.ts) stream from the OpenAI-compatible Gemini endpoint, resolve Supabase storage images, cache user tiers, enforce credit multipliers (lib/plans.ts), and clean up temporary uploads; components/Generator.tsx and FlashcardsModal.tsx consume those streams to show progressive output.
 - app/api/explain-flashcard/route.ts spins up another streaming call when users tap Explain, deducts and refunds credits via the same Supabase tables, enforces paid-tier gating, and streams raw text back so the modal can show the explanation as it arrives.
 - Preparse + storage APIs (app/api/preparse/route.ts, app/api/storage/get-signed-uploads/route.ts, app/api/storage/cleanup/route.ts, app/api/storage/scheduled-cleanup/route.ts) handle multipart/JSON uploads, bucketed file writes, sanitized filenames, one-off cleanup calls, and a Cron-triggerable scheduled job that purges uploads older than 24 hours.
-- Credit management APIs (app/api/ensure-credits/route.ts, app/api/refill-credits/route.ts) guarantee the free plan is refilled monthly (with a Vercel cron hitting /api/refill-credits daily), skipping paid accounts, while app/api/paddle-webhook/route.ts verifies Paddle HMAC signatures, stores subscriptions, and seeds user_credits via lib/plans.ts#getCreditsByPriceId.
+- Credit management APIs (app/api/ensure-credits/route.ts, app/api/refill-credits/route.ts) guarantee the free plan is refilled monthly (with a Vercel cron hitting /api/refill-credits daily), skipping paid accounts, while app/api/paddle-webhook/route.ts verifies Paddle HMAC signatures, stores subscriptions, and seeds user_credits via lib/plans.ts#getCreditsByPriceId. ensure-credits now routes through lib/server-user-tier.ts so brand-new signups automatically receive the 7-day Reverse Trial (1,000 Student-plan credits with Smart Mode + Explain access) before falling back to the normal 8 free generations.
 - app/api/share-link/route.ts creates signed share links, app/api/share-link/import/route.ts copies shared decks without duplication, and lib/share-links.ts signs/verifies tokens so app/share/[type]/[token]/page.tsx can safely hydrate ShareViewer.
 
 ## 7. Data, Storage, & Scheduling
@@ -180,6 +181,9 @@ create table public.user_credits (
   credits numeric(12, 6) not null default 0,
   last_refilled_at timestamp with time zone null,
   updated_at timestamp with time zone not null default now(),
+  trial_started_at timestamp with time zone null,
+  trial_ends_at timestamp with time zone null,
+  trial_plan_hint text null,
   constraint user_credits_pkey primary key (id),
   constraint user_credits_user_id_key unique (user_id),
   constraint user_credits_user_id_fkey foreign KEY (user_id) references auth.users (id) on delete CASCADE,

@@ -4,13 +4,15 @@ import pptxTextParser from 'pptx-text-parser';
 import { writeFile, unlink } from 'fs/promises';
 import { tmpdir } from 'os';
 import { join } from 'path';
+import type { UserTier } from '@/lib/plans';
 
 // Constants for tier-based limits
 const CHARS_PER_CREDIT = 3800;
-const TIER_LIMITS = {
+const TIER_LIMITS: Record<UserTier, number> = {
   'non-auth': 15 * CHARS_PER_CREDIT, // 57,000 characters
-  'free': 50 * CHARS_PER_CREDIT,     
-  'paid': 124 * CHARS_PER_CREDIT    
+  'free': 50 * CHARS_PER_CREDIT,
+  'trial': 124 * CHARS_PER_CREDIT,
+  'paid': 124 * CHARS_PER_CREDIT,
 } as const;
 
 /**
@@ -19,7 +21,7 @@ const TIER_LIMITS = {
  * @param userTier The user's tier ('non-auth', 'free', 'paid') to determine content limits.
  * @returns A promise that resolves to the extracted text.
  */
-export async function getTextFromDocx(buffer: Buffer, userTier: 'non-auth' | 'free' | 'paid' = 'non-auth'): Promise<string> {
+export async function getTextFromDocx(buffer: Buffer, userTier: UserTier = 'non-auth'): Promise<string> {
   try {
     const { value } = await mammoth.extractRawText({ buffer });
     return truncateByUserTier(value, userTier);
@@ -35,7 +37,7 @@ export async function getTextFromDocx(buffer: Buffer, userTier: 'non-auth' | 'fr
  * @param userTier The user's tier ('non-auth', 'free', 'paid') to determine content limits.
  * @returns A promise that resolves to the extracted text.
  */
-export async function getTextFromPdf(buffer: Buffer, userTier: 'non-auth' | 'free' | 'paid' = 'non-auth'): Promise<string> {
+export async function getTextFromPdf(buffer: Buffer, userTier: UserTier = 'non-auth'): Promise<string> {
   try {
     const data = await pdf(buffer);
     return truncateByUserTier(data.text, userTier);
@@ -51,7 +53,7 @@ export async function getTextFromPdf(buffer: Buffer, userTier: 'non-auth' | 'fre
  * @param userTier The user's tier ('non-auth', 'free', 'paid') to determine content limits.
  * @returns A promise that resolves to the extracted text.
  */
-export async function getTextFromPptx(buffer: Buffer, userTier: 'non-auth' | 'free' | 'paid' = 'non-auth'): Promise<string> {
+export async function getTextFromPptx(buffer: Buffer, userTier: UserTier = 'non-auth'): Promise<string> {
   const tempFilePath = join(tmpdir(), `temp-pptx-${Date.now()}.pptx`);
   try {
     await writeFile(tempFilePath, buffer);
@@ -81,7 +83,7 @@ export async function getTextFromPptx(buffer: Buffer, userTier: 'non-auth' | 'fr
  * @param userTier The user's tier ('non-auth', 'free', 'paid') to determine content limits.
  * @returns The processed text with appropriate truncation.
  */
-export function getTextFromPlainText(buffer: Buffer, userTier: 'non-auth' | 'free' | 'paid' = 'non-auth'): string {
+export function getTextFromPlainText(buffer: Buffer, userTier: UserTier = 'non-auth'): string {
   const text = buffer.toString('utf-8');
   return truncateByUserTier(text, userTier);
 }
@@ -95,7 +97,7 @@ export function getTextFromPlainText(buffer: Buffer, userTier: 'non-auth' | 'fre
  * @param userTier The user's tier ('non-auth', 'free', 'paid').
  * @returns The truncated or original text with appropriate limits applied.
  */
-function truncateByUserTier(text: string, userTier: 'non-auth' | 'free' | 'paid'): string {
+function truncateByUserTier(text: string, userTier: UserTier): string {
   const maxChars = TIER_LIMITS[userTier];
 
   // Check if content is within tier limits
@@ -122,12 +124,13 @@ function truncateByUserTier(text: string, userTier: 'non-auth' | 'free' | 'paid'
 /**
  * Gets the appropriate upgrade message based on user tier.
  */
-function getUpgradeMessage(userTier: 'non-auth' | 'free' | 'paid'): string {
+function getUpgradeMessage(userTier: UserTier): string {
   switch (userTier) {
     case 'non-auth':
       return '\n\n[Content truncated for free users - sign up for more access]';
     case 'free':
       return '\n\n[Content truncated for free plan - upgrade for higher limits]';
+    case 'trial':
     case 'paid':
       return '\n\n[Content truncated - file exceeds plan limit]';
     default:
@@ -162,7 +165,7 @@ export interface MultiFileProcessResult {
  */
 export async function processMultipleFiles(
   files: File[],
-  userTier: 'non-auth' | 'free' | 'paid' = 'non-auth',
+  userTier: UserTier = 'non-auth',
   options?: { alreadyCountedChars?: number }
 ): Promise<MultiFileProcessResult> {
   const maxChars = TIER_LIMITS[userTier];

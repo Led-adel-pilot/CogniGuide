@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
 import type { ChatCompletionChunk } from 'openai/resources/chat/completions';
 import { createClient } from '@supabase/supabase-js';
-import { FEATURE_REQUIRED_TIER, MODEL_CREDIT_MULTIPLIERS } from '@/lib/plans';
+import { FEATURE_REQUIRED_TIER, MODEL_CREDIT_MULTIPLIERS, type UserTier, isPaidTier } from '@/lib/plans';
+import { ensureFreeCreditsWithTrial, determineUserTier } from '@/lib/server-user-tier';
 
 const openai = new OpenAI({
   apiKey: process.env.GEMINI_API_KEY,
@@ -22,53 +23,8 @@ const EXPLANATION_CREDIT_COST = 0.2;
 // Reasoning effort control: if true, use default; if false/unset, use 'none' for faster responses
 const ENABLE_REASONING = process.env.ENABLE_REASONING === 'true';
 
-type UserTier = 'non-auth' | 'free' | 'paid';
-
 const userTierCache = new Map<string, { tier: UserTier; expiresAt: number }>();
 const TIER_CACHE_TTL = 5 * 60 * 1000;
-
-async function hasActiveSubscription(userId: string): Promise<boolean> {
-  if (!supabaseAdmin) return false;
-  const { data } = await supabaseAdmin
-    .from('subscriptions')
-    .select('status')
-    .eq('user_id', userId)
-    .order('updated_at', { ascending: false })
-    .limit(1);
-  type SubscriptionRow = { status: string | null };
-  const subscription = Array.isArray(data) && data.length > 0 ? (data[0] as SubscriptionRow) : null;
-  const status = subscription?.status ?? null;
-  return status === 'active' || status === 'trialing';
-}
-
-async function ensureFreeMonthlyCredits(userId: string): Promise<void> {
-  if (!supabaseAdmin) return;
-  try {
-    const active = await hasActiveSubscription(userId);
-    if (active) return;
-  } catch {}
-  const { data } = await supabaseAdmin
-    .from('user_credits')
-    .select('credits, last_refilled_at')
-    .eq('user_id', userId)
-    .single();
-  const nowIso = new Date().toISOString();
-  if (!data) {
-    await supabaseAdmin.from('user_credits').insert({ user_id: userId, credits: 8, last_refilled_at: nowIso });
-    return;
-  }
-  type UserCreditsRow = { credits: number | null; last_refilled_at: string | null };
-  const userCredits = data as UserCreditsRow;
-  const last = userCredits.last_refilled_at ? new Date(userCredits.last_refilled_at) : null;
-  const now = new Date(nowIso);
-  const sameMonth = last && last.getUTCFullYear() === now.getUTCFullYear() && last.getUTCMonth() === now.getUTCMonth();
-  if (!sameMonth) {
-    await supabaseAdmin
-      .from('user_credits')
-      .update({ credits: 8, last_refilled_at: nowIso, updated_at: nowIso })
-      .eq('user_id', userId);
-  }
-}
 
 async function getUserIdFromAuthHeader(req: NextRequest): Promise<string | null> {
   try {
@@ -92,19 +48,8 @@ async function getUserTier(userId: string | null): Promise<UserTier> {
   }
 
   try {
-    const { data } = await supabaseAdmin
-      .from('subscriptions')
-      .select('status')
-      .eq('user_id', userId)
-      .order('updated_at', { ascending: false })
-      .limit(1);
-    type SubscriptionRow = { status: string | null };
-    const subscription = Array.isArray(data) && data.length > 0 ? (data[0] as SubscriptionRow) : null;
-    const status = subscription?.status ?? null;
-    const tier: UserTier = status === 'active' || status === 'trialing' ? 'paid' : 'free';
-
+    const { tier } = await determineUserTier(supabaseAdmin, userId);
     userTierCache.set(userId, { tier, expiresAt: Date.now() + TIER_CACHE_TTL });
-
     return tier;
   } catch {
     return 'free';
@@ -270,20 +215,20 @@ export async function POST(req: NextRequest) {
     }, { status: 401 });
   }
 
+  try {
+    await ensureFreeCreditsWithTrial(supabaseAdmin, userId);
+  } catch (err) {
+    console.warn('Failed to ensure baseline credits for explanation:', err);
+  }
+
   const userTier = await getUserTier(userId);
   const requiredTier = FEATURE_REQUIRED_TIER.explain;
-  if (requiredTier === 'paid' && userTier !== 'paid') {
+  if (requiredTier === 'paid' && !isPaidTier(userTier)) {
     return NextResponse.json({
       error: 'Upgrade required',
       message: 'Flashcard explanations require a paid plan.',
       code: 'UPGRADE_REQUIRED',
     }, { status: 403 });
-  }
-
-  try {
-    await ensureFreeMonthlyCredits(userId);
-  } catch (err) {
-    console.warn('Failed to ensure free monthly credits for explanation:', err);
   }
 
   let deckContext: { id: string; explanations: DeckExplanationMap } | null = null;

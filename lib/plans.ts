@@ -21,6 +21,7 @@ export const FREE_PLAN_GENERATIONS = 8;
 export const NON_AUTH_FREE_LIMIT = 3;
 
 export type Plan = keyof typeof PAID_PLANS;
+export type UserTier = 'non-auth' | 'free' | 'trial' | 'paid';
 
 export const MODEL_CREDIT_MULTIPLIERS = {
   fast: 1,
@@ -37,6 +38,19 @@ export const FEATURE_REQUIRED_TIER = {
 } as const;
 
 export type ModelChoice = keyof typeof MODEL_CREDIT_MULTIPLIERS;
+
+export const REVERSE_TRIAL = {
+  name: 'Reverse Trial',
+  planKey: 'student',
+  credits: 1000,
+  durationDays: 7,
+} as const;
+
+export const PAID_SUBSCRIPTION_STATUSES = ['active', 'trialing', 'past_due'] as const;
+
+export function isPaidTier(tier: UserTier | 'free' | 'paid'): boolean {
+  return tier === 'paid' || tier === 'trial';
+}
 
 export function getPlanByPriceId(priceId: string): Plan | null {
   if (!priceId) return null;

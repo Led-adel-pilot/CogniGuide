@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { processMultipleFiles } from '@/lib/document-parser';
+import { determineUserTier } from '@/lib/server-user-tier';
+import type { UserTier } from '@/lib/plans';
 import { createClient } from '@supabase/supabase-js';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
@@ -9,7 +11,7 @@ const supabaseAdmin = (supabaseUrl && supabaseServiceKey)
   : null;
 
 // In-memory cache for user tiers (userId -> { tier, expiresAt })
-const userTierCache = new Map<string, { tier: 'free' | 'paid'; expiresAt: number }>();
+const userTierCache = new Map<string, { tier: UserTier; expiresAt: number }>();
 const TIER_CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
 type StorageObjectDescriptor = {
@@ -36,7 +38,7 @@ async function getUserIdFromAuthHeader(req: NextRequest): Promise<string | null>
   }
 }
 
-async function getUserTier(userId: string | null): Promise<'non-auth' | 'free' | 'paid'> {
+async function getUserTier(userId: string | null): Promise<UserTier> {
   if (!userId) return 'non-auth';
   if (!supabaseAdmin) return 'free'; // Default to free if we can't check
 
@@ -47,20 +49,7 @@ async function getUserTier(userId: string | null): Promise<'non-auth' | 'free' |
   }
 
   try {
-    const { data } = await supabaseAdmin
-      .from('subscriptions')
-      .select('status')
-      .eq('user_id', userId)
-      .order('updated_at', { ascending: false })
-      .limit(1);
-
-    const latest = Array.isArray(data) && data.length > 0 ? data[0] : null;
-    const status = latest && typeof latest === 'object' && latest !== null && 'status' in latest
-      ? (latest as { status?: string }).status ?? null
-      : null;
-    const tier = status === 'active' || status === 'trialing' ? 'paid' : 'free';
-
-    // Cache the result
+    const { tier } = await determineUserTier(supabaseAdmin, userId);
     userTierCache.set(userId, {
       tier,
       expiresAt: Date.now() + TIER_CACHE_TTL

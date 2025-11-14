@@ -13,7 +13,8 @@ import FlashcardIcon from '@/components/FlashcardIcon';
 import { loadDeckSchedule, saveDeckSchedule, loadDeckScheduleAsync, saveDeckScheduleAsync, loadAllDeckSchedulesAsync, upsertDeckSchedulesBulkAsync, type StoredDeckSchedule } from '@/lib/sr-store';
 import { createInitialSchedule } from '@/lib/spaced-repetition';
 import PricingModal from '@/components/PricingModal';
-import { type ModelChoice } from '@/lib/plans';
+import ReverseTrialModal from '@/components/ReverseTrialModal';
+import { PAID_SUBSCRIPTION_STATUSES, type ModelChoice } from '@/lib/plans';
 import CogniGuideLogo from '../../CogniGuide_logo.png';
 import Image from 'next/image';
 import posthog from 'posthog-js';
@@ -166,11 +167,14 @@ export default function DashboardClient() {
   const [activeDeckMindMapMarkdown, setActiveDeckMindMapMarkdown] = useState<string | null>(null);
   const [credits, setCredits] = useState<number>(0);
   const [selectedModel, setSelectedModel] = useState<ModelChoice>('fast');
-  const [userTier, setUserTier] = useState<'free' | 'paid'>('free');
+  const [userTier, setUserTier] = useState<'free' | 'trial' | 'paid'>('free');
+  const [trialEndsAt, setTrialEndsAt] = useState<string | null>(null);
   const [tierLoading, setTierLoading] = useState<boolean>(true);
   const [isModeMenuOpen, setIsModeMenuOpen] = useState(false);
   const [hoveredModel, setHoveredModel] = useState<ModelChoice | null>(null);
-  const isPaidUser = userTier === 'paid';
+  const [isTrialModalOpen, setIsTrialModalOpen] = useState(false);
+  const trialModalSeenKeyRef = useRef<string | null>(null);
+  const isPaidUser = userTier === 'paid' || userTier === 'trial';
   const balanceDisplay = isPaidUser
     ? (Math.floor(credits * 10) / 10).toFixed(1)
     : Math.max(0, Math.floor(credits)).toString();
@@ -389,6 +393,7 @@ const handleMindMapLinked = useCallback(
       const targetUserId = userIdOverride ?? userIdRef.current;
       if (!targetUserId) {
         setUserTier('free');
+        setTrialEndsAt(null);
         setTierLoading(false);
         return;
       }
@@ -409,8 +414,26 @@ const handleMindMapLinked = useCallback(
         }
 
         const status = Array.isArray(data) && data.length > 0 ? (data[0] as any).status : null;
-        const paidStatuses = new Set(['active', 'trialing', 'past_due']);
-        const nextTier: 'free' | 'paid' = status && paidStatuses.has(status) ? 'paid' : 'free';
+        let nextTier: 'free' | 'trial' | 'paid' = 'free';
+        let nextTrialEnds: string | null = null;
+        const paidStatuses = new Set(PAID_SUBSCRIPTION_STATUSES);
+
+        if (status && paidStatuses.has(status)) {
+          nextTier = 'paid';
+        } else {
+          const { data: trialData } = await supabase
+            .from('user_credits')
+            .select('trial_ends_at')
+            .eq('user_id', targetUserId)
+            .maybeSingle();
+          const trialEnds = typeof trialData?.trial_ends_at === 'string' ? trialData.trial_ends_at : null;
+          if (trialEnds && Date.parse(trialEnds) > Date.now()) {
+            nextTier = 'trial';
+            nextTrialEnds = trialEnds;
+          }
+        }
+
+        setTrialEndsAt(nextTrialEnds);
         setUserTier(nextTier);
         try {
           if (typeof window !== 'undefined') {
@@ -420,6 +443,7 @@ const handleMindMapLinked = useCallback(
       } catch (err) {
         console.error('Failed to load subscription status:', err);
         setUserTier('free');
+        setTrialEndsAt(null);
       } finally {
         setTierLoading(false);
       }
@@ -455,11 +479,11 @@ const handleMindMapLinked = useCallback(
     referralLastSeenIdRef.current = user?.referralLastSeenId ?? null;
 
     if (user?.id) {
-      let cachedTier: 'free' | 'paid' | null = null;
+      let cachedTier: 'free' | 'trial' | 'paid' | null = null;
       try {
         if (typeof window !== 'undefined') {
           const stored = localStorage.getItem(`cogniguide_user_tier_${user.id}`);
-          if (stored === 'free' || stored === 'paid') {
+          if (stored === 'free' || stored === 'paid' || stored === 'trial') {
             cachedTier = stored;
           }
         }
@@ -477,6 +501,8 @@ const handleMindMapLinked = useCallback(
       setUserTier('free');
       setTierLoading(false);
       setSelectedModel('fast');
+      setTrialEndsAt(null);
+      setIsTrialModalOpen(false);
     }
   }, [user, refreshUserTier]);
 
@@ -485,6 +511,23 @@ const handleMindMapLinked = useCallback(
       setSelectedModel('fast');
     }
   }, [isPaidUser, selectedModel]);
+
+  useEffect(() => {
+    if (!user?.id || !trialEndsAt || userTier !== 'trial') {
+      setIsTrialModalOpen(false);
+      trialModalSeenKeyRef.current = null;
+      return;
+    }
+    const key = `cogniguide_trial_modal_${user.id}_${trialEndsAt}`;
+    trialModalSeenKeyRef.current = key;
+    let seen = false;
+    try {
+      if (typeof window !== 'undefined') {
+        seen = localStorage.getItem(key) === '1';
+      }
+    } catch {}
+    setIsTrialModalOpen(!seen);
+  }, [user?.id, trialEndsAt, userTier]);
 
   const persistReferralRedemptionSeen = useCallback(
     async (redemptionId: string, userId: string) => {
@@ -509,6 +552,16 @@ const handleMindMapLinked = useCallback(
     },
     [setUser]
   );
+
+  const handleDismissTrialModal = useCallback(() => {
+    const key = trialModalSeenKeyRef.current;
+    if (key && typeof window !== 'undefined') {
+      try {
+        localStorage.setItem(key, '1');
+      } catch {}
+    }
+    setIsTrialModalOpen(false);
+  }, []);
 
   const showReferralRewardNotice = useCallback((amount: number, redemptionId?: string, userIdOverride?: string) => {
     const key = redemptionId ? `referral:${redemptionId}` : `manual:${amount}`;
@@ -737,11 +790,20 @@ const handleMindMapLinked = useCallback(
       if (accessToken) {
         const response = await fetch('/api/ensure-credits', {
           method: 'POST',
-          headers: { Authorization: `Bearer ${accessToken}` }
+          headers: { Authorization: `Bearer ${accessToken}` },
         });
         const result = await response.json();
         if (result.ok && typeof result.credits === 'number') {
           setCredits(result.credits);
+          const normalizedTier = result.tier === 'paid' ? 'paid' : result.tier === 'trial' ? 'trial' : 'free';
+          if (normalizedTier) {
+            setUserTier(normalizedTier);
+            setTierLoading(false);
+          }
+          const nextTrialEnds = normalizedTier === 'trial' && typeof result.trialEndsAt === 'string'
+            ? result.trialEndsAt
+            : null;
+          setTrialEndsAt(nextTrialEnds);
           // Cache the result
           try {
             if (typeof window !== 'undefined') {
@@ -752,19 +814,29 @@ const handleMindMapLinked = useCallback(
           return; // Successfully loaded credits from API response
         }
       }
-    } catch {}
+    } catch (apiError) {
+      console.warn('Failed to load credits via ensure API:', apiError);
+    }
 
     // Fallback: fetch credits directly from database if API call failed
-    const { data, error } = await supabase
+    const { data } = await supabase
       .from('user_credits')
-      .select('credits')
+      .select('credits, trial_ends_at')
       .eq('user_id', userId)
-      .single();
+      .maybeSingle();
 
     if (data) {
       const val = Number((data as any).credits ?? 0);
       const finalCredits = Number.isFinite(val) ? val : 0;
       setCredits(finalCredits);
+      const trialEnds = typeof (data as any).trial_ends_at === 'string' ? (data as any).trial_ends_at : null;
+      const trialActive = trialEnds && Date.parse(trialEnds) > Date.now();
+      if (trialActive) {
+        setUserTier('trial');
+        setTrialEndsAt(trialEnds);
+      } else {
+        setTrialEndsAt(null);
+      }
       // Cache the fallback result too
       try {
         if (typeof window !== 'undefined') {
@@ -1802,6 +1874,11 @@ const handleMindMapLinked = useCallback(
               <div className="text-xs text-muted-foreground flex items-center gap-1">
                 <Coins className="h-3 w-3" />
                 <span>{balanceDisplay} {balanceLabel}</span>
+                {userTier === 'trial' && (
+                  <span className="ml-2 rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold uppercase text-primary">
+                    Reverse trial
+                  </span>
+                )}
               </div>
             </div>
           </button>
@@ -2444,6 +2521,11 @@ const handleMindMapLinked = useCallback(
         resourceId={shareItem?.id ?? null}
         resourceType={shareItem?.type ?? 'mindmap'}
         resourceTitle={shareItem?.title ?? null}
+      />
+      <ReverseTrialModal
+        open={isTrialModalOpen && Boolean(user && trialEndsAt)}
+        onClose={handleDismissTrialModal}
+        trialEndsAt={trialEndsAt}
       />
     </div>
   );
