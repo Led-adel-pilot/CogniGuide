@@ -397,7 +397,7 @@ export default function PricingClient({ onPurchaseComplete }: PricingClientProps
           {/* Pro */}
           <div className="relative rounded-[1.25rem] border bg-background p-6 shadow-sm">
             <h3 className="text-xl font-bold font-heading mb-1">Pro</h3>
-            <p className="text-muted-foreground mb-6">For heavy users.</p>
+            <p className="text-muted-foreground mb-6">More credits at a premium.</p>
             <div className="mb-6">
               <div
                 className="text-3xl font-extrabold flex items-baseline gap-2"
@@ -413,12 +413,15 @@ export default function PricingClient({ onPurchaseComplete }: PricingClientProps
             <button
               onClick={() => handleChoosePlan('pro')}
               disabled={isButtonDisabled('pro')}
-              className={`mb-6 w-full rounded-full bg-primary py-2 text-sm font-semibold text-white shadow transition ${
-                isButtonDisabled('pro') ? 'opacity-60 cursor-not-allowed' : 'hover:bg-primary/90'
+              className={`mb-2 w-full rounded-full border border-primary bg-background py-2 text-sm font-semibold text-primary shadow transition ${
+                isButtonDisabled('pro') ? 'opacity-60 cursor-not-allowed' : 'hover:bg-primary/10'
               }`}
             >
               {getButtonLabel('pro')}
             </button>
+            <p className="mb-6 text-center text-xs text-muted-foreground">
+              Cancel anytime. Secure Paddle checkout.
+            </p>
             <ul className="space-y-2 text-sm">
               <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> {PAID_PLANS.pro.credits} monthly credits</li>
               <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> Mind maps + flashcards</li>
@@ -429,8 +432,8 @@ export default function PricingClient({ onPurchaseComplete }: PricingClientProps
           </div>
 
           {/* Student (Most Popular) */}
-          <div className="relative rounded-[1.25rem] border border-primary bg-primary/5 dark:bg-primary/10 p-6 shadow-sm ring-1 ring-primary/10">
-            <div className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full border bg-primary text-primary-foreground px-3 py-1 text-xs font-semibold shadow">Most popular</div>
+          <div className="relative flex h-full flex-col rounded-[1.25rem] border-2 border-primary bg-gradient-to-b from-primary/10 via-primary/5 to-transparent p-6 shadow-lg ring-2 ring-primary/20 dark:from-primary/20 dark:via-primary/10 dark:to-transparent">
+            <div className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full border border-primary bg-primary text-primary-foreground px-3 py-1 text-xs font-semibold shadow">Most popular</div>
             <h3 className="text-xl font-bold font-heading mb-1">Student</h3>
             <p className="text-muted-foreground mb-6">Everything you need for real exam prep.</p>
             <div className="mb-6">
@@ -448,12 +451,15 @@ export default function PricingClient({ onPurchaseComplete }: PricingClientProps
             <button
               onClick={() => handleChoosePlan('student')}
               disabled={isButtonDisabled('student')}
-              className={`mb-6 w-full rounded-full bg-primary py-2 text-sm font-semibold text-white shadow transition ${
+              className={`mb-2 w-full rounded-full bg-primary py-2 text-sm font-semibold text-white shadow transition ${
                 isButtonDisabled('student') ? 'opacity-60 cursor-not-allowed' : 'hover:bg-primary/90'
               }`}
             >
               {getButtonLabel('student')}
             </button>
+            <p className="mb-6 text-center text-xs text-muted-foreground">
+              Cancel anytime. Secure Paddle checkout.
+            </p>
             <ul className="space-y-2 text-sm">
               <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> {PAID_PLANS.student.credits} monthly credits</li>
               <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> Mind maps + flashcards</li>
@@ -461,6 +467,9 @@ export default function PricingClient({ onPurchaseComplete }: PricingClientProps
               <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> AI Flashcard Explanations</li>
               <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> Advanced AI Model</li>
             </ul>
+            <p className="mt-auto pt-4 text-center text-[11px] leading-tight text-muted-foreground">
+              Secure payments via Paddle. No hidden fees, tax included where applicable.
+            </p>
           </div>
 
           {/* Free */}
