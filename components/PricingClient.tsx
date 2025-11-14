@@ -6,7 +6,7 @@ import { Check, X } from 'lucide-react';
 import { supabase } from '@/lib/supabaseClient';
 import AuthModal from '@/components/AuthModal';
 import { User } from '@supabase/supabase-js';
-import { PAID_PLANS, FREE_PLAN_GENERATIONS, MODEL_CREDIT_MULTIPLIERS, REVERSE_TRIAL } from '@/lib/plans';
+import { PAID_PLANS, FREE_PLAN_GENERATIONS, MODEL_CREDIT_MULTIPLIERS } from '@/lib/plans';
 
 type BillingCycle = 'month' | 'year';
 
@@ -484,19 +484,7 @@ export default function PricingClient({ onPurchaseComplete }: PricingClientProps
                 Sign up
               </button>
             )}
-            <div className="mb-4 rounded-2xl border border-dashed border-primary/40 bg-primary/5 p-3 text-xs text-primary">
-              <p className="font-semibold text-primary">Reverse trial included</p>
-              <p className="mt-1 text-muted-foreground">
-                Unlock {REVERSE_TRIAL.credits.toLocaleString()} credits plus Smart Mode & AI explanations for {REVERSE_TRIAL.durationDays} days when you create an account.
-              </p>
-            </div>
             <ul className="space-y-2 text-sm mb-6">
-              <li className="flex items-start gap-2">
-                <Check className="h-4 w-4 text-primary mt-0.5" />
-                <span>
-                  Reverse Trial: {REVERSE_TRIAL.durationDays}-day Student experience with {REVERSE_TRIAL.credits.toLocaleString()} credits, Smart Mode, and AI Flashcard Explanations.
-                </span>
-              </li>
               <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> {FREE_PLAN_GENERATIONS} monthly generations</li>
               <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> Mind maps + flashcards</li>
               <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> Spaced repetition</li>
