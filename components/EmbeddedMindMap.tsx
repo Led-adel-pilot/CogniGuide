@@ -46,7 +46,7 @@ export default function EmbeddedMindMap({ markdown }: EmbeddedMindMapProps) {
   }, [initialize]);
 
   return (
-    <div ref={viewportRef} className="map-viewport h-full w-full !bg-transparent cursor-default">
+    <div ref={viewportRef} className="map-viewport h-full w-full cursor-default">
       <div ref={containerRef} id="mindmap-container"></div>
     </div>
   );

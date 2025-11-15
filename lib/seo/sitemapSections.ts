@@ -1,4 +1,5 @@
 import { allFlashcardPages } from '@/lib/programmatic/flashcardPages';
+import { allMindMapPages } from '@/lib/programmatic/mindMapPages';
 import { useCaseHubs } from '@/lib/programmatic/useCaseData';
 import { ensureAbsoluteUrl, formatLastmod, SitemapEntry } from '@/lib/seo/sitemap';
 
@@ -6,6 +7,7 @@ const coreRoutes = [
   '/',
   '/ai-mind-map-generator',
   '/ai-flashcard-generator',
+  '/mind-maps',
   '/pricing',
   '/contact',
   '/flashcards',
@@ -51,12 +53,17 @@ export const getSubhubSitemapEntries = (): SitemapEntry[] => {
   return sortByLocation(entries);
 };
 
-export const getFlashcardLandingSitemapEntries = (): SitemapEntry[] => {
-  const entries: SitemapEntry[] = [];
-  const seen = new Set<string>();
-
-  allFlashcardPages.forEach((page) => {
-    const canonical = page.metadata.canonical ?? page.path ?? `/flashcards/${page.slug}`;
+const addProgrammaticEntries = (
+  pages: { slug: string; path?: string; metadata: { canonical?: string } }[],
+  fallbackBase: string,
+  entries: SitemapEntry[],
+  seen: Set<string>
+) => {
+  pages.forEach((page) => {
+    const canonical =
+      page.metadata.canonical ??
+      page.path ??
+      `${fallbackBase}/${page.slug}`;
     const loc = ensureAbsoluteUrl(canonical);
 
     if (seen.has(loc)) {
@@ -69,6 +76,14 @@ export const getFlashcardLandingSitemapEntries = (): SitemapEntry[] => {
       lastmod: formatLastmod(),
     });
   });
+};
+
+export const getProgrammaticLandingSitemapEntries = (): SitemapEntry[] => {
+  const entries: SitemapEntry[] = [];
+  const seen = new Set<string>();
+
+  addProgrammaticEntries(allFlashcardPages, '/flashcards', entries, seen);
+  addProgrammaticEntries(allMindMapPages, '/mind-maps', entries, seen);
 
   return sortByLocation(entries);
 };

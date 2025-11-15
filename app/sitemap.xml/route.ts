@@ -6,8 +6,8 @@ import {
 } from '@/lib/seo/sitemap';
 import {
   getCoreSitemapEntries,
-  getFlashcardLandingSitemapEntries,
   getHubSitemapEntries,
+  getProgrammaticLandingSitemapEntries,
   getSubhubSitemapEntries,
 } from '@/lib/seo/sitemapSections';
 
@@ -15,7 +15,7 @@ export async function GET(): Promise<Response> {
   const coreEntries = getCoreSitemapEntries();
   const hubEntries = getHubSitemapEntries();
   const subhubEntries = getSubhubSitemapEntries();
-  const landingEntries = getFlashcardLandingSitemapEntries();
+  const landingEntries = getProgrammaticLandingSitemapEntries();
 
   const index = [
     {
