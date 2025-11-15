@@ -14,6 +14,7 @@ import { loadDeckSchedule, saveDeckSchedule, loadDeckScheduleAsync, saveDeckSche
 import { createInitialSchedule } from '@/lib/spaced-repetition';
 import PricingModal from '@/components/PricingModal';
 import ReverseTrialModal from '@/components/ReverseTrialModal';
+import { requestTooltipHide } from '@/components/TooltipLayer';
 import { PAID_SUBSCRIPTION_STATUSES, type ModelChoice } from '@/lib/plans';
 import CogniGuideLogo from '../../CogniGuide_logo.png';
 import Image from 'next/image';
@@ -171,6 +172,7 @@ export default function DashboardClient() {
   const [trialEndsAt, setTrialEndsAt] = useState<string | null>(null);
   const [tierLoading, setTierLoading] = useState<boolean>(true);
   const [isModeMenuOpen, setIsModeMenuOpen] = useState(false);
+  const [isPricingModalOpen, setIsPricingModalOpen] = useState(false);
   const [hoveredModel, setHoveredModel] = useState<ModelChoice | null>(null);
   const [isTrialModalOpen, setIsTrialModalOpen] = useState(false);
   const trialModalSeenKeyRef = useRef<string | null>(null);
@@ -202,6 +204,8 @@ export default function DashboardClient() {
     !isPaidUser && resolvedHoveredModel === 'smart'
       ? modelDetails.smart.lockedDescription ?? modelDetails.smart.description
       : modelDetails[resolvedHoveredModel].description;
+  const suppressModelTooltip = isModeMenuOpen || isPricingModalOpen;
+  const modelTriggerTooltip = suppressModelTooltip ? undefined : 'Change AI model';
 
   useEffect(() => {
     if (isModeMenuOpen) {
@@ -211,7 +215,6 @@ export default function DashboardClient() {
     }
   }, [isModeMenuOpen, selectedModel]);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-  const [isPricingModalOpen, setIsPricingModalOpen] = useState(false);
   const [spacedOpen, setSpacedOpen] = useState(false);
   const [dueQueue, setDueQueue] = useState<Array<{ id: string; title: string | null; cards: FlashcardType[]; mindmap_id?: string | null; mindmap_markdown?: string | null; explanations?: FlashcardExplanationMap | null }>>([]);
   const [studyDueOnly, setStudyDueOnly] = useState(false);
@@ -250,6 +253,18 @@ export default function DashboardClient() {
   const referralCopyTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const referralRewardTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const lastUpgradeTriggerRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (isModeMenuOpen) {
+      requestTooltipHide();
+    }
+  }, [isModeMenuOpen]);
+
+  useEffect(() => {
+    if (isPricingModalOpen) {
+      requestTooltipHide();
+    }
+  }, [isPricingModalOpen]);
 
   const displayName = getDisplayName(user);
   const displayInitials = getInitials(displayName);
@@ -599,6 +614,7 @@ const handleMindMapLinked = useCallback(
 
   const handleSelectModel = useCallback(
     (choice: ModelChoice) => {
+      requestTooltipHide();
       const allowed = choice === 'fast' || isPaidUser;
       try {
         posthog.capture('generation_model_option_clicked', {
@@ -1948,7 +1964,8 @@ const handleMindMapLinked = useCallback(
                 className="group inline-flex items-center gap-2 rounded-full bg-background px-3 py-2 text-sm font-medium text-foreground transition hover:bg-muted/70"
                 aria-haspopup="listbox"
                 aria-expanded={isModeMenuOpen}
-                title="Change AI model"
+                aria-label="Change AI model"
+                data-tooltip={modelTriggerTooltip}
               >
                 <div className="flex items-center gap-1">
                   <span className="text-lg font-semibold">{modelDetails[selectedModel].label}</span>
@@ -2130,7 +2147,6 @@ const handleMindMapLinked = useCallback(
               <button
                 onClick={() => setSpacedOpen(false)}
                 className="px-3 py-1.5 rounded-full border hover:bg-muted/50 transition-colors"
-                title="Close spaced repetition panel"
               >
                 Close
               </button>
@@ -2260,7 +2276,6 @@ const handleMindMapLinked = useCallback(
                         Cancel
                       </button>
                       <button
-                        title="Study this deck"
                         className={cn(
                           'px-3 py-1.5 text-xs rounded-full border bg-primary text-primary-foreground hover:bg-primary/90',
                           isCancelling ? 'opacity-60 cursor-not-allowed' : '',

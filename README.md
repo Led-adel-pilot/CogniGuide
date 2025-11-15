@@ -16,6 +16,7 @@
 
 ## 4. Client Components & Styling
 - UI primitives are built on shadcn-like helpers under components/ui/ (button, card, input, label, popover) plus components/ThemeToggle.tsx (localStorage + system detection) and components/TooltipLayer.tsx for layered modal tooltips.
+- TooltipLayer now exposes a `requestTooltipHide` helper that DashboardClient.tsx calls whenever the AI model dropdown opens or the upgrade modal appears, ensuring the “Change AI model” tooltip never lingers when free users click the locked Smart mode.
 - Global styling lives in app/globals.css (Tailwind 4 @config/@source directives, imported fonts from public/fonts, custom scrollbar tweaks, button animations), styles/mindmap.css, and styles assets referenced by export buttons for mind maps.
 - Shared utilities such as components/FlashcardIcon.tsx, components/PricingTiers.tsx, components/PricingModal.tsx, and components/ShareViewer.tsx keep the marketing + dashboard UI in sync with the rest of the experience.
 

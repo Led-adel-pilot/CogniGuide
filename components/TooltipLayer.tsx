@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
 type TooltipRect = {
@@ -27,6 +27,15 @@ type TooltipPosition = {
 // Edge padding from viewport and gap to anchor
 const EDGE_MARGIN = 8; // keep away from edges
 const GAP = 6; // distance between tooltip and anchor
+
+export const TOOLTIP_HIDE_EVENT = "cogniguide:hide-tooltips";
+
+export function requestTooltipHide() {
+  if (typeof document === "undefined") {
+    return;
+  }
+  document.dispatchEvent(new Event(TOOLTIP_HIDE_EVENT));
+}
 
 function getRect(element: HTMLElement): TooltipRect {
   const rect = element.getBoundingClientRect();
@@ -88,6 +97,14 @@ export default function TooltipLayer() {
   const activeElementRef = useRef<HTMLElement | null>(null);
   const rafRef = useRef<number | null>(null);
 
+  const hideTooltip = useCallback(() => {
+    if (activeElementRef.current) {
+      activeElementRef.current = null;
+    }
+    setTooltip((prev) => (prev.visible ? { ...prev, visible: false } : prev));
+    setPosition((prev) => (prev.ready ? { ...prev, ready: false } : prev));
+  }, []);
+
   useEffect(() => {
     mountedRef.current = true;
     return () => {
@@ -132,9 +149,7 @@ export default function TooltipLayer() {
         return;
       }
 
-      activeElementRef.current = null;
-      setTooltip((prev) => (prev.visible ? { ...prev, visible: false } : prev));
-      setPosition((prev) => ({ ...prev, ready: false }));
+      hideTooltip();
     };
 
     const handleFocusIn = (event: FocusEvent) => {
@@ -164,17 +179,35 @@ export default function TooltipLayer() {
         return;
       }
 
-      activeElementRef.current = null;
-      setTooltip((prev) => (prev.visible ? { ...prev, visible: false } : prev));
-      setPosition((prev) => ({ ...prev, ready: false }));
+      hideTooltip();
     };
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
-        activeElementRef.current = null;
-        setTooltip((prev) => (prev.visible ? { ...prev, visible: false } : prev));
-        setPosition((prev) => ({ ...prev, ready: false }));
+        hideTooltip();
       }
+    };
+
+    const handlePointerDown = () => {
+      hideTooltip();
+    };
+
+    const handleClick = () => {
+      hideTooltip();
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "hidden") {
+        hideTooltip();
+      }
+    };
+
+    const handleWindowBlur = () => {
+      hideTooltip();
+    };
+
+    const handleExternalHide = () => {
+      hideTooltip();
     };
 
     document.addEventListener("pointerenter", handlePointerEnter, true);
@@ -182,6 +215,11 @@ export default function TooltipLayer() {
     document.addEventListener("focusin", handleFocusIn, true);
     document.addEventListener("focusout", handleFocusOut, true);
     document.addEventListener("keydown", handleKeyDown, true);
+    document.addEventListener("pointerdown", handlePointerDown, true);
+    document.addEventListener("click", handleClick, true);
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    window.addEventListener("blur", handleWindowBlur);
+    document.addEventListener(TOOLTIP_HIDE_EVENT, handleExternalHide);
 
     return () => {
       document.removeEventListener("pointerenter", handlePointerEnter, true);
@@ -189,8 +227,13 @@ export default function TooltipLayer() {
       document.removeEventListener("focusin", handleFocusIn, true);
       document.removeEventListener("focusout", handleFocusOut, true);
       document.removeEventListener("keydown", handleKeyDown, true);
+      document.removeEventListener("pointerdown", handlePointerDown, true);
+      document.removeEventListener("click", handleClick, true);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+      window.removeEventListener("blur", handleWindowBlur);
+      document.removeEventListener(TOOLTIP_HIDE_EVENT, handleExternalHide);
     };
-  }, []);
+  }, [hideTooltip]);
 
   useEffect(() => {
     if (!tooltip.visible) {
@@ -198,11 +241,17 @@ export default function TooltipLayer() {
     }
 
     const updateRect = () => {
-      if (!activeElementRef.current) {
+      const element = activeElementRef.current;
+      if (!element) {
         return;
       }
 
-      const nextRect = getRect(activeElementRef.current);
+      if (!element.isConnected) {
+        hideTooltip();
+        return;
+      }
+
+      const nextRect = getRect(element);
       setTooltip((prev) => (prev.visible ? { ...prev, rect: nextRect } : prev));
     };
 
@@ -224,7 +273,7 @@ export default function TooltipLayer() {
         cancelAnimationFrame(rafRef.current);
       }
     };
-  }, [tooltip.visible]);
+  }, [tooltip.visible, hideTooltip]);
 
   useLayoutEffect(() => {
     if (!tooltip.visible || !tooltip.rect || !tooltipRef.current) {
