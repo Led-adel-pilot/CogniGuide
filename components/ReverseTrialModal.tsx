@@ -77,8 +77,7 @@ export default function ReverseTrialModal({ open, onClose, trialEndsAt }: Revers
             <Clock3 className="mt-0.5 h-4 w-4 text-primary" />
             <p>
               Your trial ends on <span className="font-medium text-foreground">{trialEndDateCopy}</span>. After that,
-              you'll go back to the Free plan - everything you
-              create stays saved.
+              you'll go back to the Free plan - everything you create stays saved.
             </p>
           </div>
         </div>
