@@ -175,7 +175,11 @@ export default function DashboardClient() {
   const [isPricingModalOpen, setIsPricingModalOpen] = useState(false);
   const [hoveredModel, setHoveredModel] = useState<ModelChoice | null>(null);
   const [isTrialModalOpen, setIsTrialModalOpen] = useState(false);
+  const [trialModalEligible, setTrialModalEligible] = useState(false);
+  const [hasGeneratedThisSession, setHasGeneratedThisSession] = useState(false);
   const trialModalSeenKeyRef = useRef<string | null>(null);
+  const trialModalEligibleRef = useRef<boolean>(false);
+  const hasGeneratedThisSessionRef = useRef<boolean>(false);
   const isPaidUser = userTier === 'paid' || userTier === 'trial';
   const balanceDisplay = isPaidUser
     ? (Math.floor(credits * 10) / 10).toFixed(1)
@@ -206,6 +210,14 @@ export default function DashboardClient() {
       : modelDetails[resolvedHoveredModel].description;
   const suppressModelTooltip = isModeMenuOpen || isPricingModalOpen;
   const modelTriggerTooltip = suppressModelTooltip ? undefined : 'Change AI model';
+
+  useEffect(() => {
+    trialModalEligibleRef.current = trialModalEligible;
+  }, [trialModalEligible]);
+
+  useEffect(() => {
+    hasGeneratedThisSessionRef.current = hasGeneratedThisSession;
+  }, [hasGeneratedThisSession]);
 
   type PricingModalOpenOptions = {
     name: string;
@@ -554,6 +566,7 @@ const handleMindMapLinked = useCallback(
       setSelectedModel('fast');
       setTrialEndsAt(null);
       setIsTrialModalOpen(false);
+      setTrialModalEligible(false);
     }
   }, [user, refreshUserTier]);
 
@@ -564,8 +577,14 @@ const handleMindMapLinked = useCallback(
   }, [isPaidUser, selectedModel]);
 
   useEffect(() => {
+    setHasGeneratedThisSession(false);
+    setTrialModalEligible(false);
+  }, [user?.id]);
+
+  useEffect(() => {
     if (!user?.id || !trialEndsAt || userTier !== 'trial') {
       setIsTrialModalOpen(false);
+      setTrialModalEligible(false);
       trialModalSeenKeyRef.current = null;
       return;
     }
@@ -577,7 +596,10 @@ const handleMindMapLinked = useCallback(
         seen = localStorage.getItem(key) === '1';
       }
     } catch {}
-    setIsTrialModalOpen(!seen);
+    setTrialModalEligible(!seen);
+    if (seen) {
+      setIsTrialModalOpen(false);
+    }
   }, [user?.id, trialEndsAt, userTier]);
 
   const persistReferralRedemptionSeen = useCallback(
@@ -612,7 +634,29 @@ const handleMindMapLinked = useCallback(
       } catch {}
     }
     setIsTrialModalOpen(false);
+    setTrialModalEligible(false);
   }, []);
+
+  const maybeOpenTrialModalAfterContentClose = useCallback(() => {
+    if (!trialModalSeenKeyRef.current) return;
+    if (!trialModalEligibleRef.current) return;
+    if (!hasGeneratedThisSessionRef.current) return;
+    setIsTrialModalOpen(true);
+    setTrialModalEligible(false);
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') {
+      return;
+    }
+    const handleStudyModalClosed = () => {
+      maybeOpenTrialModalAfterContentClose();
+    };
+    window.addEventListener('cogniguide:study-modal-closed', handleStudyModalClosed);
+    return () => {
+      window.removeEventListener('cogniguide:study-modal-closed', handleStudyModalClosed);
+    };
+  }, [maybeOpenTrialModalAfterContentClose]);
 
   const showReferralRewardNotice = useCallback((amount: number, redemptionId?: string, userIdOverride?: string) => {
     const key = redemptionId ? `referral:${redemptionId}` : `manual:${amount}`;
@@ -1010,6 +1054,7 @@ const handleMindMapLinked = useCallback(
 
       // Define event handlers
       handleGenerationComplete = () => {
+        setHasGeneratedThisSession(true);
         if (authed.id) {
           initPaginatedHistory(authed.id);
           loadAllFlashcardsOnly(authed.id).then((allFlash) => {

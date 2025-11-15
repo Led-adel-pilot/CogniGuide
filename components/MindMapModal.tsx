@@ -566,6 +566,19 @@ export default function MindMapModal({ markdown, onClose, onShareMindMap, isPaid
     setShowAuthModal(true);
   }, []);
 
+  const notifyModalClosed = useCallback(() => {
+    try {
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('cogniguide:study-modal-closed', { detail: { modal: 'mindmap' } }));
+      }
+    } catch {}
+  }, []);
+
+  const finalizeClose = useCallback(() => {
+    notifyModalClosed();
+    onClose();
+  }, [notifyModalClosed, onClose]);
+
   const handleClose = (event?: React.MouseEvent) => {
     // Prevent any automatic triggers
     if (event) {
@@ -577,7 +590,7 @@ export default function MindMapModal({ markdown, onClose, onShareMindMap, isPaid
     if (!disableSignupPrompts && !userId && hasGeneratedContent) {
       setShowLossAversionPopup(true);
     } else {
-      onClose();
+      finalizeClose();
     }
   };
 
@@ -1095,7 +1108,7 @@ export default function MindMapModal({ markdown, onClose, onShareMindMap, isPaid
                   Save & Continue
                 </button>
                 <button
-                  onClick={onClose}
+                  onClick={finalizeClose}
                   className="w-full h-10 px-6 text-sm font-medium text-muted-foreground bg-muted rounded-full hover:bg-muted/80 transition-colors whitespace-nowrap"
                   title="Close without saving"
                 >

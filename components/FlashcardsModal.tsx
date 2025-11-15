@@ -1215,6 +1215,19 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
     }
   }, [deckIdentifier, index, hasCards]);
 
+  const notifyModalClosed = React.useCallback(() => {
+    try {
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('cogniguide:study-modal-closed', { detail: { modal: 'flashcards' } }));
+      }
+    } catch {}
+  }, []);
+
+  const finalizeClose = React.useCallback(() => {
+    notifyModalClosed();
+    onClose();
+  }, [notifyModalClosed, onClose]);
+
   const handleClose = (event?: React.MouseEvent) => {
     if (event) {
       event.preventDefault();
@@ -1231,7 +1244,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
     if (!userId && !deckId && cards && cards.length > 0) {
       setShowLossAversionPopup(true);
     } else {
-      onClose();
+      finalizeClose();
     }
   };
 
@@ -2531,7 +2544,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
               </button>
               <button
                 title="Continue without saving progress"
-                onClick={onClose}
+                onClick={finalizeClose}
                 className="w-full h-10 px-6 text-sm font-medium text-muted-foreground bg-muted rounded-full hover:bg-muted/70 transition-colors whitespace-nowrap"
               >
                 Continue without saving
