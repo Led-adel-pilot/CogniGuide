@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import type { CSSProperties } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -16,6 +16,13 @@ const EmbeddedMindMap = dynamic(() => import('@/components/EmbeddedMindMap'), {
   ssr: false,
   loading: () => <div className="w-full h-full animate-pulse bg-muted/40" aria-hidden="true" />,
 });
+
+const DEFAULT_MINDMAP_PREVIEW = {
+  markdown:
+    '# Benefits of Reading from Mind Maps 🧠\n- **Enhanced Comprehension** 📖\n  - Visual layout clarifies relationships between concepts\n  - See the big picture and details simultaneously\n- **Improved Memory Retention** 💾\n  - Colors, branches, and keywords engage more of the brain\n  - Information is chunked into manageable parts\n- **Faster Learning** 🚀\n  - Quickly grasp complex topics\n  - Information is presented in a concise and organized manner\n- **Boosts Creativity** ✨\n  - Radiant structure encourages associative thinking\n  - Sparks new ideas and connections\n- **Effective Revision** ✅\n  - Condenses large amounts of information into a single page\n  - Easy to review and recall key points\n- **Engaging and Fun** 🎉\n  - More appealing than linear notes\n  - Makes studying a more active process',
+  title: 'Live mind map preview',
+  description: 'See how CogniGuide transforms dense notes into structured, expandable branches.',
+};
 
 type MindMapProgrammaticLandingProps = {
   page: ProgrammaticMindMapPage;
@@ -80,38 +87,12 @@ export default function MindMapProgrammaticLanding({ page }: MindMapProgrammatic
   const [isAuthed, setIsAuthed] = useState(false);
   const [useCasesOpen, setUseCasesOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [embeddedMindMapHeight, setEmbeddedMindMapHeight] = useState<number | null>(null);
   const router = useRouter();
   const lastSyncedAuthRef = useRef<boolean | null>(null);
   const useCaseMenuRef = useRef<HTMLDivElement | null>(null);
   const mobileUseCaseMenuRef = useRef<HTMLDivElement | null>(null);
   const mobileMenuRef = useRef<HTMLDivElement | null>(null);
   const mobileMenuToggleRef = useRef<HTMLButtonElement | null>(null);
-
-  const computeEmbeddedBaseHeight = useCallback(() => {
-    if (typeof window === 'undefined') return 0;
-    const width = window.innerWidth;
-    if (width >= 1024) {
-      return 30 * 16; // lg:h-[30rem]
-    }
-    if (width >= 768) {
-      return 26 * 16; // md:h-[26rem]
-    }
-    return Math.round(window.innerHeight * 0.65); // h-[65vh]
-  }, []);
-
-  useEffect(() => {
-    const updateHeight = () => {
-      const baseHeight = computeEmbeddedBaseHeight();
-      setEmbeddedMindMapHeight(baseHeight > 0 ? baseHeight : null);
-    };
-
-    updateHeight();
-    window.addEventListener('resize', updateHeight);
-    return () => {
-      window.removeEventListener('resize', updateHeight);
-    };
-  }, [computeEmbeddedBaseHeight]);
 
   useEffect(() => {
     if (!useCasesOpen) {
@@ -195,6 +176,8 @@ export default function MindMapProgrammaticLanding({ page }: MindMapProgrammatic
         'Explore how CogniGuide restructures dense notes into expandable branches.',
     };
   }, [page.embeddedMindMap]);
+
+  const heroMindMapPreview = mindMapPreview ?? DEFAULT_MINDMAP_PREVIEW;
 
   const hasHeroSubheading = Boolean(page.hero.subheading?.trim());
 
@@ -309,40 +292,6 @@ export default function MindMapProgrammaticLanding({ page }: MindMapProgrammatic
       },
     };
   }, [hasHeroSubheading, page.hero.heading, page.hero.subheading]);
-
-  const renderEmbeddedMindMapShowcase = (options?: { wrapperClassName?: string }) => {
-    const wrapperClassName = ['mx-auto w-full max-w-[1040px]', options?.wrapperClassName].filter(Boolean).join(' ');
-
-    if (!mindMapPreview) {
-      return (
-        <div className={wrapperClassName}>
-          <div className="flex flex-col items-center justify-center rounded-[2rem] border border-dashed border-border/60 bg-muted/30 px-6 py-10 text-center text-sm text-muted-foreground">
-            Add <code className="font-semibold">embeddedMindMap.markdown</code> to this page object to showcase a live
-            preview.
-          </div>
-        </div>
-      );
-    }
-
-    return (
-      <div className={wrapperClassName}>
-        <div className="bg-background rounded-[2rem] border shadow-xl shadow-slate-200/50 dark:shadow-slate-700/50 w-full h-full flex flex-col">
-          <div className="flex flex-col gap-4 p-6">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.3em] text-primary/70">{mindMapPreview.title}</p>
-              <p className="mt-1 text-sm text-muted-foreground">{mindMapPreview.description}</p>
-            </div>
-            <div
-              className="rounded-2xl border border-border/70 bg-muted/40 overflow-hidden flex-1"
-              style={embeddedMindMapHeight ? { height: `${embeddedMindMapHeight}px` } : undefined}
-            >
-              <EmbeddedMindMap markdown={mindMapPreview.markdown} />
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  };
 
   useEffect(() => {
     try {
@@ -601,9 +550,17 @@ export default function MindMapProgrammaticLanding({ page }: MindMapProgrammatic
                 </div>
 
                 <div className="flex-1 w-full min-h-[28rem]">
-                  {renderEmbeddedMindMapShowcase({
-                    wrapperClassName: 'h-full flex items-stretch justify-center',
-                  })}
+                  <div className="bg-background rounded-[2rem] border shadow-xl shadow-slate-200/50 dark:shadow-slate-700/50 h-full flex flex-col overflow-hidden">
+                    <div className="p-6">
+                      <p className="text-xs font-semibold uppercase tracking-[0.3em] text-primary/70">
+                        {heroMindMapPreview.title}
+                      </p>
+                      <p className="mt-1 text-sm text-muted-foreground">{heroMindMapPreview.description}</p>
+                    </div>
+                    <div className="w-full h-[60vh] min-h-[22rem] md:h-[26rem] lg:h-[30rem]">
+                      <EmbeddedMindMap markdown={heroMindMapPreview.markdown} />
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
