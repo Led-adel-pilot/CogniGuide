@@ -17,12 +17,10 @@ const EmbeddedMindMap = dynamic(() => import('@/components/EmbeddedMindMap'), {
   loading: () => <div className="w-full h-full animate-pulse bg-muted/40" aria-hidden="true" />,
 });
 
-const DEFAULT_MINDMAP_PREVIEW = {
-  markdown:
-    '# Benefits of Reading from Mind Maps 🧠\n- **Enhanced Comprehension** 📖\n  - Visual layout clarifies relationships between concepts\n  - See the big picture and details simultaneously\n- **Improved Memory Retention** 💾\n  - Colors, branches, and keywords engage more of the brain\n  - Information is chunked into manageable parts\n- **Faster Learning** 🚀\n  - Quickly grasp complex topics\n  - Information is presented in a concise and organized manner\n- **Boosts Creativity** ✨\n  - Radiant structure encourages associative thinking\n  - Sparks new ideas and connections\n- **Effective Revision** ✅\n  - Condenses large amounts of information into a single page\n  - Easy to review and recall key points\n- **Engaging and Fun** 🎉\n  - More appealing than linear notes\n  - Makes studying a more active process',
-  title: 'Live mind map preview',
-  description: 'See how CogniGuide transforms dense notes into structured, expandable branches.',
-};
+const HERO_PREVIEW_HEADING = 'Live mind map preview';
+const HERO_PREVIEW_SUBTEXT = 'See how CogniGuide transforms dense notes into structured, expandable branches.';
+const DEFAULT_MINDMAP_PREVIEW_MARKDOWN =
+  '# Benefits of Reading from Mind Maps 🧠\n- **Enhanced Comprehension** 📖\n  - Visual layout clarifies relationships between concepts\n  - See the big picture and details simultaneously\n- **Improved Memory Retention** 💾\n  - Colors, branches, and keywords engage more of the brain\n  - Information is chunked into manageable parts\n- **Faster Learning** 🚀\n  - Quickly grasp complex topics\n  - Information is presented in a concise and organized manner\n- **Boosts Creativity** ✨\n  - Radiant structure encourages associative thinking\n  - Sparks new ideas and connections\n- **Effective Revision** ✅\n  - Condenses large amounts of information into a single page\n  - Easy to review and recall key points\n- **Engaging and Fun** 🎉\n  - More appealing than linear notes\n  - Makes studying a more active process';
 
 type MindMapProgrammaticLandingProps = {
   page: ProgrammaticMindMapPage;
@@ -162,22 +160,16 @@ export default function MindMapProgrammaticLanding({ page }: MindMapProgrammatic
     };
   }, []);
 
-  const mindMapPreview = useMemo(() => {
+  const mindMapPreviewMarkdown = useMemo(() => {
     const markdown = page.embeddedMindMap?.markdown?.trim();
     if (!markdown) {
       return null;
     }
 
-    return {
-      markdown,
-      title: page.embeddedMindMap?.title?.trim() || 'AI mind map preview',
-      description:
-        page.embeddedMindMap?.description?.trim() ||
-        'Explore how CogniGuide restructures dense notes into expandable branches.',
-    };
+    return markdown;
   }, [page.embeddedMindMap]);
 
-  const heroMindMapPreview = mindMapPreview ?? DEFAULT_MINDMAP_PREVIEW;
+  const heroMindMapMarkdown = mindMapPreviewMarkdown ?? DEFAULT_MINDMAP_PREVIEW_MARKDOWN;
 
   const hasHeroSubheading = Boolean(page.hero.subheading?.trim());
 
@@ -553,12 +545,12 @@ export default function MindMapProgrammaticLanding({ page }: MindMapProgrammatic
                   <div className="bg-background rounded-[2rem] border shadow-xl shadow-slate-200/50 dark:shadow-slate-700/50 h-full flex flex-col overflow-hidden">
                     <div className="p-6">
                       <p className="text-xs font-semibold uppercase tracking-[0.3em] text-primary/70">
-                        {heroMindMapPreview.title}
+                        {HERO_PREVIEW_HEADING}
                       </p>
-                      <p className="mt-1 text-sm text-muted-foreground">{heroMindMapPreview.description}</p>
+                      <p className="mt-1 text-sm text-muted-foreground">{HERO_PREVIEW_SUBTEXT}</p>
                     </div>
                     <div className="w-full h-[60vh] min-h-[22rem] md:h-[26rem] lg:h-[30rem]">
-                      <EmbeddedMindMap markdown={heroMindMapPreview.markdown} />
+                      <EmbeddedMindMap markdown={heroMindMapMarkdown} />
                     </div>
                   </div>
                 </div>

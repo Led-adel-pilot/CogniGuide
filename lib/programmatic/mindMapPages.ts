@@ -127,8 +127,6 @@ export const defaultMindMapLanding: ProgrammaticMindMapPage = {
     ],
   },
   embeddedMindMap: {
-    title: 'Live AI mind map preview',
-    description: 'This is an example of how CogniGuide restructures a dense topic. Expand nodes to see the flow.',
     markdown: `# Sample AI Mind Map
 - Upload your files or paste notes
   - PDFs, DOCX, PPTX, lecture notes

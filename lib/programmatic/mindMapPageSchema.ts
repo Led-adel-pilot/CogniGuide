@@ -24,8 +24,6 @@ export type {
 
 export interface ProgrammaticEmbeddedMindMap {
   markdown: string;
-  title?: string;
-  description?: string;
 }
 
 export interface ProgrammaticMindMapPage {

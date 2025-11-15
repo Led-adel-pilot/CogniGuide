@@ -90,7 +90,7 @@ PSYCHOLOGY-DRIVEN CTR GUIDANCE FOR METADATA:
 6) Embedded mind map preview:
 - Provide a Markdown string in Markmap syntax that mirrors what a user searching the target keyword expects to visualize.
 - Keep hierarchy 3 levels deep max; no lorem ipsum. Emphasize subtopics and supporting bullets.
-- Include a `title` and `description` summarizing what the preview shows.
+- Do not return separate title/description fields; the top-level branch should read like the map title.
 
 7) Structured data:
 - Provide breadcrumb + FAQ JSON-LD if omitted; your JSON output may include it directly, but it must follow schema.org formats.
@@ -141,9 +141,7 @@ Return JSON with this shape (comments describe expectations):
     "descriptionVariants": [string, string]
   },
   "embeddedMindMap": {
-    "title": string,
-    "description": string,
-    "markdown": string // Valid Markmap markdown preview tailored to the keyword
+    "markdown": string // Valid Markmap markdown preview tailored to the keyword; first parent node conveys the title
   },
   "relatedTopicsSection": {
     "heading": string,
@@ -417,8 +415,6 @@ def call_model(
             "embeddedMindMap": {
               "type": "object",
               "properties": {
-                "title": {"type": "string"},
-                "description": {"type": "string"},
                 "markdown": {"type": "string"},
               },
               "required": ["markdown"],
