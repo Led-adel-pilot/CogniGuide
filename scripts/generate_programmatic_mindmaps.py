@@ -6,7 +6,7 @@ for rich SEO copy, and emits TypeScript objects that satisfy the
 ``ProgrammaticMindMapPage`` schema. Run it locally before committing the resulting
 TypeScript so that every generated page can be statically rendered by Next.js.
 
-Example usage::
+Example usage:
 
 python scripts/generate_programmatic_mindmaps.py --input data/mindmap_pages.csv --output lib/programmatic/generated/mindMapPages.ts --model gemini-flash-lite-latest --max-api-calls 3 --concurrency 5
 
@@ -582,6 +582,77 @@ def build_structured_data(row: CsvRow, payload: Dict[str, Any]) -> Dict[str, Any
   return {"@context": "https://schema.org", "@graph": graph}
 
 
+def normalize_embedded_mindmap_markdown(markdown: str, fallback_title: str) -> str:
+  """
+  Make the embedded mind map markdown resilient to slight model format drift.
+
+  The renderer only understands Markmap-style headings/lists. Models occasionally return
+  outline-style text with indentation but no list markers or missing frontmatter fences.
+  This normalises the string by:
+  - Stripping empty lines
+  - Converting a leading "title: ..." line into a heading when frontmatter is missing
+  - Injecting a root heading when none exists
+  - Prefixing non-heading lines with "- " (preserving indentation) so they become list items
+  """
+
+  if not isinstance(markdown, str):
+    raise ValueError("embeddedMindMap.markdown must be a string")
+
+  lines = [line.rstrip() for line in markdown.splitlines()]
+  while lines and not lines[0].strip():
+    lines.pop(0)
+  while lines and not lines[-1].strip():
+    lines.pop()
+
+  frontmatter: List[str] = []
+  body_lines: List[str] = list(lines)
+
+  # Preserve valid frontmatter blocks
+  if body_lines and body_lines[0].strip() == "---":
+    try:
+      closing_index = next(
+        idx for idx, line in enumerate(body_lines[1:], start=1) if line.strip() == "---"
+      )
+      frontmatter = body_lines[: closing_index + 1]
+      body_lines = body_lines[closing_index + 1 :]
+    except StopIteration:
+      # Treat as no frontmatter if the closing fence is missing
+      pass
+
+  title_override = None
+  if not frontmatter and body_lines and body_lines[0].lower().startswith("title:"):
+    title_override = body_lines[0].split(":", 1)[1].strip() or None
+    body_lines = body_lines[1:]
+    while body_lines and body_lines[0].strip() == "---":
+      body_lines = body_lines[1:]
+
+  body_lines = [line for line in body_lines if line.strip()]
+  has_heading = any(re.match(r"^\s*#\s", line) for line in body_lines)
+  effective_title = title_override or fallback_title or "Mind Map"
+
+  normalized_body: List[str] = []
+  if not has_heading:
+    normalized_body.append(f"# {effective_title}")
+
+  token_pattern = re.compile(r"^\s*(?:[-*+]|\d+\.)\s|^\s*#\s")
+  for line in body_lines:
+    if not line.strip():
+      continue
+    if token_pattern.match(line):
+      normalized_body.append(line)
+      continue
+
+    stripped = line.lstrip()
+    indent = len(line) - len(stripped)
+    normalized_body.append(f"{' ' * indent}- {stripped}")
+
+  # Safety: ensure we always return something meaningful
+  if not normalized_body:
+    normalized_body = [f"# {effective_title}", "- Key points"]
+
+  return "\n".join(frontmatter + normalized_body)
+
+
 def normalise_page(row: CsvRow, payload: Dict[str, Any]) -> Dict[str, Any]:
   metadata = payload.get("metadata")
   if not isinstance(metadata, dict):
@@ -618,6 +689,29 @@ def normalise_page(row: CsvRow, payload: Dict[str, Any]) -> Dict[str, Any]:
       f"linkingRecommendations.descriptionVariants contained invalid entries for slug '{row.slug}'"
     )
   linking_recs["descriptionVariants"] = cleaned_descriptions
+
+  embedded_mindmap = payload.get("embeddedMindMap")
+  if not isinstance(embedded_mindmap, dict):
+    raise ValueError(f"Model response for slug '{row.slug}' is missing embeddedMindMap")
+  markdown = embedded_mindmap.get("markdown")
+  if not isinstance(markdown, str) or not markdown.strip():
+    raise ValueError(
+      f"embeddedMindMap.markdown must be a non-empty string for slug '{row.slug}'"
+    )
+
+  hero = payload.get("hero") if isinstance(payload.get("hero"), dict) else {}
+  hero_heading = hero.get("heading") if isinstance(hero, dict) else None
+  metadata_title = metadata.get("title") if isinstance(metadata, dict) else None
+  target_keyword = row.data.get("target_keyword")
+  fallback_title = (
+    (hero_heading or "").strip()
+    or (metadata_title or "").strip()
+    or (target_keyword or "").strip()
+    or row.slug.replace("-", " ").strip()
+  )
+  embedded_mindmap["markdown"] = normalize_embedded_mindmap_markdown(
+    markdown, fallback_title
+  )
 
   placeholder_section = {
     "heading": payload.get("relatedTopicsSection", {}).get("heading")

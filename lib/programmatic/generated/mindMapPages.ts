@@ -7,124 +7,124 @@ import type { ProgrammaticMindMapPage } from '@/lib/programmatic/mindMapPageSche
 export const generatedMindMapPages: ProgrammaticMindMapPage[] = [
   {
     "metadata": {
-      "title": "AI Project Planning Mind Map Generator for Managers",
-      "description": "Stop wasting hours drawing dependency charts. Instantly create a dynamic project planning mind map from documents or prompts. Gain visual clarity and faster alignment. Start mapping free.",
+      "title": "AI Project Planning Mind Map Maker | Instant Visual Roadmaps",
+      "description": "Struggling with complex project planning? Generate an interactive project planning mind map instantly from your briefs or outlines. Achieve faster clarity and alignment. Start mapping free.",
       "keywords": [
         "project planning mind map",
-        "AI project mapping",
-        "workflow visualization",
-        "dependency mapping tool",
-        "operations planning"
+        "AI mind map generator",
+        "visual project roadmap",
+        "project outline visualizer"
       ],
       "canonical": "https://www.cogniguide.app/mind-maps/project-planning-mind-map"
     },
     "hero": {
-      "eyebrow": "CogniGuide for Operations",
-      "heading": "Generate Your Project Planning Mind Map Instantly",
-      "subheading": "Transform complex project briefs, SOPs, or dependency lists into interactive, visual knowledge bases that align every stakeholder. Visualize scope, resources, and critical paths immediately.",
+      "eyebrow": "From Brief to Blueprint in Seconds",
+      "heading": "Instantly Visualize Your Project Planning Mind Map",
+      "subheading": "Upload project specs or use a prompt to transform dense plans into interactive, editable, and shareable visual frameworks. Stop losing time redrawing scope documents.",
       "primaryCta": {
         "type": "modal",
-        "label": "Build My Project Map"
+        "label": "Generate mind map"
       }
     },
     "featuresSection": {
-      "heading": "From Document Chaos to Project Clarity",
-      "subheading": "Harness AI to instantly diagram complex systems and unlock workflow visibility faster than ever before.",
+      "heading": "The Core of Project Clarity",
+      "subheading": "CogniGuide turns scattered project inputs into a coherent, navigable visual knowledge base.",
       "features": [
         {
-          "title": "Intelligent Input Processing",
-          "description": "Upload PDFs, DOCX files detailing scope, or paste meeting notes. Our AI extracts key tasks, milestones, and dependencies, structuring them automatically into a navigable, hierarchical structure."
+          "title": "Input Versatility for Planning",
+          "description": "Feed the AI your existing project charters (PDFs, DOCX, meeting notes, or text dumps). It instantly structures scope, tasks, dependencies, and milestones into a hierarchical structure."
         },
         {
-          "title": "Dynamic Dependency Visualization",
-          "description": "Instantly map complex systems where one node clearly flows to the next. Easily reorganize branches, recolor critical paths, and ensure your team sees the complete project relationship landscape."
+          "title": "Dynamic Visual Structuring",
+          "description": "Our AI excels at diagramming complex systems. Watch your vague deliverables break down into expandable branches, ensuring total brainstorm visibility and immediate alignment across stakeholders."
         },
         {
-          "title": "Actionable Export & Sharing",
-          "description": "Don't just build it—use it. Export pristine SVG or PDF versions for documentation, or share a live link for real-time collaboration and immediate team alignment workshops."
+          "title": "Actionable Export & Integration",
+          "description": "Once finalized, export your visual project plan as high-resolution SVG or PDF. Share interactive links instantly, or turn critical decision nodes into flashcards for team onboarding."
         }
       ]
     },
     "howItWorksSection": {
-      "heading": "Visualize Your Project in 3 Simple Steps",
-      "subheading": "Stop spending Sunday redrawing complex process maps. Get instant visual output for immediate review.",
+      "heading": "Create Your Project Map in Three Steps",
+      "subheading": "Experience the fastest path from raw data to an actionable project roadmap.",
       "steps": [
         {
-          "title": "Input Your Plan Data",
-          "description": "Upload your existing project charter, requirement documents, or use a detailed prompt describing the workflow you need mapped (e.g., 'Map the 5 phases of our Q3 launch process')."
+          "title": "1. Input Your Plan Data",
+          "description": "Upload your Project Requirements Document (PRD), detailed meeting minutes, or simply describe the project scope you need mapped out to CogniGuide."
         },
         {
-          "title": "Let AI Structure the Hierarchy",
-          "description": "CogniGuide instantly processes the input, creating an organized, expandable mind map. Review the structure, refine nodes, adjust color coding for priority, or add missing details."
+          "title": "2. AI Generation & Refinement",
+          "description": "Our engine generates a complete, interactive project planning mind map. Tweak node colors, restructure branches visually, and ensure every task dependency is clear."
         },
         {
-          "title": "Deploy & Iterate",
-          "description": "Use the visual map to run planning sessions, export it for stakeholder review, or convert key sections into reviewable flashcards for onboarding new team members."
+          "title": "3. Finalize, Share, or Study",
+          "description": "Export the final roadmap as an SVG for documentation, share a live link for team alignment, or convert complex sections into quick reference flashcards."
         }
       ],
       "cta": {
         "type": "link",
-        "label": "See Pricing for Team Scaling",
+        "label": "See Pricing Plans",
         "href": "/pricing"
       }
     },
     "seoSection": {
-      "heading": "Mastering Project Planning Mind Maps for Operational Excellence",
+      "heading": "Mastering Project Planning with Visual Concept Mapping",
       "body": [
         {
           "type": "paragraph",
-          "html": "A robust <strong>project planning mind map</strong> is the cornerstone of efficient operations management. Traditional Gantt charts or linear documents often fail to capture the nuanced relationships and dependencies between tasks. CogniGuide leverages AI to bridge this gap, offering a visual knowledge base that clarifies complex workflows, streamlines decision-making, and promotes organizational alignment instantly."
+          "html": "Creating a robust <strong>project planning mind map</strong> is foundational for effective management, yet traditional methods rely on manually drawing complex flowcharts. CogniGuide leverages AI to automate this process, taking unstructured planning documents and instantly creating intuitive, hierarchical structures that reveal relationships instantly."
         },
         {
           "type": "list",
           "items": [
-            "Creating intuitive concept maps for onboarding guides",
-            "Rapidly generating idea maps from brainstorming sessions",
-            "Visualizing technical dependency mapping for engineering projects",
-            "Structuring complex curriculum planning or training modules"
+            "Automated creation of idea maps from meeting transcripts.",
+            "Developing complex system diagrams for technical rollouts.",
+            "Streamlining curriculum planning or process mapping workflows.",
+            "Using concept maps for risk assessment visualization.",
+            "Facilitating better brainstorming sessions during project kickoffs."
           ]
         },
         {
           "type": "paragraph",
-          "html": "By transforming raw project data into a navigable, interconnected diagram, operations managers gain unprecedented brainstorming visibility. This visual approach ensures that potential blockers are identified early, improving overall project governance and reducing costly rework."
+          "html": "By focusing on visual knowledge representation, teams can move past basic Gantt charts and adopt dynamic mapping that supports rapid iteration and deep stakeholder understanding, making your next project kickoff significantly smoother."
         }
       ]
     },
     "faqSection": {
-      "heading": "Your Project Mapping Questions Answered",
-      "subheading": "Common concerns operations leaders have when adopting AI diagramming tools.",
+      "heading": "Frequently Asked Questions for Project Mapping",
+      "subheading": "Addressing common concerns about file compatibility, collaboration, and visualization.",
       "items": [
         {
-          "question": "What file formats can I use to create my project planning mind map?",
-          "answer": "We support all common documentation formats essential for project outlines, including PDF, DOCX, PPTX, and plain text. You can also build a map purely through text prompts describing your desired structure."
+          "question": "What file formats can I upload for automated project mapping?",
+          "answer": "CogniGuide accepts standard document types crucial for planning: PDF, DOCX, and PPTX. You can also paste raw text or simply prompt the AI with your project brief for immediate generation."
         },
         {
-          "question": "Can I collaborate with my team on an AI-generated map?",
-          "answer": "Yes. Once the initial map is generated, you receive a share link. Team members can view, edit, or contribute branches, ensuring everyone works from the single source of visual truth."
+          "question": "Can I collaborate on the generated project planning mind map?",
+          "answer": "Absolutely. Once generated, you receive a shareable link allowing real-time collaboration. Team members can edit branches, add notes, and ensure the visual roadmap stays current."
         },
         {
-          "question": "How do I export the completed structure for formal documentation?",
-          "answer": "CogniGuide allows high-fidelity exports to SVG for vector scalability, high-resolution PNG for quick sharing, and PDF, making it easy to embed your visual plan directly into compliance or status reports."
+          "question": "What are the export options for sharing the final project roadmap?",
+          "answer": "We ensure maximum utility for your visual asset. You can export the completed mind map in vector SVG format (perfect for documentation), high-quality PNG, or print-ready PDF."
         },
         {
-          "question": "How does this visual structure help map complex dependencies?",
-          "answer": "The AI specifically organizes input data into parent-child relationships. You can then customize links and hierarchies visually, making it far easier to trace upstream and downstream dependencies compared to static spreadsheet tracking."
+          "question": "How reliable is the AI in correctly mapping complex project dependencies?",
+          "answer": "The AI is trained on structuring logical relationships. While it provides an expert initial diagram, we encourage managers to review the hierarchy, especially for intricate task dependencies, using our intuitive drag-and-drop editor."
         }
       ],
       "cta": {
         "type": "modal",
-        "label": "Try the AI Mapping Demo Now"
+        "label": "Get Started Building Now"
       }
     },
     "linkingRecommendations": {
-      "anchorText": "Visualize your workflow mind map",
+      "anchorText": "Create dynamic project maps",
       "descriptionVariants": [
-        "If you need clearer SOPs, explore our dedicated AI workflow mind map generator.",
-        "For better alignment, see how other operations managers use our visual project planning mind map feature."
+        "Explore how CogniGuide helps simplify complex project planning mind map generation.",
+        "See other examples of creating sophisticated project maps using our AI."
       ]
     },
     "embeddedMindMap": {
-      "markdown": "Project Plan: Q4 Product Launch\n  Phase 1: Requirements & Scoping\n    - Finalize PRD (Dependency: Legal Review)\n    - Resource Allocation Approval\n  Phase 2: Development & Testing\n    - Feature Alpha Build\n    - UAT Sign-off\n  Phase 3: Go-to-Market\n    - Marketing Asset Finalization\n    - Deployment & Monitoring"
+      "markdown": "# AI-Powered Project Planning Roadmap\n- ## Phase 1: Initiation & Scope\n- Define Objectives\n  - Key Success Metrics (KSMs)\n  - Stakeholder Approval\n- Requirements Gathering\n  - Client Interviews\n  - Constraint Identification\n- ## Phase 2: Execution & Tasks\n- Resource Allocation\n  - Team Assignment\n  - Budget Check\n- Core Development Sprints\n  - Sprint 1: Foundation Build\n  - Sprint 2: Feature Integration\n- ## Phase 3: Review & Launch\n- Quality Assurance\n  - UAT Sign-off\n  - Bug Triage\n- Final Deployment"
     },
     "path": "/mind-maps/project-planning-mind-map",
     "slug": "project-planning-mind-map",
@@ -162,7 +162,7 @@ export const generatedMindMapPages: ProgrammaticMindMapPage[] = [
             {
               "@type": "ListItem",
               "position": 3,
-              "name": "Generate Your Project Planning Mind Map Instantly"
+              "name": "Instantly Visualize Your Project Planning Mind Map"
             }
           ]
         },
@@ -171,38 +171,38 @@ export const generatedMindMapPages: ProgrammaticMindMapPage[] = [
           "@id": "https://www.cogniguide.app/mind-maps/project-planning-mind-map#faq",
           "url": "https://www.cogniguide.app/mind-maps/project-planning-mind-map",
           "inLanguage": "en",
-          "name": "AI Project Planning Mind Map Generator for Managers",
+          "name": "AI Project Planning Mind Map Maker | Instant Visual Roadmaps",
           "mainEntity": [
             {
               "@type": "Question",
-              "name": "What file formats can I use to create my project planning mind map?",
+              "name": "What file formats can I upload for automated project mapping?",
               "acceptedAnswer": {
                 "@type": "Answer",
-                "text": "We support all common documentation formats essential for project outlines, including PDF, DOCX, PPTX, and plain text. You can also build a map purely through text prompts describing your desired structure."
+                "text": "CogniGuide accepts standard document types crucial for planning: PDF, DOCX, and PPTX. You can also paste raw text or simply prompt the AI with your project brief for immediate generation."
               }
             },
             {
               "@type": "Question",
-              "name": "Can I collaborate with my team on an AI-generated map?",
+              "name": "Can I collaborate on the generated project planning mind map?",
               "acceptedAnswer": {
                 "@type": "Answer",
-                "text": "Yes. Once the initial map is generated, you receive a share link. Team members can view, edit, or contribute branches, ensuring everyone works from the single source of visual truth."
+                "text": "Absolutely. Once generated, you receive a shareable link allowing real-time collaboration. Team members can edit branches, add notes, and ensure the visual roadmap stays current."
               }
             },
             {
               "@type": "Question",
-              "name": "How do I export the completed structure for formal documentation?",
+              "name": "What are the export options for sharing the final project roadmap?",
               "acceptedAnswer": {
                 "@type": "Answer",
-                "text": "CogniGuide allows high-fidelity exports to SVG for vector scalability, high-resolution PNG for quick sharing, and PDF, making it easy to embed your visual plan directly into compliance or status reports."
+                "text": "We ensure maximum utility for your visual asset. You can export the completed mind map in vector SVG format (perfect for documentation), high-quality PNG, or print-ready PDF."
               }
             },
             {
               "@type": "Question",
-              "name": "How does this visual structure help map complex dependencies?",
+              "name": "How reliable is the AI in correctly mapping complex project dependencies?",
               "acceptedAnswer": {
                 "@type": "Answer",
-                "text": "The AI specifically organizes input data into parent-child relationships. You can then customize links and hierarchies visually, making it far easier to trace upstream and downstream dependencies compared to static spreadsheet tracking."
+                "text": "The AI is trained on structuring logical relationships. While it provides an expert initial diagram, we encourage managers to review the hierarchy, especially for intricate task dependencies, using our intuitive drag-and-drop editor."
               }
             }
           ]
@@ -212,127 +212,123 @@ export const generatedMindMapPages: ProgrammaticMindMapPage[] = [
   },
   {
     "metadata": {
-      "title": "AI Mind Map About Mental Health: Structure Your Wellness",
-      "description": "Struggling with complex mental health topics? Create an instant mind map about mental health by uploading notes or prompts. Gain visual clarity and reduce overwhelm. Start mapping free.",
+      "title": "AI Mind Map About Mental Health: Instant Visual Clarity",
+      "description": "Struggling with complex psychology notes? Instantly generate a detailed mind map about mental health from your PDFs or prompts. Visualize concepts faster. Start mapping free.",
       "keywords": [
         "mind map about mental health",
-        "mental wellness diagram",
-        "visualizing psychology concepts",
-        "AI concept mapping mental health"
+        "mental health concept map",
+        "AI diagram complex systems",
+        "psychology study maps"
       ],
       "canonical": "https://www.cogniguide.app/mind-maps/mind-map-about-mental-health"
     },
     "hero": {
-      "eyebrow": "Instant Visual Clarity for Complex Topics",
-      "heading": "Create Your Expert Mind Map About Mental Health Instantly",
-      "subheading": "Transform clinical notes, research papers, or personal journals into interactive, navigable diagrams. See the hierarchy of psychological concepts, treatments, and coping mechanisms without the manual drawing effort.",
+      "eyebrow": "From Chaos to Clarity: Visual Knowledge Bases",
+      "heading": "Instantly Create Your AI Mind Map About Mental Health",
+      "subheading": "Upload textbooks, research papers, or lecture notes—CogniGuide structures complex psychological concepts into interactive, expandable mind maps for superior retention and study.",
       "primaryCta": {
         "type": "modal",
         "label": "Generate mind map"
       }
     },
     "featuresSection": {
-      "heading": "Visualize Wellness Concepts: From Chaos to Clarity",
-      "subheading": "CogniGuide restructures dense information into expandable, intuitive visual knowledge bases, perfect for study or patient education.",
+      "heading": "Structure Complexity Without Losing Insight",
+      "subheading": "CogniGuide ensures that organizing intricate topics, from diagnostic criteria to therapeutic approaches, is immediate and intuitive.",
       "features": [
         {
-          "title": "Input Any Format",
-          "description": "Upload your PDFs of DSM criteria, DOCX lecture notes, or paste raw text. Our AI instantly maps the core structure, providing immediate brainstorm visibility over dense material."
+          "title": "Instant Input Processing",
+          "description": "Toss in any document—PDF, DOCX, or PPTX—or simply prompt the AI with a topic like 'Cognitive Distortions.' We instantly transform dense text into a navigable, hierarchical structure."
         },
         {
-          "title": "Expandable Hierarchical Structure",
-          "description": "View deep relationships instantly. Our system automatically organizes concepts into expandable branches, allowing you to focus on high-level structures or drill down into minute therapeutic details."
+          "title": "Interactive Concept Mapping",
+          "description": "Our maps aren't static images. Explore expandable branches to diagram complex systems like the DSM-5 categories or CBT frameworks. Customize colors to emphasize key relationships for better recall."
         },
         {
-          "title": "Convert to Study Tools",
-          "description": "Don't just map—learn. Convert key branches of your mental health diagram directly into customizable flashcards, reinforcing learning for exams or client understanding."
-        },
-        {
-          "title": "Share & Export Mastery",
-          "description": "Easily share live, interactive maps via a link or export finalized diagrams as clean PNGs or PDFs for integration into study guides or patient resources."
+          "title": "Convert Insights to Action",
+          "description": "Don't just study; internalize. Select any branch or concept cluster within your mental health map and instantly convert it into high-retention flashcards, streamlining your review process."
         }
       ]
     },
     "howItWorksSection": {
-      "heading": "From Research Document to Interactive Map in 3 Steps",
-      "subheading": "We handle the heavy lifting of diagram complex systems, so you can focus on understanding and application.",
+      "heading": "Visualize Your Mental Health Curriculum in 3 Steps",
+      "subheading": "Transform overwhelming reading lists into focused visual study guides today. Stop redrawing diagrams and start understanding.",
       "steps": [
         {
           "title": "1. Upload or Prompt",
-          "description": "Provide your source material—upload a PDF of a chapter on anxiety disorders, or simply prompt the AI: 'Create a mind map detailing the CBT model.'"
+          "description": "Upload your psychology textbook chapter, research paper, or clinical case study. Alternatively, ask the AI directly: 'Map the key components of Mindfulness-Based Stress Reduction (MBSR).'"
         },
         {
           "title": "2. AI Generates & Refines",
-          "description": "CogniGuide instantly generates a structured mind map. Customize node colors, re-arrange branches, and add your personal insights to perfect the visual representation."
+          "description": "Watch as CogniGuide instantly builds a visual knowledge base. Review the hierarchical structure, ensuring core concepts are central, and customize the visual layout to match your learning style."
         },
         {
-          "title": "3. Apply & Share",
-          "description": "Utilize your new visual knowledge base. Export the concept map for documentation, share the collaborative link with peers, or convert sections into focused flashcards."
+          "title": "3. Share, Export, or Study",
+          "description": "Export your finalized structure as a clean SVG or PDF for presentations, share a collaborative link with peers, or click to convert challenging nodes into active flashcards for exam preparation."
         }
       ],
       "cta": {
         "type": "link",
-        "label": "See Pricing Plans",
+        "label": "View all pricing options",
         "href": "/pricing"
       }
     },
     "seoSection": {
-      "heading": "Mastering Visual Knowledge Through Mental Health Mind Mapping",
+      "heading": "Mastering Complex Mental Health Concepts with Visual Diagrams",
       "body": [
         {
           "type": "paragraph",
-          "html": "Creating a powerful mind map about mental health requires significant organization, often taking hours to manually structure symptoms, diagnostic criteria, or therapeutic techniques. CogniGuide solves this bottleneck by using AI to instantly translate written content into a clear, navigable hierarchical structure. This technology is essential for students navigating extensive psychology curricula or clinicians needing to rapidly synthesize complex case studies."
+          "html": "Creating a high-quality <strong>mind map about mental health</strong> is essential for students and practitioners alike, allowing for the clear organization of multifaceted theories and treatments. Traditional note-taking often fails to capture the relational complexity inherent in areas like psychopathology or neurobiology, leading to surface-level understanding."
         },
         {
           "type": "list",
           "items": [
-            "Developing detailed concept maps for neuroscience modules.",
-            "Structuring complex therapeutic models like DBT or ACT.",
-            "Visual brainstorming on preventative mental wellness strategies.",
-            "Creating curriculum planning diagrams based on educational standards."
+            "Visualizing complex psychological models (e.g., psychodynamic vs. humanistic theories).",
+            "Rapidly creating concept maps from dense clinical guidelines.",
+            "Enhancing brainstorming visibility for self-care strategies.",
+            "Structuring curriculum planning for educational courses on well-being."
           ]
         },
         {
           "type": "paragraph",
-          "html": "By leveraging AI for diagram complex systems, users ensure every crucial component of mental well-being—from biological underpinnings to socio-environmental factors—is accounted for in their idea maps, leading to deeper comprehension and better retention."
+          "html": "CogniGuide’s AI ensures that mapping exercises, whether you are drafting an idea map for a research proposal or structuring a review session on diagnostic criteria, deliver immediate, expert-level visual scaffolding. This deepens comprehension far beyond linear text review."
         }
       ]
     },
     "faqSection": {
-      "heading": "Frequently Asked Questions on Health Mapping",
-      "subheading": "Addressing common concerns about input reliability and output utility.",
+      "heading": "Frequently Asked Questions",
+      "subheading": "Addressing common concerns about using AI for organizing sensitive and complex educational material.",
       "items": [
         {
-          "question": "What types of documentation can I use to build my mental health mind map?",
-          "answer": "We support uploading PDF documents, DOCX files, PPTX presentations, or raw text inputs. You can also simply provide a detailed text prompt describing the concepts you need mapped, such as specific phobias or neurotransmitter functions."
+          "question": "What formats can I use to generate my mental health mind map?",
+          "answer": "We support uploading common document types like PDF, DOCX, and PPTX. You can also simply provide a detailed text prompt. This flexibility ensures you aren't restricted by file type when needing immediate visual structure."
         },
         {
-          "question": "Can I edit the structure after the AI generates the initial mind map?",
-          "answer": "Absolutely. The initial generation provides the robust framework. You retain full control to drag, drop, add custom notes, change colors, and manually restructure branches to perfectly match your specific understanding or learning focus."
+          "question": "Can I collaborate with my study group on a shared mental health concept map?",
+          "answer": "Yes. Once the map is generated, you can create a share link, allowing colleagues or classmates to view, comment on, or even edit the hierarchical structure in real-time, fostering group alignment on complex topics."
         },
         {
-          "question": "How reliable is the AI for complex psychological terminology?",
-          "answer": "Our system is trained on vast amounts of structured data, making it highly proficient at recognizing and accurately placing standard psychological terminology and diagnostic categories into the correct hierarchical structure for concept mapping."
+          "question": "How reliable is the AI structure for specialized mental health terminology?",
+          "answer": "Our AI is trained on extensive textual data, providing high accuracy in recognizing and classifying technical terms found in established psychological literature. You always retain full editing rights to fine-tune the structure to your specific course requirements."
         },
         {
-          "question": "Is collaboration possible if I'm studying with a group?",
-          "answer": "Yes, CogniGuide allows you to generate a share link for any created mind map. This enables real-time collaboration or review sessions, allowing team members to view, comment on, or even edit the visual knowledge base together."
+          "question": "What export options are available after mapping?",
+          "answer": "You can export your final diagram in high-resolution PNG or scalable SVG formats, which are perfect for presentations or incorporating into academic papers. PDF export is also available for easy printing."
         }
       ],
       "cta": {
         "type": "modal",
-        "label": "Try It Now"
+        "label": "Ask Your Own Question"
       }
     },
     "linkingRecommendations": {
-      "anchorText": "Visualize mental health concepts",
+      "anchorText": "create your AI mind map",
       "descriptionVariants": [
-        "Explore how to use our tool for creating study outlines using a mind map about mental health.",
-        "Learn best practices for transforming complex treatment protocols into shareable mind maps."
+        "Use our powerful tool to create your AI mind map for any academic subject, ensuring better retention.",
+        "Generate a precise mind map about mental health concepts faster than ever before using our intelligent visualizer."
       ]
     },
     "embeddedMindMap": {
-      "markdown": "---\ntitle: Mental Health Overview\ndescription: Key domains in understanding psychological wellness\n---\n# Mental Wellness\n## Foundational Areas\n### Biological Factors\n- Genetics & Predisposition\n- Neurotransmitter Imbalances\n- Physical Health Correlation\n### Psychological Theories\n- Cognitive Behavioral Therapy (CBT)\n- Psychodynamic Approaches\n- Humanistic Perspective\n## Disorders & Diagnosis (DSM-5 Focus)\n### Anxiety Spectrum\n- Generalized Anxiety Disorder (GAD)\n- Panic Disorder\n- Phobias\n### Mood Disorders\n- Major Depressive Disorder (MDD)\n- Bipolar Spectrum\n## Intervention & Management\n### Therapeutic Modalities\n- Psychotherapy Types (Group/Individual)\n- Medication Management\n### Coping & Prevention\n- Mindfulness Techniques\n- Stress Management Skills"
+      "markdown": "# Core Components of Mental Well-being\n- ## Pillars of Psychological Health\n- Emotional Regulation\n  - Coping Mechanisms\n  - Stress Response\n- Cognitive Function\n  - Rational Thinking\n  - Bias Identification\n- ## Common Disruptions & Treatments\n- Anxiety Disorders\n  - Generalized Anxiety\n  - Panic Attacks\n- Therapeutic Approaches\n  - Cognitive Behavioral Therapy (CBT)\n  - Mindfulness Practice"
     },
     "path": "/mind-maps/mind-map-about-mental-health",
     "slug": "mind-map-about-mental-health",
@@ -370,7 +366,7 @@ export const generatedMindMapPages: ProgrammaticMindMapPage[] = [
             {
               "@type": "ListItem",
               "position": 3,
-              "name": "Create Your Expert Mind Map About Mental Health Instantly"
+              "name": "Instantly Create Your AI Mind Map About Mental Health"
             }
           ]
         },
@@ -379,38 +375,38 @@ export const generatedMindMapPages: ProgrammaticMindMapPage[] = [
           "@id": "https://www.cogniguide.app/mind-maps/mind-map-about-mental-health#faq",
           "url": "https://www.cogniguide.app/mind-maps/mind-map-about-mental-health",
           "inLanguage": "en",
-          "name": "AI Mind Map About Mental Health: Structure Your Wellness",
+          "name": "AI Mind Map About Mental Health: Instant Visual Clarity",
           "mainEntity": [
             {
               "@type": "Question",
-              "name": "What types of documentation can I use to build my mental health mind map?",
+              "name": "What formats can I use to generate my mental health mind map?",
               "acceptedAnswer": {
                 "@type": "Answer",
-                "text": "We support uploading PDF documents, DOCX files, PPTX presentations, or raw text inputs. You can also simply provide a detailed text prompt describing the concepts you need mapped, such as specific phobias or neurotransmitter functions."
+                "text": "We support uploading common document types like PDF, DOCX, and PPTX. You can also simply provide a detailed text prompt. This flexibility ensures you aren't restricted by file type when needing immediate visual structure."
               }
             },
             {
               "@type": "Question",
-              "name": "Can I edit the structure after the AI generates the initial mind map?",
+              "name": "Can I collaborate with my study group on a shared mental health concept map?",
               "acceptedAnswer": {
                 "@type": "Answer",
-                "text": "Absolutely. The initial generation provides the robust framework. You retain full control to drag, drop, add custom notes, change colors, and manually restructure branches to perfectly match your specific understanding or learning focus."
+                "text": "Yes. Once the map is generated, you can create a share link, allowing colleagues or classmates to view, comment on, or even edit the hierarchical structure in real-time, fostering group alignment on complex topics."
               }
             },
             {
               "@type": "Question",
-              "name": "How reliable is the AI for complex psychological terminology?",
+              "name": "How reliable is the AI structure for specialized mental health terminology?",
               "acceptedAnswer": {
                 "@type": "Answer",
-                "text": "Our system is trained on vast amounts of structured data, making it highly proficient at recognizing and accurately placing standard psychological terminology and diagnostic categories into the correct hierarchical structure for concept mapping."
+                "text": "Our AI is trained on extensive textual data, providing high accuracy in recognizing and classifying technical terms found in established psychological literature. You always retain full editing rights to fine-tune the structure to your specific course requirements."
               }
             },
             {
               "@type": "Question",
-              "name": "Is collaboration possible if I'm studying with a group?",
+              "name": "What export options are available after mapping?",
               "acceptedAnswer": {
                 "@type": "Answer",
-                "text": "Yes, CogniGuide allows you to generate a share link for any created mind map. This enables real-time collaboration or review sessions, allowing team members to view, comment on, or even edit the visual knowledge base together."
+                "text": "You can export your final diagram in high-resolution PNG or scalable SVG formats, which are perfect for presentations or incorporating into academic papers. PDF export is also available for easy printing."
               }
             }
           ]
@@ -420,124 +416,119 @@ export const generatedMindMapPages: ProgrammaticMindMapPage[] = [
   },
   {
     "metadata": {
-      "title": "Geography Concept Map Examples: Visualize Complex Topics",
-      "description": "Struggling with physical geography concepts? See instant concept map examples generated from your notes. Transform study guides into visual clarity. Start mapping free.",
+      "title": "Geography Concept Map Examples: Instant AI Generation",
+      "description": "Stop sketching complex geography systems! See instant concept map examples from your notes or prompt. Visualize climate, tectonics, or population studies faster. Start mapping free.",
       "keywords": [
         "concept map examples geography",
         "geography mind map",
-        "visualize geographic data",
-        "human geography concept mapping",
-        "physical geography study aid"
+        "AI concept mapping",
+        "visualizing geographic data"
       ],
       "canonical": "https://www.cogniguide.app/mind-maps/concept-map-examples-geography"
     },
     "hero": {
-      "eyebrow": "Instant Visual Learning for Earth Sciences",
-      "heading": "Unlock Clarity with Geography Concept Map Examples",
-      "subheading": "Upload your climate data, tectonic notes, or population studies, and watch CogniGuide instantly diagram complex systems into interactive, easy-to-navigate visual knowledge bases.",
+      "eyebrow": "Visualize Complex Systems Instantly",
+      "heading": "Generate Geography Concept Map Examples in Seconds",
+      "subheading": "Upload your study guide, textbook chapter, or lecture notes, and let CogniGuide instantly structure the content into an interactive, editable concept map of geographical relationships.",
       "primaryCta": {
         "type": "modal",
-        "label": "Generate Concept Map Now"
+        "label": "Generate mind map"
       }
     },
     "featuresSection": {
-      "heading": "Structure Study Chaos into Visual Authority",
-      "subheading": "CogniGuide transforms dense geographical texts and raw data points into structured, hierarchical concept maps that accelerate understanding and retention.",
+      "heading": "From Dense Text to Visual Clarity",
+      "subheading": "CogniGuide transforms unstructured geographic information into clear, hierarchical knowledge structures, perfect for exams or research synthesis.",
       "features": [
         {
-          "title": "Input Any Geographic Resource",
-          "description": "Drag-and-drop entire textbook chapters (PDF/DOCX), raw field notes, or lecture slides. Our AI parses complex spatial relationships and processes instantly."
+          "title": "Instant Input Processing",
+          "description": "Paste text or upload files (PDF, DOCX) describing climate zones, tectonic plates, or economic geography. Our AI immediately extracts key terms and relationships, laying the foundation for your concept map."
         },
         {
           "title": "Dynamic Hierarchical Structure",
-          "description": "See dense topics like 'Plate Tectonics' or 'Global Climate Models' automatically restructured into expandable branches, making system analysis simple and intuitive."
+          "description": "Unlike static diagrams, our maps feature expandable branches. Easily collapse complexity when reviewing core concepts or expand deeply into sub-topics like specific population dynamics or river systems."
         },
         {
-          "title": "Visualize and Export Your Understanding",
-          "description": "Customize nodes, test recall by converting branches to flashcards, and export your finalized geography concept map as high-resolution PNG or SVG for reports."
+          "title": "Review & Convert for Retention",
+          "description": "Use your finished concept map for deep study. Convert specific branches directly into high-retention flashcards for exam cram sessions or teaching preparation."
         }
       ]
     },
     "howItWorksSection": {
-      "heading": "From Data Dump to Diagram in Three Steps",
-      "subheading": "Mapping complex geography requires speed. Follow this simple flow to create powerful visual outlines from any document.",
+      "heading": "Your Geography Map in Three Steps",
+      "subheading": "See how quickly you can turn overwhelming reading material into a polished visual knowledge base.",
       "steps": [
         {
-          "title": "1. Upload or Paste Content",
-          "description": "Import your geography document—perhaps a long article on human migration patterns or a dense section on glaciology—or simply paste the text prompt directly."
+          "title": "1. Input Your Data",
+          "description": "Upload a geographical report, paste an outline of human geography theories, or simply prompt the AI with what you need visualized (e.g., 'Map the water cycle and its human impacts')."
         },
         {
-          "title": "2. AI Visual Restructuring",
-          "description": "CogniGuide analyzes the content, identifying core themes, sub-concepts, and relationships (e.g., causes and effects in environmental systems), instantly generating your first draft mind map."
+          "title": "2. AI Restructuring & Editing",
+          "description": "CogniGuide instantly generates a visual concept map. Refine the structure, adjust node colors for thematic grouping (e.g., blue for Hydrology, green for Biomes), and ensure perfect hierarchical flow."
         },
         {
-          "title": "3. Refine, Share, and Test",
-          "description": "Adjust node colors to highlight key areas, share the live link for group study on urban planning, or click to convert critical branches into study flashcards."
+          "title": "3. Export, Share, or Study",
+          "description": "Save your finalized geographic model as a high-quality SVG or PNG. Share a read-only link with study partners or leverage our tool to convert key sections into actionable flashcards for proven retention."
         }
       ],
       "cta": {
         "type": "link",
-        "label": "Explore Advanced Mapping Workflows",
+        "label": "See Tiered Plan Options",
         "href": "/pricing"
       }
     },
     "seoSection": {
-      "heading": "Creating Effective Geography Concept Map Examples",
+      "heading": "Mastering Geographic Relationships with AI Concept Maps",
       "body": [
         {
           "type": "paragraph",
-          "html": "Creating effective <strong>concept map examples in geography</strong> is essential for mastering subjects where processes, locations, and interactions are highly interconnected. Unlike simple outlines, a well-structured concept map visually enforces understanding of how variables—like topography, climate, and human impact—relate within a system."
+          "html": "Finding effective **concept map examples geography** often means sifting through outdated textbook diagrams. CogniGuide solves this by building custom visual tools based on *your* specific required reading or lecture content, ensuring relevance for modern curriculum demands."
         },
         {
           "type": "list",
           "items": [
-            "Diagram complex systems like the hydrological cycle or biome distribution.",
-            "Structure detailed political geography case studies for clearer arguments.",
-            "Use idea maps for brainstorming potential solutions to resource management challenges.",
-            "Plan research papers by mapping out thesis dependencies and supporting evidence."
+            "Creating effective visual outlines for advanced GIS projects.",
+            "Diagramming complex systems like agricultural models or plate tectonics.",
+            "Generating idea maps for brainstorming dissertation topics in environmental studies.",
+            "Building structured curriculum plans based on geography standards."
           ]
         },
         {
           "type": "paragraph",
-          "html": "Whether you are working on curriculum planning for world geography or synthesizing field research data, CogniGuide acts as your AI partner, ensuring that your visual representation accurately reflects the true hierarchy and linkages within the subject matter, moving beyond basic brainstorming into rigorous knowledge modeling."
+          "html": "By offering dynamic branching and easy exporting, our tool transforms rote memorization into active visual understanding, a crucial skill for excelling in any complex subject like physical or human geography."
         }
       ]
     },
     "faqSection": {
-      "heading": "Frequently Asked Questions on Geography Mapping",
-      "subheading": "Addressing common concerns about file formats, complexity, and integration.",
+      "heading": "Frequently Asked Questions on Geographic Mapping",
+      "subheading": "Solutions for common challenges in visualizing complex geographic studies.",
       "items": [
         {
-          "question": "Can CogniGuide handle specialized geography data formats or technical maps?",
-          "answer": "While we specialize in text-based inputs (PDF, DOCX, text prompts), you can describe complex diagrams or paste textual descriptions of geographic models, and our AI will successfully diagram the logical relationships between those concepts."
+          "question": "Can CogniGuide handle specialized geography file types?",
+          "answer": "Yes. While we focus on core documents (PDF, DOCX, PPTX), the AI is trained to interpret and map technical terminology found in specialized geography reports, ensuring your dense data structures correctly translate into visual nodes."
         },
         {
-          "question": "How does this differ from making a standard geography mind map?",
-          "answer": "A standard mind map is often freeform brainstorming. CogniGuide focuses on hierarchical structure and concept mapping—ensuring that central concepts link logically to sub-concepts, which is crucial for explaining complex geographic processes like ocean currents or demographic transitions."
+          "question": "How accurate are the AI's relationship connections in a concept map?",
+          "answer": "The AI excels at identifying subject-verb-object patterns common in academic writing, such as 'Climate Change causes Sea Level Rise.' We encourage users to review and adjust these connections post-generation to align perfectly with specific course requirements."
         },
         {
-          "question": "What if I need to collaborate on a shared geography map for a group project?",
-          "answer": "Collaboration is built-in. Once your map visualizing watershed management is generated, you can share a secure link, allowing team members to edit, add notes, or convert specific branches into action items or flashcards simultaneously."
+          "question": "Is it possible to export these concept maps for offline use?",
+          "answer": "Absolutely. You can export your finished geography mind map as high-resolution PNG, vector-scalable SVG (ideal for reports), or flattened PDF, ensuring you have access anytime."
         },
         {
-          "question": "Is it possible to export my geography concept map for academic submission?",
-          "answer": "Absolutely. You can export the finalized, visually polished map in high-quality formats like SVG, PNG, or PDF, ensuring professional presentation for your assignments or teaching materials."
+          "question": "I need to collaborate on a mapping project. How does sharing work?",
+          "answer": "You can generate a secure, shareable link for any map. Collaborators can view and edit the structure in real-time, making it excellent for group projects on topics like global supply chains or resource distribution."
         }
-      ],
-      "cta": {
-        "type": "modal",
-        "label": "Ask Another Question"
-      }
+      ]
     },
     "linkingRecommendations": {
-      "anchorText": "View geography concept map examples",
+      "anchorText": "visualize geography concept map structures",
       "descriptionVariants": [
-        "Explore our dedicated resource for advanced geography concept map examples showcasing climate systems.",
-        "Generate instant idea maps based on specific geography concept map examples for your next study session."
+        "Explore how our tool creates detailed, interactive geography concept map structures from raw text.",
+        "See more concept map examples tailored for educational and planning tasks using our AI."
       ]
     },
     "embeddedMindMap": {
-      "markdown": "title: Biome Distribution Factors\n\n- Climate\n  - Temperature (Mean Annual Range)\n    - Latitude Influence\n    - Altitude Effect\n  - Precipitation (Seasonal Variation)\n    - Ocean Currents\n    - Orographic Effects\n- Biotic Factors\n  - Soil Composition\n  - Human Impact (Land Use)"
+      "markdown": "# Generate Geography Concept Map Examples in Seconds\n- Geography Concept Map Examples: CogniGuide Generation\n* Physical Geography\n  * Tectonics\n    * Convergent Boundaries (Subduction)\n    * Transform Faults (San Andreas)\n  * Climate Systems\n    * Factors Influencing Climate (Latitude, Altitude)\n    * Major Climate Zones (Köppen System)\n* Human Geography\n  * Population Dynamics\n    * Demographic Transition Model\n    * Migration Drivers (Push/Pull Factors)\n  * Urbanization\n    * Core-Periphery Models\n    * Megacities Growth"
     },
     "path": "/mind-maps/concept-map-examples-geography",
     "slug": "concept-map-examples-geography",
@@ -575,7 +566,7 @@ export const generatedMindMapPages: ProgrammaticMindMapPage[] = [
             {
               "@type": "ListItem",
               "position": 3,
-              "name": "Unlock Clarity with Geography Concept Map Examples"
+              "name": "Generate Geography Concept Map Examples in Seconds"
             }
           ]
         },
@@ -584,38 +575,38 @@ export const generatedMindMapPages: ProgrammaticMindMapPage[] = [
           "@id": "https://www.cogniguide.app/mind-maps/concept-map-examples-geography#faq",
           "url": "https://www.cogniguide.app/mind-maps/concept-map-examples-geography",
           "inLanguage": "en",
-          "name": "Geography Concept Map Examples: Visualize Complex Topics",
+          "name": "Geography Concept Map Examples: Instant AI Generation",
           "mainEntity": [
             {
               "@type": "Question",
-              "name": "Can CogniGuide handle specialized geography data formats or technical maps?",
+              "name": "Can CogniGuide handle specialized geography file types?",
               "acceptedAnswer": {
                 "@type": "Answer",
-                "text": "While we specialize in text-based inputs (PDF, DOCX, text prompts), you can describe complex diagrams or paste textual descriptions of geographic models, and our AI will successfully diagram the logical relationships between those concepts."
+                "text": "Yes. While we focus on core documents (PDF, DOCX, PPTX), the AI is trained to interpret and map technical terminology found in specialized geography reports, ensuring your dense data structures correctly translate into visual nodes."
               }
             },
             {
               "@type": "Question",
-              "name": "How does this differ from making a standard geography mind map?",
+              "name": "How accurate are the AI's relationship connections in a concept map?",
               "acceptedAnswer": {
                 "@type": "Answer",
-                "text": "A standard mind map is often freeform brainstorming. CogniGuide focuses on hierarchical structure and concept mapping—ensuring that central concepts link logically to sub-concepts, which is crucial for explaining complex geographic processes like ocean currents or demographic transitions."
+                "text": "The AI excels at identifying subject-verb-object patterns common in academic writing, such as 'Climate Change causes Sea Level Rise.' We encourage users to review and adjust these connections post-generation to align perfectly with specific course requirements."
               }
             },
             {
               "@type": "Question",
-              "name": "What if I need to collaborate on a shared geography map for a group project?",
+              "name": "Is it possible to export these concept maps for offline use?",
               "acceptedAnswer": {
                 "@type": "Answer",
-                "text": "Collaboration is built-in. Once your map visualizing watershed management is generated, you can share a secure link, allowing team members to edit, add notes, or convert specific branches into action items or flashcards simultaneously."
+                "text": "Absolutely. You can export your finished geography mind map as high-resolution PNG, vector-scalable SVG (ideal for reports), or flattened PDF, ensuring you have access anytime."
               }
             },
             {
               "@type": "Question",
-              "name": "Is it possible to export my geography concept map for academic submission?",
+              "name": "I need to collaborate on a mapping project. How does sharing work?",
               "acceptedAnswer": {
                 "@type": "Answer",
-                "text": "Absolutely. You can export the finalized, visually polished map in high-quality formats like SVG, PNG, or PDF, ensuring professional presentation for your assignments or teaching materials."
+                "text": "You can generate a secure, shareable link for any map. Collaborators can view and edit the structure in real-time, making it excellent for group projects on topics like global supply chains or resource distribution."
               }
             }
           ]
@@ -625,59 +616,58 @@ export const generatedMindMapPages: ProgrammaticMindMapPage[] = [
   },
   {
     "metadata": {
-      "title": "AI Mind Map Biology Visualizer: Structure Complex Concepts",
-      "description": "Struggling with complex biology structures? Instantly generate interactive mind maps from your notes using our AI. Achieve faster clarity on cell structure or genetics. Start mapping free.",
+      "title": "Create a Biology Mind Map Instantly with AI | CogniGuide",
+      "description": "Struggling with complex biology concepts? Generate an interactive mind map biology visualization from lecture notes or text instantly. Achieve faster clarity for exams. Start mapping free.",
       "keywords": [
         "mind map biology",
-        "biology concept map",
-        "study mind map",
-        "visualize biological systems",
-        "AI mind mapping for science"
+        "AI biology diagram",
+        "concept mapping for science",
+        "visualizing biological systems"
       ],
       "canonical": "https://www.cogniguide.app/mind-maps/mind-map-biology"
     },
     "hero": {
-      "eyebrow": "Instant Visual Learning",
-      "heading": "Transform Dense Biology Text into Interactive Mind Maps",
-      "subheading": "Upload lecture slides, research papers, or textbook chapters, and let CogniGuide instantly diagram complex biological systems, from cellular respiration pathways to genetic hierarchies.",
+      "eyebrow": "From Complex Texts to Visual Clarity",
+      "heading": "Instantly Generate Your Interactive Mind Map for Biology",
+      "subheading": "Upload your lecture slides, research papers, or notes, and let CogniGuide instantly diagram complex biological concepts into expandable, easy-to-navigate visual knowledge bases.",
       "primaryCta": {
         "type": "modal",
         "label": "Generate mind map"
       }
     },
     "featuresSection": {
-      "heading": "Clarity Engineered for Science Learning",
-      "subheading": "Stop redrawing hierarchies. CogniGuide automates the structural organization required for mastering complex scientific subjects like biology.",
+      "heading": "Visualize Biology Like Never Before",
+      "subheading": "CogniGuide transforms dense scientific information into accessible, interconnected diagrams, ensuring deep understanding and recall.",
       "features": [
         {
-          "title": "Input Any Biological Source",
-          "description": "Seamlessly ingest PDFs of studies, DOCX outlines of lectures, or detailed text dumps. Our AI parses technical language to build a solid conceptual foundation instantly."
+          "title": "Seamless Content Ingestion",
+          "description": "Effortlessly import entire chapters or specific processes from PDF, DOCX, or raw text. Stop outlining manually; let the AI extract the core hierarchical structure of any biological system."
         },
         {
-          "title": "Dynamic Hierarchical Structure",
-          "description": "Watch complex processes unfold. Content is automatically mapped into expandable branches, allowing you to drill down into organelles, enzymes, or anatomical structures on demand."
+          "title": "Dynamic Structure & Customization",
+          "description": "Your initial mind map biology diagram is fully editable. Expand, collapse branches representing organ systems or metabolic pathways, and customize colors to highlight critical relationships."
         },
         {
-          "title": "Study & Share Assets",
-          "description": "Export your finely tuned diagrams as high-resolution PNG or PDF for study guides, or convert key branches directly into shareable flashcards for exam cram sessions."
+          "title": "Export & Study Reinforcement",
+          "description": "Export your finished visual outline as SVG or PNG for reports, or instantly convert key branches into digital flashcards, leveraging visualization for superior exam preparation."
         }
       ]
     },
     "howItWorksSection": {
-      "heading": "From Research Paper to Conceptual Map in 3 Steps",
-      "subheading": "Mastering intricate biological topics requires focused visualization. Here is how CogniGuide accelerates your understanding.",
+      "heading": "Visualize Any Biology Topic in Three Steps",
+      "subheading": "Quickly transform verbose study materials into an organized, visual framework ready for review or presentation.",
       "steps": [
         {
-          "title": "1. Upload or Paste Your Content",
-          "description": "Supply the AI with your source material—whether it's a full chapter on cell division or just a detailed prompt outlining the Krebs Cycle. We handle the input."
+          "title": "1. Upload or Prompt",
+          "description": "Upload your required biology document (e.g., a chapter on cellular respiration) or simply type a prompt defining the scope you need mapped."
         },
         {
-          "title": "2. AI Instantly Maps the Hierarchy",
-          "description": "CogniGuide analyzes the relationships, automatically structuring the data into a clean, visual knowledge base. Customize colors and relationships to highlight key pathways."
+          "title": "2. AI Generates & Refines",
+          "description": "CogniGuide instantly restructures the content into an expandable, hierarchical mind map. Review the structure and easily edit nodes, rearrange branches, or add specific details."
         },
         {
-          "title": "3. Review, Refine, and Activate Learning",
-          "description": "Interact with the resulting map. Expand nodes for detail, refine connections for better understanding, and then export the structure or convert critical nodes into active study materials."
+          "title": "3. Export or Convert",
+          "description": "Finalize your visual knowledge base. Share the interactive map via a link, export it for integration into your study notes, or convert concept clusters into actionable flashcards."
         }
       ],
       "cta": {
@@ -687,62 +677,62 @@ export const generatedMindMapPages: ProgrammaticMindMapPage[] = [
       }
     },
     "seoSection": {
-      "heading": "Mastering Biology Through Visual Concept Mapping",
+      "heading": "Mastering Complex Concepts with Mind Map Biology Visualizations",
       "body": [
         {
           "type": "paragraph",
-          "html": "Creating a useful <strong>mind map biology</strong> visual requires correctly identifying relationships between numerous components, a task often too tedious for manual creation. CogniGuide is built for this complexity, serving as an expert tool to diagram complex systems. Whether you are mapping out human anatomy, ecological relationships, or molecular structures, visual thinking dramatically improves retention and recall."
+          "html": "Creating a powerful <strong>mind map biology</strong> diagram is essential for understanding interconnected subjects like biochemistry, genetics, or anatomy. Instead of fighting with drawing tools to represent complex systems, CogniGuide automates the scaffolding process, allowing you to focus purely on the scientific relationships."
         },
         {
           "type": "list",
           "items": [
-            "Rapid generation of idea maps for thesis outlines.",
-            "Creating comprehensive curriculum planning maps for educators.",
-            "Synthesizing information from multiple research papers into one unified concept map.",
-            "Utilizing brainstorming visibility for collaborative study groups."
+            "Generating detailed concept maps for curriculum planning.",
+            "Visualizing intricate molecular pathways and feedback loops.",
+            "Creating idea maps for advanced research synthesis.",
+            "Structuring comprehensive outlines for complex anatomy studies."
           ]
         },
         {
           "type": "paragraph",
-          "html": "By leveraging AI to structure your biological knowledge base, you move past the initial organization phase faster. This allows experienced learners and students alike to focus their energy on deeper analysis, decision-making regarding pathway dependencies, and exam preparation."
+          "html": "Whether you are visualizing protein synthesis or brainstorming clinical case studies, this AI-powered approach ensures every level of detail is captured within a clear, navigable format, boosting retention immediately."
         }
       ]
     },
     "faqSection": {
-      "heading": "Frequently Asked Questions for Biology Students",
-      "subheading": "Addressing common concerns about using AI for technical subjects.",
+      "heading": "Frequently Asked Questions About Biology Mapping",
+      "subheading": "Addressing common concerns about using AI for complex scientific visualization.",
       "items": [
         {
-          "question": "Can CogniGuide handle highly technical biology jargon and nomenclature?",
-          "answer": "Yes. Our AI model is trained on vast technical datasets, enabling it to correctly interpret complex biological terms, taxonomy, and chemical structures when building your mind map biology diagram."
+          "question": "What file types can I use to generate my biology mind map?",
+          "answer": "We support the most common academic formats: PDF, DOCX, and PPTX. You can also paste text directly or use a detailed prompt. This flexibility supports nearly all lecture and textbook materials."
         },
         {
-          "question": "What formats can I use to import my biology notes or textbook excerpts?",
-          "answer": "We support PDF documents, DOCX files (for lecture notes), PPTX (for slides), and plain text. If you can paste it, our AI can structure it into an initial map."
+          "question": "Can I collaborate with classmates on the same map?",
+          "answer": "Yes. Once generated, you can generate a share link, allowing peers to view, add notes to, or collaboratively edit the same hierarchical structure in real-time."
         },
         {
-          "question": "How do the export options support offline study or printing?",
-          "answer": "You can export your finalized, fully customized mind map as SVG for high-resolution editing, or as a print-ready PNG or PDF. This ensures your visual study guides are always accessible."
+          "question": "How reliable is the AI structure for technical biology topics?",
+          "answer": "The AI is trained to recognize standard hierarchical relationships common in scientific literature. For highly specialized or novel research, we encourage you to review the initial output, as you have full editing control to perfect the diagram."
         },
         {
-          "question": "Is it possible to turn a specific branch, like 'Mitochondrial Function,' into study aids?",
-          "answer": "Absolutely. We provide a direct conversion tool. Select any branch node, and CogniGuide will instantly transform that section of your map into digital flashcards for targeted review."
+          "question": "What export options are available after creating my concept map?",
+          "answer": "We provide high-quality vector (SVG) exports for scalability, standard image (PNG), and PDF exports, ensuring your visual knowledge base looks professional wherever you use it."
         }
       ],
       "cta": {
         "type": "modal",
-        "label": "Start Visualizing My Biology Notes"
+        "label": "Start Building Your First Map"
       }
     },
     "linkingRecommendations": {
-      "anchorText": "AI diagram complex systems visually",
+      "anchorText": "generate interactive mind maps",
       "descriptionVariants": [
-        "Explore how our AI mind map biology tool speeds up understanding of intricate cell structures.",
-        "Learn more about using visual concept mapping for deep scientific study workflows."
+        "Explore how CogniGuide turns dense study guides into visual study aids for your next biology exam.",
+        "Discover the best ways to generate interactive mind maps for academic synthesis and research organization."
       ]
     },
     "embeddedMindMap": {
-      "markdown": "title: Animal Cell Structure Overview\n---\nCell (The Basic Unit)\n    Components\n        Nucleus\n            Contains DNA/Genetic Material\n            Controls Cell Activities\n        Cytoplasm\n            Gel-like Substance\n            Holds Organelles\n    Energy Production\n        Mitochondria\n            Site of Cellular Respiration\n            Generates ATP\n    Membrane System\n        Cell Membrane\n            Regulates Entry/Exit\n            Outer Boundary"
+      "markdown": "# Biology Concept Mapping: Cellular Structure\n*   **Cell Types**\n    *   Prokaryotic\n        *   No nucleus\n        *   Smaller size\n    *   Eukaryotic\n        *   Membrane-bound organelles\n        *   Includes Animal & Plant Cells\n*   **Key Organelles**\n    *   Mitochondria (Energy Production)\n    *   Nucleus (Genetic Control)\n    *   Endoplasmic Reticulum (Synthesis)\n*   **Metabolic Pathways**\n    *   Glycolysis\n    *   Krebs Cycle\n    *   Electron Transport Chain"
     },
     "path": "/mind-maps/mind-map-biology",
     "slug": "mind-map-biology",
@@ -780,7 +770,7 @@ export const generatedMindMapPages: ProgrammaticMindMapPage[] = [
             {
               "@type": "ListItem",
               "position": 3,
-              "name": "Transform Dense Biology Text into Interactive Mind Maps"
+              "name": "Instantly Generate Your Interactive Mind Map for Biology"
             }
           ]
         },
@@ -789,38 +779,38 @@ export const generatedMindMapPages: ProgrammaticMindMapPage[] = [
           "@id": "https://www.cogniguide.app/mind-maps/mind-map-biology#faq",
           "url": "https://www.cogniguide.app/mind-maps/mind-map-biology",
           "inLanguage": "en",
-          "name": "AI Mind Map Biology Visualizer: Structure Complex Concepts",
+          "name": "Create a Biology Mind Map Instantly with AI | CogniGuide",
           "mainEntity": [
             {
               "@type": "Question",
-              "name": "Can CogniGuide handle highly technical biology jargon and nomenclature?",
+              "name": "What file types can I use to generate my biology mind map?",
               "acceptedAnswer": {
                 "@type": "Answer",
-                "text": "Yes. Our AI model is trained on vast technical datasets, enabling it to correctly interpret complex biological terms, taxonomy, and chemical structures when building your mind map biology diagram."
+                "text": "We support the most common academic formats: PDF, DOCX, and PPTX. You can also paste text directly or use a detailed prompt. This flexibility supports nearly all lecture and textbook materials."
               }
             },
             {
               "@type": "Question",
-              "name": "What formats can I use to import my biology notes or textbook excerpts?",
+              "name": "Can I collaborate with classmates on the same map?",
               "acceptedAnswer": {
                 "@type": "Answer",
-                "text": "We support PDF documents, DOCX files (for lecture notes), PPTX (for slides), and plain text. If you can paste it, our AI can structure it into an initial map."
+                "text": "Yes. Once generated, you can generate a share link, allowing peers to view, add notes to, or collaboratively edit the same hierarchical structure in real-time."
               }
             },
             {
               "@type": "Question",
-              "name": "How do the export options support offline study or printing?",
+              "name": "How reliable is the AI structure for technical biology topics?",
               "acceptedAnswer": {
                 "@type": "Answer",
-                "text": "You can export your finalized, fully customized mind map as SVG for high-resolution editing, or as a print-ready PNG or PDF. This ensures your visual study guides are always accessible."
+                "text": "The AI is trained to recognize standard hierarchical relationships common in scientific literature. For highly specialized or novel research, we encourage you to review the initial output, as you have full editing control to perfect the diagram."
               }
             },
             {
               "@type": "Question",
-              "name": "Is it possible to turn a specific branch, like 'Mitochondrial Function,' into study aids?",
+              "name": "What export options are available after creating my concept map?",
               "acceptedAnswer": {
                 "@type": "Answer",
-                "text": "Absolutely. We provide a direct conversion tool. Select any branch node, and CogniGuide will instantly transform that section of your map into digital flashcards for targeted review."
+                "text": "We provide high-quality vector (SVG) exports for scalability, standard image (PNG), and PDF exports, ensuring your visual knowledge base looks professional wherever you use it."
               }
             }
           ]
