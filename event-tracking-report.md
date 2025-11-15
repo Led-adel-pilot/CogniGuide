@@ -13,6 +13,10 @@ This document lists all PostHog events that have been automatically added to you
 - **history_item_opened**: Tracks when a user clicks on a mindmap or flashcard deck from their history list in the sidebar.
 - **spaced_repetition_deck_studied**: Tracks when a user clicks the 'Study' button for a specific deck in the spaced repetition modal.
 - **user_signed_out**: Tracks when a user clicks the 'Sign out' button.
+- **pricing_modal_opened**: Fires whenever any dashboard surface opens the upgrade modal. Properties include the `trigger` (e.g., `dashboard_upgrade_cta`, `model_selector_locked`, `generator_require_upgrade`) plus the user's current tier and credit balance.
+- **pricing_modal_closed**: Logged when the upgrade modal is dismissed. Includes the previously recorded trigger and the close `reason` (`close_button`, `overlay`, or `complete`) so you can measure completion vs. drop-off.
+- **generation_model_option_clicked**: Captures attempts to switch models along with whether the option was allowed (`allowed: false` indicates a Smart-mode paywall impression).
+- **referral_link_loaded**, **referral_modal_opened**, **referral_link_copied**, **referral_code_redeemed**: Power referral-funnel dashboards by telling you who viewed, copied, and successfully redeemed referral codes, including success/error states.
 
 ### app\pricing\page.tsx
 
@@ -28,6 +32,8 @@ This document lists all PostHog events that have been automatically added to you
 
 - **flashcard_graded**: Fired when a user grades their recall of a flashcard ('Again', 'Hard', 'Good', or 'Easy').
 - **flashcard_answer_shown**: Fired when a user clicks the 'Show Answer' button to reveal the flashcard's answer.
+- **mindmap_generation_from_flashcards_started / completed**: Wrap the “flashcards → mind map” flow with metadata such as deck size and AI model so you can monitor conversion from flashcard study back into mind maps.
+- **exam_date_set / exam_date_skipped**: Capture how many decks set exam reminders vs. skipping the prompt, useful for understanding retention levers tied to calendared studying.
 
 ### components\Generator.tsx
 
@@ -39,6 +45,17 @@ This document lists all PostHog events that have been automatically added to you
 
 - **flashcards_generation_requested**: Triggered when a user clicks the button to generate flashcards from the mind map markdown.
 - **mindmap_exported**: Triggered when a user clicks to download the mind map as an SVG, PNG, or printable PDF.
+
+### components\PricingClient.tsx
+
+- **pricing_viewed**: Logs whenever the pricing grid renders (on both the public page and the in-app modal via the `context` property) so you can measure funnel entries.
+- **pricing_billing_cycle_changed**: Tracks toggles between monthly and yearly billing, including the destination cycle.
+- **pricing_plan_cta_clicked**: Fired when a user taps any “Choose Student/Pro” button; includes the target plan and current subscription info.
+- **pricing_auth_prompt_shown**: Indicates that an unauthenticated user attempted to upgrade and was shown the sign-in modal, helping you quantify anonymous upgrade intent.
+- **pricing_checkout_initiated**: Emitted right before Paddle checkout opens (with plan + billing cycle) to align checkout starts with Paddle revenue data.
+- **pricing_checkout_completed**: Fired when Paddle reports a successful checkout, including the Paddle checkout ID.
+- **pricing_checkout_closed**: Captures checkout closes (with Paddle’s `closeType`) so you can monitor abandonment reasons.
+- **pricing_checkout_error**: Logged if Paddle throws during checkout initialization; includes the error message.
 
 ### components\PromptForm.tsx
 

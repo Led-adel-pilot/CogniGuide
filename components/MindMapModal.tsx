@@ -18,7 +18,7 @@ interface MindMapModalProps {
   onClose: () => void;
   onShareMindMap?: () => void;
   isPaidUser?: boolean;
-  onRequireUpgrade?: () => void;
+  onRequireUpgrade?: (reason?: string) => void;
   embedded?: boolean;
   onBackToFlashcards?: () => void;
   disableSignupPrompts?: boolean;

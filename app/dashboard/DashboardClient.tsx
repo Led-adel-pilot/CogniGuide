@@ -207,6 +207,42 @@ export default function DashboardClient() {
   const suppressModelTooltip = isModeMenuOpen || isPricingModalOpen;
   const modelTriggerTooltip = suppressModelTooltip ? undefined : 'Change AI model';
 
+  type PricingModalOpenOptions = {
+    name: string;
+    dedupeKey?: string;
+    props?: Record<string, any>;
+  };
+
+  const trackUpgradeEvent = useCallback(
+    (eventName: string, properties?: Record<string, any>) => {
+      try {
+        posthog.capture(eventName, {
+          location: 'dashboard',
+          user_tier: userTier,
+          is_paid_user: isPaidUser,
+          is_trial_user: userTier === 'trial',
+          credits_balance: credits,
+          ...properties,
+        });
+      } catch {}
+    },
+    [credits, isPaidUser, userTier],
+  );
+
+  const openPricingModal = useCallback(
+    ({ name, dedupeKey, props }: PricingModalOpenOptions) => {
+      const key = dedupeKey ?? name;
+      lastUpgradeTriggerRef.current = { key, name };
+      setIsPricingModalOpen(true);
+      const extraProps = props || {};
+      trackUpgradeEvent('pricing_modal_opened', {
+        trigger: name,
+        ...extraProps,
+      });
+    },
+    [trackUpgradeEvent],
+  );
+
   useEffect(() => {
     if (isModeMenuOpen) {
       setHoveredModel(selectedModel);
@@ -252,7 +288,7 @@ export default function DashboardClient() {
   const referralLastSeenIdRef = useRef<string | null>(null);
   const referralCopyTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const referralRewardTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const lastUpgradeTriggerRef = useRef<string | null>(null);
+  const lastUpgradeTriggerRef = useRef<{ key: string; name: string } | null>(null);
 
   useEffect(() => {
     if (isModeMenuOpen) {
@@ -625,8 +661,10 @@ const handleMindMapLinked = useCallback(
       } catch {}
 
       if (!allowed) {
-        lastUpgradeTriggerRef.current = 'model-selector';
-        setIsPricingModalOpen(true);
+        openPricingModal({
+          name: 'model_selector_locked',
+          props: { requested_model: choice },
+        });
         setIsModeMenuOpen(false); // Close the popover when showing pricing modal
         return;
       }
@@ -635,7 +673,7 @@ const handleMindMapLinked = useCallback(
       setHoveredModel(choice);
       setIsModeMenuOpen(false);
     },
-    [isPaidUser]
+    [isPaidUser, openPricingModal]
   );
 
   useEffect(() => {
@@ -765,16 +803,23 @@ const handleMindMapLinked = useCallback(
     }
   }, [showReferralRewardNotice]);
 
-  const handleClosePricingModal = () => {
-    setIsPricingModalOpen(false);
-    try {
-      if (typeof window !== 'undefined') {
-        localStorage.removeItem('cogniguide_open_upgrade');
-        localStorage.removeItem('cogniguide_upgrade_flow');
-      }
-    } catch {}
-    router.replace('/dashboard', { scroll: false });
-  };
+  const handleClosePricingModal = useCallback(
+    (reason: 'close_button' | 'overlay' | 'complete' = 'close_button') => {
+      setIsPricingModalOpen(false);
+      trackUpgradeEvent('pricing_modal_closed', {
+        trigger: lastUpgradeTriggerRef.current?.name ?? null,
+        reason,
+      });
+      try {
+        if (typeof window !== 'undefined') {
+          localStorage.removeItem('cogniguide_open_upgrade');
+          localStorage.removeItem('cogniguide_upgrade_flow');
+        }
+      } catch {}
+      router.replace('/dashboard', { scroll: false });
+    },
+    [router, trackUpgradeEvent],
+  );
 
   const loadUserCredits = async (userId: string) => {
     // Check localStorage cache first (for faster loads on same session)
@@ -1043,14 +1088,14 @@ const handleMindMapLinked = useCallback(
     }
 
     const hasUpgradeQuery = Boolean(upgradeQueryParam);
-    const key = hasUpgradeQuery ? `query:${upgradeQueryParam}` : hasLocalFlag ? 'local' : null;
+    const dedupeKey = hasUpgradeQuery ? `query:${upgradeQueryParam}` : hasLocalFlag ? 'local' : null;
 
-    if (!key) {
+    if (!dedupeKey) {
       lastUpgradeTriggerRef.current = null;
       return;
     }
 
-    if (lastUpgradeTriggerRef.current === key) {
+    if (lastUpgradeTriggerRef.current?.key === dedupeKey) {
       if (hasLocalFlag) {
         try {
           localStorage.removeItem('cogniguide_open_upgrade');
@@ -1060,15 +1105,23 @@ const handleMindMapLinked = useCallback(
       return;
     }
 
-    lastUpgradeTriggerRef.current = key;
-    setIsPricingModalOpen(true);
+    const triggerName = hasUpgradeQuery ? 'upgrade_query_param' : 'local_upgrade_flag';
+    openPricingModal({
+      name: triggerName,
+      dedupeKey,
+      props: {
+        auto_open: true,
+        query_value: hasUpgradeQuery ? upgradeQueryParam : undefined,
+        source: hasUpgradeQuery ? 'query_param' : 'local_storage',
+      },
+    });
     if (hasLocalFlag) {
       try {
         localStorage.removeItem('cogniguide_open_upgrade');
         localStorage.removeItem('cogniguide_upgrade_flow');
       } catch {}
     }
-  }, [upgradeQueryParam]);
+  }, [openPricingModal, upgradeQueryParam]);
 
   useEffect(() => {
     if (!user) {
@@ -2053,7 +2106,7 @@ const handleMindMapLinked = useCallback(
                   <div className="flex justify-center w-full">
                     <button
                       title="View pricing plans"
-                      onClick={() => setIsPricingModalOpen(true)}
+                      onClick={() => openPricingModal({ name: 'dashboard_upgrade_cta' })}
                       className="upgrade-plan-btn inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary text-primary-foreground hover:bg-primary/90 transition-colors mx-auto"
                     >
                       <Sparkles className="h-4 w-4" />
@@ -2067,7 +2120,12 @@ const handleMindMapLinked = useCallback(
               showTitle={false}
               modelChoice={selectedModel}
               isPaidSubscriber={isPaidUser}
-              onRequireUpgrade={() => setIsPricingModalOpen(true)}
+              onRequireUpgrade={(reason) =>
+                openPricingModal({
+                  name: 'generator_require_upgrade',
+                  props: reason ? { reason } : undefined,
+                })
+              }
               freeGenerationsRemaining={!isPaidUser ? credits : undefined}
             />
           </div>
@@ -2083,7 +2141,12 @@ const handleMindMapLinked = useCallback(
         }}
         onShareMindMap={activeMindMapId ? () => setShareItem({ id: activeMindMapId, type: 'mindmap', title: activeMindMapTitle ?? null }) : undefined}
         isPaidUser={isPaidUser}
-        onRequireUpgrade={() => setIsPricingModalOpen(true)}
+        onRequireUpgrade={(reason) =>
+          openPricingModal({
+            name: 'mindmap_modal',
+            props: reason ? { reason } : undefined,
+          })
+        }
       />
       <FlashcardsModal
         open={flashcardsOpen}
@@ -2122,7 +2185,12 @@ const handleMindMapLinked = useCallback(
         initialIndex={initialDueIndex}
         onShare={activeDeckId && activeDeckId !== 'interleaved-session' ? () => setShareItem({ id: activeDeckId, type: 'flashcards', title: flashcardsTitle ?? null }) : undefined}
         isPaidUser={isPaidUser}
-        onRequireUpgrade={() => setIsPricingModalOpen(true)}
+        onRequireUpgrade={(reason) =>
+          openPricingModal({
+            name: 'flashcards_modal',
+            props: reason ? { reason } : undefined,
+          })
+        }
         mindMapModelChoice={selectedModel}
         linkedMindMapId={activeDeckMindMapId}
         linkedMindMapMarkdown={activeDeckMindMapMarkdown}
@@ -2353,7 +2421,7 @@ const handleMindMapLinked = useCallback(
                     <button
                       title="Open upgrade options"
                       type="button"
-                      onClick={() => setIsPricingModalOpen(true)}
+                      onClick={() => openPricingModal({ name: 'settings_upgrade_link' })}
                       className="w-full text-left p-3 rounded-[1.25rem] border bg-background hover:bg-muted/50 flex items-center gap-3"
                     >
                       <TrendingUp className="h-4 w-4 text-primary" />

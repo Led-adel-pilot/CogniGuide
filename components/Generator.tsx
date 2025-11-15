@@ -34,7 +34,7 @@ interface GeneratorProps {
   compact?: boolean;
   modelChoice?: ModelChoice;
   isPaidSubscriber?: boolean;
-  onRequireUpgrade?: () => void;
+  onRequireUpgrade?: (reason?: string) => void;
   freeGenerationsRemaining?: number;
 }
 

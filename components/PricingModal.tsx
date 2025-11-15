@@ -26,7 +26,7 @@ export default function PricingModal({ isOpen, onClose, onPurchaseComplete }: Pr
               Upgrade your plan
             </h1>
           </div>
-        <PricingClient onPurchaseComplete={onPurchaseComplete} />
+        <PricingClient onPurchaseComplete={onPurchaseComplete} context="modal" />
       </div>
     </div>
   );

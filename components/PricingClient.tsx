@@ -7,6 +7,7 @@ import { supabase } from '@/lib/supabaseClient';
 import AuthModal from '@/components/AuthModal';
 import { User } from '@supabase/supabase-js';
 import { PAID_PLANS, FREE_PLAN_GENERATIONS, MODEL_CREDIT_MULTIPLIERS } from '@/lib/plans';
+import posthog from 'posthog-js';
 
 type BillingCycle = 'month' | 'year';
 
@@ -27,9 +28,10 @@ const PADDLE_CLIENT_TOKEN = process.env.NEXT_PUBLIC_PADDLE_CLIENT_TOKEN || '';
 
 interface PricingClientProps {
   onPurchaseComplete?: () => void;
+  context?: 'page' | 'modal';
 }
 
-export default function PricingClient({ onPurchaseComplete }: PricingClientProps = {}) {
+export default function PricingClient({ onPurchaseComplete, context = 'page' }: PricingClientProps = {}) {
   const [scriptReady, setScriptReady] = useState(false);
   const [paddleReady, setPaddleReady] = useState(false);
   const [billingCycle, setBillingCycle] = useState<BillingCycle>('month');
@@ -41,6 +43,9 @@ export default function PricingClient({ onPurchaseComplete }: PricingClientProps
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [subscription, setSubscription] = useState<{ status: string | null; plan: string | null } | null>(null);
   const [isLoadingAuth, setIsLoadingAuth] = useState(true);
+  const isAuthed = Boolean(user);
+  const hasTrackedViewRef = useRef(false);
+  const lastCheckoutRequestRef = useRef<{ plan: 'student' | 'pro'; cycle: BillingCycle } | null>(null);
 
   useEffect(() => {
     // This effect runs on mount and checks if Paddle was already loaded by another component.
@@ -130,6 +135,47 @@ export default function PricingClient({ onPurchaseComplete }: PricingClientProps
     else setSubscription(null);
   }, [user?.id]);
 
+  // Derive current plan and cycle from the stored Paddle priceId
+  const currentSubscription = useMemo(() => {
+    const priceId = subscription?.plan || null;
+    let plan: 'student' | 'pro' | null = null;
+    let cycle: BillingCycle | null = null;
+    if (priceId) {
+      if (priceId === PAID_PLANS.student.priceIds.month) { plan = 'student'; cycle = 'month'; }
+      else if (priceId === PAID_PLANS.student.priceIds.year) { plan = 'student'; cycle = 'year'; }
+      else if (priceId === PAID_PLANS.pro.priceIds.month) { plan = 'pro'; cycle = 'month'; }
+      else if (priceId === PAID_PLANS.pro.priceIds.year) { plan = 'pro'; cycle = 'year'; }
+    }
+    const status = subscription?.status || null;
+    const isActive = Boolean(status && ['active', 'trialing', 'past_due'].includes(status));
+    return { plan, cycle, status, isActive } as const;
+  }, [subscription]);
+
+  const trackPricingEvent = useCallback(
+    (eventName: string, properties?: Record<string, any>) => {
+      try {
+        posthog.capture(eventName, {
+          context,
+          billing_cycle: billingCycle,
+          is_authenticated: isAuthed,
+          current_plan: currentSubscription.plan,
+          current_plan_cycle: currentSubscription.cycle,
+          subscription_status: currentSubscription.status,
+          ...properties,
+        });
+      } catch {}
+    },
+    [billingCycle, context, currentSubscription.cycle, currentSubscription.plan, currentSubscription.status, isAuthed],
+  );
+
+  useEffect(() => {
+    if (hasTrackedViewRef.current) return;
+    hasTrackedViewRef.current = true;
+    trackPricingEvent('pricing_viewed', {
+      referrer: typeof document !== 'undefined' ? document.referrer || undefined : undefined,
+    });
+  }, [trackPricingEvent]);
+
   const initializePaddle = useCallback(() => {
     try {
       const PaddleObj = (window as any).Paddle;
@@ -144,9 +190,24 @@ export default function PricingClient({ onPurchaseComplete }: PricingClientProps
       PaddleObj.Initialize({
         token: PADDLE_CLIENT_TOKEN,
         eventCallback: function (event: any) {
-          if (event?.name === 'checkout.completed' && onPurchaseComplete) {
-            // Call the callback function to refresh credits after successful purchase
-            setTimeout(() => onPurchaseComplete(), 1000); // Small delay to ensure webhook has processed
+          if (event?.name === 'checkout.completed') {
+            trackPricingEvent('pricing_checkout_completed', {
+              plan: lastCheckoutRequestRef.current?.plan ?? null,
+              billing_cycle: lastCheckoutRequestRef.current?.cycle ?? null,
+              paddle_checkout_id: event?.data?.checkout?.id ?? event?.data?.id ?? null,
+            });
+            lastCheckoutRequestRef.current = null;
+            if (onPurchaseComplete) {
+              // Call the callback function to refresh credits after successful purchase
+              setTimeout(() => onPurchaseComplete(), 1000); // Small delay to ensure webhook has processed
+            }
+          } else if (event?.name === 'checkout.closed') {
+            trackPricingEvent('pricing_checkout_closed', {
+              plan: lastCheckoutRequestRef.current?.plan ?? null,
+              billing_cycle: lastCheckoutRequestRef.current?.cycle ?? null,
+              reason: event?.data?.closeType ?? event?.data?.reason ?? null,
+            });
+            lastCheckoutRequestRef.current = null;
           }
         },
       });
@@ -156,7 +217,7 @@ export default function PricingClient({ onPurchaseComplete }: PricingClientProps
     } catch (err) {
       console.error('Paddle init error', err);
     }
-  }, [onPurchaseComplete]);
+  }, [onPurchaseComplete, trackPricingEvent]);
 
   const updatePrices = useCallback(
     async (cycle: BillingCycle) => {
@@ -212,22 +273,6 @@ export default function PricingClient({ onPurchaseComplete }: PricingClientProps
       }
     }
   }, [updatePrices, paddleReady, isConfigured]);
-
-  // Derive current plan and cycle from the stored Paddle priceId
-  const currentSubscription = useMemo(() => {
-    const priceId = subscription?.plan || null;
-    let plan: 'student' | 'pro' | null = null;
-    let cycle: BillingCycle | null = null;
-    if (priceId) {
-      if (priceId === PAID_PLANS.student.priceIds.month) { plan = 'student'; cycle = 'month'; }
-      else if (priceId === PAID_PLANS.student.priceIds.year) { plan = 'student'; cycle = 'year'; }
-      else if (priceId === PAID_PLANS.pro.priceIds.month) { plan = 'pro'; cycle = 'month'; }
-      else if (priceId === PAID_PLANS.pro.priceIds.year) { plan = 'pro'; cycle = 'year'; }
-    }
-    const status = subscription?.status || null;
-    const isActive = Boolean(status && ['active', 'trialing', 'past_due'].includes(status));
-    return { plan, cycle, status, isActive } as const;
-  }, [subscription]);
 
   const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 
@@ -287,6 +332,9 @@ export default function PricingClient({ onPurchaseComplete }: PricingClientProps
       if (!paddleReady || !isConfigured) return;
       try {
         const PaddleObj = (window as any).Paddle;
+        if (!PaddleObj) return;
+        lastCheckoutRequestRef.current = { plan, cycle: billingCycle };
+        trackPricingEvent('pricing_checkout_initiated', { plan });
         PaddleObj.Checkout.open({
           items: [
             {
@@ -307,9 +355,13 @@ export default function PricingClient({ onPurchaseComplete }: PricingClientProps
         });
       } catch (error: any) {
         console.error('Checkout error:', error?.message || error);
+        trackPricingEvent('pricing_checkout_error', {
+          plan,
+          message: error?.message || (typeof error === 'string' ? error : undefined),
+        });
       }
     },
-    [billingCycle, isConfigured, paddleReady]
+    [billingCycle, isConfigured, paddleReady, trackPricingEvent]
   );
 
   const getDailyCostText = useCallback(
@@ -328,7 +380,9 @@ export default function PricingClient({ onPurchaseComplete }: PricingClientProps
   );
 
   const handleChoosePlan = (plan: 'student' | 'pro') => {
+    trackPricingEvent('pricing_plan_cta_clicked', { plan });
     if (!user) {
+      trackPricingEvent('pricing_auth_prompt_shown', { plan });
       localStorage.setItem('cogniguide_upgrade_flow', 'true');
       setAuthModalOpen(true);
     } else {
@@ -382,7 +436,11 @@ export default function PricingClient({ onPurchaseComplete }: PricingClientProps
               className={`px-4 py-2 text-sm rounded-full billing-toggle-button ${
                 billingCycle === 'month' ? 'billing-toggle-active' : ''
               }`}
-              onClick={() => setBillingCycle('month')}
+              onClick={() => {
+                if (billingCycle === 'month') return;
+                setBillingCycle('month');
+                trackPricingEvent('pricing_billing_cycle_changed', { new_cycle: 'month' });
+              }}
             >
               Monthly
             </button>
@@ -391,7 +449,11 @@ export default function PricingClient({ onPurchaseComplete }: PricingClientProps
               className={`px-4 py-2 text-sm rounded-full billing-toggle-button ${
                 billingCycle === 'year' ? 'billing-toggle-active' : ''
               }`}
-              onClick={() => setBillingCycle('year')}
+              onClick={() => {
+                if (billingCycle === 'year') return;
+                setBillingCycle('year');
+                trackPricingEvent('pricing_billing_cycle_changed', { new_cycle: 'year' });
+              }}
             >
               Yearly (Save 2 months)
             </button>

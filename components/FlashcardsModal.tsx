@@ -164,7 +164,7 @@ type Props = {
   isEmbedded?: boolean;
   onShare?: () => void;
   isPaidUser?: boolean;
-  onRequireUpgrade?: () => void;
+  onRequireUpgrade?: (reason?: string) => void;
   mindMapModelChoice?: ModelChoice;
   linkedMindMapId?: string | null;
   linkedMindMapMarkdown?: string | null;
@@ -467,7 +467,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
   const handleExplain = React.useCallback(async () => {
     if (!isPaidUser) {
       if (onRequireUpgrade) {
-        onRequireUpgrade();
+        onRequireUpgrade('flashcard_explain_blocked');
       } else {
         openAuthModal();
       }
@@ -727,7 +727,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
           }
         } catch {}
         setMindMapError(message);
-        if (onRequireUpgrade) onRequireUpgrade();
+        if (onRequireUpgrade) onRequireUpgrade('flashcards_to_mindmap_blocked');
         setIsMindMapModalOpen(false);
         return;
       }
