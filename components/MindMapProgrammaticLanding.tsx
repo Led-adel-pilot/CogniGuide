@@ -559,7 +559,11 @@ export default function MindMapProgrammaticLanding({ page }: MindMapProgrammatic
                       </p>
                     </div>
                     <div className="w-full h-[60vh] min-h-[22rem] md:h-[26rem] lg:h-[30rem]">
-                      <EmbeddedMindMap markdown={heroMindMapMarkdown} />
+                      <EmbeddedMindMap
+                        markdown={heroMindMapMarkdown}
+                        initialAutoFitScaleMultiplier={1.65}
+                        initialAutoFitCenterBias={{ x: -0.05 }}
+                      />
                     </div>
                   </div>
                 </div>

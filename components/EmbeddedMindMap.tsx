@@ -5,11 +5,22 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { initializeMindMap, cleanup } from '@/lib/markmap-renderer';
 import { ensureKatexAssets } from '@/lib/katex-loader';
 
-interface EmbeddedMindMapProps {
-  markdown: string;
+interface AutoFitCenterBias {
+  x?: number;
+  y?: number;
 }
 
-export default function EmbeddedMindMap({ markdown }: EmbeddedMindMapProps) {
+interface EmbeddedMindMapProps {
+  markdown: string;
+  initialAutoFitScaleMultiplier?: number;
+  initialAutoFitCenterBias?: AutoFitCenterBias;
+}
+
+export default function EmbeddedMindMap({
+  markdown,
+  initialAutoFitScaleMultiplier,
+  initialAutoFitCenterBias,
+}: EmbeddedMindMapProps) {
   const [isLoading, setIsLoading] = useState(true);
   const viewportRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -27,8 +38,10 @@ export default function EmbeddedMindMap({ markdown }: EmbeddedMindMapProps) {
 
     initializeMindMap(markdown, viewportRef.current, containerRef.current, {
       disableInteractions: true,
+      initialAutoFitScaleMultiplier,
+      initialAutoFitCenterBias,
     });
-  }, [markdown]);
+  }, [initialAutoFitCenterBias, initialAutoFitScaleMultiplier, markdown]);
 
   useEffect(() => {
     let cancelled = false;

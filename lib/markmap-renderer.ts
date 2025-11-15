@@ -36,10 +36,17 @@ export interface MindMapNode {
     connectorPath?: SVGPathElement;
 }
 
+export interface AutoFitCenterBiasOptions {
+    x?: number;
+    y?: number;
+}
+
 export interface InitializeOptions {
     initialPanXOffset?: number;
     initialPanYOffset?: number;
     disableInteractions?: boolean;
+    initialAutoFitScaleMultiplier?: number;
+    initialAutoFitCenterBias?: AutoFitCenterBiasOptions;
 }
 
 interface RgbColor { r: number; g: number; b: number; }
@@ -223,6 +230,9 @@ let willChangeTimeoutId: number | null = null;
 // Initial pan offset state (can be overridden via initialize options)
 let initialPanXOffset = INITIAL_PAN_X_OFFSET;
 let initialPanYOffset = INITIAL_PAN_Y_OFFSET;
+let initialAutoFitScaleMultiplier = 1;
+let initialAutoFitCenterBiasX = 0;
+let initialAutoFitCenterBiasY = 0;
 
 // ============== MEASUREMENT CACHE ==============
 // Reuse a single hidden measurement host and cache results to avoid repeated layout & KaTeX work
@@ -654,13 +664,18 @@ function autoFitView(markdown: string) {
     const scaleX = effectiveWidth / contentWidth;
     const scaleY = effectiveHeight / contentHeight;
 
-    scale = Math.min(scaleX, scaleY, 2); // Cap max zoom
+    const baseScale = Math.min(scaleX, scaleY, 2);
+    const multiplier = Math.max(initialAutoFitScaleMultiplier, 0.1);
+    scale = Math.min(baseScale * multiplier, 2); // Cap max zoom
 
     const contentCenterX = bounds.minX + PADDING + bounds.width / 2;
     const contentCenterY = bounds.minY + PADDING + bounds.height / 2;
 
-    panX = (viewportWidth / 2) - (contentCenterX * scale);
-    panY = (viewportHeight / 2) - (contentCenterY * scale);
+    const viewportBiasX = viewportWidth * initialAutoFitCenterBiasX;
+    const viewportBiasY = viewportHeight * initialAutoFitCenterBiasY;
+
+    panX = (viewportWidth / 2 + viewportBiasX) - (contentCenterX * scale);
+    panY = (viewportHeight / 2 + viewportBiasY) - (contentCenterY * scale);
 
     applyTransform();
     // After auto-fitting, we need to update stableRootY as if the root was centered,
@@ -1295,6 +1310,9 @@ export function initializeMindMap(
     // Set initial offsets from options or fall back to defaults
     initialPanXOffset = options?.initialPanXOffset ?? INITIAL_PAN_X_OFFSET;
     initialPanYOffset = options?.initialPanYOffset ?? INITIAL_PAN_Y_OFFSET;
+    initialAutoFitScaleMultiplier = options?.initialAutoFitScaleMultiplier ?? 1;
+    initialAutoFitCenterBiasX = options?.initialAutoFitCenterBias?.x ?? 0;
+    initialAutoFitCenterBiasY = options?.initialAutoFitCenterBias?.y ?? 0;
 
     // Clean up previous event listeners
     cleanup();
