@@ -12,9 +12,20 @@ import { useCaseMenuHubs } from '@/lib/programmatic/useCaseMenuData';
 import { broadcastAuthState, readSignedInFromCookies, writeCgAuthedCookie } from '@/lib/authCookie';
 
 const AuthModal = dynamic(() => import('@/components/AuthModal'), { ssr: false });
+const MindMapLoading = () => (
+  <div className="relative w-full h-full bg-background">
+    <div className="absolute inset-0 flex items-center justify-center bg-background/80 backdrop-blur-[1px]">
+      <div
+        className="h-12 w-12 rounded-full border-4 border-primary/30 border-t-primary animate-spin"
+        role="status"
+        aria-label="Loading mind map"
+      />
+    </div>
+  </div>
+);
 const EmbeddedMindMap = dynamic(() => import('@/components/EmbeddedMindMap'), {
   ssr: false,
-  loading: () => <div className="w-full h-full animate-pulse bg-muted/40" aria-hidden="true" />,
+  loading: MindMapLoading,
 });
 
 const HERO_PREVIEW_HEADING = 'AI Generated Preview';
@@ -543,7 +554,7 @@ export default function MindMapProgrammaticLanding({ page }: MindMapProgrammatic
                 <div className="flex-1 w-full min-h-[28rem]">
                   <div className="bg-background rounded-[2rem] border shadow-xl shadow-slate-200/50 dark:shadow-slate-700/50 h-full flex flex-col overflow-hidden">
                     <div className="px-6 pt-4 pb-4">
-                      <p className="text-sm font-semibold text-muted-foreground/65">
+                      <p className="text-sm font-semibold text-muted-foreground/85">
                         {HERO_PREVIEW_HEADING}
                       </p>
                     </div>
