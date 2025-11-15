@@ -458,6 +458,12 @@ export default function HomeLanding() {
                 Mind Map Generator
               </Link>
               <Link
+                href="/mind-maps"
+                className="text-xs text-muted-foreground/70 hover:underline"
+              >
+                Mind Map Use Cases
+              </Link>
+              <Link
                 href="/flashcards"
                 className="text-xs text-muted-foreground/70 hover:underline"
               >
