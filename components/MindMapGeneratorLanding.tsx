@@ -547,6 +547,9 @@ export default function MindMapGeneratorLanding() {
             <Link href="/ai-mind-map-generator" className="text-xs text-muted-foreground/70 hover:underline">
               Mind Map Generator
             </Link>
+            <Link href="/mind-maps" className="text-xs text-muted-foreground/70 hover:underline">
+              Mind Map Use Cases
+            </Link>
             <Link
               href="/ai-flashcard-generator"
               className="text-xs text-muted-foreground/70 hover:underline"

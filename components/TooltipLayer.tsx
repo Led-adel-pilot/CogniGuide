@@ -27,6 +27,7 @@ type TooltipPosition = {
 // Edge padding from viewport and gap to anchor
 const EDGE_MARGIN = 8; // keep away from edges
 const GAP = 6; // distance between tooltip and anchor
+const DEFAULT_SHOW_DELAY = 300; // ms delay before showing a tooltip
 
 export const TOOLTIP_HIDE_EVENT = "cogniguide:hide-tooltips";
 
@@ -85,6 +86,20 @@ function resolveTooltipText(element: HTMLElement): string | null {
   return null;
 }
 
+function resolveTooltipDelay(element: HTMLElement): number {
+  const raw = element.dataset.tooltipDelay;
+  if (!raw) {
+    return DEFAULT_SHOW_DELAY;
+  }
+
+  const parsed = Number.parseInt(raw, 10);
+  if (Number.isFinite(parsed) && parsed >= 0) {
+    return parsed;
+  }
+
+  return DEFAULT_SHOW_DELAY;
+}
+
 export default function TooltipLayer() {
   const [tooltip, setTooltip] = useState<TooltipState>({ text: "", rect: null, visible: false });
   const [position, setPosition] = useState<TooltipPosition>({
@@ -95,15 +110,30 @@ export default function TooltipLayer() {
   const tooltipRef = useRef<HTMLDivElement | null>(null);
   const mountedRef = useRef(false);
   const activeElementRef = useRef<HTMLElement | null>(null);
+  const pendingElementRef = useRef<HTMLElement | null>(null);
+  const showTimeoutRef = useRef<number | null>(null);
   const rafRef = useRef<number | null>(null);
 
-  const hideTooltip = useCallback(() => {
-    if (activeElementRef.current) {
-      activeElementRef.current = null;
+  const clearShowTimeout = useCallback(() => {
+    if (showTimeoutRef.current) {
+      window.clearTimeout(showTimeoutRef.current);
+      showTimeoutRef.current = null;
     }
+  }, []);
+
+  const showTooltip = useCallback((host: HTMLElement, text: string) => {
+    activeElementRef.current = host;
+    setPosition((prev) => ({ ...prev, ready: false }));
+    setTooltip({ text, rect: getRect(host), visible: true });
+  }, []);
+
+  const hideTooltip = useCallback(() => {
+    pendingElementRef.current = null;
+    clearShowTimeout();
+    activeElementRef.current = null;
     setTooltip((prev) => (prev.visible ? { ...prev, visible: false } : prev));
     setPosition((prev) => (prev.ready ? { ...prev, ready: false } : prev));
-  }, []);
+  }, [clearShowTimeout]);
 
   useEffect(() => {
     mountedRef.current = true;
@@ -113,6 +143,27 @@ export default function TooltipLayer() {
   }, []);
 
   useEffect(() => {
+    const scheduleShow = (host: HTMLElement, text: string) => {
+      pendingElementRef.current = host;
+      clearShowTimeout();
+
+      const delay = resolveTooltipDelay(host);
+      const run = () => {
+        showTimeoutRef.current = null;
+        if (pendingElementRef.current !== host) {
+          return;
+        }
+        showTooltip(host, text);
+      };
+
+      if (delay <= 0) {
+        run();
+        return;
+      }
+
+      showTimeoutRef.current = window.setTimeout(run, delay);
+    };
+
     const handlePointerEnter = (event: Event) => {
       const host = findTooltipHost(event.target);
       if (!host) {
@@ -124,13 +175,11 @@ export default function TooltipLayer() {
         return;
       }
 
-      activeElementRef.current = host;
-      setPosition((prev) => ({ ...prev, ready: false }));
-      setTooltip({ text, rect: getRect(host), visible: true });
+      scheduleShow(host, text);
     };
 
     const handlePointerLeave = (event: Event) => {
-      const current = activeElementRef.current;
+      const current = activeElementRef.current ?? pendingElementRef.current;
       if (!current) {
         return;
       }
@@ -163,13 +212,11 @@ export default function TooltipLayer() {
         return;
       }
 
-      activeElementRef.current = host;
-      setPosition((prev) => ({ ...prev, ready: false }));
-      setTooltip({ text, rect: getRect(host), visible: true });
+      scheduleShow(host, text);
     };
 
     const handleFocusOut = (event: FocusEvent) => {
-      const current = activeElementRef.current;
+      const current = activeElementRef.current ?? pendingElementRef.current;
       if (!current) {
         return;
       }
@@ -222,6 +269,8 @@ export default function TooltipLayer() {
     document.addEventListener(TOOLTIP_HIDE_EVENT, handleExternalHide);
 
     return () => {
+      clearShowTimeout();
+      pendingElementRef.current = null;
       document.removeEventListener("pointerenter", handlePointerEnter, true);
       document.removeEventListener("pointerleave", handlePointerLeave, true);
       document.removeEventListener("focusin", handleFocusIn, true);
@@ -233,7 +282,7 @@ export default function TooltipLayer() {
       window.removeEventListener("blur", handleWindowBlur);
       document.removeEventListener(TOOLTIP_HIDE_EVENT, handleExternalHide);
     };
-  }, [hideTooltip]);
+  }, [hideTooltip, clearShowTimeout, showTooltip]);
 
   useEffect(() => {
     if (!tooltip.visible) {

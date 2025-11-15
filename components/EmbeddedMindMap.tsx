@@ -1,15 +1,27 @@
 'use client';
 
 import '@/styles/mindmap.css';
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { initializeMindMap, cleanup } from '@/lib/markmap-renderer';
 import { ensureKatexAssets } from '@/lib/katex-loader';
 
-interface EmbeddedMindMapProps {
-  markdown: string;
+interface AutoFitCenterBias {
+  x?: number;
+  y?: number;
 }
 
-export default function EmbeddedMindMap({ markdown }: EmbeddedMindMapProps) {
+interface EmbeddedMindMapProps {
+  markdown: string;
+  initialAutoFitScaleMultiplier?: number;
+  initialAutoFitCenterBias?: AutoFitCenterBias;
+}
+
+export default function EmbeddedMindMap({
+  markdown,
+  initialAutoFitScaleMultiplier,
+  initialAutoFitCenterBias,
+}: EmbeddedMindMapProps) {
+  const [isLoading, setIsLoading] = useState(true);
   const viewportRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -26,15 +38,21 @@ export default function EmbeddedMindMap({ markdown }: EmbeddedMindMapProps) {
 
     initializeMindMap(markdown, viewportRef.current, containerRef.current, {
       disableInteractions: true,
+      initialAutoFitScaleMultiplier,
+      initialAutoFitCenterBias,
     });
-  }, [markdown]);
+  }, [initialAutoFitCenterBias, initialAutoFitScaleMultiplier, markdown]);
 
   useEffect(() => {
     let cancelled = false;
 
     const run = async () => {
       if (cancelled) return;
+      setIsLoading(true);
       await initialize();
+      if (!cancelled) {
+        setIsLoading(false);
+      }
     };
 
     void run();
@@ -46,7 +64,16 @@ export default function EmbeddedMindMap({ markdown }: EmbeddedMindMapProps) {
   }, [initialize]);
 
   return (
-    <div ref={viewportRef} className="map-viewport h-full w-full !bg-transparent cursor-default">
+    <div ref={viewportRef} className="map-viewport h-full w-full cursor-default">
+      {isLoading ? (
+        <div className="absolute inset-0 z-10 flex items-center justify-center bg-background/70 backdrop-blur-[1px]">
+          <div
+            className="h-12 w-12 rounded-full border-4 border-primary/30 border-t-primary animate-spin"
+            role="status"
+            aria-label="Loading mind map"
+          />
+        </div>
+      ) : null}
       <div ref={containerRef} id="mindmap-container"></div>
     </div>
   );
