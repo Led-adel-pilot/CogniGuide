@@ -27,6 +27,7 @@ const LOW_TEXT_CHAR_THRESHOLD = 40;
 const SCANNED_PDF_WARNING = 'We couldn\'t detect much selectable text in your PDF. If it\'s a scanned image, run OCR or upload a text-based copy so the AI can read it.';
 const HIGH_DEMAND_WARNING_MESSAGE = 'We are experiencing high demand right now. Please try again in a few minutes.';
 const OUT_OF_GENERATIONS_MESSAGE = 'You\'re out of generations for this month. Upgrade your plan so you don\'t lose study momentum before your exam.';
+const GENERATOR_INTENT_KEY = 'cogniguide:generator_intent';
 
 interface GeneratorProps {
   redirectOnAuth?: boolean;
@@ -84,7 +85,17 @@ export default function Generator({
   const [isAuthed, setIsAuthed] = useState(false);
   const [isPaidSubscriberState, setIsPaidSubscriberState] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
-  const [mode, setMode] = useState<'mindmap' | 'flashcards'>('mindmap');
+  const [mode, setMode] = useState<'mindmap' | 'flashcards'>(() => {
+    if (typeof window === 'undefined') return 'flashcards';
+    try {
+      const intent = localStorage.getItem(GENERATOR_INTENT_KEY);
+      if (intent === 'flashcards') {
+        localStorage.removeItem(GENERATOR_INTENT_KEY);
+        return 'flashcards';
+      }
+    } catch {}
+    return 'flashcards';
+  });
   const [flashcardsOpen, setFlashcardsOpen] = useState(false);
   const [flashcardsTitle, setFlashcardsTitle] = useState<string | null>(null);
   const [flashcardsCards, setFlashcardsCards] = useState<FlashcardType[] | null>(null);

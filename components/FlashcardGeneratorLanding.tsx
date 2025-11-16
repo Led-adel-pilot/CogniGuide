@@ -368,6 +368,7 @@ export default function FlashcardGeneratorLanding({ page }: FlashcardGeneratorLa
         if (rawCode && /^[A-Za-z0-9_-]{6,}$/u.test(rawCode)) {
           localStorage.setItem('cogniguide_pending_referral', rawCode);
         }
+        localStorage.setItem('cogniguide:generator_intent', 'flashcards');
       }
     } catch {}
   }, []);
