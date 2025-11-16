@@ -1,6 +1,6 @@
 'use client';
 
-import { Clock3, Sparkles, Zap, GraduationCap, Coins, X } from 'lucide-react';
+import { Clock3, Sparkles, Zap, GraduationCap, Coins } from 'lucide-react';
 import { FREE_PLAN_GENERATIONS, REVERSE_TRIAL } from '@/lib/plans';
 
 interface ReverseTrialModalProps {
@@ -32,14 +32,6 @@ export default function ReverseTrialModal({ open, onClose, trialEndsAt }: Revers
   return (
     <div className="fixed inset-0 z-[210] flex items-center justify-center bg-background/95 px-4 py-10 backdrop-blur-sm">
       <div className="relative w-full max-w-xl rounded-3xl border border-border/60 bg-card p-6 shadow-2xl">
-        <button
-          type="button"
-          onClick={onClose}
-          aria-label="Dismiss reverse trial welcome"
-          className="absolute right-4 top-4 rounded-full p-2 text-muted-foreground transition hover:bg-muted hover:text-foreground"
-        >
-          <X className="h-4 w-4" />
-        </button>
         <div className="flex items-center gap-2 text-sm font-semibold uppercase text-primary">
           <Sparkles className="h-4 w-4" />
           Student trial unlocked
@@ -86,7 +78,7 @@ export default function ReverseTrialModal({ open, onClose, trialEndsAt }: Revers
           onClick={onClose}
           className="mt-6 w-full rounded-2xl bg-primary px-4 py-2.5 text-base font-semibold text-primary-foreground shadow hover:bg-primary/90"
         >
-          Start creating
+          Continue
         </button>
       </div>
     </div>

@@ -180,6 +180,8 @@ export default function DashboardClient() {
   const trialModalSeenKeyRef = useRef<string | null>(null);
   const trialModalEligibleRef = useRef<boolean>(false);
   const hasGeneratedThisSessionRef = useRef<boolean>(false);
+  const trialModalTimeoutRef = useRef<number | null>(null);
+  const isTrialModalOpenRef = useRef<boolean>(false);
   const isPaidUser = userTier === 'paid' || userTier === 'trial';
   const balanceDisplay = isPaidUser
     ? (Math.floor(credits * 10) / 10).toFixed(1)
@@ -218,6 +220,10 @@ export default function DashboardClient() {
   useEffect(() => {
     hasGeneratedThisSessionRef.current = hasGeneratedThisSession;
   }, [hasGeneratedThisSession]);
+
+  useEffect(() => {
+    isTrialModalOpenRef.current = isTrialModalOpen;
+  }, [isTrialModalOpen]);
 
   type PricingModalOpenOptions = {
     name: string;
@@ -577,8 +583,21 @@ const handleMindMapLinked = useCallback(
   }, [isPaidUser, selectedModel]);
 
   useEffect(() => {
-    setHasGeneratedThisSession(false);
     setTrialModalEligible(false);
+    if (!user?.id) {
+      setHasGeneratedThisSession(false);
+      return;
+    }
+
+    let hasGenerated = false;
+    const flagKey = `cogniguide:has_generated_${user.id}`;
+    try {
+      if (typeof window !== 'undefined') {
+        hasGenerated = localStorage.getItem(flagKey) === '1';
+      }
+    } catch {}
+
+    setHasGeneratedThisSession(hasGenerated);
   }, [user?.id]);
 
   useEffect(() => {
@@ -601,6 +620,17 @@ const handleMindMapLinked = useCallback(
       setIsTrialModalOpen(false);
     }
   }, [user?.id, trialEndsAt, userTier]);
+
+  useEffect(() => {
+    if (!trialModalEligible) return;
+    if (!user || userTier !== 'trial' || !trialEndsAt) return;
+    if (isTrialModalOpen) return;
+    if (!hasGeneratedThisSession) return;
+    if (flashcardsOpen || Boolean(markdown)) return;
+
+    setIsTrialModalOpen(true);
+    setTrialModalEligible(false);
+  }, [flashcardsOpen, hasGeneratedThisSession, isTrialModalOpen, markdown, trialEndsAt, trialModalEligible, user, userTier]);
 
   const persistReferralRedemptionSeen = useCallback(
     async (redemptionId: string, userId: string) => {
@@ -633,11 +663,19 @@ const handleMindMapLinked = useCallback(
         localStorage.setItem(key, '1');
       } catch {}
     }
+    if (trialModalTimeoutRef.current) {
+      clearTimeout(trialModalTimeoutRef.current);
+      trialModalTimeoutRef.current = null;
+    }
     setIsTrialModalOpen(false);
     setTrialModalEligible(false);
   }, []);
 
   const maybeOpenTrialModalAfterContentClose = useCallback(() => {
+    if (trialModalTimeoutRef.current) {
+      clearTimeout(trialModalTimeoutRef.current);
+      trialModalTimeoutRef.current = null;
+    }
     if (!trialModalSeenKeyRef.current) return;
     if (!trialModalEligibleRef.current) return;
     if (!hasGeneratedThisSessionRef.current) return;
@@ -657,6 +695,35 @@ const handleMindMapLinked = useCallback(
       window.removeEventListener('cogniguide:study-modal-closed', handleStudyModalClosed);
     };
   }, [maybeOpenTrialModalAfterContentClose]);
+
+  useEffect(() => {
+    if (trialModalTimeoutRef.current) {
+      clearTimeout(trialModalTimeoutRef.current);
+      trialModalTimeoutRef.current = null;
+    }
+    if (!trialModalEligible) return;
+    if (!user || userTier !== 'trial' || !trialEndsAt) return;
+    if (!hasGeneratedThisSessionRef.current) return;
+    if (isTrialModalOpenRef.current) return;
+    if (!(flashcardsOpen || Boolean(markdown))) return;
+
+    trialModalTimeoutRef.current = window.setTimeout(() => {
+      trialModalTimeoutRef.current = null;
+      if (!trialModalSeenKeyRef.current) return;
+      if (!trialModalEligibleRef.current) return;
+      if (!hasGeneratedThisSessionRef.current) return;
+      if (isTrialModalOpenRef.current) return;
+      setIsTrialModalOpen(true);
+      setTrialModalEligible(false);
+    }, 5000);
+
+    return () => {
+      if (trialModalTimeoutRef.current) {
+        clearTimeout(trialModalTimeoutRef.current);
+        trialModalTimeoutRef.current = null;
+      }
+    };
+  }, [flashcardsOpen, markdown, trialEndsAt, trialModalEligible, user, userTier]);
 
   const showReferralRewardNotice = useCallback((amount: number, redemptionId?: string, userIdOverride?: string) => {
     const key = redemptionId ? `referral:${redemptionId}` : `manual:${amount}`;
@@ -1055,6 +1122,14 @@ const handleMindMapLinked = useCallback(
       // Define event handlers
       handleGenerationComplete = () => {
         setHasGeneratedThisSession(true);
+        const generationFlagUserId = userIdRef.current ?? authed.id ?? null;
+        if (generationFlagUserId) {
+          try {
+            if (typeof window !== 'undefined') {
+              localStorage.setItem(`cogniguide:has_generated_${generationFlagUserId}`, '1');
+            }
+          } catch {}
+        }
         if (authed.id) {
           initPaginatedHistory(authed.id);
           loadAllFlashcardsOnly(authed.id).then((allFlash) => {
