@@ -11,6 +11,7 @@ import CogniGuideLogo from '../CogniGuide_logo.png';
 import type { Flashcard } from '@/components/FlashcardsModal';
 import { useCaseMenuHubs } from '@/lib/programmatic/useCaseMenuData';
 import { broadcastAuthState, readSignedInFromCookies, writeCgAuthedCookie } from '@/lib/authCookie';
+import { rememberFlashcardIntent } from '@/lib/generationIntent';
 
 const AuthModal = dynamic(() => import('@/components/AuthModal'), { ssr: false });
 const EmbeddedFlashcards = dynamic(() => import('@/components/EmbeddedFlashcards'), {
@@ -203,6 +204,11 @@ export default function FlashcardGeneratorLanding({ page }: FlashcardGeneratorLa
     return () => {
       document.removeEventListener('keydown', handleKey);
     };
+  }, []);
+
+  useEffect(() => {
+    // Store intent as soon as the landing loads so redirects keep flashcard as the default
+    rememberFlashcardIntent();
   }, []);
 
   const embeddedFlashcardDeck = useMemo<Flashcard[] | null>(() => {

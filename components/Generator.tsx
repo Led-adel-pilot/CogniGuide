@@ -8,6 +8,7 @@ import Dropzone from '@/components/Dropzone';
 import PromptForm from '@/components/PromptForm';
 import { supabase } from '@/lib/supabaseClient';
 import { FREE_PLAN_GENERATIONS, type ModelChoice } from '@/lib/plans';
+import { getStoredGenerationIntent } from '@/lib/generationIntent';
 import { AlertTriangle, Sparkles } from 'lucide-react';
 import type AuthModalComponent from '@/components/AuthModal';
 import type MindMapModalComponent from '@/components/MindMapModal';
@@ -27,7 +28,6 @@ const LOW_TEXT_CHAR_THRESHOLD = 40;
 const SCANNED_PDF_WARNING = 'We couldn\'t detect much selectable text in your PDF. If it\'s a scanned image, run OCR or upload a text-based copy so the AI can read it.';
 const HIGH_DEMAND_WARNING_MESSAGE = 'We are experiencing high demand right now. Please try again in a few minutes.';
 const OUT_OF_GENERATIONS_MESSAGE = 'You\'re out of generations for this month. Upgrade your plan so you don\'t lose study momentum before your exam.';
-const GENERATOR_INTENT_KEY = 'cogniguide:generator_intent';
 
 interface GeneratorProps {
   redirectOnAuth?: boolean;
@@ -86,15 +86,8 @@ export default function Generator({
   const [isPaidSubscriberState, setIsPaidSubscriberState] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
   const [mode, setMode] = useState<'mindmap' | 'flashcards'>(() => {
-    if (typeof window === 'undefined') return 'flashcards';
-    try {
-      const intent = localStorage.getItem(GENERATOR_INTENT_KEY);
-      if (intent === 'flashcards') {
-        localStorage.removeItem(GENERATOR_INTENT_KEY);
-        return 'flashcards';
-      }
-    } catch {}
-    return 'flashcards';
+    const intent = getStoredGenerationIntent();
+    return intent === 'flashcards' ? 'flashcards' : 'mindmap';
   });
   const [flashcardsOpen, setFlashcardsOpen] = useState(false);
   const [flashcardsTitle, setFlashcardsTitle] = useState<string | null>(null);
@@ -127,6 +120,13 @@ export default function Generator({
       ? `${baseCtaTooltip}\n${normalizedFreeGenerations} of ${FREE_PLAN_GENERATIONS} free uses remaining`
       : baseCtaTooltip;
   const isOutOfFreeGenerations = normalizedFreeGenerations === 0 && !resolvedIsPaidSubscriber;
+
+  useEffect(() => {
+    const intent = getStoredGenerationIntent();
+    if (intent === 'flashcards') {
+      setMode('flashcards');
+    }
+  }, []);
 
   const evaluateLowTextWarning = useCallback((text: string, rawCharCount: number | undefined, fileList?: File[] | null) => {
     if (!fileList || fileList.length === 0) {
