@@ -535,11 +535,14 @@ export default function MindMapModal({ markdown, onClose, onShareMindMap, isPaid
   const [showLossAversionPopup, setShowLossAversionPopup] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [authModalSubtitleOverride, setAuthModalSubtitleOverride] = useState<string | undefined>(undefined);
+  const [authResolved, setAuthResolved] = useState(false);
   const [signupPromptTriggered, setSignupPromptTriggered] = useState(false);
   const [hasGeneratedContent, setHasGeneratedContent] = useState(false);
   // Gate auto-collapse: allow for non-auth users, and for auth users only if they have never generated a mind map before
   const [shouldAutoCollapse, setShouldAutoCollapse] = useState<boolean>(false);
+  const [autoCollapseResolved, setAutoCollapseResolved] = useState(false);
   const shouldAutoCollapseRef = useRef<boolean>(false);
+  const autoCollapseResolvedRef = useRef<boolean>(false);
   const collapseRetryTimeoutRef = useRef<number | null>(null);
   const finalizedRequestIdRef = useRef<number | null>(null);
   const latestMarkdownRef = useRef<string | null>(null);
@@ -718,6 +721,12 @@ export default function MindMapModal({ markdown, onClose, onShareMindMap, isPaid
   }, [initialFocusNodeId]);
 
   const requestCollapse = useCallback(() => {
+    collapseRequestedRef.current = true;
+
+    if (!autoCollapseResolvedRef.current) {
+      return;
+    }
+
     if (!shouldAutoCollapseRef.current) {
       collapseRequestedRef.current = false;
       return;
@@ -728,10 +737,9 @@ export default function MindMapModal({ markdown, onClose, onShareMindMap, isPaid
       return;
     }
 
-    collapseRequestedRef.current = true;
-
     const attempt = () => {
       if (!collapseRequestedRef.current) return;
+      if (!autoCollapseResolvedRef.current) return;
       if (!shouldAutoCollapseRef.current) {
         collapseRequestedRef.current = false;
         return;
@@ -761,6 +769,36 @@ export default function MindMapModal({ markdown, onClose, onShareMindMap, isPaid
     attempt();
   }, []);
 
+  const restoreExpandedMindMap = useCallback(() => {
+    if (!initializedRef.current) return;
+    const content = latestMarkdownRef.current;
+    if (!content) return;
+    hasAutoCollapsedRef.current = false;
+    collapseRequestedRef.current = false;
+    try {
+      updateMindMap(content);
+    } catch {}
+  }, []);
+
+  const setAutoCollapseState = useCallback((enabled: boolean) => {
+    setShouldAutoCollapse(enabled);
+    shouldAutoCollapseRef.current = enabled;
+    autoCollapseResolvedRef.current = true;
+    setAutoCollapseResolved(true);
+    if (!enabled && hasAutoCollapsedRef.current) {
+      restoreExpandedMindMap();
+    }
+  }, [restoreExpandedMindMap]);
+
+  const markUserHasPriorMindmap = useCallback(() => {
+    if (!userId) return;
+    const cacheKey = `cogniguide:user:${userId}:hasPriorMindmap`;
+    try {
+      if (typeof window !== 'undefined') window.localStorage.setItem(cacheKey, 'true');
+    } catch {}
+    setAutoCollapseState(false);
+  }, [setAutoCollapseState, userId]);
+
   useEffect(() => {
     finalizedRequestIdRef.current = null;
     hasAutoCollapsedRef.current = false;
@@ -779,6 +817,9 @@ export default function MindMapModal({ markdown, onClose, onShareMindMap, isPaid
         if (!embedded) {
           requestCollapse();
         }
+        if (userId) {
+          markUserHasPriorMindmap();
+        }
       }
     };
 
@@ -790,7 +831,7 @@ export default function MindMapModal({ markdown, onClose, onShareMindMap, isPaid
         collapseRetryTimeoutRef.current = null;
       }
     };
-  }, [streamingRequestId, queueRendererUpdate, requestCollapse, embedded]);
+  }, [streamingRequestId, queueRendererUpdate, requestCollapse, embedded, markUserHasPriorMindmap, userId]);
 
   // Reset renderer when modal is closed (markdown becomes null)
   useEffect(() => {
@@ -809,6 +850,23 @@ export default function MindMapModal({ markdown, onClose, onShareMindMap, isPaid
         collapseRetryTimeoutRef.current = null;
       }
       cleanup();
+    }
+  }, [markdown]);
+
+  // Notify dashboard when the mind map modal opens (for reverse trial timing)
+  const hasDispatchedOpenRef = useRef(false);
+  useEffect(() => {
+    if (markdown) {
+      if (!hasDispatchedOpenRef.current) {
+        hasDispatchedOpenRef.current = true;
+        try {
+          if (typeof window !== 'undefined') {
+            window.dispatchEvent(new CustomEvent('cogniguide:study-modal-opened', { detail: { modal: 'mindmap' } }));
+          }
+        } catch {}
+      }
+    } else {
+      hasDispatchedOpenRef.current = false;
     }
   }, [markdown]);
 
@@ -873,30 +931,33 @@ export default function MindMapModal({ markdown, onClose, onShareMindMap, isPaid
   useEffect(() => {
     let cancelled = false;
 
+    autoCollapseResolvedRef.current = false;
+    setAutoCollapseResolved(false);
+
     if (embedded) {
-      setShouldAutoCollapse(false);
-      shouldAutoCollapseRef.current = false;
+      setAutoCollapseState(false);
       return () => {
         cancelled = true;
       };
     }
 
+    if (!authResolved) {
+      return () => { cancelled = true; };
+    }
+
     const computeAutoCollapse = async () => {
       if (!userId) {
         if (!cancelled) {
-          setShouldAutoCollapse(true);
-          shouldAutoCollapseRef.current = true;
+          setAutoCollapseState(true);
         }
         return;
       }
       const cacheKey = `cogniguide:user:${userId}:hasPriorMindmap`;
       try {
         const raw = typeof window !== 'undefined' ? window.localStorage.getItem(cacheKey) : null;
-        if (raw === 'true' || raw === 'false') {
-          const hasPrior = raw === 'true';
+        if (raw === 'true') {
           if (!cancelled) {
-            setShouldAutoCollapse(!hasPrior);
-            shouldAutoCollapseRef.current = !hasPrior;
+            setAutoCollapseState(false);
           }
           return;
         }
@@ -909,22 +970,26 @@ export default function MindMapModal({ markdown, onClose, onShareMindMap, isPaid
           .limit(1);
         const hasPrior = !error && Array.isArray(data) && data.length > 0;
         if (!cancelled) {
-          setShouldAutoCollapse(!hasPrior);
-          shouldAutoCollapseRef.current = !hasPrior;
+          setAutoCollapseState(!hasPrior);
           try {
             if (typeof window !== 'undefined') window.localStorage.setItem(cacheKey, hasPrior ? 'true' : 'false');
           } catch {}
         }
       } catch {
         if (!cancelled) {
-          setShouldAutoCollapse(false);
-          shouldAutoCollapseRef.current = false;
+          setAutoCollapseState(false);
         }
       }
     };
     computeAutoCollapse();
     return () => { cancelled = true; };
-  }, [userId, embedded]);
+  }, [userId, embedded, setAutoCollapseState, authResolved]);
+
+  useEffect(() => {
+    if (!autoCollapseResolved) return;
+    if (!collapseRequestedRef.current) return;
+    requestCollapse();
+  }, [autoCollapseResolved, requestCollapse]);
 
   // Detect authenticated user for signup prompts
   useEffect(() => {
@@ -938,12 +1003,15 @@ export default function MindMapModal({ markdown, onClose, onShareMindMap, isPaid
         console.error('Failed to get user session:', error);
         if (!isMounted) return;
         setUserId(null);
+      } finally {
+        if (isMounted) setAuthResolved(true);
       }
     };
     init();
     const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
       if (!isMounted) return;
       setUserId(session?.user?.id ?? null);
+      setAuthResolved(true);
     });
     return () => {
       isMounted = false;

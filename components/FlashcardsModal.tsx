@@ -1275,6 +1275,23 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
     }
   }, [open, resetExplanation]);
 
+  // Notify dashboard when flashcards modal opens (for reverse trial timing)
+  const hasDispatchedOpenRef = React.useRef(false);
+  React.useEffect(() => {
+    if (open) {
+      if (!hasDispatchedOpenRef.current) {
+        hasDispatchedOpenRef.current = true;
+        try {
+          if (typeof window !== 'undefined') {
+            window.dispatchEvent(new CustomEvent('cogniguide:study-modal-opened', { detail: { modal: 'flashcards' } }));
+          }
+        } catch {}
+      }
+    } else {
+      hasDispatchedOpenRef.current = false;
+    }
+  }, [open]);
+
   React.useEffect(() => {
     mindMapRequestRef.current += 1;
     setActiveMindMapRequestId(null);
