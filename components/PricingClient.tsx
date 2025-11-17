@@ -26,8 +26,6 @@ const INITIAL_PRICES: PricesState = {
 const PADDLE_ENV = process.env.NEXT_PUBLIC_PADDLE_ENV || 'sandbox';
 const PADDLE_CLIENT_TOKEN = process.env.NEXT_PUBLIC_PADDLE_CLIENT_TOKEN || '';
 const CUSTOMER_PORTAL_URL = process.env.NEXT_PUBLIC_PADDLE_CUSTOMER_PORTAL_URL || 'https://customer-portal.paddle.com';
-// Testing helper: show cancel link for all users unless explicitly disabled
-const FORCE_SHOW_CANCEL_LINK = process.env.NEXT_PUBLIC_FORCE_CANCEL_LINK !== 'false';
 
 interface PricingClientProps {
   onPurchaseComplete?: () => void;
@@ -141,6 +139,7 @@ export default function PricingClient({ onPurchaseComplete, context = 'page' }: 
   // Derive current plan and cycle from the stored Paddle priceId
   const currentSubscription = useMemo(() => {
     const priceId = subscription?.plan || null;
+    const hasPlanId = Boolean(priceId);
     let plan: 'student' | 'pro' | null = null;
     let cycle: BillingCycle | null = null;
     if (priceId) {
@@ -150,16 +149,19 @@ export default function PricingClient({ onPurchaseComplete, context = 'page' }: 
       else if (priceId === PAID_PLANS.pro.priceIds.year) { plan = 'pro'; cycle = 'year'; }
     }
     const status = subscription?.status ?? null;
-    // Treat any non-canceled record with a plan as active; status can legitimately be null in our table.
-    const isActive =
-      plan !== null &&
-      (status === null || !['canceled', 'cancelled'].includes(status));
-    return { plan, cycle, status, isActive } as const;
+    // Only treat subscription as active when status is explicitly "active".
+    const isActive = hasPlanId && status === 'active';
+    return { plan, cycle, status, isActive, hasPlanId } as const;
   }, [subscription]);
 
   const hasActivePaidSubscription = useMemo(
-    () => Boolean(currentSubscription.plan) && currentSubscription.isActive,
-    [currentSubscription.isActive, currentSubscription.plan],
+    () => currentSubscription.isActive && (Boolean(currentSubscription.plan) || currentSubscription.hasPlanId),
+    [currentSubscription.isActive, currentSubscription.plan, currentSubscription.hasPlanId],
+  );
+
+  const isCurrentPaidPlan = useCallback(
+    (planKey: 'student' | 'pro') => hasActivePaidSubscription && currentSubscription.plan === planKey,
+    [currentSubscription.plan, hasActivePaidSubscription],
   );
 
   const trackPricingEvent = useCallback(
@@ -333,9 +335,10 @@ export default function PricingClient({ onPurchaseComplete, context = 'page' }: 
       if (pricesLoading) return true;
       if (!prices[planKey][billingCycle]) return true;
       if (isCurrentPlanSelected(planKey)) return true;
+      if (isCurrentPaidPlan(planKey)) return true;
       return false;
     },
-    [billingCycle, isConfigured, paddleReady, prices, pricesLoading, isCurrentPlanSelected]
+    [billingCycle, isConfigured, paddleReady, prices, pricesLoading, isCurrentPlanSelected, isCurrentPaidPlan]
   );
 
   const openCheckout = useCallback(
@@ -391,6 +394,7 @@ export default function PricingClient({ onPurchaseComplete, context = 'page' }: 
   );
 
   const handleChoosePlan = (plan: 'student' | 'pro') => {
+    if (isCurrentPaidPlan(plan)) return;
     trackPricingEvent('pricing_plan_cta_clicked', { plan });
     if (!user) {
       trackPricingEvent('pricing_auth_prompt_shown', { plan });
@@ -507,8 +511,16 @@ export default function PricingClient({ onPurchaseComplete, context = 'page' }: 
           </div>
 
           {/* Student (Most Popular) */}
-          <div className="relative flex h-full flex-col rounded-[1.25rem] border-2 border-primary bg-primary/5 p-6 shadow-lg ring-2 ring-primary/20 dark:bg-primary/20">
-            <div className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full border border-primary bg-primary text-primary-foreground px-3 py-1 text-xs font-semibold shadow">Most popular</div>
+          <div
+            className={`relative flex h-full flex-col rounded-[1.25rem] ${
+              isCurrentPaidPlan('student')
+                ? 'border bg-background p-6 shadow-sm'
+                : 'border-2 border-primary bg-primary/5 p-6 shadow-lg ring-2 ring-primary/20 dark:bg-primary/20'
+            }`}
+          >
+            {!isCurrentPaidPlan('student') && (
+              <div className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full border border-primary bg-primary text-primary-foreground px-3 py-1 text-xs font-semibold shadow">Most popular</div>
+            )}
             <h3 className="text-xl font-bold font-heading mb-1">Student</h3>
             <p className="text-muted-foreground mb-6">Everything you need to learn a semester’s content before your exam.</p>
             <div className="mb-6">
@@ -604,7 +616,7 @@ export default function PricingClient({ onPurchaseComplete, context = 'page' }: 
           </p>
         </div>
 
-        {(FORCE_SHOW_CANCEL_LINK || hasActivePaidSubscription) && (
+        {hasActivePaidSubscription && (
           <div className="mt-8 text-center text-sm">
             <a
               href={CUSTOMER_PORTAL_URL}
