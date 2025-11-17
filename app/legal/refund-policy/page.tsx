@@ -1,8 +1,8 @@
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Refund & Dispute Policy - CogniMap',
-  description: 'Refunds and disputes for CogniMap subscriptions and purchases.',
+  title: 'Refund & Dispute Policy - CogniGuide',
+  description: 'Refunds and disputes for CogniGuide subscriptions and purchases.',
 };
 
 const RefundPolicyPage = () => {
@@ -15,7 +15,7 @@ const RefundPolicyPage = () => {
             <strong>Last Updated:</strong> August 13, 2025
           </p>
           <p>
-            CogniMap is a subscription software service that helps you transform notes and documents into interactive mind maps and flashcards.
+            CogniGuide is a subscription software service that helps you transform notes and documents into interactive mind maps and flashcards.
           </p>
 
           <section>
@@ -46,7 +46,7 @@ const RefundPolicyPage = () => {
           <section>
             <h2 className="text-2xl font-semibold mb-2">4. Exclusions</h2>
             <p>
-              We do not offer refunds for partial billing periods or unused credits. Promotional credits are not refundable. CogniMap does not sell physical goods; returns do not apply.
+              We do not offer refunds for partial billing periods or unused credits. Promotional credits are not refundable. CogniGuide does not sell physical goods; returns do not apply.
             </p>
           </section>
         </div>

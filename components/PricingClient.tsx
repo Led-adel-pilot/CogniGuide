@@ -25,6 +25,9 @@ const INITIAL_PRICES: PricesState = {
 
 const PADDLE_ENV = process.env.NEXT_PUBLIC_PADDLE_ENV || 'sandbox';
 const PADDLE_CLIENT_TOKEN = process.env.NEXT_PUBLIC_PADDLE_CLIENT_TOKEN || '';
+const CUSTOMER_PORTAL_URL = process.env.NEXT_PUBLIC_PADDLE_CUSTOMER_PORTAL_URL || 'https://customer-portal.paddle.com';
+// Testing helper: show cancel link for all users unless explicitly disabled
+const FORCE_SHOW_CANCEL_LINK = process.env.NEXT_PUBLIC_FORCE_CANCEL_LINK !== 'false';
 
 interface PricingClientProps {
   onPurchaseComplete?: () => void;
@@ -146,10 +149,18 @@ export default function PricingClient({ onPurchaseComplete, context = 'page' }: 
       else if (priceId === PAID_PLANS.pro.priceIds.month) { plan = 'pro'; cycle = 'month'; }
       else if (priceId === PAID_PLANS.pro.priceIds.year) { plan = 'pro'; cycle = 'year'; }
     }
-    const status = subscription?.status || null;
-    const isActive = Boolean(status && ['active', 'trialing', 'past_due'].includes(status));
+    const status = subscription?.status ?? null;
+    // Treat any non-canceled record with a plan as active; status can legitimately be null in our table.
+    const isActive =
+      plan !== null &&
+      (status === null || !['canceled', 'cancelled'].includes(status));
     return { plan, cycle, status, isActive } as const;
   }, [subscription]);
+
+  const hasActivePaidSubscription = useMemo(
+    () => Boolean(currentSubscription.plan) && currentSubscription.isActive,
+    [currentSubscription.isActive, currentSubscription.plan],
+  );
 
   const trackPricingEvent = useCallback(
     (eventName: string, properties?: Record<string, any>) => {
@@ -593,7 +604,22 @@ export default function PricingClient({ onPurchaseComplete, context = 'page' }: 
           </p>
         </div>
 
-
+        {(FORCE_SHOW_CANCEL_LINK || hasActivePaidSubscription) && (
+          <div className="mt-8 text-center text-sm">
+            <a
+              href={CUSTOMER_PORTAL_URL}
+              target="_blank"
+              rel="noreferrer"
+              className="font-semibold text-primary hover:underline"
+              onClick={() => trackPricingEvent('pricing_cancel_link_clicked')}
+            >
+              Cancel plan via billing portal
+            </a>
+            <p className="mt-1 text-xs text-muted-foreground">
+              Opens the Paddle customer portal to manage or cancel your subscription.
+            </p>
+          </div>
+        )}
       </div>
       <AuthModal open={authModalOpen} />
     </section>

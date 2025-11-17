@@ -1,8 +1,8 @@
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Cancellation Policy - CogniMap',
-  description: 'How to cancel your CogniMap subscription and what happens after cancellation.',
+  title: 'Cancellation Policy - CogniGuide',
+  description: 'How to cancel your CogniGuide subscription and what happens after cancellation.',
 };
 
 const CancellationPolicyPage = () => {

@@ -2,8 +2,8 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
-  title: 'Terms of Service - CogniMap',
-  description: 'The terms and conditions for using CogniMap.',
+  title: 'Terms of Service - CogniGuide',
+  description: 'The terms and conditions for using CogniGuide.',
 };
 
 const TermsPage = () => {
@@ -16,13 +16,13 @@ const TermsPage = () => {
             <strong>Last Updated:</strong> August 13, 2025
           </p>
           <p>
-            Please read these terms carefully. By accessing or using CogniMap, you agree to be bound by these Terms of Service.
+            Please read these terms carefully. By accessing or using CogniGuide, you agree to be bound by these Terms of Service.
           </p>
 
           <section>
             <h2 className="text-2xl font-semibold mb-2">1. Service Description</h2>
             <p>
-              CogniMap is an AI study tool that converts documents and notes into interactive mind maps and flashcards. Access is provided on a subscription basis with monthly credit allocations.
+              CogniGuide is an AI study tool that converts documents and notes into interactive mind maps and flashcards. Access is provided on a subscription basis with monthly credit allocations.
             </p>
           </section>
 
