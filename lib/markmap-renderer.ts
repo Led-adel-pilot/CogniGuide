@@ -45,6 +45,13 @@ export interface InitializeOptions {
     initialPanXOffset?: number;
     initialPanYOffset?: number;
     disableInteractions?: boolean;
+    /**
+     * Controls what interactions are allowed on the rendered map.
+     * - 'full': pan, zoom, pinch, and node collapse/expand.
+     * - 'pan-only': restrict to panning and node collapse/expand (no zooming).
+     * - 'none': render-only, no interactions.
+     */
+    interactionMode?: 'full' | 'pan-only' | 'none';
     initialAutoFitScaleMultiplier?: number;
     initialAutoFitCenterBias?: AutoFitCenterBiasOptions;
 }
@@ -139,6 +146,10 @@ let lastMarkdown: string = '';
 
 // Pan and Zoom State
 let scale = 1, panX = 0, panY = 0;
+let interactionMode: 'full' | 'pan-only' | 'none' = 'full';
+let panEnabled = true;
+let zoomEnabled = true;
+let nodeInteractionsEnabled = true;
 let userHasInteracted = false; // Track if user has manually panned or zoomed
 let themeObserver: MutationObserver | null = null;
 // Mouse panning state
@@ -855,6 +866,7 @@ function renderNodeAndChildren(node: MindMapNode, container: HTMLElement, svgEl:
     if (node.isCollapsed) nodeEl.classList.add('collapsed');
     
     nodeEl.addEventListener('click', (e) => {
+        if (!nodeInteractionsEnabled) return;
         if ((e.target as HTMLElement).tagName.toLowerCase() === 'a') return;
 
         // Check if the user is selecting text within this node.
@@ -871,6 +883,7 @@ function renderNodeAndChildren(node: MindMapNode, container: HTMLElement, svgEl:
 
     // Add touch event handler for mobile tap detection
     nodeEl.addEventListener('touchend', (e) => {
+        if (!nodeInteractionsEnabled) return;
         if ((e.target as HTMLElement).tagName.toLowerCase() === 'a') return;
 
         // Check if this was a tap (not part of panning)
@@ -1110,6 +1123,7 @@ function rerenderMindMap() {
 // ============== EVENT HANDLERS ==============
 
 function handleWheel(e: WheelEvent) {
+    if (!zoomEnabled) return;
     e.preventDefault();
     userHasInteracted = true;
     // Cancel ongoing transform animation on user interaction
@@ -1151,6 +1165,7 @@ function handleDarkModeChange() {
 }
 
 function handleMouseDown(e: MouseEvent) {
+    if (!panEnabled) return;
     if (shouldBlockPanAtPoint(e.target, e.clientX, e.clientY)) {
         isPanning = false;
         return;
@@ -1169,7 +1184,7 @@ function handleMouseUp() {
 }
 
 function handleMouseMove(e: MouseEvent) {
-    if (!isPanning) return;
+    if (!panEnabled || !isPanning) return;
     panX = e.clientX - startX;
     panY = e.clientY - startY;
     bumpContainerWillChange();
@@ -1192,16 +1207,18 @@ function getMidpoint(touches: TouchList): { x: number, y: number } {
 }
 
 function handleTouchStart(e: TouchEvent) {
+    if (!panEnabled && !zoomEnabled) return;
     e.preventDefault();
     userHasInteracted = true;
     // Cancel ongoing transform animation on user interaction
     transformAnimationToken++;
 
     if (e.touches.length === 2) {
+        if (!zoomEnabled) return;
         isPinching = true;
         isPanning = false; // Ensure single-finger panning is off
         initialDistance = getDistance(e.touches);
-    } else if (e.touches.length === 1) {
+    } else if (e.touches.length === 1 && panEnabled) {
         // Record touch start for gesture detection
         touchStartTime = performance.now();
         touchStartX = e.touches[0].clientX;
@@ -1215,6 +1232,7 @@ function handleTouchStart(e: TouchEvent) {
 }
 
 function handleTouchMove(e: TouchEvent) {
+    if (!panEnabled && !zoomEnabled) return;
     if (!isPanning && !isPinching) {
         // Check if this is a single touch that has moved beyond threshold
         if (e.touches.length === 1) {
@@ -1237,7 +1255,7 @@ function handleTouchMove(e: TouchEvent) {
 
     e.preventDefault();
 
-    if (isPinching && e.touches.length === 2) { // Zooming
+    if (isPinching && zoomEnabled && e.touches.length === 2) { // Zooming
         const newDistance = getDistance(e.touches);
         const oldScale = scale;
         const scaleFactor = newDistance / initialDistance;
@@ -1252,7 +1270,7 @@ function handleTouchMove(e: TouchEvent) {
         panX = midpointX - (midpointX - panX) * (scale / oldScale);
         panY = midpointY - (midpointY - panY) * (scale / oldScale);
 
-    } else if (isPanning && e.touches.length === 1) { // Panning
+    } else if (isPanning && panEnabled && e.touches.length === 1) { // Panning
         const touch = e.touches[0];
         panX += touch.clientX - lastTouchX;
         panY += touch.clientY - lastTouchY;
@@ -1264,6 +1282,7 @@ function handleTouchMove(e: TouchEvent) {
 }
 
 function handleTouchEnd(e: TouchEvent) {
+    if (!panEnabled && !zoomEnabled) return;
     if (e.touches.length < 2) isPinching = false;
     if (e.touches.length < 1) {
         isPanning = false;
@@ -1314,6 +1333,15 @@ export function initializeMindMap(
     initialAutoFitCenterBiasX = options?.initialAutoFitCenterBias?.x ?? 0;
     initialAutoFitCenterBiasY = options?.initialAutoFitCenterBias?.y ?? 0;
 
+    const resolvedInteractionMode =
+        options?.interactionMode ??
+        (options?.disableInteractions ? 'none' : 'full');
+
+    interactionMode = resolvedInteractionMode;
+    panEnabled = interactionMode !== 'none';
+    zoomEnabled = interactionMode === 'full';
+    nodeInteractionsEnabled = interactionMode !== 'none';
+
     // Clean up previous event listeners
     cleanup();
 
@@ -1325,15 +1353,21 @@ export function initializeMindMap(
         autoFitView(markdown);
 
         // Attach event listeners (unless disabled)
-        if (!options?.disableInteractions) {
-            viewport.addEventListener('wheel', handleWheel, { passive: false });
-            viewport.addEventListener('mousedown', handleMouseDown);
-            window.addEventListener('mouseup', handleMouseUp);
-            window.addEventListener('mousemove', handleMouseMove);
-            // Add touch event listeners for mobile
-            viewport.addEventListener('touchstart', handleTouchStart, { passive: false });
-            viewport.addEventListener('touchmove', handleTouchMove, { passive: false });
-            window.addEventListener('touchend', handleTouchEnd);
+        if (interactionMode !== 'none') {
+            if (zoomEnabled) {
+                viewport.addEventListener('wheel', handleWheel, { passive: false });
+            }
+            if (panEnabled) {
+                viewport.addEventListener('mousedown', handleMouseDown);
+                window.addEventListener('mouseup', handleMouseUp);
+                window.addEventListener('mousemove', handleMouseMove);
+            }
+            // Add touch event listeners for mobile (supports both pan and zoom)
+            if (panEnabled || zoomEnabled) {
+                viewport.addEventListener('touchstart', handleTouchStart, { passive: false });
+                viewport.addEventListener('touchmove', handleTouchMove, { passive: false });
+                window.addEventListener('touchend', handleTouchEnd);
+            }
             // Listen for dark mode changes
             window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', handleDarkModeChange);
             // Keep cached viewport rect valid on resize

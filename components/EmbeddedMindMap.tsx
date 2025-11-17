@@ -37,7 +37,7 @@ export default function EmbeddedMindMap({
     if (!viewportRef.current || !containerRef.current) return;
 
     initializeMindMap(markdown, viewportRef.current, containerRef.current, {
-      disableInteractions: true,
+      interactionMode: 'pan-only',
       initialAutoFitScaleMultiplier,
       initialAutoFitCenterBias,
     });
