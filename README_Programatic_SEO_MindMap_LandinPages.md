@@ -18,6 +18,7 @@ AI automation that:
 - Enforces the `ProgrammaticMindMapPage` JSON schema.
 - Injects breadcrumb context from `data/mindmap_taxonomy.json`.
 - Normalizes outputs (canonical URLs, linking recommendations, placeholder related links).
+- Uses the CSV-provided slug directly for paths/canonicals—no AI-generated slugs.
 - Emits TypeScript: `lib/programmatic/generated/mindMapPages.ts`.
 
 Key CLI flags are equivalent to the flashcard script (`--input`, `--output`, `--model`, `--temperature`, `--rerun-existing`, etc.).

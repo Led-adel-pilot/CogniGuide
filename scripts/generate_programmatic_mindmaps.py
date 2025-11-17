@@ -25,7 +25,9 @@ import random
 import re
 import sys
 import time
+import threading
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from collections import deque
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Mapping
@@ -52,7 +54,7 @@ PLACEHOLDER_RELATED_LINKS = [
 
 PROMPT_TEMPLATE = """
 You will generate a complete landing page JSON for CogniGuide’s AI mind map generator app, suitable for static rendering.
-Info on app: Users upload PDFs, DOCX, PPTX, text, or prompt the AI to build interactive mind maps. CogniGuide restructures the content into expandable branches, supports custom colors, exports (SVG/PNG/PDF), collaboration via share links, and lets users convert branches into flashcards. The core experience is instant, visual mind mapping—do not claim unrelated features (no Kanban boards, auto task tracking, etc.).
+Info on app: Users upload PDFs, DOCX, PPTX, text, or prompt the AI to build interactive mind maps. CogniGuide restructures the content into expandable branches, exports (PNG/PDF), collaboration via share links. Do not claim unrelated features (you can not edit mind maps for now, do not mention this).
 
 You will receive structured CSV data for one landing page. Follow these requirements precisely:
 
@@ -66,17 +68,17 @@ CRITICAL WRITING RULES (people-first + E-E-A-T):
 
 PSYCHOLOGY-DRIVEN CTR GUIDANCE FOR METADATA:
 - Curiosity gap: Promise a transformation (“turn chaotic research into visual clarity”) while staying truthful.
-- Loss aversion: Highlight pain avoided by using CogniGuide (“don’t spend Sunday redrawing mind maps”).
-- Emotional resonance: Mirror the target audience’s stress (“overwhelmed product brief,” “exam cram chaos”) in the meta description.
+- Loss aversion: Highlight pain avoided by using CogniGuide (Time saving).
+- Emotional resonance: Mirror the target audience’s stress in the meta description.
 
 3) Title requirements:
 - <=60 characters.
 - Include the target keyword or its natural variant in the first half.
 - Communicate the exact benefit (“AI mind map maker for nursing students,” etc.).
 
-4) Meta description (120–155 chars):
+4) Meta description (130 chars max):
 - Mention the target keyword once.
-- Describe the real workflow (upload/paste → AI generates mind maps you can edit/export).
+- Describe the real workflow (upload document/type → AI generates mind maps you can export).
 - Include two benefits max (e.g., faster clarity, easier collaboration).
 - End with a soft CTA (“Start mapping free”).
 
@@ -95,15 +97,14 @@ PSYCHOLOGY-DRIVEN CTR GUIDANCE FOR METADATA:
 7) Structured data:
 - Provide breadcrumb + FAQ JSON-LD if omitted; your JSON output may include it directly, but it must follow schema.org formats.
 
-Return JSON with this shape (comments describe expectations):
+Return JSON with this shape (comments describe expectations). The slug, path, and canonical URL are injected from the CSV slug by the generator—do not include or invent them:
 
 ```json
 {
   "metadata": {
-    "title": "...",
-    "description": "...",
-    "keywords": ["mind map keyword variants", "..."],
-    "canonical": "https://www.cogniguide.app/mind-maps/{slug}"
+    "title": string,            // ≤60 characters, includes target keyword
+    "description": string,      // 120 characters
+    "keywords": string[]        // 5–10 semantic variants (for internal use; not meta keywords).
   },
   "hero": {
     "eyebrow": string,
@@ -120,7 +121,7 @@ Return JSON with this shape (comments describe expectations):
     "heading": string,
     "subheading": string,
     "steps": [{ "title": string, "description": string }, ...], // exactly 3
-    "cta": { "type": "link", "label": string, "href": "/pricing" }
+    "cta": { "type": "modal", "label": "Generate mind map" }
   },
   "seoSection": {
     "heading": string,
@@ -284,6 +285,12 @@ def parse_args(argv: Iterable[str] | None = None) -> argparse.Namespace:
     help="Maximum number of concurrent Gemini API requests to make",
   )
   parser.add_argument(
+    "--max-api-calls-per-minute",
+    type=int,
+    default=12,
+    help="Throttle Gemini API usage to this many calls per rolling minute (0 to disable).",
+  )
+  parser.add_argument(
     "--rerun-existing",
     action="store_true",
     help="Regenerate rows whose slugs already exist in the output file",
@@ -361,6 +368,34 @@ def _inject_thinking_budget(
   google_section["thinking_config"] = thinking_config
   request_params["extra_body"] = extra_body
   return request_params
+
+
+class RateLimiter:
+  """Thread-safe rolling window limiter for API calls."""
+
+  def __init__(self, max_calls_per_minute: int | None):
+    self.max_calls_per_minute = max_calls_per_minute or 0
+    self.lock = threading.Lock()
+    self.calls: deque[float] = deque()
+
+  def wait_for_slot(self) -> None:
+    if self.max_calls_per_minute <= 0:
+      return
+
+    while True:
+      now = time.time()
+      with self.lock:
+        # Drop calls older than 60 seconds
+        while self.calls and now - self.calls[0] >= 60:
+          self.calls.popleft()
+
+        if len(self.calls) < self.max_calls_per_minute:
+          self.calls.append(now)
+          return
+
+        oldest_call = self.calls[0]
+        sleep_for = max(0.01, 60 - (now - oldest_call))
+      time.sleep(sleep_for)
 
 
 def call_model(
@@ -470,10 +505,13 @@ def call_model_with_retries(
   *,
   max_attempts: int = 6,
   initial_delay: float = 4.0,
+  rate_limiter: RateLimiter | None = None,
 ) -> Dict[str, Any]:
   delay = initial_delay
   for attempt in range(1, max_attempts + 1):
     try:
+      if rate_limiter:
+        rate_limiter.wait_for_slot()
       return call_model(client, model, temperature, payload, reasoning_effort)
     except RateLimitError:
       if attempt == max_attempts:
@@ -865,6 +903,8 @@ def main(argv: Iterable[str] | None = None) -> int:
     else:
       rows_to_generate = rows_to_generate[: max_api_calls]
 
+  rate_limiter = RateLimiter(args.max_api_calls_per_minute)
+
   if rows_to_generate:
     with ThreadPoolExecutor(max_workers=max(1, args.concurrency)) as executor:
       future_to_row = {
@@ -875,6 +915,7 @@ def main(argv: Iterable[str] | None = None) -> int:
           args.temperature,
           row.prompt_payload(),
           args.reasoning_effort,
+          rate_limiter=rate_limiter,
         ): row
         for row in rows_to_generate
       }

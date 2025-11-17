@@ -109,7 +109,7 @@ Return ONLY a single valid JSON object with this shape (no markdown, no commenta
   "metadata": {
     "title": string,            // ≤60 chars, includes target keyword
     "description": string,      // 140–155 chars
-    "keywords": string[]        // 5–10 semantic variants (for internal use; not meta keywords). Canonical URL is added automatically; omit this field.
+    "keywords": string[]        // 5–10 semantic variants (for internal use; not meta keywords).
   },
   "hero": {
     "heading": string,          // H1, contains target keyword/variant

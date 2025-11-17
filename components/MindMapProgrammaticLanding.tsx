@@ -47,29 +47,15 @@ const CTAButton = ({
 }) => {
   if (!cta) return null;
 
-  if (cta.type === 'modal') {
-    return (
-      <button
-        type="button"
-        onClick={onOpenAuth}
-        className={className}
-        aria-label={cta.ariaLabel ?? cta.label}
-      >
-        {cta.label}
-      </button>
-    );
-  }
-
   return (
-    <Link
-      href={cta.href}
+    <button
+      type="button"
+      onClick={onOpenAuth}
       className={className}
       aria-label={cta.ariaLabel ?? cta.label}
-      target={cta.target}
-      rel={cta.rel}
     >
       {cta.label}
-    </Link>
+    </button>
   );
 };
 
