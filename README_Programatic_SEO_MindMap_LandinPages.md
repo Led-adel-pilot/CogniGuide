@@ -47,6 +47,7 @@ Catch-all route that:
 - Serves the `/mind-maps` pillar page with cards linking only to hub pages.
 - Renders hub pages at `/mind-maps/{hub}` and subhub directories at `/mind-maps/{hub}/{subhub}`, each pulling link text/description from `lib/programmatic/generated/mindMapPages.ts`.
 - Subhub pages link directly to each landing’s canonical path (from the generator) under `/mind-maps/{slug}`.
+- Empty hubs/subhubs are suppressed from routing, navigation, and sitemaps until they have at least one generated mind map landing.
 - Builds metadata via `buildProgrammaticMetadata` for individual landings and uses hub/subhub defaults for hierarchy pages.
 - Includes structured data injection when landing pages already have `structuredData` populated.
 

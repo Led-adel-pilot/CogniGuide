@@ -62,9 +62,8 @@ type MindMapLinkMetadata = {
   href: string;
   title?: string;
   description?: string;
-  anchorTextVar1?: string;
-  anchorTextVar2?: string;
-  linkDescription?: string;
+  anchorText?: string;
+  descriptionVariants?: [string, string];
 };
 
 const mindMapPageMap = new Map<string, MindMapLinkMetadata>(
@@ -74,9 +73,8 @@ const mindMapPageMap = new Map<string, MindMapLinkMetadata>(
       href: page.path ?? `/mind-maps/${page.slug}`,
       title: page.hero.heading ?? humanize(page.slug),
       description: page.metadata?.description ?? page.hero.subheading,
-      anchorTextVar1: page.linkingRecommendations?.anchorTextVar1,
-      anchorTextVar2: page.linkingRecommendations?.anchorTextVar2,
-      linkDescription: page.linkingRecommendations?.description,
+      anchorText: page.linkingRecommendations?.anchorText,
+      descriptionVariants: page.linkingRecommendations?.descriptionVariants,
     },
   ])
 );
@@ -145,13 +143,13 @@ const buildMindMapLinks = (slugs: string[]): MindMapLink[] =>
 
       const fallbackTitle = humanize(slug);
       const anchorText =
-        entry.anchorTextVar1 ??
-        entry.anchorTextVar2 ??
+        entry.anchorText ??
+        entry.descriptionVariants?.[0] ??
         entry.title ??
         fallbackTitle;
       const description =
-        entry.linkDescription ??
         entry.description ??
+        entry.descriptionVariants?.[1] ??
         entry.title ??
         fallbackTitle;
 
@@ -165,10 +163,36 @@ const buildMindMapLinks = (slugs: string[]): MindMapLink[] =>
     })
     .filter((link): link is MindMapLink => Boolean(link));
 
-export const mindMapUseCaseHubs: MindMapUseCaseHub[] = Object.entries(rawHubData).map(
-  ([hubName, subhubMap]) => {
+export const mindMapUseCaseHubs: MindMapUseCaseHub[] = Object.entries(rawHubData)
+  .map(([hubName, subhubMap]) => {
     const hubSlug = slugify(hubName);
     const hubMetadata = getHubCopy(hubName);
+
+    const subhubs = Object.entries(subhubMap)
+      .map(([subhubName, slugs]) => {
+        const subhubSlug = slugify(subhubName);
+        const subhubMetadata = getSubhubCopy(hubName, hubSlug, subhubName, subhubSlug);
+        const mindMaps = buildMindMapLinks(slugs);
+
+        if (mindMaps.length === 0) {
+          return null;
+        }
+
+        return {
+          name: subhubName,
+          slug: subhubSlug,
+          path: buildSubhubPath(hubSlug, subhubSlug),
+          description: subhubMetadata.description,
+          pageIntro: subhubMetadata.pageIntro,
+          metaDescription: subhubMetadata.metaDescription,
+          mindMaps,
+        };
+      })
+      .filter((subhub): subhub is MindMapUseCaseSubhub => Boolean(subhub));
+
+    if (subhubs.length === 0) {
+      return null;
+    }
 
     return {
       name: hubName,
@@ -177,22 +201,10 @@ export const mindMapUseCaseHubs: MindMapUseCaseHub[] = Object.entries(rawHubData
       menuDescription: hubMetadata.menuDescription,
       pageIntro: hubMetadata.pageIntro,
       metaDescription: hubMetadata.metaDescription,
-      subhubs: Object.entries(subhubMap).map(([subhubName, slugs]) => {
-        const subhubSlug = slugify(subhubName);
-        const subhubMetadata = getSubhubCopy(hubName, hubSlug, subhubName, subhubSlug);
-        return {
-          name: subhubName,
-          slug: subhubSlug,
-          path: buildSubhubPath(hubSlug, subhubSlug),
-          description: subhubMetadata.description,
-          pageIntro: subhubMetadata.pageIntro,
-          metaDescription: subhubMetadata.metaDescription,
-          mindMaps: buildMindMapLinks(slugs),
-        };
-      }),
+      subhubs,
     };
-  }
-);
+  })
+  .filter((hub): hub is MindMapUseCaseHub => Boolean(hub));
 
 export const mindMapUseCaseHubMap = new Map(mindMapUseCaseHubs.map((hub) => [hub.slug, hub]));
 
