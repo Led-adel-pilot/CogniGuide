@@ -69,7 +69,7 @@ interface ProgrammaticFlashcardPage {
 **Purpose**: Auto-generated, SEO-optimized page content
 
 **Content Sections**:
-- **Hero Section**: Eyebrow, heading, subheading, and a primary CTA (the "No credit card required" microcopy is fixed in the UI)
+- **Hero Section**: Heading, subheading, and a primary CTA (the "No credit card required" microcopy is fixed in the UI)
 - **Features Section**: 3-4 differentiated benefit cards
 - **How It Works Section**: Exactly 3 sequential steps customized to topic
 - **SEO Section**: Mix of paragraphs and bullet lists with HTML markup for emphasis and internal links

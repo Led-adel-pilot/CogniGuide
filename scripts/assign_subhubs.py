@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-"""Assign and audit programmatic flashcard pages within the taxonomy.
+"""Assign and audit programmatic flashcard or mind map pages within a taxonomy.
 
-This utility inspects the generated flashcard landing pages and the hub/subhub
-taxonomy declared in ``data/flashcard_taxonomy.json``. Missing slugs are scored
-against every subhub using lightweight lexical similarity heuristics and placed
-with the best match. Ambiguous matches can be reported, reassigned, or routed to
-an explicit fallback subhub for manual curation.
+This utility inspects the generated landing pages and the hub/subhub taxonomy
+declared for the selected content type (flashcards or mind maps). Missing slugs
+are scored against every subhub using lightweight lexical similarity heuristics
+and placed with the best match. Ambiguous matches can be reported, reassigned,
+or routed to an explicit fallback subhub for manual curation.
 
 Heuristic highlights:
   * Overlapping keyword phrases and slug tokens carry extra weight.
@@ -26,6 +26,21 @@ from typing import Dict, Iterable, List, Mapping, MutableMapping, Optional, Sequ
 
 DEFAULT_PAGES = Path("lib/programmatic/generated/flashcardPages.ts")
 DEFAULT_TAXONOMY = Path("data/flashcard_taxonomy.json")
+
+CONTENT_TYPES = {
+    "flashcards": {
+        "pages": DEFAULT_PAGES,
+        "taxonomy": DEFAULT_TAXONOMY,
+        "fallback_hub": "Vocabulary & Specialized Concepts",
+        "fallback_subhub": "General Concepts",
+    },
+    "mindmaps": {
+        "pages": Path("lib/programmatic/generated/mindMapPages.ts"),
+        "taxonomy": Path("data/mindmap_taxonomy.json"),
+        "fallback_hub": "General Topic Mind Maps",
+        "fallback_subhub": "Topics M-R",
+    },
+}
 
 # Common words that add noise when comparing topical similarity.
 STOPWORDS: Set[str] = {
@@ -86,6 +101,12 @@ STOPWORDS: Set[str] = {
     "making",
     "master",
     "mastery",
+    "map",
+    "mapping",
+    "maps",
+    "mind",
+    "mindmap",
+    "mindmaps",
     "notes",
     "online",
     "pdf",
@@ -195,19 +216,25 @@ class LowConfidenceEntry:
 
 def parse_arguments() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Assign ungrouped flashcard pages to the most relevant taxonomy subhub."
+        description="Assign ungrouped programmatic pages to the most relevant taxonomy subhub."
+    )
+    parser.add_argument(
+        "--content-type",
+        choices=sorted(CONTENT_TYPES.keys()),
+        default="flashcards",
+        help="Select which programmatic landings to process (default: %(default)s).",
     )
     parser.add_argument(
         "--pages",
         type=Path,
-        default=DEFAULT_PAGES,
-        help="Path to generated flashcard pages file (default: %(default)s).",
+        default=None,
+        help="Path to generated pages file (defaults depend on --content-type).",
     )
     parser.add_argument(
         "--taxonomy",
         type=Path,
-        default=DEFAULT_TAXONOMY,
-        help="Path to hub/subhub taxonomy JSON (default: %(default)s).",
+        default=None,
+        help="Path to hub/subhub taxonomy JSON (defaults depend on --content-type).",
     )
     parser.add_argument(
         "--baseline-taxonomy",
@@ -252,14 +279,14 @@ def parse_arguments() -> argparse.Namespace:
     parser.add_argument(
         "--fallback-hub",
         type=str,
-        default="Vocabulary & Specialized Concepts",
-        help="Hub to use for fallback assignments (default: %(default)s).",
+        default=None,
+        help="Hub to use for fallback assignments (default depends on --content-type).",
     )
     parser.add_argument(
         "--fallback-subhub",
         type=str,
-        default="General Concepts",
-        help="Subhub to use for fallback assignments (default: %(default)s).",
+        default=None,
+        help="Subhub to use for fallback assignments (default depends on --content-type).",
     )
     parser.add_argument(
         "--report-existing",
@@ -503,6 +530,13 @@ def build_page_contexts(pages: Sequence[Dict]) -> Dict[str, PageContext]:
                 if isinstance(value, str):
                     for token in tokenize(value):
                         incorporate_token(tokens, token)
+
+        embedded_mindmap = page.get("embeddedMindMap")
+        if isinstance(embedded_mindmap, Mapping):
+            markdown = embedded_mindmap.get("markdown")
+            if isinstance(markdown, str):
+                for token in tokenize(markdown):
+                    incorporate_token(tokens, token)
 
         contexts[slug] = PageContext(
             slug=slug,
@@ -840,9 +874,15 @@ def write_low_confidence_report(path: Path, entries: Sequence[LowConfidenceEntry
 def main() -> None:
     args = parse_arguments()
 
-    _, _, _, pages = load_pages(args.pages)
+    content_config = CONTENT_TYPES.get(args.content_type, CONTENT_TYPES["flashcards"])
+    pages_path = args.pages or content_config["pages"]
+    taxonomy_path = args.taxonomy or content_config["taxonomy"]
+    fallback_hub = args.fallback_hub or content_config["fallback_hub"]
+    fallback_subhub = args.fallback_subhub or content_config["fallback_subhub"]
+
+    _, _, _, pages = load_pages(pages_path)
     page_contexts = build_page_contexts(pages)
-    taxonomy = load_taxonomy(args.taxonomy)
+    taxonomy = load_taxonomy(taxonomy_path)
 
     baseline_slugs = load_baseline_slugs(args.baseline_taxonomy)
     assigned_slugs = collect_slugs(taxonomy)
@@ -853,12 +893,12 @@ def main() -> None:
     if args.limit is not None:
         missing_slugs = missing_slugs[: args.limit]
 
-    fallback_key = (args.fallback_hub, args.fallback_subhub)
-    if args.fallback_hub not in taxonomy:
-        raise KeyError(f"Fallback hub {args.fallback_hub!r} not found in taxonomy.")
-    if args.fallback_subhub not in taxonomy[args.fallback_hub]:
+    fallback_key = (fallback_hub, fallback_subhub)
+    if fallback_hub not in taxonomy:
+        raise KeyError(f"Fallback hub {fallback_hub!r} not found in taxonomy.")
+    if fallback_subhub not in taxonomy[fallback_hub]:
         raise KeyError(
-            f"Fallback subhub {args.fallback_subhub!r} not found under hub {args.fallback_hub!r}."
+            f"Fallback subhub {fallback_subhub!r} not found under hub {fallback_hub!r}."
         )
 
     restrict_slugs = None
@@ -926,8 +966,8 @@ def main() -> None:
 
     updates = apply_assignments(taxonomy, assignments)
     if updates:
-        write_taxonomy(args.taxonomy, taxonomy)
-        print(f"Wrote {updates} new assignments to {args.taxonomy}.")
+        write_taxonomy(taxonomy_path, taxonomy)
+        print(f"Wrote {updates} new assignments to {taxonomy_path}.")
     else:
         print("Assignments matched existing taxonomy; no filesystem changes made.")
 

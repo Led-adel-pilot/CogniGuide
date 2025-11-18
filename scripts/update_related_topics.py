@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Update internal related topic links for generated flashcard pages.
+"""Update internal related topic links for generated flashcard or mind map pages.
 
 This script replaces placeholder related topic links (`/` and `/flashcards`)
 with data-driven interlinks based on topical similarity and each page's
@@ -15,10 +15,22 @@ import re
 from collections import defaultdict
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Dict, List, Sequence, Tuple
+from typing import Dict, List, Sequence, Set, Tuple
 
 
 DEFAULT_SOURCE = Path("lib/programmatic/generated/flashcardPages.ts")
+CONTENT_TYPES = {
+    "flashcards": {
+        "source": DEFAULT_SOURCE,
+        "placeholders": {"/", "/flashcards"},
+        "base_path": "/flashcards",
+    },
+    "mindmaps": {
+        "source": Path("lib/programmatic/generated/mindMapPages.ts"),
+        "placeholders": {"/", "/mind-maps"},
+        "base_path": "/mind-maps",
+    },
+}
 MIN_LINKS = 2
 MAX_LINKS = 3
 
@@ -77,6 +89,12 @@ STOPWORDS = {
     "making",
     "master",
     "mastery",
+    "map",
+    "mapping",
+    "maps",
+    "mind",
+    "mindmap",
+    "mindmaps",
     "notes",
     "online",
     "pdf",
@@ -124,10 +142,16 @@ def parse_arguments() -> argparse.Namespace:
         description="Replace placeholder related topic links with data-driven interlinks."
     )
     parser.add_argument(
+        "--content-type",
+        choices=sorted(CONTENT_TYPES.keys()),
+        default="flashcards",
+        help="Select which programmatic landings to process (default: %(default)s).",
+    )
+    parser.add_argument(
         "--source",
         type=Path,
-        default=DEFAULT_SOURCE,
-        help="Path to generated flashcard pages file (default: %(default)s).",
+        default=None,
+        help="Path to generated pages file (defaults depend on --content-type).",
     )
     parser.add_argument(
         "--min-links",
@@ -161,7 +185,7 @@ def tokenize(value: str) -> List[str]:
     return [token for token in tokens if token not in STOPWORDS]
 
 
-def build_page_contexts(pages: Sequence[Dict]) -> List[PageContext]:
+def build_page_contexts(pages: Sequence[Dict], base_path: str = "") -> List[PageContext]:
     contexts: List[PageContext] = []
     for page in pages:
         metadata = page.get("metadata", {})
@@ -184,15 +208,26 @@ def build_page_contexts(pages: Sequence[Dict]) -> List[PageContext]:
         for phrase in keyword_phrases:
             tokens.update(tokenize(phrase))
 
+        embedded_mindmap = page.get("embeddedMindMap")
+        if isinstance(embedded_mindmap, dict):
+            markdown = embedded_mindmap.get("markdown")
+            if isinstance(markdown, str):
+                tokens.update(tokenize(markdown))
+
+        path_value = (page.get("path") or "").strip()
+        slug = (page.get("slug") or "").strip()
+        if not path_value and base_path and slug:
+            path_value = f"{base_path.rstrip('/')}/{slug}"
+
         contexts.append(
             PageContext(
-                slug=page.get("slug", ""),
-                path=page.get("path", ""),
+                slug=slug,
+                path=path_value,
                 linking_anchor=anchor_text,
                 linking_descriptions=tuple(desc for desc in description_variants if desc),
                 tokens=tuple(tokens),
                 keyword_phrases=tuple(keyword_phrases),
-                slug_tokens=tuple(token for token in page.get("slug", "").split("-") if token),
+                slug_tokens=tuple(token for token in slug.split("-") if token),
             )
         )
     return contexts
@@ -363,12 +398,12 @@ def write_pages(path: Path, original_text: str, start: int, end: int, pages: Seq
     path.write_text(new_text, encoding="utf-8")
 
 
-def find_placeholder_indices(pages: Sequence[Dict]) -> List[int]:
+def find_placeholder_indices(pages: Sequence[Dict], placeholders: Set[str]) -> List[int]:
     indices: List[int] = []
     for idx, page in enumerate(pages):
         links = (page.get("relatedTopicsSection") or {}).get("links") or []
         if any(
-            link.get("href") in {"/", "/flashcards"} or link.get("label") in {"/", "/flashcards"}
+            link.get("href") in placeholders or link.get("label") in placeholders
             for link in links
         ):
             indices.append(idx)
@@ -377,21 +412,26 @@ def find_placeholder_indices(pages: Sequence[Dict]) -> List[int]:
 
 def main() -> None:
     args = parse_arguments()
-    original_text, start_idx, end_idx, pages = load_pages(args.source)
+    content_config = CONTENT_TYPES.get(args.content_type, CONTENT_TYPES["flashcards"])
+    source_path = args.source or content_config["source"]
+    placeholders = set(content_config["placeholders"])
+    base_path = content_config["base_path"]
 
-    placeholder_indices = find_placeholder_indices(pages)
+    original_text, start_idx, end_idx, pages = load_pages(source_path)
+
+    placeholder_indices = find_placeholder_indices(pages, placeholders)
     if not placeholder_indices:
         print("No placeholder related topic links found; nothing to update.")
         return
 
-    contexts = build_page_contexts(pages)
+    contexts = build_page_contexts(pages, base_path)
     selections = select_related_targets(
         contexts, placeholder_indices, args.min_links, args.max_links
     )
     link_map = build_link_entries(pages, contexts, selections)
 
     updated = replace_related_links(pages, link_map, placeholder_indices)
-    write_pages(args.source, original_text, start_idx, end_idx, pages)
+    write_pages(source_path, original_text, start_idx, end_idx, pages)
 
     print(f"Updated relatedTopicsSection links for {updated} pages.")
 

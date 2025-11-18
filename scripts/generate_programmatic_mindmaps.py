@@ -107,7 +107,6 @@ Return JSON with this shape (comments describe expectations). The slug, path, an
     "keywords": string[]        // 5–10 semantic variants (for internal use; not meta keywords).
   },
   "hero": {
-    "eyebrow": string,
     "heading": string,        // contains the target keyword or closest variant
     "subheading": string,
     "primaryCta": { "type": "modal", "label": "Generate mind map" }

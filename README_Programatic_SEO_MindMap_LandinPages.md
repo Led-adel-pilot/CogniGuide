@@ -54,9 +54,30 @@ Now accepts both flashcard and mind map page interfaces to produce canonical met
 ### 9. Sitemaps (`lib/seo/sitemapSections.ts`)
 `getProgrammaticLandingSitemapEntries()` now emits URLs for both flashcard and mind map landings so `/sitemap.xml` and `/sitemaps/sitemap-landings.xml` stay in sync.
 
+### 10. Taxonomy & Hubs (`data/mindmap_taxonomy.json`)
+Mind map slugs are grouped into hubs/subhubs (mirroring the flashcard taxonomy flow) to power breadcrumbs, internal navigation, and sitemap priority. The taxonomy file is derived from `data/mindmap_pages.csv` with broad buckets:
+- **Skills & Resources**: Apps/tools, how-to/benefits, templates/examples.
+- **Academic & Study**: CBSE/K-12 chapters, subjects/courses, study skills.
+- **Business & Professional**: Strategy/marketing, projects/ops, career skills.
+- **General Topic Mind Maps**: Alphabetical fallback subhubs (Topics 0-9, A-F, G-L, M-R, S-Z) to ensure coverage for all 9k+ slugs.
+
+### 11. Taxonomy Assignment Helper (`scripts/assign_subhubs.py`)
+Extends the flashcard assignment utility to mind maps. Scores ungrouped slugs against subhubs using slug tokens, metadata, embedded mind map markdown, and keyword overlap.
+- Flashcards: `python3 scripts/assign_subhubs.py --content-type flashcards`
+- Mind maps: `python3 scripts/assign_subhubs.py --content-type mindmaps`
+Defaults (pages file, taxonomy path, fallback hub/subhub) switch automatically per content type. Use `--report-existing` to audit low-confidence mappings without writing changes.
+
+### 12. Related Topics Link Updater (`scripts/update_related_topics.py`)
+Replaces placeholder related links with data-driven internal links using keyword and slug similarity.
+- Flashcards: `python3 scripts/update_related_topics.py --content-type flashcards`
+- Mind maps: `python3 scripts/update_related_topics.py --content-type mindmaps`
+Mind map runs look for `/` or `/mind-maps` placeholders in `lib/programmatic/generated/mindMapPages.ts` and backfill up to three relevant peers per page.
+
 ## Workflow
 1. Add or update rows in `data/mindmap_pages.csv`.
 2. Run `python scripts/generate_programmatic_mindmaps.py --input data/mindmap_pages.csv --output lib/programmatic/generated/mindMapPages.ts`.
+3. Assign hubs/subhubs for any new slugs: `python3 scripts/assign_subhubs.py --content-type mindmaps`.
+4. Update related links: `python3 scripts/update_related_topics.py --content-type mindmaps`.
 3. Commit the regenerated TypeScript along with any CSV changes.
 4. Deploy—Next.js statically renders the new `/mind-maps/{slug}` routes.
 
