@@ -258,10 +258,11 @@ export default function Dropzone({ onFileChange, disabled = false, onOpen, isPre
 
   const isCentered = files.length <= 2;
   const gridClass = isCentered
-    ? "flex flex-wrap justify-center gap-4 w-full"
+    ? "flex flex-wrap justify-center -m-2 w-full"
     : "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 w-full";
-  const itemClass = isCentered
-    ? "w-full sm:w-[calc(50%_-_1rem)] md:w-[calc(33.333%_-_1rem)] lg:w-[calc(25%_-_1rem)] flex-none"
+
+  const wrapperClass = isCentered
+    ? "w-full sm:w-1/2 md:w-1/3 lg:w-1/4 p-2 flex-none"
     : "";
 
   const getFileIcon = (file: File) => {
@@ -354,54 +355,57 @@ export default function Dropzone({ onFileChange, disabled = false, onOpen, isPre
                   : displayProgress < 100;
 
                 return (
-                  <div
-                    key={index}
-                    className={`group relative flex flex-col items-center justify-center text-center p-4 border border-border/40 bg-background/80 hover:bg-background hover:border-primary/30 rounded-2xl transition-all duration-300 shadow-sm hover:shadow-md overflow-hidden ${itemClass}`}
-                    onClick={(e) => e.stopPropagation()} // Prevent opening file dialog when clicking the card
-                  >
-                    <div className="mb-3 transition-transform duration-300 group-hover:scale-110">
-                      {getFileIcon(file)}
-                    </div>
-
-                    <div className="w-full px-2">
-                      <p className="text-sm font-medium text-foreground truncate w-full" title={file.name}>
-                        {file.name}
-                      </p>
-                      <p className="text-[10px] uppercase tracking-wider text-muted-foreground mt-1 font-medium">
-                        {(file.size < 102400 ? (file.size / 1024).toFixed(1) + ' KB' : (file.size / (1024 * 1024)).toFixed(1) + ' MB')}
-                      </p>
-                    </div>
-
-                    <button
-                      onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        handleRemoveFile(file);
-                      }}
-                      className="absolute top-2 right-2 p-1.5 bg-background/80 hover:bg-destructive/10 text-muted-foreground hover:text-destructive rounded-full opacity-0 group-hover:opacity-100 transition-all duration-200 transform translate-y-1 group-hover:translate-y-0"
-                      aria-label="Remove file"
+                  <div key={index} className={wrapperClass}>
+                    <div
+                      className="group relative flex flex-col items-center justify-center text-center p-4 border border-border/40 bg-background/80 hover:bg-background hover:border-primary/30 rounded-2xl transition-all duration-300 shadow-sm hover:shadow-md overflow-hidden h-full w-full"
+                      onClick={(e) => e.stopPropagation()} // Prevent opening file dialog when clicking the card
                     >
-                      <X className="w-3.5 h-3.5" />
-                    </button>
+                      <div className="mb-3 transition-transform duration-300 group-hover:scale-110">
+                        {getFileIcon(file)}
+                      </div>
 
-                    {showProgress && (
-                      <div className="absolute inset-0 bg-background/95 backdrop-blur-sm z-10 flex flex-col items-center justify-center animate-in fade-in duration-200">
-                        <RadialProgressBar progress={displayProgress} size={40} strokeWidth={4} />
-                        <p className="text-[10px] font-medium text-primary mt-2 animate-pulse">
-                          {isUploading ? 'UPLOADING' : 'PROCESSING'}
+                      <div className="w-full px-2">
+                        <p className="text-sm font-medium text-foreground truncate w-full" title={file.name}>
+                          {file.name}
+                        </p>
+                        <p className="text-[10px] uppercase tracking-wider text-muted-foreground mt-1 font-medium">
+                          {(file.size < 102400 ? (file.size / 1024).toFixed(1) + ' KB' : (file.size / (1024 * 1024)).toFixed(1) + ' MB')}
                         </p>
                       </div>
-                    )}
+
+                      <button
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          handleRemoveFile(file);
+                        }}
+                        className="absolute top-2 right-2 p-1.5 bg-background/80 hover:bg-accent hover:text-accent-foreground text-muted-foreground rounded-full opacity-0 group-hover:opacity-100 transition-all duration-200 transform translate-y-1 group-hover:translate-y-0"
+                        aria-label="Remove file"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+
+                      {showProgress && (
+                        <div className="absolute inset-0 bg-background/95 backdrop-blur-sm z-10 flex flex-col items-center justify-center animate-in fade-in duration-200">
+                          <RadialProgressBar progress={displayProgress} size={40} strokeWidth={4} />
+                          <p className="text-[10px] font-medium text-primary mt-2 animate-pulse">
+                            {isUploading ? 'UPLOADING' : 'PROCESSING'}
+                          </p>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 );
               })}
 
               {/* Add more button card */}
-              <div className={`flex flex-col items-center justify-center p-4 border-2 border-dashed border-border/40 hover:border-primary/40 bg-muted/5 hover:bg-muted/20 rounded-2xl transition-all duration-300 cursor-pointer group min-h-[140px] ${itemClass}`}>
-                <div className="p-3 rounded-full bg-primary/5 text-primary group-hover:bg-primary/10 group-hover:scale-110 transition-all duration-300 mb-2">
-                  <UploadCloud className="w-6 h-6" />
+              <div className={wrapperClass}>
+                <div className="flex flex-col items-center justify-center p-4 border-2 border-dashed border-border/40 hover:border-primary/40 bg-muted/5 hover:bg-muted/20 rounded-2xl transition-all duration-300 cursor-pointer group min-h-[140px] h-full w-full">
+                  <div className="p-3 rounded-full bg-primary/5 text-primary group-hover:bg-primary/10 group-hover:scale-110 transition-all duration-300 mb-2">
+                    <UploadCloud className="w-6 h-6" />
+                  </div>
+                  <p className="text-xs font-medium text-muted-foreground group-hover:text-primary transition-colors">Add more files</p>
                 </div>
-                <p className="text-xs font-medium text-muted-foreground group-hover:text-primary transition-colors">Add more files</p>
               </div>
             </div>
           </div>
