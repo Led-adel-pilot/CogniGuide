@@ -2,7 +2,7 @@
 
 import posthog from 'posthog-js';
 import { useState, useCallback, useMemo, useEffect, useRef } from 'react';
-import { UploadCloud, File, X } from 'lucide-react';
+import { UploadCloud, File, X, FileText, Image as ImageIcon, FileCode, FileSpreadsheet, Music, Video } from 'lucide-react';
 
 interface RadialProgressBarProps {
   progress?: number;
@@ -213,7 +213,7 @@ export default function Dropzone({ onFileChange, disabled = false, onOpen, isPre
     // Force re-mount the input to avoid edge cases where shift-selection prevents subsequent change events
     setInputKey(prev => prev + 1);
   };
-  
+
   const handleRemoveFile = (fileToRemove: File) => {
     posthog.capture('file_removed', {
       file_name: fileToRemove.name,
@@ -248,12 +248,77 @@ export default function Dropzone({ onFileChange, disabled = false, onOpen, isPre
   }, [isPreParsing]);
 
   const dropzoneClassName = useMemo(() => {
-    const heightClass = size === 'compact' ? 'h-36 sm:h-40' : 'h-48';
-    const base = `flex flex-col items-center justify-center w-full ${heightClass} border-2 border-dashed rounded-[1.25rem] cursor-pointer transition-colors duration-300`;
-    if (disabled) return `${base} bg-muted/50 border-border/30 cursor-not-allowed`;
-    if (dragIsOver) return `${base} bg-primary/10 border-primary`;
-    return `${base} bg-background hover:bg-muted/50 border-border/50 hover:border-primary/50`;
+    const heightClass = size === 'compact' ? 'min-h-[9rem]' : 'min-h-[12rem]';
+    const base = `relative flex flex-col items-center justify-center w-full ${heightClass} border-2 border-dashed rounded-[1.25rem] cursor-pointer transition-all duration-300 ease-in-out`;
+
+    if (disabled) return `${base} bg-muted/30 border-border/30 cursor-not-allowed opacity-60`;
+    if (dragIsOver) return `${base} bg-primary/5 border-primary scale-[1.01] ring-1 ring-primary/20`;
+    return `${base} bg-background/50 hover:bg-muted/30 border-border/50 hover:border-primary/40`;
   }, [dragIsOver, disabled, size]);
+
+  const isCentered = files.length <= 2;
+  const gridClass = isCentered
+    ? "flex flex-wrap justify-center gap-4 w-full"
+    : "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 w-full";
+  const itemClass = isCentered
+    ? "w-full sm:w-[calc(50%-1rem)] md:w-[calc(33.333%-1rem)] lg:w-[calc(25%-1rem)] flex-none"
+    : "";
+
+  const getFileIcon = (file: File) => {
+    const type = file.type;
+    const name = file.name.toLowerCase();
+
+    const iconProps = { className: "w-8 h-8" };
+
+    if (type.includes('pdf')) {
+      return (
+        <div className="p-3 rounded-xl bg-red-500/10 text-red-500">
+          <FileText {...iconProps} />
+        </div>
+      );
+    }
+    if (type.includes('image')) {
+      return (
+        <div className="p-3 rounded-xl bg-purple-500/10 text-purple-500">
+          <ImageIcon {...iconProps} />
+        </div>
+      );
+    }
+    if (name.endsWith('.csv') || name.endsWith('.xlsx') || name.endsWith('.xls')) {
+      return (
+        <div className="p-3 rounded-xl bg-green-500/10 text-green-500">
+          <FileSpreadsheet {...iconProps} />
+        </div>
+      );
+    }
+    if (name.endsWith('.md') || name.endsWith('.txt') || name.endsWith('.json') || name.endsWith('.js') || name.endsWith('.ts') || name.endsWith('.tsx')) {
+      return (
+        <div className="p-3 rounded-xl bg-yellow-500/10 text-yellow-600">
+          <FileCode {...iconProps} />
+        </div>
+      );
+    }
+    if (type.includes('video')) {
+      return (
+        <div className="p-3 rounded-xl bg-pink-500/10 text-pink-500">
+          <Video {...iconProps} />
+        </div>
+      );
+    }
+    if (type.includes('audio')) {
+      return (
+        <div className="p-3 rounded-xl bg-indigo-500/10 text-indigo-500">
+          <Music {...iconProps} />
+        </div>
+      );
+    }
+
+    return (
+      <div className="p-3 rounded-xl bg-blue-500/10 text-blue-500">
+        <File {...iconProps} />
+      </div>
+    );
+  };
 
   return (
     <div className="w-full">
@@ -270,7 +335,7 @@ export default function Dropzone({ onFileChange, disabled = false, onOpen, isPre
               e.stopPropagation();
               return;
             }
-          } catch {}
+          } catch { }
         }}
         onDragEnter={handleDragEnter}
         onDragLeave={handleDragLeave}
@@ -278,8 +343,8 @@ export default function Dropzone({ onFileChange, disabled = false, onOpen, isPre
         onDrop={handleDrop}
       >
         {files.length > 0 ? (
-          <div className="flex flex-col items-center justify-center w-full h-full p-4">
-            <div className="flex flex-row items-center justify-center gap-4 w-full overflow-x-auto max-h-full">
+          <div className="w-full h-full p-6">
+            <div className={gridClass}>
               {files.map((file, index) => {
                 const fileKey = getFileKey(file);
                 const showProgress = isPreParsing && uploadingFileKeys.has(fileKey);
@@ -287,41 +352,72 @@ export default function Dropzone({ onFileChange, disabled = false, onOpen, isPre
                 const isUploading = typeof uploadProgress === 'number'
                   ? uploadProgress < 100
                   : displayProgress < 100;
+
                 return (
-                  <div key={index} className="relative flex-shrink-0 flex flex-col items-center justify-center text-center p-4 border bg-background rounded-[1.25rem]">
-                    <File className="w-10 h-10 text-primary mb-2" />
-                    <p className="text-sm font-semibold text-foreground truncate w-28" title={file.name}>{file.name}</p>
-                    <p className="text-xs text-muted-foreground">({(file.size < 102400 ? (file.size / 1024).toFixed(2) + ' KB' : (file.size / (1024 * 1024)).toFixed(2) + ' MB')})</p>
+                  <div
+                    key={index}
+                    className={`group relative flex flex-col items-center justify-center text-center p-4 border border-border/40 bg-background/80 hover:bg-background hover:border-primary/30 rounded-2xl transition-all duration-300 shadow-sm hover:shadow-md overflow-hidden ${itemClass}`}
+                    onClick={(e) => e.stopPropagation()} // Prevent opening file dialog when clicking the card
+                  >
+                    <div className="mb-3 transition-transform duration-300 group-hover:scale-110">
+                      {getFileIcon(file)}
+                    </div>
+
+                    <div className="w-full px-2">
+                      <p className="text-sm font-medium text-foreground truncate w-full" title={file.name}>
+                        {file.name}
+                      </p>
+                      <p className="text-[10px] uppercase tracking-wider text-muted-foreground mt-1 font-medium">
+                        {(file.size < 102400 ? (file.size / 1024).toFixed(1) + ' KB' : (file.size / (1024 * 1024)).toFixed(1) + ' MB')}
+                      </p>
+                    </div>
+
                     <button
                       onClick={(e) => {
                         e.preventDefault();
                         e.stopPropagation();
                         handleRemoveFile(file);
                       }}
-                      className="absolute top-2 right-2 w-6 h-6 inline-flex items-center justify-center bg-white text-black border border-gray-300 rounded-full hover:bg-gray-50 focus:outline-none z-30"
+                      className="absolute top-2 right-2 p-1.5 bg-background/80 hover:bg-destructive/10 text-muted-foreground hover:text-destructive rounded-full opacity-0 group-hover:opacity-100 transition-all duration-200 transform translate-y-1 group-hover:translate-y-0"
                       aria-label="Remove file"
                     >
-                      <X className="w-4 h-4" />
+                      <X className="w-3.5 h-3.5" />
                     </button>
+
                     {showProgress && (
-                      <div className="absolute inset-4 bg-background/90 backdrop-blur-md rounded-[1rem] flex flex-col items-center justify-center z-10 transition-all duration-200">
-                        <RadialProgressBar progress={displayProgress} />
-                        <p className="text-xs text-muted-foreground font-medium mt-3 text-center">
-                          {isUploading ? 'Uploading...' : 'Processing...'}
+                      <div className="absolute inset-0 bg-background/95 backdrop-blur-sm z-10 flex flex-col items-center justify-center animate-in fade-in duration-200">
+                        <RadialProgressBar progress={displayProgress} size={40} strokeWidth={4} />
+                        <p className="text-[10px] font-medium text-primary mt-2 animate-pulse">
+                          {isUploading ? 'UPLOADING' : 'PROCESSING'}
                         </p>
                       </div>
                     )}
                   </div>
                 );
               })}
+
+              {/* Add more button card */}
+              <div className={`flex flex-col items-center justify-center p-4 border-2 border-dashed border-border/40 hover:border-primary/40 bg-muted/5 hover:bg-muted/20 rounded-2xl transition-all duration-300 cursor-pointer group min-h-[140px] ${itemClass}`}>
+                <div className="p-3 rounded-full bg-primary/5 text-primary group-hover:bg-primary/10 group-hover:scale-110 transition-all duration-300 mb-2">
+                  <UploadCloud className="w-6 h-6" />
+                </div>
+                <p className="text-xs font-medium text-muted-foreground group-hover:text-primary transition-colors">Add more files</p>
+              </div>
             </div>
-            <p className="mt-4 text-xs text-muted-foreground">You can add more files.</p>
           </div>
         ) : (
-          <div className="flex flex-col items-center justify-center text-center">
-            <UploadCloud className="w-10 h-10 mb-4 text-muted-foreground" />
-            <p className="mb-2 text-md text-foreground"><span className="font-semibold text-primary">Click to upload</span> or drag and drop</p>
-            <p className="text-xs text-muted-foreground">PDF, DOCX, PPTX, TXT, MD, or Images (PNG, JPG, etc.)</p>
+          <div className="flex flex-col items-center justify-center text-center p-8 space-y-4">
+            <div className="p-4 rounded-full bg-primary/5 text-primary ring-8 ring-primary/5 mb-2 transition-transform duration-300 hover:scale-105">
+              <UploadCloud className="w-8 h-8" />
+            </div>
+            <div className="space-y-1">
+              <p className="text-lg font-medium text-foreground">
+                Drop files here or <span className="text-primary cursor-pointer hover:underline">browse</span>
+              </p>
+              <p className="text-sm text-muted-foreground max-w-xs mx-auto">
+                Support for PDF, DOCX, Images, and Markdown
+              </p>
+            </div>
           </div>
         )}
         <input
