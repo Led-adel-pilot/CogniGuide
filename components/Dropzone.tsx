@@ -261,7 +261,7 @@ export default function Dropzone({ onFileChange, disabled = false, onOpen, isPre
     ? "flex flex-wrap justify-center gap-4 w-full"
     : "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 w-full";
   const itemClass = isCentered
-    ? "w-full sm:w-[calc(50%-1rem)] md:w-[calc(33.333%-1rem)] lg:w-[calc(25%-1rem)] flex-none"
+    ? "w-full sm:w-[calc(50%_-_1rem)] md:w-[calc(33.333%_-_1rem)] lg:w-[calc(25%_-_1rem)] flex-none"
     : "";
 
   const getFileIcon = (file: File) => {
