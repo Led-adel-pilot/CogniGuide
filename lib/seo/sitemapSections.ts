@@ -1,5 +1,6 @@
 import { allFlashcardPages } from '@/lib/programmatic/flashcardPages';
 import { allMindMapPages } from '@/lib/programmatic/mindMapPages';
+import { mindMapUseCaseHubs } from '@/lib/programmatic/mindMapUseCaseData';
 import { useCaseHubs } from '@/lib/programmatic/useCaseData';
 import { ensureAbsoluteUrl, formatLastmod, SitemapEntry } from '@/lib/seo/sitemap';
 
@@ -22,6 +23,12 @@ const coreRoutes = [
 const sortByLocation = (entries: SitemapEntry[]): SitemapEntry[] =>
   [...entries].sort((a, b) => a.loc.localeCompare(b.loc));
 
+const dedupeEntries = (entries: SitemapEntry[]): SitemapEntry[] => {
+  const byUrl = new Map<string, SitemapEntry>();
+  entries.forEach((entry) => byUrl.set(entry.loc, entry));
+  return [...byUrl.values()];
+};
+
 export const getCoreSitemapEntries = (): SitemapEntry[] =>
   sortByLocation(
     coreRoutes.map((path) => ({
@@ -30,13 +37,17 @@ export const getCoreSitemapEntries = (): SitemapEntry[] =>
     }))
   );
 
-export const getHubSitemapEntries = (): SitemapEntry[] =>
-  sortByLocation(
-    useCaseHubs.map((hub) => ({
+export const getHubSitemapEntries = (): SitemapEntry[] => {
+  const buildEntries = (hubs: { path: string }[]) =>
+    hubs.map((hub) => ({
       loc: ensureAbsoluteUrl(hub.path),
       lastmod: formatLastmod(),
-    }))
+    }));
+
+  return sortByLocation(
+    dedupeEntries([...buildEntries(useCaseHubs), ...buildEntries(mindMapUseCaseHubs)])
   );
+};
 
 export const getSubhubSitemapEntries = (): SitemapEntry[] => {
   const entries: SitemapEntry[] = [];
@@ -50,7 +61,16 @@ export const getSubhubSitemapEntries = (): SitemapEntry[] => {
     });
   });
 
-  return sortByLocation(entries);
+  mindMapUseCaseHubs.forEach((hub) => {
+    hub.subhubs.forEach((subhub) => {
+      entries.push({
+        loc: ensureAbsoluteUrl(subhub.path),
+        lastmod: formatLastmod(),
+      });
+    });
+  });
+
+  return sortByLocation(dedupeEntries(entries));
 };
 
 const addProgrammaticEntries = (

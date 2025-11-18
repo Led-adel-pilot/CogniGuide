@@ -68,7 +68,7 @@ CRITICAL WRITING RULES (people-first + E-E-A-T):
 
 PSYCHOLOGY-DRIVEN CTR GUIDANCE FOR METADATA:
 - Curiosity gap: Promise a transformation (“turn chaotic research into visual clarity”) while staying truthful.
-- Loss aversion: Highlight pain avoided by using CogniGuide (Time saving).
+- Loss aversion: Highlight pain avoided by using the app (Time saving).
 - Emotional resonance: Mirror the target audience’s stress in the meta description.
 
 3) Title requirements:

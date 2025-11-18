@@ -42,11 +42,13 @@ Custom skeleton modeled after the flashcard template but with:
 - Mind-map specific CTA copy and footer links.
 - Shared navigation, hero typography calculations, FAQ grid, etc.
 
-### 7. Routing (`app/mind-maps/[slug]/page.tsx`)
-Next.js dynamic route that:
-- Generates static params for every generated slug.
-- Builds metadata via `buildProgrammaticMetadata`.
-- Renders `<MindMapProgrammaticLanding page={page} />` or 404s when missing.
+### 7. Routing (`app/mind-maps/[[...slug]]/page.tsx`)
+Catch-all route that:
+- Serves the `/mind-maps` pillar page with cards linking only to hub pages.
+- Renders hub pages at `/mind-maps/{hub}` and subhub directories at `/mind-maps/{hub}/{subhub}`, each pulling link text/description from `lib/programmatic/generated/mindMapPages.ts`.
+- Subhub pages link directly to each landing’s canonical path (from the generator) under `/mind-maps/{slug}`.
+- Builds metadata via `buildProgrammaticMetadata` for individual landings and uses hub/subhub defaults for hierarchy pages.
+- Includes structured data injection when landing pages already have `structuredData` populated.
 
 ### 8. Metadata (`lib/programmatic/metadata.ts`)
 Now accepts both flashcard and mind map page interfaces to produce canonical metadata, OG tags, and Twitter cards.
@@ -60,6 +62,7 @@ Mind map slugs are grouped into hubs/subhubs (mirroring the flashcard taxonomy f
 - **Academic & Study**: CBSE/K-12 chapters, subjects/courses, study skills.
 - **Business & Professional**: Strategy/marketing, projects/ops, career skills.
 - **General Topic Mind Maps**: Alphabetical fallback subhubs (Topics 0-9, A-F, G-L, M-R, S-Z) to ensure coverage for all 9k+ slugs.
+- `lib/programmatic/mindMapUseCaseData.ts` converts the taxonomy into hub/subhub objects with anchor text/description sourced from the generated mind map pages, powering the `/mind-maps/{hub}` and `/mind-maps/{hub}/{subhub}` experiences.
 
 ### 11. Taxonomy Assignment Helper (`scripts/assign_subhubs.py`)
 Extends the flashcard assignment utility to mind maps. Scores ungrouped slugs against subhubs using slug tokens, metadata, embedded mind map markdown, and keyword overlap.
