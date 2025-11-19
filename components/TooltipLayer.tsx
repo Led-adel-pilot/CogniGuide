@@ -202,6 +202,19 @@ export default function TooltipLayer() {
     };
 
     const handleFocusIn = (event: FocusEvent) => {
+      // Only show tooltip on focus if it's a keyboard focus (focus-visible).
+      // This prevents tooltips from reappearing when switching tabs if the element
+      // was focused via mouse click.
+      if (event.target instanceof HTMLElement) {
+        try {
+          if (!event.target.matches(":focus-visible")) {
+            return;
+          }
+        } catch {
+          // Fallback/ignore
+        }
+      }
+
       const host = findTooltipHost(event.target);
       if (!host) {
         return;
