@@ -538,7 +538,7 @@ export default function MindMapModal({ markdown, onClose, onShareMindMap, isPaid
   const [authResolved, setAuthResolved] = useState(false);
   const [signupPromptTriggered, setSignupPromptTriggered] = useState(false);
   const [hasGeneratedContent, setHasGeneratedContent] = useState(false);
-  // Gate auto-collapse: allow for non-auth users, and for auth users only if they have never generated a mind map before
+  // Gate auto-collapse: default off so new users keep their nodes expanded
   const [shouldAutoCollapse, setShouldAutoCollapse] = useState<boolean>(false);
   const [autoCollapseResolved, setAutoCollapseResolved] = useState(false);
   const shouldAutoCollapseRef = useRef<boolean>(false);
@@ -945,40 +945,25 @@ export default function MindMapModal({ markdown, onClose, onShareMindMap, isPaid
       return () => { cancelled = true; };
     }
 
+    // New users (including unauthenticated) should not auto-collapse nodes; keep everything expanded by default
+    const cacheKey = userId ? `cogniguide:user:${userId}:hasPriorMindmap` : null;
+    if (!userId) {
+      setAutoCollapseState(false);
+      return () => { cancelled = true; };
+    }
+
     const computeAutoCollapse = async () => {
-      if (!userId) {
-        if (!cancelled) {
-          setAutoCollapseState(true);
-        }
-        return;
-      }
-      const cacheKey = `cogniguide:user:${userId}:hasPriorMindmap`;
       try {
-        const raw = typeof window !== 'undefined' ? window.localStorage.getItem(cacheKey) : null;
+        const raw = cacheKey && typeof window !== 'undefined' ? window.localStorage.getItem(cacheKey) : null;
         if (raw === 'true') {
-          if (!cancelled) {
-            setAutoCollapseState(false);
-          }
+          if (!cancelled) setAutoCollapseState(false);
           return;
         }
       } catch {}
-      try {
-        const { data, error } = await supabase
-          .from('mindmaps')
-          .select('id')
-          .eq('user_id', userId)
-          .limit(1);
-        const hasPrior = !error && Array.isArray(data) && data.length > 0;
-        if (!cancelled) {
-          setAutoCollapseState(!hasPrior);
-          try {
-            if (typeof window !== 'undefined') window.localStorage.setItem(cacheKey, hasPrior ? 'true' : 'false');
-          } catch {}
-        }
-      } catch {
-        if (!cancelled) {
-          setAutoCollapseState(false);
-        }
+
+      // Regardless of prior history, keep auto-collapse disabled for signed-in users too
+      if (!cancelled) {
+        setAutoCollapseState(false);
       }
     };
     computeAutoCollapse();
