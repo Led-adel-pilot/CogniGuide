@@ -24,7 +24,7 @@ export default function ThemeToggle() {
       if (savedTheme && ['light', 'dark', 'system'].includes(savedTheme)) {
         setTheme(savedTheme);
       }
-    } catch (e) {}
+    } catch (e) { }
   }, []);
 
   const updateTheme = (newTheme: Theme) => {
@@ -43,7 +43,7 @@ export default function ThemeToggle() {
         const isDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
         document.documentElement.dataset.theme = isDark ? 'dark' : 'light';
       }
-    } catch (e) {}
+    } catch (e) { }
   };
 
   // Listen for system theme changes when in system mode
@@ -82,14 +82,14 @@ export default function ThemeToggle() {
 
   return (
     <div className="flex items-center justify-between">
-      <div className="text-sm font-medium">Theme</div>
+      <div className="text-sm font-medium text-foreground/80 pl-2">Theme</div>
       <div className="relative">
         <button
           onClick={(e) => {
             e.stopPropagation();
             setIsOpen(!isOpen);
           }}
-          className="flex items-center justify-between gap-2 p-2 rounded-xl bg-background hover:bg-muted/50 transition-colors min-w-[120px]"
+          className="flex items-center justify-between gap-2 px-3 py-2 rounded-xl hover:bg-muted/50 transition-colors min-w-[120px]"
         >
           <div className="flex items-center gap-2">
             <CurrentIcon className="h-4 w-4 text-primary" />
@@ -110,11 +110,10 @@ export default function ThemeToggle() {
                     e.stopPropagation();
                     updateTheme(option.value);
                   }}
-                  className={`w-full flex items-center gap-2 px-3 py-2 text-left text-sm transition-colors ${
-                    isSelected
-                      ? 'bg-muted/60'
-                      : 'hover:bg-muted/50 text-foreground'
-                  }`}
+                  className={`w-full flex items-center gap-2 px-3 py-2 text-left text-sm transition-colors ${isSelected
+                    ? 'bg-muted/60'
+                    : 'hover:bg-muted/50 text-foreground'
+                    }`}
                 >
                   <Icon className="h-4 w-4" />
                   <span>{option.label}</span>

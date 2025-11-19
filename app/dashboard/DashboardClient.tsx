@@ -2618,7 +2618,7 @@ export default function DashboardClient() {
 
               <div className="flex-1 overflow-y-auto -mx-2 px-2 py-1 min-h-0 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:'none']">
                 {/* Credits Card */}
-                <div className="relative overflow-hidden px-4 py-3 rounded-[1.5rem] border border-primary/20 bg-gradient-to-br from-primary/10 via-primary/5 to-transparent mb-3 group flex-shrink-0">
+                <div className="relative overflow-hidden px-4 py-3 rounded-2xl border border-primary/20 bg-gradient-to-br from-primary/10 via-primary/5 to-transparent mb-3 group flex-shrink-0">
                   <div className="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-primary/10 rounded-full blur-2xl group-hover:bg-primary/20 transition-colors duration-500"></div>
                   <div className="relative z-10">
                     <div className="text-xs font-medium text-muted-foreground mb-0.5">Available Credits</div>
