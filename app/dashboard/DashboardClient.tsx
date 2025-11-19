@@ -329,7 +329,7 @@ export default function DashboardClient() {
           credits_balance: credits,
           ...properties,
         });
-      } catch {}
+      } catch { }
     },
     [credits, isPaidUser, userTier],
   );
@@ -421,44 +421,44 @@ export default function DashboardClient() {
   useEffect(() => { historyBufferRef.current = historyBuffer; }, [historyBuffer]);
   useEffect(() => { hasMoreMmRef.current = hasMoreMm; }, [hasMoreMm]);
   useEffect(() => { hasMoreFcRef.current = hasMoreFc; }, [hasMoreFc]);
-const handleMindMapLinked = useCallback(
-  (mindmapId: string | null, markdownValue: string | null) => {
-    setActiveDeckMindMapId(mindmapId);
-    setActiveDeckMindMapMarkdown(markdownValue);
-    const deckId = activeDeckId;
-    if (!deckId || deckId === 'interleaved-session') {
-      return;
-    }
+  const handleMindMapLinked = useCallback(
+    (mindmapId: string | null, markdownValue: string | null) => {
+      setActiveDeckMindMapId(mindmapId);
+      setActiveDeckMindMapMarkdown(markdownValue);
+      const deckId = activeDeckId;
+      if (!deckId || deckId === 'interleaved-session') {
+        return;
+      }
 
-    const updateCombinedItems = <T extends { type: string; id: string }>(items: T[]) =>
-      items.map((item) => {
-        if (item.type !== 'flashcards' || item.id !== deckId) return item;
-        return { ...item, mindmap_id: mindmapId ?? null, markdown: markdownValue ?? null } as T;
-      }) as T[];
+      const updateCombinedItems = <T extends { type: string; id: string }>(items: T[]) =>
+        items.map((item) => {
+          if (item.type !== 'flashcards' || item.id !== deckId) return item;
+          return { ...item, mindmap_id: mindmapId ?? null, markdown: markdownValue ?? null } as T;
+        }) as T[];
 
-    setCombinedHistory((prev) => updateCombinedItems(prev));
-    setHistoryBuffer((prev) => {
-      const next = updateCombinedItems(prev);
-      historyBufferRef.current = next;
-      return next;
-    });
-    setFlashcardsHistory((prev) =>
-      prev.map((item) =>
-        item.id === deckId
-          ? { ...item, mindmap_id: mindmapId ?? null, markdown: markdownValue ?? null }
-          : item,
-      ),
-    );
-    setDueQueue((prev) =>
-      prev.map((deck) =>
-        deck.id === deckId
-          ? { ...deck, mindmap_id: mindmapId ?? null, mindmap_markdown: markdownValue ?? null }
-          : deck,
-      ),
-    );
-  },
-  [activeDeckId],
-);
+      setCombinedHistory((prev) => updateCombinedItems(prev));
+      setHistoryBuffer((prev) => {
+        const next = updateCombinedItems(prev);
+        historyBufferRef.current = next;
+        return next;
+      });
+      setFlashcardsHistory((prev) =>
+        prev.map((item) =>
+          item.id === deckId
+            ? { ...item, mindmap_id: mindmapId ?? null, markdown: markdownValue ?? null }
+            : item,
+        ),
+      );
+      setDueQueue((prev) =>
+        prev.map((deck) =>
+          deck.id === deckId
+            ? { ...deck, mindmap_id: mindmapId ?? null, mindmap_markdown: markdownValue ?? null }
+            : deck,
+        ),
+      );
+    },
+    [activeDeckId],
+  );
   useEffect(() => {
     return () => {
       if (referralCopyTimeoutRef.current) {
@@ -508,7 +508,7 @@ const handleMindMapLinked = useCallback(
           status: 'success',
           monthlyRedemptions: stats?.redemptionsThisMonth ?? 0,
         });
-      } catch {}
+      } catch { }
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Unable to fetch referral link.';
       setReferralLink(null);
@@ -517,7 +517,7 @@ const handleMindMapLinked = useCallback(
       setReferralError(message);
       try {
         posthog.capture('referral_link_loaded', { status: 'error', message });
-      } catch {}
+      } catch { }
     } finally {
       setReferralLoading(false);
     }
@@ -540,7 +540,7 @@ const handleMindMapLinked = useCallback(
     }
     try {
       posthog.capture('referral_modal_opened');
-    } catch {}
+    } catch { }
     void fetchReferralDetails();
   }, [isReferralOpen, fetchReferralDetails]);
 
@@ -595,7 +595,7 @@ const handleMindMapLinked = useCallback(
           if (typeof window !== 'undefined') {
             localStorage.setItem(`cogniguide_user_tier_${targetUserId}`, nextTier);
           }
-        } catch {}
+        } catch { }
       } catch (err) {
         console.error('Failed to load subscription status:', err);
         setUserTier('free');
@@ -623,7 +623,7 @@ const handleMindMapLinked = useCallback(
       }, 2000);
       try {
         posthog.capture('referral_link_copied');
-      } catch {}
+      } catch { }
     } else {
       setReferralCopied(false);
       setReferralError('Unable to copy link automatically. Please copy it manually.');
@@ -643,7 +643,7 @@ const handleMindMapLinked = useCallback(
             cachedTier = stored;
           }
         }
-      } catch {}
+      } catch { }
 
       if (cachedTier) {
         setUserTier(cachedTier);
@@ -682,7 +682,7 @@ const handleMindMapLinked = useCallback(
       if (typeof window !== 'undefined') {
         hasGenerated = localStorage.getItem(flagKey) === '1';
       }
-    } catch {}
+    } catch { }
 
     setHasGeneratedThisSession(hasGenerated);
   }, [user?.id]);
@@ -701,7 +701,7 @@ const handleMindMapLinked = useCallback(
       if (typeof window !== 'undefined') {
         seen = localStorage.getItem(key) === '1';
       }
-    } catch {}
+    } catch { }
     setTrialModalEligible(!seen);
     if (seen) {
       setIsTrialModalOpen(false);
@@ -747,7 +747,7 @@ const handleMindMapLinked = useCallback(
     if (key && typeof window !== 'undefined') {
       try {
         localStorage.setItem(key, '1');
-      } catch {}
+      } catch { }
     }
     cancelTrialModalTimeout();
     setIsTrialModalOpen(false);
@@ -802,7 +802,7 @@ const handleMindMapLinked = useCallback(
         if (typeof window !== 'undefined') {
           localStorage.setItem(`cogniguide_referral_last_seen_${targetUserId}`, redemptionId);
         }
-      } catch {}
+      } catch { }
       void persistReferralRedemptionSeen(redemptionId, targetUserId);
     }
     if (referralRewardTimeoutRef.current) {
@@ -834,7 +834,7 @@ const handleMindMapLinked = useCallback(
           allowed,
           location: 'dashboard',
         });
-      } catch {}
+      } catch { }
 
       if (!allowed) {
         openPricingModal({
@@ -867,7 +867,7 @@ const handleMindMapLinked = useCallback(
       if (storedId) {
         referralRewardSeenRef.current.add(`referral:${storedId}`);
       }
-    } catch {}
+    } catch { }
   }, [user]);
 
   useEffect(() => {
@@ -898,7 +898,7 @@ const handleMindMapLinked = useCallback(
       if (typeof window !== 'undefined') {
         try {
           storedId = localStorage.getItem(`cogniguide_referral_last_seen_${user.id}`);
-        } catch {}
+        } catch { }
       }
       const seenId = storedId || user.referralLastSeenId || referralLastSeenIdRef.current;
       if (seenId === redemptionId) {
@@ -958,24 +958,24 @@ const handleMindMapLinked = useCallback(
                 localStorage.setItem(`cogniguide_credits_${currentUserId}`, creditsValue.toString());
                 localStorage.setItem(`cogniguide_credits_time_${currentUserId}`, Date.now().toString());
               }
-            } catch {}
+            } catch { }
           }
         }
         try {
           posthog.capture('referral_code_redeemed', { status: 'success', actor: 'redeemer', reward: rewardAmount });
-        } catch {}
+        } catch { }
       } else {
         const errorMessage = result?.error || 'Referral redemption failed.';
         console.warn('Referral redemption failed:', errorMessage);
         try {
           posthog.capture('referral_code_redeemed', { status: 'failed', error: errorMessage, actor: 'redeemer' });
-        } catch {}
+        } catch { }
       }
     } catch (error) {
       console.error('Error redeeming referral code:', error);
       try {
         posthog.capture('referral_code_redeemed', { status: 'error', actor: 'redeemer' });
-      } catch {}
+      } catch { }
     }
   }, [showReferralRewardNotice]);
 
@@ -991,7 +991,7 @@ const handleMindMapLinked = useCallback(
           localStorage.removeItem('cogniguide_open_upgrade');
           localStorage.removeItem('cogniguide_upgrade_flow');
         }
-      } catch {}
+      } catch { }
       router.replace('/dashboard', { scroll: false });
     },
     [router, trackUpgradeEvent],
@@ -1013,7 +1013,7 @@ const handleMindMapLinked = useCallback(
           return;
         }
       }
-    } catch {}
+    } catch { }
 
     // Load from API
     await loadUserCreditsFromAPI(userId);
@@ -1047,7 +1047,7 @@ const handleMindMapLinked = useCallback(
               localStorage.setItem(`cogniguide_credits_${userId}`, result.credits.toString());
               localStorage.setItem(`cogniguide_credits_time_${userId}`, Date.now().toString());
             }
-          } catch {}
+          } catch { }
           return; // Successfully loaded credits from API response
         }
       }
@@ -1080,7 +1080,7 @@ const handleMindMapLinked = useCallback(
           localStorage.setItem(`cogniguide_credits_${userId}`, finalCredits.toString());
           localStorage.setItem(`cogniguide_credits_time_${userId}`, Date.now().toString());
         }
-      } catch {}
+      } catch { }
     }
   };
 
@@ -1097,12 +1097,12 @@ const handleMindMapLinked = useCallback(
         typeof metadata['referral_last_seen_id'] === 'string' ? (metadata['referral_last_seen_id'] as string) : null;
       const authed = data.user
         ? {
-            id: data.user.id,
-            email: data.user.email || undefined,
-            fullName,
-            avatarUrl,
-            referralLastSeenId: lastSeenFromMetadata,
-          }
+          id: data.user.id,
+          email: data.user.email || undefined,
+          fullName,
+          avatarUrl,
+          referralLastSeenId: lastSeenFromMetadata,
+        }
         : null;
       setUser(authed);
       setLoading(false);
@@ -1119,7 +1119,7 @@ const handleMindMapLinked = useCallback(
         if (pendingMarkdown && authed.id) {
           // Clear immediately to prevent re-saving on refresh
           localStorage.removeItem('cogniguide:pending_mindmap');
-          
+
           const title = extractTitle(pendingMarkdown);
           const { data: insertData, error: insertError } = await supabase
             .from('mindmaps')
@@ -1193,12 +1193,12 @@ const handleMindMapLinked = useCallback(
             if (typeof window !== 'undefined') {
               localStorage.setItem(`cogniguide:has_generated_${generationFlagUserId}`, '1');
             }
-          } catch {}
+          } catch { }
         }
         if (authed.id) {
           initPaginatedHistory(authed.id);
           loadAllFlashcardsOnly(authed.id).then((allFlash) => {
-            try { prefetchSpacedData(allFlash); } catch {}
+            try { prefetchSpacedData(allFlash); } catch { }
           });
         }
       };
@@ -1213,7 +1213,7 @@ const handleMindMapLinked = useCallback(
               localStorage.setItem(`cogniguide_credits_${authed.id}`, credits.toString());
               localStorage.setItem(`cogniguide_credits_time_${authed.id}`, Date.now().toString());
             }
-          } catch {}
+          } catch { }
         }
       };
 
@@ -1225,7 +1225,7 @@ const handleMindMapLinked = useCallback(
       try {
         const allFlash = await loadAllFlashcardsOnly(authed.id);
         await prefetchSpacedData(allFlash);
-      } catch {}
+      } catch { }
 
       // Add event listeners
       window.addEventListener('cogniguide:generation-complete', handleGenerationComplete);
@@ -1242,7 +1242,7 @@ const handleMindMapLinked = useCallback(
           if (typeof document !== 'undefined') {
             document.cookie = 'cg_authed=; Path=/; Max-Age=0; SameSite=Lax; Secure';
           }
-        } catch {}
+        } catch { }
         router.replace('/');
       }
     });
@@ -1285,7 +1285,7 @@ const handleMindMapLinked = useCallback(
         try {
           localStorage.removeItem('cogniguide_open_upgrade');
           localStorage.removeItem('cogniguide_upgrade_flow');
-        } catch {}
+        } catch { }
       }
       return;
     }
@@ -1304,7 +1304,7 @@ const handleMindMapLinked = useCallback(
       try {
         localStorage.removeItem('cogniguide_open_upgrade');
         localStorage.removeItem('cogniguide_upgrade_flow');
-      } catch {}
+      } catch { }
     }
   }, [openPricingModal, upgradeQueryParam]);
 
@@ -1333,7 +1333,7 @@ const handleMindMapLinked = useCallback(
                 localStorage.setItem(`cogniguide_credits_${user.id}`, finalCredits.toString());
                 localStorage.setItem(`cogniguide_credits_time_${user.id}`, Date.now().toString());
               }
-            } catch {}
+            } catch { }
           }
         }
       )
@@ -1362,8 +1362,8 @@ const handleMindMapLinked = useCallback(
     return () => {
       supabase.removeChannel(creditsChannel);
       supabase.removeChannel(referralsChannel);
-      window.removeEventListener('cogniguide:generation-complete', () => {});
-      window.removeEventListener('cogniguide:credits-updated', () => {});
+      window.removeEventListener('cogniguide:generation-complete', () => { });
+      window.removeEventListener('cogniguide:credits-updated', () => { });
     };
   }, [user, showReferralRewardNotice]);
 
@@ -1546,7 +1546,7 @@ const handleMindMapLinked = useCallback(
           })),
         ]).slice(0, PAGE_SIZE);
         setCombinedHistory(merged);
-      } catch {}
+      } catch { }
     }
     setHasMoreHistory(historyBufferRef.current.length > 0 || hasMoreMmRef.current || hasMoreFcRef.current);
     setIsHistoryInitialLoading(false);
@@ -1658,7 +1658,7 @@ const handleMindMapLinked = useCallback(
         }
       }
       if (bulkToSave.length > 0) {
-        try { await upsertDeckSchedulesBulkAsync(bulkToSave); } catch {}
+        try { await upsertDeckSchedulesBulkAsync(bulkToSave); } catch { }
       }
       setDueQueue(queue);
       if (typeof window !== 'undefined') {
@@ -1853,29 +1853,29 @@ const handleMindMapLinked = useCallback(
 
     const tableName = itemType === 'mindmap' ? 'mindmaps' : 'flashcards';
     const { data, error } = await supabase
-        .from(tableName)
-        .update({ title: newTitle })
-        .eq('id', itemId)
-        .select();
+      .from(tableName)
+      .update({ title: newTitle })
+      .eq('id', itemId)
+      .select();
 
     if (error || !data) {
-        alert('Failed to rename item. Please try again.');
-        console.error('Rename error:', error);
+      alert('Failed to rename item. Please try again.');
+      console.error('Rename error:', error);
     } else {
-        setCombinedHistory((prev) =>
+      setCombinedHistory((prev) =>
+        prev.map((item) => (item.id === itemId ? { ...item, title: newTitle } : item))
+      );
+      if (itemType === 'mindmap' && itemId === activeMindMapId) {
+        setActiveMindMapTitle(newTitle);
+      }
+      if (itemType === 'flashcards') {
+        setFlashcardsHistory((prev) =>
           prev.map((item) => (item.id === itemId ? { ...item, title: newTitle } : item))
         );
-        if (itemType === 'mindmap' && itemId === activeMindMapId) {
-          setActiveMindMapTitle(newTitle);
+        if (itemId === activeDeckId) {
+          setFlashcardsTitle(newTitle);
         }
-        if (itemType === 'flashcards') {
-          setFlashcardsHistory((prev) =>
-            prev.map((item) => (item.id === itemId ? { ...item, title: newTitle } : item))
-          );
-          if (itemId === activeDeckId) {
-            setFlashcardsTitle(newTitle);
-          }
-        }
+      }
     }
     setRenamingItem(null);
     setOpenMenuId(null);
@@ -1887,7 +1887,7 @@ const handleMindMapLinked = useCallback(
       const dueMap = (typeof window !== 'undefined' && (window as any).__cogniguide_due_map) || {};
       const total = Object.values(dueMap).reduce((sum: number, arr: any) => sum + (Array.isArray(arr) ? arr.length : 0), 0);
       setTotalDueCount(total);
-    } catch {}
+    } catch { }
   }, [spacedPrefetched, flashcardsHistory]);
 
   const handleSignOut = async () => {
@@ -1899,7 +1899,7 @@ const handleMindMapLinked = useCallback(
       if (typeof document !== 'undefined') {
         document.cookie = 'cg_authed=; Path=/; Max-Age=0; SameSite=Lax; Secure';
       }
-    } catch {}
+    } catch { }
 
     router.replace('/');
   };
@@ -1922,9 +1922,8 @@ const handleMindMapLinked = useCallback(
       )}
       {/* Sidebar */}
       <aside
-        className={`fixed inset-y-0 left-0 z-40 w-72 border-r bg-background pl-2 pt-2 pb-2 pr-0 flex flex-col h-screen min-h-0 transform transition-transform duration-300 md:relative md:translate-x-0 md:flex ${
-          isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
-        }`}
+        className={`fixed inset-y-0 left-0 z-40 w-72 border-r bg-background pl-2 pt-2 pb-2 pr-0 flex flex-col h-screen min-h-0 transform transition-transform duration-300 md:relative md:translate-x-0 md:flex ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
+          }`}
       >
         <div className="flex-1 overflow-y-auto" ref={listRef}>
           <div className="flex items-center justify-between gap-2 mb-4 pl-0 pr-2">
@@ -1990,7 +1989,7 @@ const handleMindMapLinked = useCallback(
               return (
                 <div key={itemKey} className="relative group">
                   <button
-                    title={(function() {
+                    title={(function () {
                       const cleaned = removeFirstEmoji(item.title);
                       return cleaned && cleaned.length > 0
                         ? cleaned
@@ -2020,11 +2019,10 @@ const handleMindMapLinked = useCallback(
                         setFlashcardsOpen(true);
                       }
                     }}
-        className={`w-full text-left pl-2 py-2 rounded-xl flex items-start gap-2 transition-all ${
-          openMenuId === itemKey
-            ? 'pr-8 bg-muted/50'
-            : 'pr-2 group-hover:pr-8 hover:bg-muted/50'
-        }`}
+                    className={`w-full text-left pl-2 py-2 rounded-xl flex items-start gap-2 transition-all ${openMenuId === itemKey
+                      ? 'pr-8 bg-muted/50'
+                      : 'pr-2 group-hover:pr-8 hover:bg-muted/50'
+                      }`}
                   >
                     <div className="mt-0.5 text-gray-600">
                       {(() => {
@@ -2109,20 +2107,20 @@ const handleMindMapLinked = useCallback(
             onClick={() => setIsSettingsOpen(true)}
             className="w-full text-left pl-2 pr-2 py-2 rounded-xl hover:bg-muted/50 flex items-center gap-3 transition-colors"
           >
-    <div className="relative h-7 w-7 rounded-full overflow-hidden bg-muted flex items-center justify-center text-sm font-medium text-foreground/80">
-      {avatarUrl ? (
-        <Image
-          src={avatarUrl}
-          alt={`${displayName} avatar`}
-          fill
-          sizes="28px"
-          className="object-cover"
-          unoptimized
-        />
-      ) : (
-        <span>{displayInitials}</span>
-      )}
-    </div>
+            <div className="relative h-7 w-7 rounded-full overflow-hidden bg-muted flex items-center justify-center text-sm font-medium text-foreground/80">
+              {avatarUrl ? (
+                <Image
+                  src={avatarUrl}
+                  alt={`${displayName} avatar`}
+                  fill
+                  sizes="28px"
+                  className="object-cover"
+                  unoptimized
+                />
+              ) : (
+                <span>{displayInitials}</span>
+              )}
+            </div>
             <div className="min-w-0 flex-1">
               <div className="font-medium line-clamp-1">{displayName}</div>
               <div className="text-xs text-muted-foreground flex items-center gap-1">
@@ -2443,35 +2441,35 @@ const handleMindMapLinked = useCallback(
                       // Intelligent interleaving to avoid consecutive cards from the same deck
                       const interleavedCards = [];
                       if (allDueCards.length > 0) {
-                          const cardsByDeck = new Map<string, any[]>();
-                          for (const card of allDueCards) {
-                              if (!cardsByDeck.has(card.deckId)) {
-                                  cardsByDeck.set(card.deckId, []);
-                              }
-                              cardsByDeck.get(card.deckId)!.push(card);
+                        const cardsByDeck = new Map<string, any[]>();
+                        for (const card of allDueCards) {
+                          if (!cardsByDeck.has(card.deckId)) {
+                            cardsByDeck.set(card.deckId, []);
+                          }
+                          cardsByDeck.get(card.deckId)!.push(card);
+                        }
+
+                        let lastDeckId: string | null = null;
+                        const totalCards = allDueCards.length;
+                        while (interleavedCards.length < totalCards) {
+                          let availableDeckIds = Array.from(cardsByDeck.keys()).filter(id => cardsByDeck.get(id)!.length > 0);
+                          let candidateDeckIds = availableDeckIds.filter(id => id !== lastDeckId);
+
+                          if (candidateDeckIds.length === 0) {
+                            candidateDeckIds = availableDeckIds;
                           }
 
-                          let lastDeckId: string | null = null;
-                          const totalCards = allDueCards.length;
-                          while (interleavedCards.length < totalCards) {
-                              let availableDeckIds = Array.from(cardsByDeck.keys()).filter(id => cardsByDeck.get(id)!.length > 0);
-                              let candidateDeckIds = availableDeckIds.filter(id => id !== lastDeckId);
-                              
-                              if (candidateDeckIds.length === 0) {
-                                  candidateDeckIds = availableDeckIds;
-                              }
-                      
-                              if (candidateDeckIds.length === 0) {
-                                  break; 
-                              }
-                      
-                              const nextDeckId = candidateDeckIds[Math.floor(Math.random() * candidateDeckIds.length)];
-                              const deckCards = cardsByDeck.get(nextDeckId)!;
-                              const nextCard = deckCards.shift()!;
-                              
-                              interleavedCards.push(nextCard);
-                              lastDeckId = nextDeckId;
+                          if (candidateDeckIds.length === 0) {
+                            break;
                           }
+
+                          const nextDeckId = candidateDeckIds[Math.floor(Math.random() * candidateDeckIds.length)];
+                          const deckCards = cardsByDeck.get(nextDeckId)!;
+                          const nextCard = deckCards.shift()!;
+
+                          interleavedCards.push(nextCard);
+                          lastDeckId = nextDeckId;
+                        }
                       }
 
                       // Create a composite deck for the modal
@@ -2571,89 +2569,131 @@ const handleMindMapLinked = useCallback(
       )}
 
       {isSettingsOpen && (
-        <div className="fixed inset-0 bg-black/40 dark:bg-black/60 z-50 flex items-center justify-center p-4" onClick={() => setIsSettingsOpen(false)}>
-          <div className="bg-background rounded-[2rem] p-6 w-full max-w-sm border flex flex-col" onClick={(e) => e.stopPropagation()}>
-            <h2 className="text-lg font-bold mb-4 flex-shrink-0">Settings</h2>
-            <div className="flex-1">
-              <div className="p-4 rounded-[1.25rem] border bg-muted/30 mb-4">
-                <div className="text-sm text-muted-foreground">Credit Balance</div>
-                <div className="text-2xl font-bold flex items-center gap-2">
-                  <Coins className="h-6 w-6 text-primary" />
-                  <span>{(Math.floor(credits * 10) / 10).toFixed(1)}</span>
-                </div>
-              </div>
-              <div className="mb-4">
-                <ThemeToggle />
-              </div>
-              <nav className="mb-4">
-                <ul className="space-y-2 text-sm">
-                  <li>
-                    <button
-                      title="Open referral rewards"
-                      type="button"
-                      onClick={() => {
-                        setLegalOpen(false);
-                        setIsSettingsOpen(false);
-                        setIsReferralOpen(true);
-                      }}
-                      className="w-full text-left p-3 rounded-[1.25rem] border bg-background hover:bg-muted/50 flex items-center gap-3"
-                    >
-                      <Gift className="h-4 w-4 text-primary" />
-                      <span>Refer friends (earn credits)</span>
-                    </button>
-                  </li>
-                  <li>
-                    <button
-                      title="Open upgrade options"
-                      type="button"
-                      onClick={() => openPricingModal({ name: 'settings_upgrade_link' })}
-                      className="w-full text-left p-3 rounded-[1.25rem] border bg-background hover:bg-muted/50 flex items-center gap-3"
-                    >
-                      <TrendingUp className="h-4 w-4 text-primary" />
-                      <span>Upgrade Plan</span>
-                    </button>
-                  </li>
-                  <li>
-                    <Link href="/contact" className="block w-full p-3 rounded-[1.25rem] border bg-background hover:bg-muted/50 flex items-center gap-3">
-                      <Mail className="h-4 w-4 text-primary" />
-                      <span>Contact</span>
-                    </Link>
-                  </li>
-                  <li className="relative">
-                    <button
-                      title="Show legal links"
-                      onClick={() => setLegalOpen(!legalOpen)}
-                      className="w-full text-left p-3 rounded-[1.25rem] border bg-background hover:bg-muted/50 flex items-center gap-3"
-                    >
-                      <FileText className="h-4 w-4 text-primary" />
-                      <span>Legal</span>
-                      <ChevronRight className={`h-4 w-4 transition-transform ml-auto ${legalOpen ? 'rotate-90' : ''}`} />
-                    </button>
-                    {legalOpen && (
-                      <div className="absolute left-full top-0 ml-2 z-10 bg-background border rounded-[1.25rem] p-2 shadow-lg min-w-[140px]">
-                        <div className="flex flex-col space-y-1">
-                          <Link href="/legal/refund-policy" className="block w-full p-2 text-xs rounded-lg border bg-background hover:bg-muted/50">Refunds</Link>
-                          <Link href="/legal/cancellation-policy" className="block w-full p-2 text-xs rounded-lg border bg-background hover:bg-muted/50">Cancellation</Link>
-                          <Link href="/legal/terms" className="block w-full p-2 text-xs rounded-lg border bg-background hover:bg-muted/50">Terms</Link>
-                          <Link href="/legal/privacy-policy" className="block w-full p-2 text-xs rounded-lg border bg-background hover:bg-muted/50">Privacy</Link>
-                        </div>
-                      </div>
-                    )}
-                  </li>
-                </ul>
-              </nav>
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 transition-all duration-300" onClick={() => setIsSettingsOpen(false)}>
+          <div
+            className="bg-background/95 backdrop-blur-xl rounded-2xl p-4 pb-2 w-full max-w-sm border border-border/50 shadow-2xl flex flex-col animate-in fade-in zoom-in-95 duration-200 max-h-[90vh]"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between mb-4 flex-shrink-0">
+              <h2 className="text-xl font-bold bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">Settings</h2>
+              <button
+                onClick={() => setIsSettingsOpen(false)}
+                className="p-2 rounded-full hover:bg-muted/50 transition-colors text-muted-foreground hover:text-foreground"
+              >
+                <X className="h-5 w-5" />
+              </button>
             </div>
 
-            <button
-              onClick={handleSignOut}
-              className="w-full text-left p-3 rounded-[1.25rem] border bg-background hover:bg-red-50 hover:border-red-200 dark:hover:bg-red-900/20 dark:hover:border-red-800 flex items-center gap-3 text-red-600 flex-shrink-0 mt-4"
-              title="Sign out of CogniGuide"
-            >
-              <LogOut className="h-5 w-5" />
-              <span className="font-medium">Sign out</span>
-            </button>
+            <div className="flex-1 overflow-y-auto -mx-2 px-2 py-1 min-h-0 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:'none']">
+              {/* Credits Card */}
+              <div className="relative overflow-hidden px-4 py-3 rounded-[1.5rem] border border-primary/20 bg-gradient-to-br from-primary/10 via-primary/5 to-transparent mb-3 group flex-shrink-0">
+                <div className="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-primary/10 rounded-full blur-2xl group-hover:bg-primary/20 transition-colors duration-500"></div>
+                <div className="relative z-10">
+                  <div className="text-xs font-medium text-muted-foreground mb-0.5">Available Credits</div>
+                  <div className="text-2xl font-bold flex items-center gap-2 text-foreground">
+                    <Coins className="h-6 w-6 text-primary animate-pulse" />
+                    <span>{(Math.floor(credits * 10) / 10).toFixed(1)}</span>
+                  </div>
+                  {/*
+                  <button
+                    onClick={() => {
+                      setIsSettingsOpen(false);
+                      openPricingModal({ name: 'settings_credits_card' });
+                    }}
+                    className="mt-1 flex items-center gap-1.5 text-xs text-primary font-semibold hover:underline decoration-primary/50 underline-offset-2"
+                  >
+                    <Sparkles className="h-3.5 w-3.5" /> Get more credits
+                  </button>
+                  */}
+                </div>
+              </div>
 
-            <div className="text-xs text-muted-foreground text-center mt-4">© {new Date().getFullYear()} CogniGuide</div>
+              {/* Theme Toggle Wrapper */}
+              <div className="mb-3 px-1 flex-shrink-0">
+                <ThemeToggle />
+              </div>
+
+              {/* Menu */}
+              <nav className="space-y-1">
+                <button
+                  title="Open referral rewards"
+                  type="button"
+                  onClick={() => {
+                    setLegalOpen(false);
+                    setIsSettingsOpen(false);
+                    setIsReferralOpen(true);
+                  }}
+                  className="w-full text-left p-2 rounded-[1.25rem] hover:bg-muted/60 active:scale-[0.98] transition-all duration-200 flex items-center gap-3 group"
+                >
+                  <div className="p-1.5 rounded-full bg-primary/10 text-primary group-hover:scale-110 transition-transform duration-200">
+                    <Gift className="h-4 w-4" />
+                  </div>
+                  <span className="font-medium text-foreground/80 group-hover:text-foreground text-sm">Refer friends</span>
+                </button>
+
+                <button
+                  title="Open upgrade options"
+                  type="button"
+                  onClick={() => {
+                    setIsSettingsOpen(false);
+                    openPricingModal({ name: 'settings_upgrade_link' });
+                  }}
+                  className="w-full text-left p-2 rounded-[1.25rem] hover:bg-muted/60 active:scale-[0.98] transition-all duration-200 flex items-center gap-3 group"
+                >
+                  <div className="p-1.5 rounded-full bg-blue-500/10 text-blue-600 dark:text-blue-400 group-hover:scale-110 transition-transform duration-200">
+                    <TrendingUp className="h-4 w-4" />
+                  </div>
+                  <span className="font-medium text-foreground/80 group-hover:text-foreground text-sm">Upgrade Plan</span>
+                </button>
+
+                <Link
+                  href="/contact"
+                  className="w-full text-left p-2 rounded-[1.25rem] hover:bg-muted/60 active:scale-[0.98] transition-all duration-200 flex items-center gap-3 group"
+                >
+                  <div className="p-1.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 group-hover:scale-110 transition-transform duration-200">
+                    <Mail className="h-4 w-4" />
+                  </div>
+                  <span className="font-medium text-foreground/80 group-hover:text-foreground text-sm">Contact Support</span>
+                </Link>
+
+                <div className="relative">
+                  <button
+                    title="Show legal links"
+                    onClick={() => setLegalOpen(!legalOpen)}
+                    className="w-full text-left p-2 rounded-[1.25rem] hover:bg-muted/60 active:scale-[0.98] transition-all duration-200 flex items-center gap-3 group"
+                  >
+                    <div className="p-1.5 rounded-full bg-gray-500/10 text-gray-600 dark:text-gray-400 group-hover:scale-110 transition-transform duration-200">
+                      <FileText className="h-4 w-4" />
+                    </div>
+                    <span className="font-medium text-foreground/80 group-hover:text-foreground text-sm">Legal</span>
+                    <ChevronRight className={`h-4 w-4 text-muted-foreground ml-auto transition-transform duration-300 ${legalOpen ? 'rotate-90' : ''}`} />
+                  </button>
+
+                  <div className={`overflow-hidden transition-all duration-300 ease-in-out ${legalOpen ? 'max-h-40 opacity-100' : 'max-h-0 opacity-0'}`}>
+                    <div className="pl-[3rem] pr-2 py-1 space-y-1">
+                      <Link href="/legal/refund-policy" className="block w-full p-1.5 text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted/40 rounded-lg transition-colors">Refund Policy</Link>
+                      <Link href="/legal/cancellation-policy" className="block w-full p-1.5 text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted/40 rounded-lg transition-colors">Cancellation Policy</Link>
+                      <Link href="/legal/terms" className="block w-full p-1.5 text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted/40 rounded-lg transition-colors">Terms of Service</Link>
+                      <Link href="/legal/privacy-policy" className="block w-full p-1.5 text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted/40 rounded-lg transition-colors">Privacy Policy</Link>
+                    </div>
+                  </div>
+                </div>
+
+                <button
+                  onClick={handleSignOut}
+                  className="w-full text-left p-2 rounded-[1.25rem] hover:bg-red-50 dark:hover:bg-red-900/10 active:scale-[0.98] transition-all duration-200 flex items-center gap-3 group"
+                  title="Sign out of CogniGuide"
+                >
+                  <div className="p-1.5 rounded-full bg-red-100 dark:bg-red-900/20 text-red-600 dark:text-red-400 group-hover:scale-110 transition-transform duration-200">
+                    <LogOut className="h-4 w-4" />
+                  </div>
+                  <span className="font-medium text-red-600 dark:text-red-400 group-hover:text-red-700 dark:group-hover:text-red-300 text-sm">Sign out</span>
+                </button>
+              </nav>
+            </div>
+            <div className="text-xs text-muted-foreground/60 text-center py-1.5 mt-1 font-medium flex-shrink-0">
+              © {new Date().getFullYear()} CogniGuide
+            </div>
           </div>
         </div>
       )}
