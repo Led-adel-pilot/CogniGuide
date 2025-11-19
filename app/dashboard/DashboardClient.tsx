@@ -2285,18 +2285,47 @@ export default function DashboardClient() {
             <div className="relative flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-center mb-8 min-h-[3rem]">
               {(() => {
                 const shouldShowButton = !tierLoading && !isPaidUser;
-                return shouldShowButton ? (
-                  <div className="flex justify-center w-full">
-                    <button
-                      title="View pricing plans"
-                      onClick={() => openPricingModal({ name: 'dashboard_upgrade_cta' })}
-                      className="upgrade-plan-btn inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary text-primary-foreground hover:bg-primary/90 transition-colors mx-auto"
-                    >
-                      <Sparkles className="h-4 w-4" />
-                      <span>Upgrade your Plan</span>
-                    </button>
-                  </div>
-                ) : null;
+
+                // Check for trial expiration warning
+                let trialWarning = null;
+                if (!tierLoading && userTier === 'trial' && trialEndsAt) {
+                  const end = new Date(trialEndsAt);
+                  const now = new Date();
+                  const diffTime = end.getTime() - now.getTime();
+                  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+                  if (diffDays <= 2 && diffDays >= 0) {
+                    trialWarning = (
+                      <div className="flex justify-center w-full">
+                        <div
+                          className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-yellow-100 text-yellow-800 border border-yellow-200 text-sm font-medium cursor-help transition-colors hover:bg-yellow-200"
+                          title="You are currently exceeding the Free plan limits. Upgrade to keep these credits valid."
+                        >
+                          <CalendarClock className="h-4 w-4" />
+                          <span>Trial ends in {diffDays} {diffDays === 1 ? 'day' : 'days'}</span>
+                        </div>
+                      </div>
+                    );
+                  }
+                }
+
+                return (
+                  <>
+                    {shouldShowButton ? (
+                      <div className="flex justify-center w-full">
+                        <button
+                          title="View pricing plans"
+                          onClick={() => openPricingModal({ name: 'dashboard_upgrade_cta' })}
+                          className="upgrade-plan-btn inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary text-primary-foreground hover:bg-primary/90 transition-colors mx-auto"
+                        >
+                          <Sparkles className="h-4 w-4" />
+                          <span>Upgrade your Plan</span>
+                        </button>
+                      </div>
+                    ) : null}
+                    {trialWarning}
+                  </>
+                );
               })()}
             </div>
             <Generator
@@ -2313,7 +2342,7 @@ export default function DashboardClient() {
             />
           </div>
         </div>
-      </main>
+      </main >
 
       <MindMapModal
         markdown={markdown}
@@ -2390,211 +2419,214 @@ export default function DashboardClient() {
         }}
       />
 
-      {spacedOpen && (
-        <div className="fixed inset-0 bg-black/40 dark:bg-black/60 z-50 flex items-center justify-center" onClick={() => setSpacedOpen(false)}>
-          <div className="bg-background rounded-[2rem] p-6 w-full max-w-2xl border" onClick={(e) => e.stopPropagation()}>
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-bold">Spaced repetition</h2>
-              <button
-                onClick={() => setSpacedOpen(false)}
-                className="px-3 py-1.5 rounded-full border hover:bg-muted/50 transition-colors"
-              >
-                Close
-              </button>
-            </div>
-            {spacedError && (
-              <div className="mb-3 text-sm text-red-600">{spacedError}</div>
-            )}
-            {!spacedError && (
-              <div className="text-sm text-muted-foreground">
-                Select a deck with cards due now, or study all due cards interleaved for best results.
+      {
+        spacedOpen && (
+          <div className="fixed inset-0 bg-black/40 dark:bg-black/60 z-50 flex items-center justify-center" onClick={() => setSpacedOpen(false)}>
+            <div className="bg-background rounded-[2rem] p-6 w-full max-w-2xl border" onClick={(e) => e.stopPropagation()}>
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg font-bold">Spaced repetition</h2>
+                <button
+                  onClick={() => setSpacedOpen(false)}
+                  className="px-3 py-1.5 rounded-full border hover:bg-muted/50 transition-colors"
+                >
+                  Close
+                </button>
               </div>
-            )}
-            <div className="mt-4 flex flex-col gap-2 max-h-80 overflow-y-auto">
-              {spacedLoading && (
-                <div className="text-sm text-muted-foreground">Loading due decks…</div>
+              {spacedError && (
+                <div className="mb-3 text-sm text-red-600">{spacedError}</div>
               )}
-              {!spacedLoading && dueQueue.length > 0 && (
-                <div className="p-2 rounded-xl border flex items-center justify-between">
-                  <div className="flex-1">
-                    <div className="font-medium line-clamp-1 flex items-center gap-2">
-                      <Sparkles className="h-4 w-4 text-primary" />
-                      Interleaving Mode
-                    </div>
-                    <div className="text-xs text-muted-foreground">Shuffle cards from multiple decks for better retention and learning efficiency</div>
-                  </div>
-                  <button
-                    title="Start interleaved study session"
-                    className="px-3 py-1.5 text-xs rounded-full border bg-primary text-primary-foreground hover:bg-primary/90"
-                    onClick={() => {
-                      const dueMap = (typeof window !== 'undefined' && (window as any).__cogniguide_due_map) || {};
-                      const allDueCards = dueQueue.flatMap(deck => {
-                        const dueIndexes = (dueMap[deck.id] as number[]) || [];
-                        return dueIndexes.map(cardIndex => ({
-                          ...deck.cards[cardIndex],
-                          deckId: deck.id,
-                          cardIndex: cardIndex,
-                          deckTitle: deck.title || 'flashcards'
-                        }));
-                      });
-
-                      // Intelligent interleaving to avoid consecutive cards from the same deck
-                      const interleavedCards = [];
-                      if (allDueCards.length > 0) {
-                        const cardsByDeck = new Map<string, any[]>();
-                        for (const card of allDueCards) {
-                          if (!cardsByDeck.has(card.deckId)) {
-                            cardsByDeck.set(card.deckId, []);
-                          }
-                          cardsByDeck.get(card.deckId)!.push(card);
-                        }
-
-                        let lastDeckId: string | null = null;
-                        const totalCards = allDueCards.length;
-                        while (interleavedCards.length < totalCards) {
-                          let availableDeckIds = Array.from(cardsByDeck.keys()).filter(id => cardsByDeck.get(id)!.length > 0);
-                          let candidateDeckIds = availableDeckIds.filter(id => id !== lastDeckId);
-
-                          if (candidateDeckIds.length === 0) {
-                            candidateDeckIds = availableDeckIds;
-                          }
-
-                          if (candidateDeckIds.length === 0) {
-                            break;
-                          }
-
-                          const nextDeckId = candidateDeckIds[Math.floor(Math.random() * candidateDeckIds.length)];
-                          const deckCards = cardsByDeck.get(nextDeckId)!;
-                          const nextCard = deckCards.shift()!;
-
-                          interleavedCards.push(nextCard);
-                          lastDeckId = nextDeckId;
-                        }
-                      }
-
-                      // Create a composite deck for the modal
-                      const interleavedDeck = {
-                        id: 'interleaved-session',
-                        title: 'Interleaved Study',
-                        cards: interleavedCards
-                      };
-
-                      const interleavedIndices = interleavedCards.map((_: any, i: number) => i);
-
-                      posthog.capture('spaced_repetition_interleaved_started', {
-                        deck_count: dueQueue.length,
-                        total_due_card_count: interleavedCards.length,
-                      });
-
-                      setFlashcardsTitle(interleavedDeck.title);
-                      setFlashcardsCards(interleavedDeck.cards as any); // cast needed due to deckId
-                      setFlashcardsExplanations(null);
-                      setActiveDeckMindMapId(null);
-                      setActiveDeckMindMapMarkdown(null);
-                      setActiveDeckId(interleavedDeck.id);
-                      setStudyDueOnly(true); // to enable SR logic
-                      setStudyInterleaved(true);
-                      setDueIndices(interleavedIndices);
-                      setInitialDueIndex(0);
-                      setSpacedOpen(false);
-                      setFlashcardsOpen(true);
-                    }}
-                  >
-                    Study
-                  </button>
+              {!spacedError && (
+                <div className="text-sm text-muted-foreground">
+                  Select a deck with cards due now, or study all due cards interleaved for best results.
                 </div>
               )}
-              {!spacedLoading && dueQueue.map((f) => {
-                const dueMap = (typeof window !== 'undefined' && (window as any).__cogniguide_due_map) || {};
-                const count = Array.isArray(dueMap[f.id]) ? (dueMap[f.id] as number[]).length : 0;
-                const isCancelling = cancellingDeckId === f.id;
-                return (
-                  <div key={f.id} className="p-2 rounded-xl border flex items-center justify-between gap-3">
-                    <div className="min-w-0">
-                      <div className="font-medium line-clamp-1">{f.title || 'flashcards'}</div>
-                      <div className="text-xs text-muted-foreground">{count} due now</div>
+              <div className="mt-4 flex flex-col gap-2 max-h-80 overflow-y-auto">
+                {spacedLoading && (
+                  <div className="text-sm text-muted-foreground">Loading due decks…</div>
+                )}
+                {!spacedLoading && dueQueue.length > 0 && (
+                  <div className="p-2 rounded-xl border flex items-center justify-between">
+                    <div className="flex-1">
+                      <div className="font-medium line-clamp-1 flex items-center gap-2">
+                        <Sparkles className="h-4 w-4 text-primary" />
+                        Interleaving Mode
+                      </div>
+                      <div className="text-xs text-muted-foreground">Shuffle cards from multiple decks for better retention and learning efficiency</div>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <button
-                        title="Remove deck from due list"
-                        className={cn(
-                          'px-3 py-1.5 text-xs rounded-full border hover:bg-muted/50 transition-colors',
-                          isCancelling ? 'opacity-60 cursor-not-allowed' : '',
-                        )}
-                        onClick={() => handleCancelDueDeck(f.id)}
-                        disabled={isCancelling}
-                      >
-                        Cancel
-                      </button>
-                      <button
-                        className={cn(
-                          'px-3 py-1.5 text-xs rounded-full border bg-primary text-primary-foreground hover:bg-primary/90',
-                          isCancelling ? 'opacity-60 cursor-not-allowed' : '',
-                        )}
-                        onClick={() => {
-                          const list = (dueMap[f.id] as number[]) || [];
-                          posthog.capture('spaced_repetition_deck_studied', {
-                            deck_id: f.id,
-                            due_card_count: list.length,
-                          });
-                          const arr = f.cards as any;
-                          (arr as any).__deckId = f.id;
-                          setActiveDeckMindMapId(f.mindmap_id ?? null);
-                          setActiveDeckMindMapMarkdown(f.mindmap_markdown ?? null);
-                          setActiveDeckId(f.id);
-                          setStudyDueOnly(true);
-                          setDueIndices(list);
-                          setInitialDueIndex(list[0] ?? 0);
-                          setSpacedOpen(false);
-                          setFlashcardsTitle(f.title || 'flashcards');
-                          setFlashcardsCards(arr);
-                          setFlashcardsExplanations(f.explanations ?? null);
-                          setFlashcardsError(null);
-                          setFlashcardsOpen(true);
-                        }}
-                        disabled={isCancelling}
-                      >
-                        Study
-                      </button>
-                    </div>
+                    <button
+                      title="Start interleaved study session"
+                      className="px-3 py-1.5 text-xs rounded-full border bg-primary text-primary-foreground hover:bg-primary/90"
+                      onClick={() => {
+                        const dueMap = (typeof window !== 'undefined' && (window as any).__cogniguide_due_map) || {};
+                        const allDueCards = dueQueue.flatMap(deck => {
+                          const dueIndexes = (dueMap[deck.id] as number[]) || [];
+                          return dueIndexes.map(cardIndex => ({
+                            ...deck.cards[cardIndex],
+                            deckId: deck.id,
+                            cardIndex: cardIndex,
+                            deckTitle: deck.title || 'flashcards'
+                          }));
+                        });
+
+                        // Intelligent interleaving to avoid consecutive cards from the same deck
+                        const interleavedCards = [];
+                        if (allDueCards.length > 0) {
+                          const cardsByDeck = new Map<string, any[]>();
+                          for (const card of allDueCards) {
+                            if (!cardsByDeck.has(card.deckId)) {
+                              cardsByDeck.set(card.deckId, []);
+                            }
+                            cardsByDeck.get(card.deckId)!.push(card);
+                          }
+
+                          let lastDeckId: string | null = null;
+                          const totalCards = allDueCards.length;
+                          while (interleavedCards.length < totalCards) {
+                            let availableDeckIds = Array.from(cardsByDeck.keys()).filter(id => cardsByDeck.get(id)!.length > 0);
+                            let candidateDeckIds = availableDeckIds.filter(id => id !== lastDeckId);
+
+                            if (candidateDeckIds.length === 0) {
+                              candidateDeckIds = availableDeckIds;
+                            }
+
+                            if (candidateDeckIds.length === 0) {
+                              break;
+                            }
+
+                            const nextDeckId = candidateDeckIds[Math.floor(Math.random() * candidateDeckIds.length)];
+                            const deckCards = cardsByDeck.get(nextDeckId)!;
+                            const nextCard = deckCards.shift()!;
+
+                            interleavedCards.push(nextCard);
+                            lastDeckId = nextDeckId;
+                          }
+                        }
+
+                        // Create a composite deck for the modal
+                        const interleavedDeck = {
+                          id: 'interleaved-session',
+                          title: 'Interleaved Study',
+                          cards: interleavedCards
+                        };
+
+                        const interleavedIndices = interleavedCards.map((_: any, i: number) => i);
+
+                        posthog.capture('spaced_repetition_interleaved_started', {
+                          deck_count: dueQueue.length,
+                          total_due_card_count: interleavedCards.length,
+                        });
+
+                        setFlashcardsTitle(interleavedDeck.title);
+                        setFlashcardsCards(interleavedDeck.cards as any); // cast needed due to deckId
+                        setFlashcardsExplanations(null);
+                        setActiveDeckMindMapId(null);
+                        setActiveDeckMindMapMarkdown(null);
+                        setActiveDeckId(interleavedDeck.id);
+                        setStudyDueOnly(true); // to enable SR logic
+                        setStudyInterleaved(true);
+                        setDueIndices(interleavedIndices);
+                        setInitialDueIndex(0);
+                        setSpacedOpen(false);
+                        setFlashcardsOpen(true);
+                      }}
+                    >
+                      Study
+                    </button>
                   </div>
-                );
-              })}
-              {!spacedLoading && dueQueue.length === 0 && (
-                <div className="text-sm text-muted-foreground">No saved flashcards yet.</div>
-              )}
+                )}
+                {!spacedLoading && dueQueue.map((f) => {
+                  const dueMap = (typeof window !== 'undefined' && (window as any).__cogniguide_due_map) || {};
+                  const count = Array.isArray(dueMap[f.id]) ? (dueMap[f.id] as number[]).length : 0;
+                  const isCancelling = cancellingDeckId === f.id;
+                  return (
+                    <div key={f.id} className="p-2 rounded-xl border flex items-center justify-between gap-3">
+                      <div className="min-w-0">
+                        <div className="font-medium line-clamp-1">{f.title || 'flashcards'}</div>
+                        <div className="text-xs text-muted-foreground">{count} due now</div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <button
+                          title="Remove deck from due list"
+                          className={cn(
+                            'px-3 py-1.5 text-xs rounded-full border hover:bg-muted/50 transition-colors',
+                            isCancelling ? 'opacity-60 cursor-not-allowed' : '',
+                          )}
+                          onClick={() => handleCancelDueDeck(f.id)}
+                          disabled={isCancelling}
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          className={cn(
+                            'px-3 py-1.5 text-xs rounded-full border bg-primary text-primary-foreground hover:bg-primary/90',
+                            isCancelling ? 'opacity-60 cursor-not-allowed' : '',
+                          )}
+                          onClick={() => {
+                            const list = (dueMap[f.id] as number[]) || [];
+                            posthog.capture('spaced_repetition_deck_studied', {
+                              deck_id: f.id,
+                              due_card_count: list.length,
+                            });
+                            const arr = f.cards as any;
+                            (arr as any).__deckId = f.id;
+                            setActiveDeckMindMapId(f.mindmap_id ?? null);
+                            setActiveDeckMindMapMarkdown(f.mindmap_markdown ?? null);
+                            setActiveDeckId(f.id);
+                            setStudyDueOnly(true);
+                            setDueIndices(list);
+                            setInitialDueIndex(list[0] ?? 0);
+                            setSpacedOpen(false);
+                            setFlashcardsTitle(f.title || 'flashcards');
+                            setFlashcardsCards(arr);
+                            setFlashcardsExplanations(f.explanations ?? null);
+                            setFlashcardsError(null);
+                            setFlashcardsOpen(true);
+                          }}
+                          disabled={isCancelling}
+                        >
+                          Study
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+                {!spacedLoading && dueQueue.length === 0 && (
+                  <div className="text-sm text-muted-foreground">No saved flashcards yet.</div>
+                )}
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )
+      }
 
-      {isSettingsOpen && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 transition-all duration-300" onClick={() => setIsSettingsOpen(false)}>
-          <div
-            className="bg-background/95 backdrop-blur-xl rounded-2xl p-4 pb-2 w-full max-w-sm border border-border/50 shadow-2xl flex flex-col animate-in fade-in zoom-in-95 duration-200 max-h-[90vh]"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="flex items-center justify-between mb-4 flex-shrink-0">
-              <h2 className="text-xl font-bold bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">Settings</h2>
-              <button
-                onClick={() => setIsSettingsOpen(false)}
-                className="p-2 rounded-full hover:bg-muted/50 transition-colors text-muted-foreground hover:text-foreground"
-              >
-                <X className="h-5 w-5" />
-              </button>
-            </div>
+      {
+        isSettingsOpen && (
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 transition-all duration-300" onClick={() => setIsSettingsOpen(false)}>
+            <div
+              className="bg-background/95 backdrop-blur-xl rounded-2xl p-4 pb-2 w-full max-w-sm border border-border/50 shadow-2xl flex flex-col animate-in fade-in zoom-in-95 duration-200 max-h-[90vh]"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-center justify-between mb-4 flex-shrink-0">
+                <h2 className="text-xl font-bold bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">Settings</h2>
+                <button
+                  onClick={() => setIsSettingsOpen(false)}
+                  className="p-2 rounded-full hover:bg-muted/50 transition-colors text-muted-foreground hover:text-foreground"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
 
-            <div className="flex-1 overflow-y-auto -mx-2 px-2 py-1 min-h-0 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:'none']">
-              {/* Credits Card */}
-              <div className="relative overflow-hidden px-4 py-3 rounded-[1.5rem] border border-primary/20 bg-gradient-to-br from-primary/10 via-primary/5 to-transparent mb-3 group flex-shrink-0">
-                <div className="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-primary/10 rounded-full blur-2xl group-hover:bg-primary/20 transition-colors duration-500"></div>
-                <div className="relative z-10">
-                  <div className="text-xs font-medium text-muted-foreground mb-0.5">Available Credits</div>
-                  <div className="text-2xl font-bold flex items-center gap-2 text-foreground">
-                    <Coins className="h-6 w-6 text-primary animate-pulse" />
-                    <span>{(Math.floor(credits * 10) / 10).toFixed(1)}</span>
-                  </div>
-                  {/*
+              <div className="flex-1 overflow-y-auto -mx-2 px-2 py-1 min-h-0 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:'none']">
+                {/* Credits Card */}
+                <div className="relative overflow-hidden px-4 py-3 rounded-[1.5rem] border border-primary/20 bg-gradient-to-br from-primary/10 via-primary/5 to-transparent mb-3 group flex-shrink-0">
+                  <div className="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-primary/10 rounded-full blur-2xl group-hover:bg-primary/20 transition-colors duration-500"></div>
+                  <div className="relative z-10">
+                    <div className="text-xs font-medium text-muted-foreground mb-0.5">Available Credits</div>
+                    <div className="text-2xl font-bold flex items-center gap-2 text-foreground">
+                      <Coins className="h-6 w-6 text-primary animate-pulse" />
+                      <span>{(Math.floor(credits * 10) / 10).toFixed(1)}</span>
+                    </div>
+                    {/*
                   <button
                     onClick={() => {
                       setIsSettingsOpen(false);
@@ -2605,218 +2637,223 @@ export default function DashboardClient() {
                     <Sparkles className="h-3.5 w-3.5" /> Get more credits
                   </button>
                   */}
+                  </div>
                 </div>
-              </div>
 
-              {/* Theme Toggle Wrapper */}
-              <div className="mb-3 px-1 flex-shrink-0">
-                <ThemeToggle />
-              </div>
+                {/* Theme Toggle Wrapper */}
+                <div className="mb-3 px-1 flex-shrink-0">
+                  <ThemeToggle />
+                </div>
 
-              {/* Menu */}
-              <nav className="space-y-1">
-                <button
-                  title="Open referral rewards"
-                  type="button"
-                  onClick={() => {
-                    setLegalOpen(false);
-                    setIsSettingsOpen(false);
-                    setIsReferralOpen(true);
-                  }}
-                  className="w-full text-left p-2 rounded-[1.25rem] hover:bg-muted/60 active:scale-[0.98] transition-all duration-200 flex items-center gap-3 group"
-                >
-                  <div className="p-1.5 rounded-full bg-primary/10 text-primary group-hover:scale-110 transition-transform duration-200">
-                    <Gift className="h-4 w-4" />
-                  </div>
-                  <span className="font-medium text-foreground/80 group-hover:text-foreground text-sm">Refer friends</span>
-                </button>
-
-                <button
-                  title="Open upgrade options"
-                  type="button"
-                  onClick={() => {
-                    setIsSettingsOpen(false);
-                    openPricingModal({ name: 'settings_upgrade_link' });
-                  }}
-                  className="w-full text-left p-2 rounded-[1.25rem] hover:bg-muted/60 active:scale-[0.98] transition-all duration-200 flex items-center gap-3 group"
-                >
-                  <div className="p-1.5 rounded-full bg-blue-500/10 text-blue-600 dark:text-blue-400 group-hover:scale-110 transition-transform duration-200">
-                    <TrendingUp className="h-4 w-4" />
-                  </div>
-                  <span className="font-medium text-foreground/80 group-hover:text-foreground text-sm">Upgrade Plan</span>
-                </button>
-
-                <Link
-                  href="/contact"
-                  className="w-full text-left p-2 rounded-[1.25rem] hover:bg-muted/60 active:scale-[0.98] transition-all duration-200 flex items-center gap-3 group"
-                >
-                  <div className="p-1.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 group-hover:scale-110 transition-transform duration-200">
-                    <Mail className="h-4 w-4" />
-                  </div>
-                  <span className="font-medium text-foreground/80 group-hover:text-foreground text-sm">Contact Support</span>
-                </Link>
-
-                <div className="relative">
+                {/* Menu */}
+                <nav className="space-y-1">
                   <button
-                    title="Show legal links"
-                    onClick={() => setLegalOpen(!legalOpen)}
+                    title="Open referral rewards"
+                    type="button"
+                    onClick={() => {
+                      setLegalOpen(false);
+                      setIsSettingsOpen(false);
+                      setIsReferralOpen(true);
+                    }}
                     className="w-full text-left p-2 rounded-[1.25rem] hover:bg-muted/60 active:scale-[0.98] transition-all duration-200 flex items-center gap-3 group"
                   >
-                    <div className="p-1.5 rounded-full bg-gray-500/10 text-gray-600 dark:text-gray-400 group-hover:scale-110 transition-transform duration-200">
-                      <FileText className="h-4 w-4" />
+                    <div className="p-1.5 rounded-full bg-primary/10 text-primary group-hover:scale-110 transition-transform duration-200">
+                      <Gift className="h-4 w-4" />
                     </div>
-                    <span className="font-medium text-foreground/80 group-hover:text-foreground text-sm">Legal</span>
-                    <ChevronRight className={`h-4 w-4 text-muted-foreground ml-auto transition-transform duration-300 ${legalOpen ? 'rotate-90' : ''}`} />
+                    <span className="font-medium text-foreground/80 group-hover:text-foreground text-sm">Refer friends</span>
                   </button>
 
-                  <div className={`overflow-hidden transition-all duration-300 ease-in-out ${legalOpen ? 'max-h-40 opacity-100' : 'max-h-0 opacity-0'}`}>
-                    <div className="pl-[3rem] pr-2 py-1 space-y-1">
-                      <Link href="/legal/refund-policy" className="block w-full p-1.5 text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted/40 rounded-lg transition-colors">Refund Policy</Link>
-                      <Link href="/legal/cancellation-policy" className="block w-full p-1.5 text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted/40 rounded-lg transition-colors">Cancellation Policy</Link>
-                      <Link href="/legal/terms" className="block w-full p-1.5 text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted/40 rounded-lg transition-colors">Terms of Service</Link>
-                      <Link href="/legal/privacy-policy" className="block w-full p-1.5 text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted/40 rounded-lg transition-colors">Privacy Policy</Link>
+                  <button
+                    title="Open upgrade options"
+                    type="button"
+                    onClick={() => {
+                      setIsSettingsOpen(false);
+                      openPricingModal({ name: 'settings_upgrade_link' });
+                    }}
+                    className="w-full text-left p-2 rounded-[1.25rem] hover:bg-muted/60 active:scale-[0.98] transition-all duration-200 flex items-center gap-3 group"
+                  >
+                    <div className="p-1.5 rounded-full bg-blue-500/10 text-blue-600 dark:text-blue-400 group-hover:scale-110 transition-transform duration-200">
+                      <TrendingUp className="h-4 w-4" />
+                    </div>
+                    <span className="font-medium text-foreground/80 group-hover:text-foreground text-sm">Upgrade Plan</span>
+                  </button>
+
+                  <Link
+                    href="/contact"
+                    className="w-full text-left p-2 rounded-[1.25rem] hover:bg-muted/60 active:scale-[0.98] transition-all duration-200 flex items-center gap-3 group"
+                  >
+                    <div className="p-1.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 group-hover:scale-110 transition-transform duration-200">
+                      <Mail className="h-4 w-4" />
+                    </div>
+                    <span className="font-medium text-foreground/80 group-hover:text-foreground text-sm">Contact Support</span>
+                  </Link>
+
+                  <div className="relative">
+                    <button
+                      title="Show legal links"
+                      onClick={() => setLegalOpen(!legalOpen)}
+                      className="w-full text-left p-2 rounded-[1.25rem] hover:bg-muted/60 active:scale-[0.98] transition-all duration-200 flex items-center gap-3 group"
+                    >
+                      <div className="p-1.5 rounded-full bg-gray-500/10 text-gray-600 dark:text-gray-400 group-hover:scale-110 transition-transform duration-200">
+                        <FileText className="h-4 w-4" />
+                      </div>
+                      <span className="font-medium text-foreground/80 group-hover:text-foreground text-sm">Legal</span>
+                      <ChevronRight className={`h-4 w-4 text-muted-foreground ml-auto transition-transform duration-300 ${legalOpen ? 'rotate-90' : ''}`} />
+                    </button>
+
+                    <div className={`overflow-hidden transition-all duration-300 ease-in-out ${legalOpen ? 'max-h-40 opacity-100' : 'max-h-0 opacity-0'}`}>
+                      <div className="pl-[3rem] pr-2 py-1 space-y-1">
+                        <Link href="/legal/refund-policy" className="block w-full p-1.5 text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted/40 rounded-lg transition-colors">Refund Policy</Link>
+                        <Link href="/legal/cancellation-policy" className="block w-full p-1.5 text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted/40 rounded-lg transition-colors">Cancellation Policy</Link>
+                        <Link href="/legal/terms" className="block w-full p-1.5 text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted/40 rounded-lg transition-colors">Terms of Service</Link>
+                        <Link href="/legal/privacy-policy" className="block w-full p-1.5 text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted/40 rounded-lg transition-colors">Privacy Policy</Link>
+                      </div>
                     </div>
                   </div>
-                </div>
 
-                <button
-                  onClick={handleSignOut}
-                  className="w-full text-left p-2 rounded-[1.25rem] hover:bg-red-50 dark:hover:bg-red-900/10 active:scale-[0.98] transition-all duration-200 flex items-center gap-3 group"
-                  title="Sign out of CogniGuide"
-                >
-                  <div className="p-1.5 rounded-full bg-red-100 dark:bg-red-900/20 text-red-600 dark:text-red-400 group-hover:scale-110 transition-transform duration-200">
-                    <LogOut className="h-4 w-4" />
-                  </div>
-                  <span className="font-medium text-red-600 dark:text-red-400 group-hover:text-red-700 dark:group-hover:text-red-300 text-sm">Sign out</span>
-                </button>
-              </nav>
-            </div>
-            <div className="text-xs text-muted-foreground/60 text-center py-1.5 mt-1 font-medium flex-shrink-0">
-              © {new Date().getFullYear()} CogniGuide
+                  <button
+                    onClick={handleSignOut}
+                    className="w-full text-left p-2 rounded-[1.25rem] hover:bg-red-50 dark:hover:bg-red-900/10 active:scale-[0.98] transition-all duration-200 flex items-center gap-3 group"
+                    title="Sign out of CogniGuide"
+                  >
+                    <div className="p-1.5 rounded-full bg-red-100 dark:bg-red-900/20 text-red-600 dark:text-red-400 group-hover:scale-110 transition-transform duration-200">
+                      <LogOut className="h-4 w-4" />
+                    </div>
+                    <span className="font-medium text-red-600 dark:text-red-400 group-hover:text-red-700 dark:group-hover:text-red-300 text-sm">Sign out</span>
+                  </button>
+                </nav>
+              </div>
+              <div className="text-xs text-muted-foreground/60 text-center py-1.5 mt-1 font-medium flex-shrink-0">
+                © {new Date().getFullYear()} CogniGuide
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )
+      }
 
-      {isReferralOpen && (
-        <div
-          className="fixed inset-0 bg-black/40 dark:bg-black/60 z-50 flex items-center justify-center p-4"
-          onClick={() => setIsReferralOpen(false)}
-        >
+      {
+        isReferralOpen && (
           <div
-            className="relative bg-background rounded-[1.5rem] p-6 w-full max-w-lg border"
-            onClick={(e) => e.stopPropagation()}
+            className="fixed inset-0 bg-black/40 dark:bg-black/60 z-50 flex items-center justify-center p-4"
+            onClick={() => setIsReferralOpen(false)}
           >
-            <button
-              onClick={() => setIsReferralOpen(false)}
-              className="absolute top-4 right-4 inline-flex items-center justify-center w-8 h-8 rounded-full border border-border hover:bg-muted/60"
-              title="Close referral modal"
+            <div
+              className="relative bg-background rounded-[1.5rem] p-6 w-full max-w-lg border"
+              onClick={(e) => e.stopPropagation()}
             >
-              <X className="h-4 w-4" />
-            </button>
-            <div className="flex items-center gap-2 mb-2">
-              <Sparkles className="h-5 w-5 text-primary" />
-              <h2 className="text-lg font-bold">Refer friends & earn credits</h2>
-            </div>
-            <p className="text-xs text-muted-foreground mb-4">
-              Share your link so you and your friend each earn <span className="font-semibold text-foreground">30 credits</span> when they sign in using it
-              (up to {referralLimit} rewards per calendar month for you).
-            </p>
-            {referralError && (
-              <div className="mb-3 rounded-lg border border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/20 px-3 py-2 text-xs text-red-600 dark:text-red-300">
-                {referralError}
+              <button
+                onClick={() => setIsReferralOpen(false)}
+                className="absolute top-4 right-4 inline-flex items-center justify-center w-8 h-8 rounded-full border border-border hover:bg-muted/60"
+                title="Close referral modal"
+              >
+                <X className="h-4 w-4" />
+              </button>
+              <div className="flex items-center gap-2 mb-2">
+                <Sparkles className="h-5 w-5 text-primary" />
+                <h2 className="text-lg font-bold">Refer friends & earn credits</h2>
               </div>
-            )}
-            {referralLoading ? (
-              <div className="flex items-center justify-center py-10">
-                <Loader2 className="h-5 w-5 animate-spin" />
-              </div>
-            ) : (
-              <div className="space-y-4">
-                <div className="flex rounded-full border border-border/40 bg-background shadow-inner focus-within:outline-none focus-within:ring-2 focus-within:ring-primary/40">
-                  <input
-                    value={referralLink ?? ''}
-                    readOnly
-                    placeholder="https://cogniguide.app/?ref=yourcode"
-                    className="flex-1 bg-transparent px-4 py-3 text-sm font-medium text-foreground border-none outline-none focus:ring-0"
-                  />
-                  <button
-                    type="button"
-                    onClick={handleCopyReferralLink}
-                    disabled={referralLoading || !referralLink}
-                    className="inline-flex items-center justify-center gap-2 rounded-full bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground transition hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50 mr-1 my-1"
-                    title="Copy referral link"
-                  >
-                    {referralLoading ? (
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                    ) : referralLink ? (
-                      referralCopied ? (
-                        <Check className="h-4 w-4" />
+              <p className="text-xs text-muted-foreground mb-4">
+                Share your link so you and your friend each earn <span className="font-semibold text-foreground">30 credits</span> when they sign in using it
+                (up to {referralLimit} rewards per calendar month for you).
+              </p>
+              {referralError && (
+                <div className="mb-3 rounded-lg border border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/20 px-3 py-2 text-xs text-red-600 dark:text-red-300">
+                  {referralError}
+                </div>
+              )}
+              {referralLoading ? (
+                <div className="flex items-center justify-center py-10">
+                  <Loader2 className="h-5 w-5 animate-spin" />
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  <div className="flex rounded-full border border-border/40 bg-background shadow-inner focus-within:outline-none focus-within:ring-2 focus-within:ring-primary/40">
+                    <input
+                      value={referralLink ?? ''}
+                      readOnly
+                      placeholder="https://cogniguide.app/?ref=yourcode"
+                      className="flex-1 bg-transparent px-4 py-3 text-sm font-medium text-foreground border-none outline-none focus:ring-0"
+                    />
+                    <button
+                      type="button"
+                      onClick={handleCopyReferralLink}
+                      disabled={referralLoading || !referralLink}
+                      className="inline-flex items-center justify-center gap-2 rounded-full bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground transition hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50 mr-1 my-1"
+                      title="Copy referral link"
+                    >
+                      {referralLoading ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : referralLink ? (
+                        referralCopied ? (
+                          <Check className="h-4 w-4" />
+                        ) : (
+                          <Copy className="h-4 w-4" />
+                        )
                       ) : (
                         <Copy className="h-4 w-4" />
-                      )
+                      )}
+                      <span>
+                        {referralCopied ? 'Copied!' : referralLoading ? 'Loading…' : 'Copy link'}
+                      </span>
+                    </button>
+                  </div>
+                  <div className="rounded-[1.25rem] border bg-muted/30 p-4 space-y-3">
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-muted-foreground">Monthly rewards</span>
+                      <span className="font-semibold">{referralUsed} / {referralLimit}</span>
+                    </div>
+                    <div className="h-2 w-full bg-muted rounded-full overflow-hidden">
+                      <div
+                        className="h-full bg-primary transition-all"
+                        style={{ width: `${referralProgress}%` }}
+                      />
+                    </div>
+                    {referralCapReached ? (
+                      <p className="text-xs text-muted-foreground">
+                        You&apos;ve reached this month&apos;s cap. Invite more friends next month for additional credits.
+                      </p>
                     ) : (
-                      <Copy className="h-4 w-4" />
+                      <p className="text-xs text-muted-foreground">
+                        Invite {referralRemaining} more friend{referralRemaining === 1 ? '' : 's'} to maximize this month&apos;s rewards.
+                      </p>
                     )}
-                    <span>
-                      {referralCopied ? 'Copied!' : referralLoading ? 'Loading…' : 'Copy link'}
-                    </span>
-                  </button>
-                </div>
-                <div className="rounded-[1.25rem] border bg-muted/30 p-4 space-y-3">
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-muted-foreground">Monthly rewards</span>
-                    <span className="font-semibold">{referralUsed} / {referralLimit}</span>
+                    {referralCode && (
+                      <p className="text-xs text-muted-foreground">
+                        Referral code: <span className="font-mono font-medium text-foreground">{referralCode}</span>
+                      </p>
+                    )}
                   </div>
-                  <div className="h-2 w-full bg-muted rounded-full overflow-hidden">
-                    <div
-                      className="h-full bg-primary transition-all"
-                      style={{ width: `${referralProgress}%` }}
-                    />
-                  </div>
-                  {referralCapReached ? (
-                    <p className="text-xs text-muted-foreground">
-                      You&apos;ve reached this month&apos;s cap. Invite more friends next month for additional credits.
-                    </p>
-                  ) : (
-                    <p className="text-xs text-muted-foreground">
-                      Invite {referralRemaining} more friend{referralRemaining === 1 ? '' : 's'} to maximize this month&apos;s rewards.
-                    </p>
-                  )}
-                  {referralCode && (
-                    <p className="text-xs text-muted-foreground">
-                      Referral code: <span className="font-mono font-medium text-foreground">{referralCode}</span>
-                    </p>
-                  )}
                 </div>
-              </div>
-            )}
+              )}
+            </div>
           </div>
-        </div>
-      )}
+        )
+      }
 
-      {referralRewardNotice && (
-        <div className="fixed bottom-6 right-6 z-[60]">
-          <div className="pointer-events-auto flex w-80 items-start gap-3 rounded-2xl border border-border/60 bg-background/95 p-4 shadow-xl backdrop-blur">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary">
-              <Gift className="h-5 w-5" />
+      {
+        referralRewardNotice && (
+          <div className="fixed bottom-6 right-6 z-[60]">
+            <div className="pointer-events-auto flex w-80 items-start gap-3 rounded-2xl border border-border/60 bg-background/95 p-4 shadow-xl backdrop-blur">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary">
+                <Gift className="h-5 w-5" />
+              </div>
+              <div className="flex-1 text-sm text-foreground">
+                <p className="text-base font-semibold">Referral bonus applied</p>
+                <p className="mt-1 text-sm text-muted-foreground">You and your friend each earned {referralRewardNotice.amount} bonus credits. Enjoy exploring CogniGuide!</p>
+              </div>
+              <button
+                type="button"
+                onClick={dismissReferralRewardNotice}
+                className="ml-2 inline-flex h-8 w-8 items-center justify-center rounded-full border border-transparent text-muted-foreground transition hover:bg-muted/80 hover:text-foreground"
+                aria-label="Dismiss referral bonus notice"
+                title="Dismiss notice"
+              >
+                <X className="h-4 w-4" />
+              </button>
             </div>
-            <div className="flex-1 text-sm text-foreground">
-              <p className="text-base font-semibold">Referral bonus applied</p>
-              <p className="mt-1 text-sm text-muted-foreground">You and your friend each earned {referralRewardNotice.amount} bonus credits. Enjoy exploring CogniGuide!</p>
-            </div>
-            <button
-              type="button"
-              onClick={dismissReferralRewardNotice}
-              className="ml-2 inline-flex h-8 w-8 items-center justify-center rounded-full border border-transparent text-muted-foreground transition hover:bg-muted/80 hover:text-foreground"
-              aria-label="Dismiss referral bonus notice"
-              title="Dismiss notice"
-            >
-              <X className="h-4 w-4" />
-            </button>
           </div>
-        </div>
-      )}
+        )
+      }
 
       <ShareLinkDialog
         open={Boolean(shareItem?.id)}
@@ -2830,6 +2867,6 @@ export default function DashboardClient() {
         onClose={handleDismissTrialModal}
         trialEndsAt={trialEndsAt}
       />
-    </div>
+    </div >
   );
 }
