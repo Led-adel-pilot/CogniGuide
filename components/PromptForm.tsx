@@ -47,8 +47,8 @@ export default function PromptForm({
           : "e.g., 'Only make flashcards about the first and third chapters'";
       }
       return isMobile
-        ? "e.g., Generate flashcards on ..."
-        : "e.g., Generate flashcards on ...";
+        ? "e.g., 'Generate flashcards on The Cold War'"
+        : "e.g., 'Generate flashcards on The Cold War'";
     }
 
     if (hasFiles) {
@@ -57,8 +57,8 @@ export default function PromptForm({
         : "e.g., 'Focus on chapter summaries and key arguments'";
     }
     return isMobile
-      ? "e.g., Create a mindmap on ..."
-      : "e.g., Create a mindmap on ...";
+      ? "e.g., 'Create a mindmap on the Nervous System'"
+      : "e.g., 'Create a mindmap on the Nervous System'";
   };
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -124,7 +124,7 @@ export default function PromptForm({
           // Fire interaction hook when the user starts typing
           try {
             if (onInteract && !prompt && e.target.value) onInteract();
-          } catch {}
+          } catch { }
           setPrompt(e.target.value);
         }}
         onKeyDown={handleKeyDown}
@@ -137,15 +137,14 @@ export default function PromptForm({
         aria-label="Prompt input"
         onFocus={() => {
           // Optionally fire on focus as well, harmless if it opens once
-          try { onInteract && onInteract(); } catch {}
+          try { onInteract && onInteract(); } catch { }
         }}
       />
       <button
         type="submit"
         disabled={disabled || (filesLength === 0 && prompt.trim().length === 0)}
-        className={`flex-shrink-0 inline-flex items-center justify-center w-10 h-10 text-white bg-primary rounded-full shadow hover:bg-primary/90 transition-all duration-300 disabled:opacity-60 disabled:cursor-not-allowed relative overflow-hidden ${
-          previewLoading && !isLoading ? 'button-attention' : ''
-        }`}
+        className={`flex-shrink-0 inline-flex items-center justify-center w-10 h-10 text-white bg-primary rounded-full shadow hover:bg-primary/90 transition-all duration-300 disabled:opacity-60 disabled:cursor-not-allowed relative overflow-hidden ${previewLoading && !isLoading ? 'button-attention' : ''
+          }`}
         aria-label={tooltipText}
         data-tooltip={tooltipText}
       >
