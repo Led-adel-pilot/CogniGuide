@@ -22,7 +22,7 @@ export async function GET() {
     }
 
     const cutoff = new Date();
-    cutoff.setHours(cutoff.getHours() - 24); // Delete files older than 24 hours
+    cutoff.setMinutes(cutoff.getMinutes() - 5); // Delete files older than 5 minutes
 
     const filesToDelete = files
       .filter(file => {
