@@ -259,7 +259,7 @@ export default function DashboardClient() {
     if (!firstOpenAt || !hasRecordedFirstStudyOpenRef.current) return;
 
     const elapsed = Date.now() - firstOpenAt;
-    const remaining = Math.max(5000 - elapsed, 0);
+    const remaining = Math.max(20000 - elapsed, 0);
 
     const openModal = () => {
       trialModalTimeoutRef.current = null;
