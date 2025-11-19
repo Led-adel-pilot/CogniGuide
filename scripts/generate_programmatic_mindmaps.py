@@ -8,7 +8,7 @@ TypeScript so that every generated page can be statically rendered by Next.js.
 
 Example usage:
 
-python scripts/generate_programmatic_mindmaps.py --input data/mindmap_pages.csv --output lib/programmatic/generated/mindMapPages.ts --model gemini-flash-lite-latest --max-api-calls 3 --concurrency 5
+python scripts/generate_programmatic_mindmaps.py --input data/mindmap_pages.csv --output lib/programmatic/generated/mindMapPages.ts --model gemini-flash-lite-latest --max-api-calls 500 --concurrency 10
 
 The input CSV must include, at minimum, the columns ``slug`` and
 ``target_keyword``. Every other column becomes context that is injected into the
@@ -286,7 +286,7 @@ def parse_args(argv: Iterable[str] | None = None) -> argparse.Namespace:
   parser.add_argument(
     "--max-api-calls-per-minute",
     type=int,
-    default=12,
+    default=10,
     help="Throttle Gemini API usage to this many calls per rolling minute (0 to disable).",
   )
   parser.add_argument(
