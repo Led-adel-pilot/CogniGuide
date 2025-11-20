@@ -1187,7 +1187,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
       window.cancelAnimationFrame(id);
       window.clearTimeout(timeout);
     };
-  }, [answerContent, isEditingCard, open, questionContent, renderMath]);
+  }, [answerContent, isEditingCard, open, questionContent, renderMath, showAnswer, showExplanation]);
 
   React.useEffect(() => {
     resetExplanation();
