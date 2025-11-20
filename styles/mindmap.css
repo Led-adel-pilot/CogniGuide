@@ -36,21 +36,29 @@
   border-radius: 25px;
   padding: 8px 14px;
   box-shadow: var(--node-shadow);
-  cursor: pointer;
+  cursor: default;
   font-family: "Poppins", system-ui, -apple-system, "Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", "Segoe UI Symbol", "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
   backface-visibility: hidden;
   will-change: opacity, top, left;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   transition: border-color 0.2s, background-color 0.2s,
-              transform 0.35s cubic-bezier(0.4, 0, 0.2, 1),
-              opacity 0.35s cubic-bezier(0.4, 0, 0.2, 1),
-              top 0.35s cubic-bezier(0.4, 0, 0.2, 1),
-              left 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    transform 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+    opacity 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+    top 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+    left 0.35s cubic-bezier(0.4, 0, 0.2, 1);
   white-space: nowrap;
   font-size: 15px;
   font-weight: 500;
   color: var(--text-color);
+}
+
+.mindmap-node.has-children {
+  cursor: pointer;
+}
+
+#mindmap-container.is-selecting .mindmap-node {
+  cursor: text !important;
 }
 
 .mindmap-node:hover {
@@ -113,8 +121,8 @@
   stroke-linecap: round;
   stroke-linejoin: round;
   transition: stroke 0.2s ease,
-              opacity 0.25s ease 50ms,
-              d 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    opacity 0.25s ease 50ms,
+    d 0.35s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .mindmap-node code {

@@ -218,14 +218,14 @@ function shouldBlockPanAtPoint(target: EventTarget | null, clientX: number, clie
     if (!(target instanceof Element)) return false;
     const nodeEl = target.closest('.mindmap-node') as HTMLElement | null;
     if (!nodeEl) return false;
-    
+
     // On mobile touch events only, don't block panning even over text
     // Mobile users use press-and-hold for text selection, so they should be able to pan freely
     // Desktop mouse events should still block panning to allow text selection
     if (isTouchEvent) {
         return false;
     }
-    
+
     return isPointNearNodeText(nodeEl, clientX, clientY);
 }
 
@@ -284,8 +284,8 @@ function measureHtmlSize(html: string, isRoot: boolean): { width: number; height
     if ((window as any).renderMathInElement) {
         (window as any).renderMathInElement(tempNode, {
             delimiters: [
-                {left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false},
-                {left: '\\(', right: '\\)', display: false}, {left: '\\[', right: '\\]', display: true}
+                { left: '$$', right: '$$', display: true }, { left: '$', right: '$', display: false },
+                { left: '\\(', right: '\\)', display: false }, { left: '\\[', right: '\\]', display: true }
             ],
             throwOnError: false
         });
@@ -362,16 +362,16 @@ function hslToRgb(h: number, s: number, l: number): RgbColor {
         const hue2rgb = (p: number, q: number, t: number) => {
             if (t < 0) t += 1;
             if (t > 1) t -= 1;
-            if (t < 1/6) return p + (q - p) * 6 * t;
-            if (t < 1/2) return q;
-            if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+            if (t < 1 / 6) return p + (q - p) * 6 * t;
+            if (t < 1 / 2) return q;
+            if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
             return p;
         };
         const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
         const p = 2 * l - q;
-        r = hue2rgb(p, q, h + 1/3);
+        r = hue2rgb(p, q, h + 1 / 3);
         g = hue2rgb(p, q, h);
-        b = hue2rgb(p, q, h - 1/3);
+        b = hue2rgb(p, q, h - 1 / 3);
     }
     return { r: Math.round(r * 255), g: Math.round(g * 255), b: Math.round(b * 255) };
 }
@@ -831,13 +831,13 @@ function renderNodeAndChildren(node: MindMapNode, container: HTMLElement, svgEl:
     if ((window as any).renderMathInElement) {
         (window as any).renderMathInElement(nodeEl, {
             delimiters: [
-                {left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false},
-                {left: '\\(', right: '\\)', display: false}, {left: '\\[', right: '\\]', display: true}
+                { left: '$$', right: '$$', display: true }, { left: '$', right: '$', display: false },
+                { left: '\\(', right: '\\)', display: false }, { left: '\\[', right: '\\]', display: true }
             ],
             throwOnError: false
         });
     }
-    
+
     const shouldAnimateIn = !!expandingSubtreeRoot;
 
     if (shouldAnimateIn) {
@@ -849,7 +849,7 @@ function renderNodeAndChildren(node: MindMapNode, container: HTMLElement, svgEl:
         nodeEl.style.left = `${node.x + xOffset}px`;
         nodeEl.style.top = `${node.y + yOffset}px`;
     }
-    
+
     if (node.themeColor) {
         const borderColor = node.themeColor;
         nodeEl.style.borderColor = borderColor;
@@ -864,7 +864,7 @@ function renderNodeAndChildren(node: MindMapNode, container: HTMLElement, svgEl:
     }
     if (node.children.length > 0) nodeEl.classList.add('has-children');
     if (node.isCollapsed) nodeEl.classList.add('collapsed');
-    
+
     nodeEl.addEventListener('click', (e) => {
         if (!nodeInteractionsEnabled) return;
         if ((e.target as HTMLElement).tagName.toLowerCase() === 'a') return;
@@ -899,7 +899,7 @@ function renderNodeAndChildren(node: MindMapNode, container: HTMLElement, svgEl:
             if (node.children.length > 0) toggleNodeCollapse(node);
         }
     }, { passive: false });
-    
+
     container.appendChild(nodeEl);
 
     if (shouldAnimateIn) {
@@ -955,7 +955,7 @@ function toggleNodeCollapse(node: MindMapNode) {
         const descendantNodes: MindMapNode[] = [];
         function traverse(n: MindMapNode, isDescendant = false) {
             allNodes.push(n);
-            n.startX = n.x; 
+            n.startX = n.x;
             n.startY = n.y;
             if (isDescendant) descendantNodes.push(n);
             if (!n.isCollapsed || n === node) {
@@ -1016,11 +1016,11 @@ function toggleNodeCollapse(node: MindMapNode) {
             const easedProgress = 1 - Math.pow(1 - progress, 3); // easeOutCubic
 
             allNodes.forEach(n => {
-                if (n.isRoot) { 
-                    n.animX = n.endX; 
-                    n.animY = n.endY; 
+                if (n.isRoot) {
+                    n.animX = n.endX;
+                    n.animY = n.endY;
                     // No need to update the DOM element's transform, it's static.
-                    return; 
+                    return;
                 }
 
                 let currentX, currentY, opacity = 1, scaleVal = 1;
@@ -1045,7 +1045,7 @@ function toggleNodeCollapse(node: MindMapNode) {
                     el.style.opacity = String(opacity);
                     el.style.transform = `translate(${dx}px, ${dy}px) scale(${scaleVal})`;
                 }
-                n.animX = currentX; 
+                n.animX = currentX;
                 n.animY = currentY;
             });
 
@@ -1076,7 +1076,7 @@ function toggleNodeCollapse(node: MindMapNode) {
                         }
                     }
                 });
-                
+
                 node.isAnimating = false;
                 rerenderMindMap();
             }
@@ -1089,7 +1089,7 @@ function toggleNodeCollapse(node: MindMapNode) {
 
 function rerenderMindMap() {
     if (!mindMapTree || !mapContainer) return;
-    
+
     mapContainer.innerHTML = '';
     svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
     svg.id = 'mindmap-svg';
@@ -1109,10 +1109,10 @@ function rerenderMindMap() {
         if (deltaY !== 0) panY -= deltaY * scale;
     }
     stableRootY = newRootY;
-    
+
     applyTransform();
     renderNodeAndChildren(mindMapTree, mapContainer, svg, PADDING, PADDING, null);
-    
+
     const bounds = getTreeBounds(mindMapTree);
     mapContainer.style.width = `${bounds.width + 2 * PADDING}px`;
     mapContainer.style.height = `${bounds.maxY + 2 * PADDING}px`;
@@ -1296,6 +1296,19 @@ function handleTouchEnd(e: TouchEvent) {
 
 // ============== PUBLIC API ==============
 
+function handleSelectionChange() {
+    if (!mapContainer) return;
+    const selection = window.getSelection();
+    const hasSelection = selection && !selection.isCollapsed &&
+        selection.anchorNode && mapContainer.contains(selection.anchorNode);
+
+    if (hasSelection) {
+        mapContainer.classList.add('is-selecting');
+    } else {
+        mapContainer.classList.remove('is-selecting');
+    }
+}
+
 /**
  * Initializes the mind map renderer and draws the mind map.
  * @param markdown The markdown string to render.
@@ -1321,7 +1334,7 @@ export function initializeMindMap(
         cancelAnimationFrame(transformRafId);
         transformRafId = null;
     }
-    
+
     viewport = targetViewport;
     mapContainer = targetContainer;
     lastMarkdown = markdown;
@@ -1373,6 +1386,9 @@ export function initializeMindMap(
             // Keep cached viewport rect valid on resize
             window.addEventListener('resize', invalidateViewportRect, { passive: true });
 
+            // Listen for selection changes to update cursor
+            document.addEventListener('selectionchange', handleSelectionChange);
+
             // Observe data-theme attribute changes on <html> to react to theme toggle
             themeObserver = new MutationObserver(() => {
                 invalidateMeasurementCache();
@@ -1380,7 +1396,7 @@ export function initializeMindMap(
             });
             themeObserver.observe(document.documentElement, {
                 attributes: true,
-                attributeFilter: ['data-theme', 'class'] 
+                attributeFilter: ['data-theme', 'class']
             });
         }
 
@@ -1466,6 +1482,7 @@ export function collapseToMainBranches(options?: { animate?: boolean }) {
         autoFitToCurrentTree();
     }
 }
+
 /**
  * Cleans up event listeners to prevent memory leaks.
  */
@@ -1481,6 +1498,7 @@ export function cleanup() {
     window.removeEventListener('touchend', handleTouchEnd);
     window.removeEventListener('resize', invalidateViewportRect);
     window.matchMedia('(prefers-color-scheme: dark)').removeEventListener('change', handleDarkModeChange);
+    document.removeEventListener('selectionchange', handleSelectionChange);
     if (themeObserver) {
         themeObserver.disconnect();
         themeObserver = null;
@@ -1491,6 +1509,7 @@ export function cleanup() {
     }
     if (mapContainer) {
         mapContainer.style.removeProperty('will-change');
+        mapContainer.classList.remove('is-selecting');
     }
     invalidateMeasurementCache();
 }
@@ -1521,7 +1540,7 @@ export function getFullMindMapBounds(markdown: string): { minX: number, minY: nu
 
         // 4. Get the bounds of the fully expanded, laid-out tree.
         const { minX, minY, width, height } = getTreeBounds(tree);
-        
+
         return { minX, minY, width, height };
     } catch (error) {
         console.error("Error calculating full mind map bounds:", error);
