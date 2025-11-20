@@ -536,14 +536,14 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
           if (payload && typeof payload.message === 'string' && payload.message.trim()) {
             message = payload.message;
           }
-        } catch {}
+        } catch { }
         throw new Error(message);
       }
 
       // Read streaming response
       const reader = response.body?.getReader();
       const decoder = new TextDecoder();
-      
+
       if (!reader) {
         throw new Error('Unable to read response stream.');
       }
@@ -725,7 +725,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
           if (json && typeof json.message === 'string' && json.message.trim()) {
             message = json.message;
           }
-        } catch {}
+        } catch { }
         setMindMapError(message);
         if (onRequireUpgrade) onRequireUpgrade('flashcards_to_mindmap_blocked');
         setIsMindMapModalOpen(false);
@@ -739,7 +739,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
           if (json && typeof json.message === 'string' && json.message.trim()) {
             message = json.message;
           }
-        } catch {}
+        } catch { }
         setMindMapError(message);
         setIsMindMapModalOpen(false);
         return;
@@ -754,12 +754,12 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
             if (json && typeof json.error === 'string' && json.error.trim()) {
               message = json.error;
             }
-          } catch {}
+          } catch { }
         } else {
           try {
             const text = await response.text();
             if (text.trim()) message = text.trim();
-          } catch {}
+          } catch { }
         }
         setMindMapError(message);
         setIsMindMapModalOpen(false);
@@ -781,7 +781,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
         while (true) {
           const { value, done } = await reader.read();
           if (mindMapRequestRef.current !== requestId) {
-            try { await reader.cancel(); } catch {}
+            try { await reader.cancel(); } catch { }
             return;
           }
           if (done) break;
@@ -840,7 +840,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
               detail: { credits: creditsValue, display: creditsValue.toFixed(1) },
             }));
           }
-        } catch {}
+        } catch { }
       }
 
       posthog.capture('mindmap_generation_from_flashcards_completed', {
@@ -1220,7 +1220,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
       if (typeof window !== 'undefined') {
         window.dispatchEvent(new CustomEvent('cogniguide:study-modal-closed', { detail: { modal: 'flashcards' } }));
       }
-    } catch {}
+    } catch { }
   }, []);
 
   const finalizeClose = React.useCallback(() => {
@@ -1285,7 +1285,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
           if (typeof window !== 'undefined') {
             window.dispatchEvent(new CustomEvent('cogniguide:study-modal-opened', { detail: { modal: 'flashcards' } }));
           }
-        } catch {}
+        } catch { }
       }
     } else {
       hasDispatchedOpenRef.current = false;
@@ -1812,8 +1812,10 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
     if (!studyDueOnly && scheduledCards && scheduledCards.length > 0) {
       const nextIndex = (index + 1) % scheduledCards.length;
       if (nextIndex === 0) {
-        // We've completed the full deck
-        setFinished(true);
+        if (!isGenerating) {
+          // We've completed the full deck
+          setFinished(true);
+        }
       } else {
         setIndex(nextIndex);
       }
@@ -1834,6 +1836,9 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
     if (scheduledCards && scheduledCards.length > 0) {
       const nextIndex = (index + 1) % scheduledCards.length;
       if (nextIndex === 0) {
+        if (isGenerating) {
+          return index;
+        }
         // We've completed the full deck
         setFinished(true);
         return nextIndex; // Return the next index (0)
@@ -1843,6 +1848,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
     }
     return index;
   };
+
   const getPrevIndex = () => {
     if (studyDueOnly && dueList.length > 0) {
       const pos = dueList.indexOf(index);
@@ -1988,6 +1994,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
       if (persistedMindMapMarkdown && persistedMindMapMarkdown.trim().length > 0) return persistedMindMapMarkdown;
       return null;
     })();
+    const isLastCard = index === (displayedCards?.length ?? 0) - 1;
     const hasMindMapAvailable = Boolean(resolvedMindMapContent) || Boolean(persistedMindMapId);
     const dueAgainCount = dueNowIndices.length;
     const hasImmediateDue = dueAgainCount > 0;
@@ -1998,137 +2005,134 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
 
     return (
       <div
-        className={`relative w-full rounded-[1.5rem] flex flex-col ${
-          isEmbedded
-            ? 'h-auto overflow-visible !bg-transparent !border-0 !ring-0 !shadow-none'
-            : 'h-full overflow-hidden bg-background border border-border ring-1 ring-black/5 shadow-2xl'
-        }`}
+        className={`relative w-full rounded-[1.5rem] flex flex-col ${isEmbedded
+          ? 'h-auto overflow-visible !bg-transparent !border-0 !ring-0 !shadow-none'
+          : 'h-full overflow-hidden bg-background border border-border ring-1 ring-black/5 shadow-2xl'
+          }`}
       >
-      {!isEmbedded && (
-        <div className="absolute top-2 right-2 z-30 flex items-center gap-2">
-          {hasCards && (
-            <button
-              onClick={handleGenerateMindMap}
-              disabled={isMindMapGenerating}
-              className="inline-flex items-center gap-2 h-8 px-3 rounded-full border border-border bg-background text-sm font-medium text-foreground hover:bg-muted/50 dark:hover:bg-muted/80 disabled:opacity-60 disabled:cursor-not-allowed focus:outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400/50"
-              title={
-                isMindMapGenerating
-                  ? 'Generating an AI mind map from this deck…'
-                  : hasMindMapAvailable
-                    ? 'Mind map linked to this deck'
-                    : 'Generate mind map from flashcards'
-              }
-            >
-              {isMindMapGenerating ? <Loader2 className="h-4 w-4 animate-spin" /> : hasMindMapAvailable ? <MapIcon className="h-4 w-4" /> : <Sparkles className="h-4 w-4" />}
-              <span>Mind map</span>
-            </button>
-          )}
-          {onShare && (
-            <ShareTriggerButton
-              onClick={onShare}
-              showText={true}
-              title="Share link with friends"
-            />
-          )}
-          {!userId && (
-            <button
-              onClick={() => openAuthModal()}
-              className="inline-flex items-center justify-center h-8 px-4 rounded-full border border-border bg-background text-sm font-medium text-foreground hover:bg-muted/50 dark:hover:bg-muted/80 focus:outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400/50"
-              aria-label="Sign up"
-              title="Sign up to save your progress"
-            >
-              Sign up
-            </button>
-          )}
-          <button
-            onClick={handleClose}
-            className="inline-flex items-center justify-center w-8 h-8 bg-background text-foreground rounded-full border border-border shadow-sm hover:bg-muted/50 dark:hover:bg-muted/80 focus:outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400/50"
-            aria-label="Close"
-          >
-            <X className="h-4 w-4" />
-          </button>
-        </div>
-      )}
-
-      {mindMapError && (
-        <div className="w-full max-w-5xl mx-auto mt-4 px-4 sm:px-6 md:px-0">
-          <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-2 text-sm text-red-600 dark:border-red-900/40 dark:bg-red-950/50 dark:text-red-200">
-            {mindMapError}
-          </div>
-        </div>
-      )}
-
-      <div
-        className={`w-full grid grid-rows-[auto,1fr,auto] bg-background gap-y-3 ${
-          isEmbedded ? 'pb-8 sm:pb-10' : 'pb-4 sm:pb-6'
-        } ${!isEmbedded ? 'h-full pt-14 sm:pt-4 md:pt-6' : 'h-auto pt-4 md:pt-6'}`}
-      >
-        <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 items-center gap-2 sm:gap-3 px-4 sm:px-6 md:px-0 mt-4">
-          <div className="text-center md:text-left text-sm font-medium truncate text-foreground">{studyInterleaved ? (current?.deckTitle || title) : (title || 'Flashcards')}</div>
-          <div className="text-sm text-muted-foreground text-center hidden md:block">{hasCards ? (finished ? 'Completed' : studyDueOnly ? `${originalDueList.indexOf(index) + 1} / ${originalDueCount} due` : `${index + 1} / ${totalCardCount}`) : ''}</div>
-          <div className="justify-self-center md:justify-self-end">
+        {!isEmbedded && (
+          <div className="absolute top-2 right-2 z-30 flex items-center gap-2">
             {hasCards && (
-              <div className="inline-flex items-center gap-2 text-sm">
-                <span className="text-foreground font-medium">{studyInterleaved ? 'Source deck exam' : 'Exam date'}</span>
-                <div className="w-32">
-                  <DatePicker
-                    date={examDateInput}
-                    onDateChange={(date) => {
-                      setExamDateInput(date);
-                      handleSetDeckExamDate(date);
-                    }}
-                    placeholder="Select date"
-                    className="h-7 text-xs"
-                    showTimeOnButton={false}
-                    showTimeSelector={false}
-                  />
-                </div>
-              </div>
+              <button
+                onClick={handleGenerateMindMap}
+                disabled={isMindMapGenerating}
+                className="inline-flex items-center gap-2 h-8 px-3 rounded-full border border-border bg-background text-sm font-medium text-foreground hover:bg-muted/50 dark:hover:bg-muted/80 disabled:opacity-60 disabled:cursor-not-allowed focus:outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400/50"
+                title={
+                  isMindMapGenerating
+                    ? 'Generating an AI mind map from this deck…'
+                    : hasMindMapAvailable
+                      ? 'Mind map linked to this deck'
+                      : 'Generate mind map from flashcards'
+                }
+              >
+                {isMindMapGenerating ? <Loader2 className="h-4 w-4 animate-spin" /> : hasMindMapAvailable ? <MapIcon className="h-4 w-4" /> : <Sparkles className="h-4 w-4" />}
+                <span>Mind map</span>
+              </button>
             )}
+            {onShare && (
+              <ShareTriggerButton
+                onClick={onShare}
+                showText={true}
+                title="Share link with friends"
+              />
+            )}
+            {!userId && (
+              <button
+                onClick={() => openAuthModal()}
+                className="inline-flex items-center justify-center h-8 px-4 rounded-full border border-border bg-background text-sm font-medium text-foreground hover:bg-muted/50 dark:hover:bg-muted/80 focus:outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400/50"
+                aria-label="Sign up"
+                title="Sign up to save your progress"
+              >
+                Sign up
+              </button>
+            )}
+            <button
+              onClick={handleClose}
+              className="inline-flex items-center justify-center w-8 h-8 bg-background text-foreground rounded-full border border-border shadow-sm hover:bg-muted/50 dark:hover:bg-muted/80 focus:outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400/50"
+              aria-label="Close"
+            >
+              <X className="h-4 w-4" />
+            </button>
           </div>
-          <div className="text-sm text-muted-foreground text-center md:hidden">{hasCards ? (finished ? 'Completed' : studyDueOnly ? `${originalDueList.indexOf(index) + 1} / ${originalDueCount} due` : `${index + 1} / ${totalCardCount}`) : ''}</div>
-        </div>
-        {hasCards && (
-          <div className="w-full max-w-5xl mx-auto mt-6 px-4 sm:px-6 md:px-0">
-            <div className="h-1.5 rounded-full bg-muted overflow-hidden">
+        )}
+
+        {mindMapError && (
+          <div className="w-full max-w-5xl mx-auto mt-4 px-4 sm:px-6 md:px-0">
+            <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-2 text-sm text-red-600 dark:border-red-900/40 dark:bg-red-950/50 dark:text-red-200">
+              {mindMapError}
+            </div>
+          </div>
+        )}
+
+        <div
+          className={`w-full grid grid-rows-[auto,1fr,auto] bg-background gap-y-3 ${isEmbedded ? 'pb-8 sm:pb-10' : 'pb-4 sm:pb-6'
+            } ${!isEmbedded ? 'h-full pt-14 sm:pt-4 md:pt-6' : 'h-auto pt-4 md:pt-6'}`}
+        >
+          <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 items-center gap-2 sm:gap-3 px-4 sm:px-6 md:px-0 mt-4">
+            <div className="text-center md:text-left text-sm font-medium truncate text-foreground">{studyInterleaved ? (current?.deckTitle || title) : (title || 'Flashcards')}</div>
+            <div className="text-sm text-muted-foreground text-center hidden md:block">{hasCards ? (finished ? 'Completed' : studyDueOnly ? `${originalDueList.indexOf(index) + 1} / ${originalDueCount} due` : `${index + 1} / ${totalCardCount}`) : ''}</div>
+            <div className="justify-self-center md:justify-self-end">
+              {hasCards && (
+                <div className="inline-flex items-center gap-2 text-sm">
+                  <span className="text-foreground font-medium">{studyInterleaved ? 'Source deck exam' : 'Exam date'}</span>
+                  <div className="w-32">
+                    <DatePicker
+                      date={examDateInput}
+                      onDateChange={(date) => {
+                        setExamDateInput(date);
+                        handleSetDeckExamDate(date);
+                      }}
+                      placeholder="Select date"
+                      className="h-7 text-xs"
+                      showTimeOnButton={false}
+                      showTimeSelector={false}
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+            <div className="text-sm text-muted-foreground text-center md:hidden">{hasCards ? (finished ? 'Completed' : studyDueOnly ? `${originalDueList.indexOf(index) + 1} / ${originalDueCount} due` : `${index + 1} / ${totalCardCount}`) : ''}</div>
+          </div>
+          {hasCards && (
+            <div className="w-full max-w-5xl mx-auto mt-6 px-4 sm:px-6 md:px-0">
+              <div className="h-1.5 rounded-full bg-muted overflow-hidden">
                 <div
                   className="h-full bg-gradient-to-r from-indigo-500 via-sky-500 to-emerald-500"
                   style={{
-                    width: `${
-                      finished
-                        ? 100
-                        : studyDueOnly
+                    width: `${finished
+                      ? 100
+                      : studyDueOnly
                         ? originalDueCount > 0
                           ? ((originalDueList.indexOf(index) + 1) / originalDueCount) * 100
                           : 0
                         : totalCardCount > 0 ? ((index + 1) / totalCardCount) * 100 : 0
-                    }%`,
+                      }%`,
                   }}
                 />
               </div>
             </div>
-        )}
+          )}
 
-        <div className="w-full max-w-3xl mx-auto overflow-auto py-2 mt-0 sm:mt-0 sm:flex sm:items-start sm:justify-center px-4 sm:px-6 md:px-0">
-          {error ? (
-            <div className="w-full text-sm text-red-600">{error}</div>
-          ) : !hasCards ? (
-            <div className="flex items-center gap-2 text-muted-foreground">
-              <Loader2 className="h-5 w-5 animate-spin" />
-              {isGenerating ? 'Generating flashcards…' : 'No flashcards yet'}
-            </div>
-          ) : finished ? (
-            <div className="w-full">
-              {userId || deckId ? (
-                <div className="relative mx-auto rounded-[1.35rem] p-[1.5px] bg-gradient-to-br from-emerald-200 via-teal-200 to-green-200">
-                  <div className="bg-background border border-border rounded-[1.25rem] shadow p-8 sm:p-10 min-h-[200px] sm:min-h-[250px] flex flex-col items-center justify-center text-center">
-                    <div className="text-4xl mb-4">🎉</div>
-                    <div className="text-foreground text-xl sm:text-2xl font-bold leading-7 sm:leading-8 mb-4">
-                      Congratulations!
-                    </div>
-                    <div className="text-foreground text-sm sm:text-base leading-6 max-w-md">
-                      {completionMessage}
-                    </div>
+          <div className="w-full max-w-3xl mx-auto overflow-auto py-2 mt-0 sm:mt-0 sm:flex sm:items-start sm:justify-center px-4 sm:px-6 md:px-0">
+            {error ? (
+              <div className="w-full text-sm text-red-600">{error}</div>
+            ) : !hasCards ? (
+              <div className="flex items-center gap-2 text-muted-foreground">
+                <Loader2 className="h-5 w-5 animate-spin" />
+                {isGenerating ? 'Generating flashcards…' : 'No flashcards yet'}
+              </div>
+            ) : finished ? (
+              <div className="w-full">
+                {userId || deckId ? (
+                  <div className="relative mx-auto rounded-[1.35rem] p-[1.5px] bg-gradient-to-br from-emerald-200 via-teal-200 to-green-200">
+                    <div className="bg-background border border-border rounded-[1.25rem] shadow p-8 sm:p-10 min-h-[200px] sm:min-h-[250px] flex flex-col items-center justify-center text-center">
+                      <div className="text-4xl mb-4">🎉</div>
+                      <div className="text-foreground text-xl sm:text-2xl font-bold leading-7 sm:leading-8 mb-4">
+                        Congratulations!
+                      </div>
+                      <div className="text-foreground text-sm sm:text-base leading-6 max-w-md">
+                        {completionMessage}
+                      </div>
                       <button
                         title={dueNowIndices.length > 0 ? 'Review cards that need another pass' : 'Close deck'}
                         onClick={() => {
@@ -2157,333 +2161,345 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
                       >
                         {dueNowIndices.length > 0 ? 'Review due cards' : 'Close'}
                       </button>
-                  </div>
-                </div>
-              ) : isEmbedded ? (
-                <div className="relative mx-auto rounded-[1.35rem] p-[1.5px] bg-gradient-to-br from-indigo-200 via-sky-200 to-emerald-200">
-                  <div className="bg-background border border-border rounded-[1.25rem] shadow p-8 sm:p-10 min-h-[200px] sm:min-h-[250px] flex flex-col items-center justify-center text-center">
-                    <h2 className="text-foreground text-2xl font-bold mb-4">Ready to study smarter?</h2>
-                    <p className="text-muted-foreground mb-6 max-w-md">
-                      You&apos;ve seen how effective flashcards can be. Create your own study set from your course materials in seconds.
-                    </p>
-                    <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full max-w-md justify-center">
-                      <button
-                        title="Generate a personalized deck"
-                        onClick={() => {
-                          if (title && displayedCards) {
-                            const pendingDeck = { title, cards: displayedCards };
-                            localStorage.setItem('cogniguide:pending_flashcards', JSON.stringify(pendingDeck));
-                          }
-                          openAuthModal();
-                        }}
-                        className="flex-1 h-auto sm:h-10 py-2 sm:py-0 px-6 text-base font-bold text-white bg-gradient-primary rounded-full hover:bg-gradient-primary-hover transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/50 whitespace-nowrap inline-flex items-center justify-center"
-                      >
-                        Generate Your Deck
-                      </button>
-                      <button
-                        title="Review the sample deck again"
-                        onClick={() => {
-                          setFinished(false);
-                          setIndex(0);
-                          setShowAnswer(false);
-                          resetExplanation();
-                          setPredictedDueByGrade({});
-                          setCardsViewedCount(0);
-                          setSignupPromptTriggered(false);
-                          setAnswerShownTime(null);
-                        }}
-                        className="flex-1 h-auto sm:h-10 py-2 sm:py-0 px-6 text-base font-medium text-muted-foreground bg-muted rounded-full hover:bg-muted/70 transition-colors"
-                      >
-                        Review Sample
-                      </button>
                     </div>
                   </div>
+                ) : isEmbedded ? (
+                  <div className="relative mx-auto rounded-[1.35rem] p-[1.5px] bg-gradient-to-br from-indigo-200 via-sky-200 to-emerald-200">
+                    <div className="bg-background border border-border rounded-[1.25rem] shadow p-8 sm:p-10 min-h-[200px] sm:min-h-[250px] flex flex-col items-center justify-center text-center">
+                      <h2 className="text-foreground text-2xl font-bold mb-4">Ready to study smarter?</h2>
+                      <p className="text-muted-foreground mb-6 max-w-md">
+                        You&apos;ve seen how effective flashcards can be. Create your own study set from your course materials in seconds.
+                      </p>
+                      <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full max-w-md justify-center">
+                        <button
+                          title="Generate a personalized deck"
+                          onClick={() => {
+                            if (title && displayedCards) {
+                              const pendingDeck = { title, cards: displayedCards };
+                              localStorage.setItem('cogniguide:pending_flashcards', JSON.stringify(pendingDeck));
+                            }
+                            openAuthModal();
+                          }}
+                          className="flex-1 h-auto sm:h-10 py-2 sm:py-0 px-6 text-base font-bold text-white bg-gradient-primary rounded-full hover:bg-gradient-primary-hover transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/50 whitespace-nowrap inline-flex items-center justify-center"
+                        >
+                          Generate Your Deck
+                        </button>
+                        <button
+                          title="Review the sample deck again"
+                          onClick={() => {
+                            setFinished(false);
+                            setIndex(0);
+                            setShowAnswer(false);
+                            resetExplanation();
+                            setPredictedDueByGrade({});
+                            setCardsViewedCount(0);
+                            setSignupPromptTriggered(false);
+                            setAnswerShownTime(null);
+                          }}
+                          className="flex-1 h-auto sm:h-10 py-2 sm:py-0 px-6 text-base font-medium text-muted-foreground bg-muted rounded-full hover:bg-muted/70 transition-colors"
+                        >
+                          Review Sample
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="relative mx-auto rounded-[1.35rem] p-[1.5px] bg-gradient-to-br from-indigo-200 via-sky-200 to-emerald-200">
+                    <div className="bg-background border border-border rounded-[1.25rem] shadow p-8 sm:p-10 min-h-[200px] sm:min-h-[250px] flex flex-col items-center justify-center text-center">
+                      <h2 className="text-foreground text-2xl font-bold mb-4">🎉 Great job! Don&apos;t lose your progress!</h2>
+                      <p className="text-muted-foreground mb-6 max-w-md">
+                        Sign up to save this flashcard deck and track your study progress with spaced repetition.
+                      </p>
+                      <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full max-w-md justify-center">
+                        <button
+                          title="Sign up to save this deck"
+                          onClick={() => {
+                            if (title && displayedCards) {
+                              const pendingDeck = { title, cards: displayedCards };
+                              localStorage.setItem('cogniguide:pending_flashcards', JSON.stringify(pendingDeck));
+                            }
+                            openAuthModal();
+                          }}
+                          className="flex-1 h-auto sm:h-10 py-2 sm:py-0 px-6 text-base font-bold text-white bg-gradient-primary rounded-full hover:bg-gradient-primary-hover transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/50 whitespace-nowrap"
+                        >
+                          Sign Up & Save Deck
+                        </button>
+                        <button
+                          title="Restart the deck"
+                          onClick={() => {
+                            setFinished(false);
+                            setIndex(0);
+                            setShowAnswer(false);
+                            resetExplanation();
+                            setPredictedDueByGrade({});
+                            setCardsViewedCount(0);
+                            setSignupPromptTriggered(false);
+                            setAnswerShownTime(null);
+                          }}
+                          className="flex-1 h-auto sm:h-10 py-2 sm:py-0 px-6 text-base font-medium text-muted-foreground bg-muted rounded-full hover:bg-muted/70 transition-colors"
+                        >
+                          Start Over
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="w-full">
+                <div className="relative mx-auto rounded-[1.35rem] p-[1.5px] bg-gradient-to-br from-indigo-200 via-sky-200 to-emerald-200">
+                  <div className="bg-background border border-border rounded-[1.25rem] shadow p-5 sm:p-6 min-h-[180px] sm:min-h-[200px] flex flex-col">
+                    {showExplanation ? (
+                      <div className="flex-1 flex flex-col">
+                        <div
+                          ref={answerRef}
+                          className={`flex-1 ${isEmbedded ? 'overflow-visible' : 'overflow-y-auto'
+                            } text-sm text-foreground flashcard-katex-content`}
+                        >
+                          <div className="space-y-3">
+                            {explanation ? (
+                              <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
+                                {explanation}
+                              </ReactMarkdown>
+                            ) : null}
+                            {(!explanation || isExplaining) ? (
+                              <div className="flex items-center gap-2 text-muted-foreground">
+                                <Loader2 className="h-4 w-4 animate-spin" />
+                                {explanation ? 'Finishing explanation…' : 'Generating explanation…'}
+                              </div>
+                            ) : null}
+                          </div>
+                        </div>
+                      </div>
+                    ) : (
+                      <>
+                        {isEditingCard ? (
+                          <textarea
+                            ref={editedQuestionRef}
+                            value={editedQuestion}
+                            onChange={handleEditedQuestionChange}
+                            rows={2}
+                            className="w-full rounded-xl border border-border bg-background px-3 py-2 text-lg sm:text-[22px] font-semibold leading-7 sm:leading-snug focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-300/50 resize-vertical"
+                            aria-label="Question text"
+                          />
+                        ) : (
+                          <div
+                            ref={questionRef}
+                            className="text-foreground text-lg sm:text-[22px] font-semibold leading-7 sm:leading-snug break-words flashcard-katex-content"
+                          >
+                            {questionContent}
+                          </div>
+                        )}
+                        <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+                          {showAnswer && !showExplanation && !isEditingCard ? (
+                            <>
+                              <button
+                                onClick={handleExplain}
+                                disabled={isExplaining}
+                                className="inline-flex items-center gap-1.5 h-6 px-3 rounded-full border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-300/50 flashcard-grade-good disabled:cursor-not-allowed"
+                              >
+                                {isExplaining ? (
+                                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                                ) : (
+                                  !isPaidUser ? <Lock className="h-3.5 w-3.5" aria-hidden="true" /> : null
+                                )}
+                                <span>{explanationButtonLabel}</span>
+                              </button>
+                              <button
+                                type="button"
+                                onClick={handleStartEdit}
+                                className="inline-flex items-center justify-center h-6 w-6 rounded-full border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-300/50 flashcard-grade-good"
+                                title="Edit in your own words"
+                                aria-label="Edit question and answer"
+                              >
+                                <Pencil className="h-3.5 w-3.5" aria-hidden="true" />
+                                <span className="sr-only">Edit question and answer</span>
+                              </button>
+                            </>
+                          ) : null}
+                          {showAnswer && explanationError && !isExplaining ? (
+                            <span className="text-red-500 dark:text-red-400">{explanationError}</span>
+                          ) : null}
+                        </div>
+                        {showAnswer && (
+                          <div className="mt-4 text-foreground">
+                            <div className="h-px bg-border mb-4" />
+                            <div
+                              ref={answerRef}
+                              className={`${isEmbedded || isEditingCard
+                                ? 'max-h-none overflow-visible'
+                                : 'max-h-[45vh] overflow-y-auto'
+                                } text-sm text-foreground flashcard-katex-content`}
+                            >
+                              {isEditingCard ? (
+                                <textarea
+                                  ref={editedAnswerRef}
+                                  value={editedAnswer}
+                                  onChange={handleEditedAnswerChange}
+                                  rows={3}
+                                  className="w-full rounded-xl border border-border bg-background px-3 py-2 text-sm leading-6 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-300/50 resize-vertical"
+                                  aria-label="Answer text"
+                                />
+                              ) : (
+                                <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
+                                  {answerContent || ''}
+                                </ReactMarkdown>
+                              )}
+                            </div>
+                          </div>
+                        )}
+                      </>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {hasCards && !finished ? (
+            <div className="w-full max-w-3xl mx-auto mt-4 grid grid-cols-3 items-center gap-2 sm:gap-3">
+              {!showAnswer ? (
+                <div className="justify-self-start">
+                  <button
+                    title="Go to previous card"
+                    onClick={handlePrevCard}
+                    disabled={!canGoPrev}
+                    className="inline-flex items-center justify-center h-10 w-10 sm:w-auto sm:px-4 rounded-full border border-border bg-background text-foreground hover:bg-muted/50 dark:hover:bg-muted/80 disabled:opacity-60 disabled:cursor-not-allowed transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400/50"
+                  >
+                    <ChevronLeft className="h-5 w-5 sm:mr-2" />
+                    <span className="hidden sm:inline">Prev</span>
+                  </button>
                 </div>
               ) : (
-                <div className="relative mx-auto rounded-[1.35rem] p-[1.5px] bg-gradient-to-br from-indigo-200 via-sky-200 to-emerald-200">
-                  <div className="bg-background border border-border rounded-[1.25rem] shadow p-8 sm:p-10 min-h-[200px] sm:min-h-[250px] flex flex-col items-center justify-center text-center">
-                    <h2 className="text-foreground text-2xl font-bold mb-4">🎉 Great job! Don&apos;t lose your progress!</h2>
-                    <p className="text-muted-foreground mb-6 max-w-md">
-                      Sign up to save this flashcard deck and track your study progress with spaced repetition.
-                    </p>
-                    <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full max-w-md justify-center">
-                      <button
-                        title="Sign up to save this deck"
-                        onClick={() => {
-                          if (title && displayedCards) {
-                            const pendingDeck = { title, cards: displayedCards };
-                            localStorage.setItem('cogniguide:pending_flashcards', JSON.stringify(pendingDeck));
-                          }
-                          openAuthModal();
-                        }}
-                        className="flex-1 h-auto sm:h-10 py-2 sm:py-0 px-6 text-base font-bold text-white bg-gradient-primary rounded-full hover:bg-gradient-primary-hover transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/50 whitespace-nowrap"
-                      >
-                        Sign Up & Save Deck
-                      </button>
-                      <button
-                        title="Restart the deck"
-                        onClick={() => {
-                          setFinished(false);
-                          setIndex(0);
-                          setShowAnswer(false);
-                          resetExplanation();
-                          setPredictedDueByGrade({});
-                          setCardsViewedCount(0);
-                          setSignupPromptTriggered(false);
-                          setAnswerShownTime(null);
-                        }}
-                        className="flex-1 h-auto sm:h-10 py-2 sm:py-0 px-6 text-base font-medium text-muted-foreground bg-muted rounded-full hover:bg-muted/70 transition-colors"
-                      >
-                        Start Over
-                      </button>
+                <div />
+              )}
+              <div className="justify-self-center flex flex-col items-center gap-2">
+                {showAnswer ? (
+                  showExplanation ? (
+                    <button
+                      title="Return to answer view"
+                      onClick={handleExplanationBack}
+                      className="inline-flex items-center h-10 px-5 rounded-full text-white bg-primary hover:bg-primary/90 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/50 whitespace-nowrap"
+                    >
+                      Back
+                    </button>
+                  ) : isEditingCard ? (
+                    <div className="flex flex-col items-center justify-center gap-2">
+                      <div className="flex items-center justify-center gap-3 flex-nowrap">
+                        <button
+                          type="button"
+                          onClick={handleCancelEdit}
+                          disabled={isSavingEditedAnswer}
+                          className="h-9 px-4 text-xs rounded-full border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400/50 bg-muted hover:bg-muted/80 disabled:opacity-60 disabled:cursor-not-allowed"
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          type="button"
+                          onClick={handleSaveEdit}
+                          disabled={isSavingEditedAnswer}
+                          className="inline-flex items-center justify-center gap-2 h-9 px-4 text-xs rounded-full text-white bg-primary hover:bg-primary/90 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/50 disabled:opacity-60 disabled:cursor-not-allowed"
+                        >
+                          {isSavingEditedAnswer ? (
+                            <>
+                              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                              <span>Saving…</span>
+                            </>
+                          ) : (
+                            'Save'
+                          )}
+                        </button>
+                      </div>
+                      {editPersistenceError ? (
+                        <span className="text-[11px] text-red-500 dark:text-red-400 text-center">
+                          {editPersistenceError}
+                        </span>
+                      ) : null}
                     </div>
-                  </div>
+                  ) : (
+                    isGenerating && isLastCard ? (
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground h-9 px-3">
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        <span>Generating more...</span>
+                      </div>
+                    ) : (
+                      <div className="flex items-end justify-center gap-3 flex-nowrap">
+                        <div className="flex flex-col items-center">
+                          <span className="text-[11px] text-gray-500 dark:text-gray-400 h-4">{predictedDueByGrade[1] || ''}</span>
+                          <button
+                            onClick={() => handleGrade(1)}
+                            className="h-9 px-3 text-xs rounded-full border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-300/50 flashcard-grade-again"
+                          >
+                            Again
+                          </button>
+                        </div>
+                        <div className="flex flex-col items-center">
+                          <span className="text-[11px] text-gray-500 dark:text-gray-400 h-4">{predictedDueByGrade[2] || ''}</span>
+                          <button
+                            onClick={() => handleGrade(2)}
+                            className="h-9 px-3 text-xs rounded-full border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-300/50 flashcard-grade-hard"
+                          >
+                            Hard
+                          </button>
+                        </div>
+                        <div className="flex flex-col items-center">
+                          <span className="text-[11px] text-gray-500 dark:text-gray-400 h-4">{predictedDueByGrade[3] || ''}</span>
+                          <button
+                            onClick={() => handleGrade(3)}
+                            className="h-9 px-3 text-xs rounded-full border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-300/50 flashcard-grade-good"
+                          >
+                            Good
+                          </button>
+                        </div>
+                        <div className="flex flex-col items-center">
+                          <span className="text-[11px] text-gray-500 dark:text-gray-400 h-4">{predictedDueByGrade[4] || ''}</span>
+                          <button
+                            onClick={() => handleGrade(4)}
+                            className="h-9 px-3 text-xs rounded-full border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/50 flashcard-grade-easy"
+                          >
+                            Easy
+                          </button>
+                        </div>
+                      </div>
+                    )
+                  )
+                ) : (
+                  <button
+                    onClick={handleShowAnswer}
+                    className="inline-flex items-center h-10 px-5 rounded-full text-white bg-primary hover:bg-primary/90 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/50 whitespace-nowrap"
+                  >
+                    <Eye className="h-5 w-5 mr-2" /> Show Answer
+                  </button>
+                )}
+              </div>
+              {!showAnswer ? (
+                <div className="justify-self-end">
+                  <button
+                    onClick={handleNextCard}
+                    disabled={isGenerating && isLastCard}
+                    className="inline-flex items-center justify-center h-10 w-10 sm:w-auto sm:px-4 rounded-full border border-border bg-background text-foreground hover:bg-muted/50 dark:hover:bg-muted/80 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400/50 disabled:opacity-60 disabled:cursor-not-allowed"
+                    title={isGenerating && isLastCard ? "Waiting for more cards..." : "Skip to next card"}
+                  >
+                    {isGenerating && isLastCard ? (
+                      <Loader2 className="h-5 w-5 animate-spin" />
+                    ) : (
+                      <>
+                        <span className="hidden sm:inline">Next</span>
+                        <ChevronRight className="h-5 w-5 sm:ml-2" />
+                      </>
+                    )}
+                  </button>
                 </div>
+              ) : (
+                <div />
               )}
             </div>
           ) : (
-            <div className="w-full">
-              <div className="relative mx-auto rounded-[1.35rem] p-[1.5px] bg-gradient-to-br from-indigo-200 via-sky-200 to-emerald-200">
-                <div className="bg-background border border-border rounded-[1.25rem] shadow p-5 sm:p-6 min-h-[180px] sm:min-h-[200px] flex flex-col">
-                  {showExplanation ? (
-                    <div className="flex-1 flex flex-col">
-                      <div
-                        ref={answerRef}
-                        className={`flex-1 ${
-                          isEmbedded ? 'overflow-visible' : 'overflow-y-auto'
-                        } text-sm text-foreground flashcard-katex-content`}
-                      >
-                        <div className="space-y-3">
-                          {explanation ? (
-                            <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
-                              {explanation}
-                            </ReactMarkdown>
-                          ) : null}
-                          {(!explanation || isExplaining) ? (
-                            <div className="flex items-center gap-2 text-muted-foreground">
-                              <Loader2 className="h-4 w-4 animate-spin" />
-                              {explanation ? 'Finishing explanation…' : 'Generating explanation…'}
-                            </div>
-                          ) : null}
-                        </div>
-                      </div>
-                    </div>
-                  ) : (
-                    <>
-                      {isEditingCard ? (
-                        <textarea
-                          ref={editedQuestionRef}
-                          value={editedQuestion}
-                          onChange={handleEditedQuestionChange}
-                          rows={2}
-                          className="w-full rounded-xl border border-border bg-background px-3 py-2 text-lg sm:text-[22px] font-semibold leading-7 sm:leading-snug focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-300/50 resize-vertical"
-                          aria-label="Question text"
-                        />
-                      ) : (
-                        <div
-                          ref={questionRef}
-                          className="text-foreground text-lg sm:text-[22px] font-semibold leading-7 sm:leading-snug break-words flashcard-katex-content"
-                        >
-                          {questionContent}
-                        </div>
-                      )}
-                      <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-                        {showAnswer && !showExplanation && !isEditingCard ? (
-                          <>
-                            <button
-                              onClick={handleExplain}
-                              disabled={isExplaining}
-                              className="inline-flex items-center gap-1.5 h-6 px-3 rounded-full border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-300/50 flashcard-grade-good disabled:cursor-not-allowed"
-                            >
-                              {isExplaining ? (
-                                <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                              ) : (
-                                !isPaidUser ? <Lock className="h-3.5 w-3.5" aria-hidden="true" /> : null
-                              )}
-                              <span>{explanationButtonLabel}</span>
-                            </button>
-                            <button
-                              type="button"
-                              onClick={handleStartEdit}
-                              className="inline-flex items-center justify-center h-6 w-6 rounded-full border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-300/50 flashcard-grade-good"
-                              title="Edit in your own words"
-                              aria-label="Edit question and answer"
-                            >
-                              <Pencil className="h-3.5 w-3.5" aria-hidden="true" />
-                              <span className="sr-only">Edit question and answer</span>
-                            </button>
-                          </>
-                        ) : null}
-                        {showAnswer && explanationError && !isExplaining ? (
-                          <span className="text-red-500 dark:text-red-400">{explanationError}</span>
-                        ) : null}
-                      </div>
-                      {showAnswer && (
-                        <div className="mt-4 text-foreground">
-                          <div className="h-px bg-border mb-4" />
-                          <div
-                            ref={answerRef}
-                            className={`${
-                              isEmbedded || isEditingCard
-                                ? 'max-h-none overflow-visible'
-                                : 'max-h-[45vh] overflow-y-auto'
-                            } text-sm text-foreground flashcard-katex-content`}
-                          >
-                            {isEditingCard ? (
-                              <textarea
-                                ref={editedAnswerRef}
-                                value={editedAnswer}
-                                onChange={handleEditedAnswerChange}
-                                rows={3}
-                                className="w-full rounded-xl border border-border bg-background px-3 py-2 text-sm leading-6 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-300/50 resize-vertical"
-                                aria-label="Answer text"
-                              />
-                            ) : (
-                              <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
-                                {answerContent || ''}
-                              </ReactMarkdown>
-                            )}
-                          </div>
-                        </div>
-                      )}
-                    </>
-                  )}
-                </div>
-              </div>
-            </div>
+            <div />
           )}
         </div>
-
-        {hasCards && !finished ? (
-          <div className="w-full max-w-3xl mx-auto mt-4 grid grid-cols-3 items-center gap-2 sm:gap-3">
-            {!showAnswer ? (
-              <div className="justify-self-start">
-                <button
-                  title="Go to previous card"
-                  onClick={handlePrevCard}
-                  disabled={!canGoPrev}
-                  className="inline-flex items-center justify-center h-10 w-10 sm:w-auto sm:px-4 rounded-full border border-border bg-background text-foreground hover:bg-muted/50 dark:hover:bg-muted/80 disabled:opacity-60 disabled:cursor-not-allowed transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400/50"
-                >
-                  <ChevronLeft className="h-5 w-5 sm:mr-2" />
-                  <span className="hidden sm:inline">Prev</span>
-                </button>
-              </div>
-            ) : (
-              <div />
-            )}
-            <div className="justify-self-center flex flex-col items-center gap-2">
-              {showAnswer ? (
-                showExplanation ? (
-                  <button
-                    title="Return to answer view"
-                    onClick={handleExplanationBack}
-                    className="inline-flex items-center h-10 px-5 rounded-full text-white bg-primary hover:bg-primary/90 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/50 whitespace-nowrap"
-                  >
-                    Back
-                  </button>
-                ) : isEditingCard ? (
-                  <div className="flex flex-col items-center justify-center gap-2">
-                    <div className="flex items-center justify-center gap-3 flex-nowrap">
-                      <button
-                        type="button"
-                        onClick={handleCancelEdit}
-                        disabled={isSavingEditedAnswer}
-                        className="h-9 px-4 text-xs rounded-full border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400/50 bg-muted hover:bg-muted/80 disabled:opacity-60 disabled:cursor-not-allowed"
-                      >
-                        Cancel
-                      </button>
-                      <button
-                        type="button"
-                        onClick={handleSaveEdit}
-                        disabled={isSavingEditedAnswer}
-                        className="inline-flex items-center justify-center gap-2 h-9 px-4 text-xs rounded-full text-white bg-primary hover:bg-primary/90 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/50 disabled:opacity-60 disabled:cursor-not-allowed"
-                      >
-                        {isSavingEditedAnswer ? (
-                          <>
-                            <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                            <span>Saving…</span>
-                          </>
-                        ) : (
-                          'Save'
-                        )}
-                      </button>
-                    </div>
-                    {editPersistenceError ? (
-                      <span className="text-[11px] text-red-500 dark:text-red-400 text-center">
-                        {editPersistenceError}
-                      </span>
-                    ) : null}
-                  </div>
-                ) : (
-                  <div className="flex items-end justify-center gap-3 flex-nowrap">
-                    <div className="flex flex-col items-center">
-                      <span className="text-[11px] text-gray-500 dark:text-gray-400 h-4">{predictedDueByGrade[1] || ''}</span>
-                      <button
-                        onClick={() => handleGrade(1)}
-                        className="h-9 px-3 text-xs rounded-full border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-300/50 flashcard-grade-again"
-                      >
-                        Again
-                      </button>
-                    </div>
-                    <div className="flex flex-col items-center">
-                      <span className="text-[11px] text-gray-500 dark:text-gray-400 h-4">{predictedDueByGrade[2] || ''}</span>
-                      <button
-                        onClick={() => handleGrade(2)}
-                        className="h-9 px-3 text-xs rounded-full border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-300/50 flashcard-grade-hard"
-                      >
-                        Hard
-                      </button>
-                    </div>
-                    <div className="flex flex-col items-center">
-                      <span className="text-[11px] text-gray-500 dark:text-gray-400 h-4">{predictedDueByGrade[3] || ''}</span>
-                      <button
-                        onClick={() => handleGrade(3)}
-                        className="h-9 px-3 text-xs rounded-full border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-300/50 flashcard-grade-good"
-                      >
-                        Good
-                      </button>
-                    </div>
-                    <div className="flex flex-col items-center">
-                      <span className="text-[11px] text-gray-500 dark:text-gray-400 h-4">{predictedDueByGrade[4] || ''}</span>
-                      <button
-                        onClick={() => handleGrade(4)}
-                        className="h-9 px-3 text-xs rounded-full border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/50 flashcard-grade-easy"
-                      >
-                        Easy
-                      </button>
-                    </div>
-                  </div>
-                )
-              ) : (
-                <button
-                  onClick={handleShowAnswer}
-                  className="inline-flex items-center h-10 px-5 rounded-full text-white bg-primary hover:bg-primary/90 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/50 whitespace-nowrap"
-                >
-                  <Eye className="h-5 w-5 mr-2" /> Show Answer
-                </button>
-              )}
-            </div>
-            {!showAnswer ? (
-              <div className="justify-self-end">
-                <button
-                  onClick={handleNextCard}
-                  className="inline-flex items-center justify-center h-10 w-10 sm:w-auto sm:px-4 rounded-full border border-border bg-background text-foreground hover:bg-muted/50 dark:hover:bg-muted/80 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400/50"
-                  title="Skip to next card"
-                >
-                  <span className="hidden sm:inline">Next</span>
-                  <ChevronRight className="h-5 w-5 sm:ml-2" />
-                </button>
-              </div>
-            ) : (
-              <div />
-            )}
-          </div>
-        ) : (
-          <div />
-        )}
       </div>
-    </div>
-  );
+    );
   };
 
   const katexAlignmentStyles = `
