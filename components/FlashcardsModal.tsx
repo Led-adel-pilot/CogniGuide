@@ -164,6 +164,7 @@ type Props = {
   isEmbedded?: boolean;
   onShare?: () => void;
   isPaidUser?: boolean;
+  isTrialUser?: boolean;
   onRequireUpgrade?: (reason?: string) => void;
   mindMapModelChoice?: ModelChoice;
   linkedMindMapId?: string | null;
@@ -172,7 +173,7 @@ type Props = {
   explanations?: FlashcardExplanationMap | null;
 };
 
-export default function FlashcardsModal({ open, title, cards, isGenerating = false, error, onClose, onReviewDueCards, deckId, initialIndex, studyDueOnly = false, studyInterleaved = false, interleavedDecks, dueIndices, isEmbedded = false, onShare, isPaidUser = false, onRequireUpgrade, mindMapModelChoice = 'fast', linkedMindMapId, linkedMindMapMarkdown, onMindMapLinked, explanations }: Props) {
+export default function FlashcardsModal({ open, title, cards, isGenerating = false, error, onClose, onReviewDueCards, deckId, initialIndex, studyDueOnly = false, studyInterleaved = false, interleavedDecks, dueIndices, isEmbedded = false, onShare, isPaidUser = false, isTrialUser = false, onRequireUpgrade, mindMapModelChoice = 'fast', linkedMindMapId, linkedMindMapMarkdown, onMindMapLinked, explanations }: Props) {
   const [index, setIndex] = React.useState(0);
   const [showAnswer, setShowAnswer] = React.useState(false);
   const [showExplanation, setShowExplanation] = React.useState(false);
@@ -2296,6 +2297,7 @@ export default function FlashcardsModal({ open, title, cards, isGenerating = fal
                               <button
                                 onClick={handleExplain}
                                 disabled={isExplaining}
+                                title={!isPaidUser || isTrialUser ? '✨ Premium feature' : undefined}
                                 className="inline-flex items-center gap-1.5 h-6 px-3 rounded-full border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-300/50 flashcard-grade-good disabled:cursor-not-allowed"
                               >
                                 {isExplaining ? (

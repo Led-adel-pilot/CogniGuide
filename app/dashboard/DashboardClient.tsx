@@ -184,6 +184,7 @@ export default function DashboardClient() {
   const isTrialModalOpenRef = useRef<boolean>(false);
   const firstStudyModalOpenedAtRef = useRef<number | null>(null);
   const hasRecordedFirstStudyOpenRef = useRef<boolean>(false);
+  const isTrialUser = userTier === 'trial';
   const isPaidUser = userTier === 'paid' || userTier === 'trial';
   const balanceDisplay = isPaidUser
     ? (Math.floor(credits * 10) / 10).toFixed(1)
@@ -2407,6 +2408,7 @@ export default function DashboardClient() {
         initialIndex={initialDueIndex}
         onShare={activeDeckId && activeDeckId !== 'interleaved-session' ? () => setShareItem({ id: activeDeckId, type: 'flashcards', title: flashcardsTitle ?? null }) : undefined}
         isPaidUser={isPaidUser}
+        isTrialUser={isTrialUser}
         onRequireUpgrade={(reason) =>
           openPricingModal({
             name: 'flashcards_modal',
