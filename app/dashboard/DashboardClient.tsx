@@ -8,7 +8,7 @@ import Generator from '@/components/Generator';
 import MindMapModal from '@/components/MindMapModal';
 import FlashcardsModal, { Flashcard as FlashcardType } from '@/components/FlashcardsModal';
 import ShareLinkDialog from '@/components/ShareLinkDialog';
-import { BrainCircuit, LogOut, Loader2, Map as MapIcon, Coins, Zap, Sparkles, CalendarClock, Menu, X, ChevronRight, MoreHorizontal, Edit, Trash2, Share2, Copy, Check, Gift, TrendingUp, Mail, FileText, Lock, ChevronDown } from 'lucide-react';
+import { BrainCircuit, LogOut, Loader2, Map as MapIcon, Coins, Zap, Sparkles, CalendarClock, Menu, X, ChevronRight, MoreHorizontal, Edit, Trash2, Share2, Copy, Check, Gift, TrendingUp, Mail, FileText, Lock, ChevronDown, Crown } from 'lucide-react';
 import FlashcardIcon from '@/components/FlashcardIcon';
 import { loadDeckSchedule, saveDeckSchedule, loadDeckScheduleAsync, saveDeckScheduleAsync, loadAllDeckSchedulesAsync, upsertDeckSchedulesBulkAsync, type StoredDeckSchedule } from '@/lib/sr-store';
 import { createInitialSchedule } from '@/lib/spaced-repetition';
@@ -2107,18 +2107,28 @@ export default function DashboardClient() {
             onClick={() => setIsSettingsOpen(true)}
             className="w-full text-left pl-2 pr-2 py-2 rounded-xl hover:bg-muted/50 flex items-center gap-3 transition-colors"
           >
-            <div className="relative h-7 w-7 rounded-full overflow-hidden bg-muted flex items-center justify-center text-sm font-medium text-foreground/80">
-              {avatarUrl ? (
-                <Image
-                  src={avatarUrl}
-                  alt={`${displayName} avatar`}
-                  fill
-                  sizes="28px"
-                  className="object-cover"
-                  unoptimized
-                />
-              ) : (
-                <span>{displayInitials}</span>
+            <div className="relative">
+              <div className={cn(
+                "relative h-7 w-7 rounded-full overflow-hidden bg-muted flex items-center justify-center text-sm font-medium text-foreground/80",
+                isPaidUser && "ring-2 ring-primary ring-offset-2 ring-offset-background"
+              )}>
+                {avatarUrl ? (
+                  <Image
+                    src={avatarUrl}
+                    alt={`${displayName} avatar`}
+                    fill
+                    sizes="28px"
+                    className="object-cover"
+                    unoptimized
+                  />
+                ) : (
+                  <span>{displayInitials}</span>
+                )}
+              </div>
+              {isPaidUser && (
+                <div className="absolute -top-1.5 -right-1.5 bg-primary text-primary-foreground rounded-full p-[2px] shadow-sm border border-background z-10">
+                  <Crown className="h-2.5 w-2.5 fill-current" />
+                </div>
               )}
             </div>
             <div className="min-w-0 flex-1">
