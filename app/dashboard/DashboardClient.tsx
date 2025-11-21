@@ -2394,13 +2394,16 @@ export default function DashboardClient() {
                   if (diffDays <= 2 && diffDays >= 0) {
                     trialWarning = (
                       <div className="flex justify-center w-full">
-                        <div
-                          className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-100 text-amber-700 border border-amber-200 text-sm font-semibold cursor-help transition-colors hover:bg-amber-200 shadow-sm dark:bg-amber-500/20 dark:text-amber-100 dark:border-amber-500/40 dark:hover:bg-amber-500/30"
+                        <button
+                          type="button"
+                          onClick={() => openPricingModal({ name: 'trial_expiring_pill' })}
+                          className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-100 text-amber-700 border border-amber-200 text-sm font-semibold cursor-pointer transition-colors hover:bg-amber-200 shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:ring-offset-2 focus-visible:ring-offset-background dark:bg-amber-500/20 dark:text-amber-100 dark:border-amber-500/40 dark:hover:bg-amber-500/30"
                           title="You are currently exceeding the Free plan limits. Upgrade to keep these credits valid."
+                          aria-label="Open pricing to keep your trial benefits"
                         >
                           <CalendarClock className="h-4 w-4" />
                           <span>Trial ends in {diffDays} {diffDays === 1 ? 'day' : 'days'}</span>
-                        </div>
+                        </button>
                       </div>
                     );
                   }

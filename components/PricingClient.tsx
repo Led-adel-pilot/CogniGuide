@@ -176,7 +176,7 @@ export default function PricingClient({ onPurchaseComplete, context = 'page' }: 
           subscription_status: currentSubscription.status,
           ...properties,
         });
-      } catch {}
+      } catch { }
     },
     [billingCycle, context, currentSubscription.cycle, currentSubscription.plan, currentSubscription.status, isAuthed],
   );
@@ -388,7 +388,7 @@ export default function PricingClient({ onPurchaseComplete, context = 'page' }: 
       if (!Number.isFinite(perDay)) return null;
       const formattedValue = perDay.toFixed(2);
       const currencyValue = `${parsed.prefix ?? ''}${formattedValue}${parsed.suffix ?? ''}`.trim();
-      return `≈ ${currencyValue} per day - Less than one coffee per week`;
+      return `≈ ${currencyValue} per day - Less than one coffee per week!`;
     },
     [billingCycle, prices]
   );
@@ -448,9 +448,8 @@ export default function PricingClient({ onPurchaseComplete, context = 'page' }: 
           <div className="inline-flex items-center billing-toggle-bg rounded-full p-1">
             <button
               type="button"
-              className={`px-4 py-2 text-sm rounded-full billing-toggle-button ${
-                billingCycle === 'month' ? 'billing-toggle-active' : ''
-              }`}
+              className={`px-4 py-2 text-sm rounded-full billing-toggle-button ${billingCycle === 'month' ? 'billing-toggle-active' : ''
+                }`}
               onClick={() => {
                 if (billingCycle === 'month') return;
                 setBillingCycle('month');
@@ -461,9 +460,8 @@ export default function PricingClient({ onPurchaseComplete, context = 'page' }: 
             </button>
             <button
               type="button"
-              className={`px-4 py-2 text-sm rounded-full billing-toggle-button ${
-                billingCycle === 'year' ? 'billing-toggle-active' : ''
-              }`}
+              className={`px-4 py-2 text-sm rounded-full billing-toggle-button ${billingCycle === 'year' ? 'billing-toggle-active' : ''
+                }`}
               onClick={() => {
                 if (billingCycle === 'year') return;
                 setBillingCycle('year');
@@ -492,9 +490,8 @@ export default function PricingClient({ onPurchaseComplete, context = 'page' }: 
             <button
               onClick={() => handleChoosePlan('pro')}
               disabled={isButtonDisabled('pro')}
-              className={`mb-2 w-full rounded-full border border-primary bg-background py-2 text-sm font-semibold text-primary shadow transition ${
-                isButtonDisabled('pro') ? 'opacity-60 cursor-not-allowed' : 'hover:bg-primary/10'
-              }`}
+              className={`mb-2 w-full rounded-full border border-primary bg-background py-2 text-sm font-semibold text-primary shadow transition ${isButtonDisabled('pro') ? 'opacity-60 cursor-not-allowed' : 'hover:bg-primary/10'
+                }`}
             >
               {getButtonLabel('pro')}
             </button>
@@ -512,11 +509,10 @@ export default function PricingClient({ onPurchaseComplete, context = 'page' }: 
 
           {/* Student (Most Popular) */}
           <div
-            className={`relative flex h-full flex-col rounded-[1.25rem] ${
-              isCurrentPaidPlan('student')
+            className={`relative flex h-full flex-col rounded-[1.25rem] ${isCurrentPaidPlan('student')
                 ? 'border bg-background p-6 shadow-sm'
                 : 'border-2 border-primary bg-primary/5 p-6 shadow-lg ring-2 ring-primary/20 dark:bg-primary/20'
-            }`}
+              }`}
           >
             {!isCurrentPaidPlan('student') && (
               <div className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full border border-primary bg-primary text-primary-foreground px-3 py-1 text-xs font-semibold shadow">Most popular</div>
@@ -540,9 +536,8 @@ export default function PricingClient({ onPurchaseComplete, context = 'page' }: 
             <button
               onClick={() => handleChoosePlan('student')}
               disabled={isButtonDisabled('student')}
-              className={`mb-2 w-full rounded-full bg-primary py-2 text-sm font-semibold text-white shadow transition ${
-                isButtonDisabled('student') ? 'opacity-60 cursor-not-allowed' : 'hover:bg-primary/90'
-              }`}
+              className={`mb-2 w-full rounded-full bg-primary py-2 text-sm font-semibold text-white shadow transition ${isButtonDisabled('student') ? 'opacity-60 cursor-not-allowed' : 'hover:bg-primary/90'
+                }`}
             >
               {getButtonLabel('student')}
             </button>
