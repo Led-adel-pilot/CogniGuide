@@ -14,6 +14,7 @@ import { loadDeckSchedule, saveDeckSchedule, loadDeckScheduleAsync, saveDeckSche
 import { createInitialSchedule } from '@/lib/spaced-repetition';
 import PricingModal from '@/components/PricingModal';
 import ReverseTrialModal from '@/components/ReverseTrialModal';
+import ReverseTrialEndModal from '@/components/ReverseTrialEndModal';
 import { requestTooltipHide } from '@/components/TooltipLayer';
 import { PAID_SUBSCRIPTION_STATUSES, type ModelChoice } from '@/lib/plans';
 import CogniGuideLogo from '../../CogniGuide_logo.png';
@@ -175,9 +176,12 @@ export default function DashboardClient() {
   const [isPricingModalOpen, setIsPricingModalOpen] = useState(false);
   const [hoveredModel, setHoveredModel] = useState<ModelChoice | null>(null);
   const [isTrialModalOpen, setIsTrialModalOpen] = useState(false);
+  const [isReverseTrialEndModalOpen, setIsReverseTrialEndModalOpen] = useState(false);
+  const [trialEndStats, setTrialEndStats] = useState<{ mindmaps: number; flashcards: number; explanations: number }>({ mindmaps: 0, flashcards: 0, explanations: 0 });
   const [trialModalEligible, setTrialModalEligible] = useState(false);
   const [hasGeneratedThisSession, setHasGeneratedThisSession] = useState(false);
   const trialModalSeenKeyRef = useRef<string | null>(null);
+  const trialEndModalSeenKeyRef = useRef<string | null>(null);
   const trialModalEligibleRef = useRef<boolean>(false);
   const hasGeneratedThisSessionRef = useRef<boolean>(false);
   const trialModalTimeoutRef = useRef<number | null>(null);
@@ -693,6 +697,7 @@ export default function DashboardClient() {
       setIsTrialModalOpen(false);
       setTrialModalEligible(false);
       trialModalSeenKeyRef.current = null;
+      setIsReverseTrialEndModalOpen(false);
       return;
     }
     const key = `cogniguide_trial_modal_${user.id}_${trialEndsAt}`;
@@ -707,7 +712,73 @@ export default function DashboardClient() {
     if (seen) {
       setIsTrialModalOpen(false);
     }
-  }, [user?.id, trialEndsAt, userTier]);
+
+    // Check for Reverse Trial End Modal (Day 7)
+    const end = new Date(trialEndsAt);
+    const now = new Date();
+    const diffTime = end.getTime() - now.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    // If 1 day or less remaining (meaning today or tomorrow it expires), trigger "Day 7" modal
+    // The trial is 7 days. If diffDays <= 1, we are at the end.
+    if (diffDays <= 1) {
+      const endModalKey = `cogniguide_trial_end_modal_seen_${user.id}_${trialEndsAt}`;
+      trialEndModalSeenKeyRef.current = endModalKey;
+      let endSeen = false;
+      try {
+        if (typeof window !== 'undefined') {
+          endSeen = localStorage.getItem(endModalKey) === '1';
+        }
+      } catch { }
+
+      if (!endSeen && !tierLoading) {
+        // Calculate stats and show modal
+        const calculateStats = async () => {
+          try {
+            // Mindmaps count
+            const { count: mindmapsCount } = await supabase
+              .from('mindmaps')
+              .select('*', { count: 'exact', head: true })
+              .eq('user_id', user.id);
+
+            // Flashcards count and explanations count
+            // We use flashcardsHistory which should be populated by now or we can fetch fresh
+            // Since this might run before flashcardsHistory is fully populated, let's fetch explicitly if needed
+            // But loadAllFlashcardsOnly is called on init. We can wait or just fetch.
+            // To be safe and accurate, let's fetch lightweight data.
+            const { data: fcData } = await supabase
+              .from('flashcards')
+              .select('explanations')
+              .eq('user_id', user.id);
+
+            let flashcardsCount = 0;
+            let explanationsCount = 0;
+
+            if (fcData) {
+              flashcardsCount = fcData.length;
+              fcData.forEach((row: any) => {
+                if (row.explanations && typeof row.explanations === 'object') {
+                  explanationsCount += Object.keys(row.explanations).length;
+                }
+              });
+            }
+
+            setTrialEndStats({
+              mindmaps: mindmapsCount || 0,
+              flashcards: flashcardsCount,
+              explanations: explanationsCount
+            });
+            setIsReverseTrialEndModalOpen(true);
+            // Mark as seen immediately to prevent double show on reload if they don't act?
+            // Or mark seen on close? The prompt implies "On login", so once per session/day.
+            // Marking on close is safer.
+          } catch (e) {
+            console.error("Failed to calculate trial stats", e);
+          }
+        };
+        calculateStats();
+      }
+    }
+  }, [user?.id, trialEndsAt, userTier, tierLoading]);
 
   useEffect(() => {
     if (!trialModalEligible) return;
@@ -754,6 +825,21 @@ export default function DashboardClient() {
     setIsTrialModalOpen(false);
     setTrialModalEligible(false);
   }, [cancelTrialModalTimeout]);
+
+  const handleDismissReverseTrialEndModal = useCallback(() => {
+    const key = trialEndModalSeenKeyRef.current;
+    if (key && typeof window !== 'undefined') {
+      try {
+        localStorage.setItem(key, '1');
+      } catch { }
+    }
+    setIsReverseTrialEndModalOpen(false);
+  }, []);
+
+  const handleUpgradeFromEndModal = useCallback(() => {
+    handleDismissReverseTrialEndModal();
+    openPricingModal({ name: 'reverse_trial_end_modal' });
+  }, [handleDismissReverseTrialEndModal, openPricingModal]);
 
   const maybeOpenTrialModalAfterContentClose = useCallback(() => {
     cancelTrialModalTimeout();
@@ -2878,6 +2964,12 @@ export default function DashboardClient() {
         open={isTrialModalOpen && Boolean(user && trialEndsAt)}
         onClose={handleDismissTrialModal}
         trialEndsAt={trialEndsAt}
+      />
+      <ReverseTrialEndModal
+        open={isReverseTrialEndModalOpen && Boolean(user && trialEndsAt)}
+        onClose={handleDismissReverseTrialEndModal}
+        onUpgrade={handleUpgradeFromEndModal}
+        stats={trialEndStats}
       />
     </div >
   );
