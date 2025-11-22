@@ -221,7 +221,7 @@ export async function generateMetadata({
       const baseMetadata = withCanonical(mindMapHierarchyMetadataBase, hub.path);
       return {
         ...baseMetadata,
-        title: `${hub.name} Mind Map Hub | CogniGuide`,
+        title: `${hub.name} Mind Map Hub`,
         description: hub.metaDescription,
       };
     }
@@ -236,7 +236,7 @@ export async function generateMetadata({
       const baseMetadata = withCanonical(mindMapHierarchyMetadataBase, resolved.subhub.path);
       return {
         ...baseMetadata,
-        title: `${resolved.subhub.name} Mind Maps | ${resolved.hub.name} | CogniGuide`,
+        title: `${resolved.subhub.name} Mind Maps | ${resolved.hub.name}`,
         description: resolved.subhub.metaDescription,
       };
     }

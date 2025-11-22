@@ -254,13 +254,13 @@ export const getMindMapBreadcrumbs = (slug: string): MindMapBreadcrumbSegment[] 
 };
 
 export const mindMapsPillarMetadata: Metadata = {
-  title: 'AI Mind Map Templates & Programmatic Landings | CogniGuide',
+  title: 'AI Mind Map Templates & Programmatic Landings',
   description:
     'Browse CogniGuide’s AI mind map landing pages by topic. Upload files or prompts to generate visual outlines, then edit, export, or convert to flashcards.',
 };
 
 export const mindMapHierarchyMetadataBase: Metadata = {
-  title: 'Mind Map Study Hubs | CogniGuide',
+  title: 'Mind Map Study Hubs',
   description:
     'Explore AI mind map hubs organized by study skills, academic subjects, and professional workflows.',
 };

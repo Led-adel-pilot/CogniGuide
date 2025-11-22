@@ -17,8 +17,13 @@ export function buildProgrammaticMetadata(
   const canonical = metadata.canonical ?? absoluteUrl(path);
   const keywords = metadata.keywords?.length ? metadata.keywords : siteMetadata.keywords;
 
+  let title = metadata.title ?? siteMetadata.title;
+  if (typeof title === 'string') {
+    title = title.replace(/ \| CogniGuide$/i, '').replace(/ - CogniGuide$/i, '');
+  }
+
   return {
-    title: metadata.title ?? siteMetadata.title,
+    title,
     description: metadata.description ?? siteMetadata.description,
     keywords,
     alternates: {

@@ -4,7 +4,7 @@ import MindMapGeneratorLanding from '@/components/MindMapGeneratorLanding';
 import { mindMapGeneratorFaqs } from '@/lib/data/mindMapGeneratorFaqs';
 import { siteMetadata } from '@/lib/siteMetadata';
 
-const pageTitle = 'AI Mind Map Generator & Maker - Create Mind Maps Online | CogniGuide';
+const pageTitle = 'AI Mind Map Generator & Maker - Create Mind Maps Online';
 const pageDescription =
   "Instantly generate interactive mind maps from text, PDFs, and documents with CogniGuide's free AI mind map maker. Jump in and start mapping right away.";
 const pageUrl = `${siteMetadata.url}/ai-mind-map-generator`;
@@ -34,7 +34,7 @@ export const metadata: Metadata = {
     follow: true,
   },
   openGraph: {
-    title: pageTitle,
+    title: `${pageTitle} | ${siteMetadata.name}`,
     description: pageDescription,
     url: pageUrl,
     siteName: siteMetadata.name,
@@ -51,7 +51,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: pageTitle,
+    title: `${pageTitle} | ${siteMetadata.name}`,
     description: pageDescription,
     images: [siteMetadata.ogImage],
   },

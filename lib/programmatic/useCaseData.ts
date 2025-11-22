@@ -220,13 +220,13 @@ export const getFlashcardBreadcrumbs = (slug: string): FlashcardBreadcrumbSegmen
 };
 
 export const flashcardsPillarMetadata: Metadata = {
-  title: 'AI Flashcards & Study Generator | CogniGuide',
+  title: 'AI Flashcards & Study Generator',
   description:
     'Learn how CogniGuide creates AI flashcards with spaced repetition, explore top study workflows, and jump into curated hubs for exams, languages, phonics, and K-5 skills.',
 };
 
 export const flashcardHierarchyMetadataBase: Metadata = {
-  title: 'Flashcard Study Hubs | CogniGuide',
+  title: 'Flashcard Study Hubs',
   description:
     'Browse AI flashcard hubs organized by exam prep, language learning, literacy, STEM, K-5 skills, and more specialized study goals.',
 };

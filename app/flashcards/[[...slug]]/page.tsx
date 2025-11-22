@@ -178,7 +178,7 @@ export async function generateMetadata({
       const baseMetadata = withCanonical(flashcardHierarchyMetadataBase, hub.path);
       return {
         ...baseMetadata,
-        title: `${hub.name} Flashcard Hub | CogniGuide`,
+        title: `${hub.name} Flashcard Hub`,
         description: hub.metaDescription,
       };
     }
@@ -193,7 +193,7 @@ export async function generateMetadata({
       const baseMetadata = withCanonical(flashcardHierarchyMetadataBase, resolved.subhub.path);
       return {
         ...baseMetadata,
-        title: `${resolved.subhub.name} Flashcards | ${resolved.hub.name} | CogniGuide`,
+        title: `${resolved.subhub.name} Flashcards | ${resolved.hub.name}`,
         description: resolved.subhub.metaDescription,
       };
     }

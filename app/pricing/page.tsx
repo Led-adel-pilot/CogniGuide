@@ -1,10 +1,16 @@
+import type { Metadata } from 'next';
 import PricingClient from '../../components/PricingClient';
 import PricingHeader from '../../components/PricingHeader';
 
-export const metadata = {
-  title: 'Pricing — CogniGuide',
+export const metadata: Metadata = {
+  title: 'Pricing',
   description:
     'Compare CogniGuide plans. Free, Student, and Pro tiers with monthly credits to turn notes and documents into mind maps and flashcards.',
+  openGraph: {
+    title: 'Pricing | CogniGuide',
+    description:
+      'Compare CogniGuide plans. Free, Student, and Pro tiers with monthly credits to turn notes and documents into mind maps and flashcards.',
+  },
 };
 
 export default function PricingPage() {
