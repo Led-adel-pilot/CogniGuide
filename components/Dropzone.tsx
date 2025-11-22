@@ -79,6 +79,31 @@ interface DropzoneProps {
   onFileRemove?: (file: File) => void;
 }
 
+function ImagePreview({ file, children }: { file: File, children: React.ReactNode }) {
+  const [preview, setPreview] = useState<string | null>(null);
+
+  useEffect(() => {
+    const objectUrl = URL.createObjectURL(file);
+    setPreview(objectUrl);
+
+    return () => URL.revokeObjectURL(objectUrl);
+  }, [file]);
+
+  if (!preview) {
+    return <>{children}</>;
+  }
+
+  return (
+    <div className="w-14 h-14 relative rounded-xl overflow-hidden shadow-sm border border-border/50 bg-background">
+      <img
+        src={preview}
+        alt={file.name}
+        className="w-full h-full object-cover"
+      />
+    </div>
+  );
+}
+
 export default function Dropzone({ onFileChange, disabled = false, onOpen, isPreParsing = false, uploadProgress, allowedNameSizes, size = 'default', onFileRemove }: DropzoneProps) {
   const [dragIsOver, setDragIsOver] = useState(false);
   const [files, setFiles] = useState<File[]>([]);
@@ -361,7 +386,13 @@ export default function Dropzone({ onFileChange, disabled = false, onOpen, isPre
                       onClick={(e) => e.stopPropagation()} // Prevent opening file dialog when clicking the card
                     >
                       <div className="mb-3 transition-transform duration-300 group-hover:scale-110">
-                        {getFileIcon(file)}
+                        {file.type.startsWith('image/') ? (
+                          <ImagePreview file={file}>
+                            {getFileIcon(file)}
+                          </ImagePreview>
+                        ) : (
+                          getFileIcon(file)
+                        )}
                       </div>
 
                       <div className="w-full px-2">
