@@ -38,7 +38,7 @@ Provides:
 
 ### 6. React Template (`components/MindMapProgrammaticLanding.tsx`)
 Custom skeleton modeled after the flashcard template but with:
-- `EmbeddedMindMap` preview fed solely by `embeddedMindMap.markdown` (no separate title/description fields—use the first parent branch as the visible title).
+- `EmbeddedMindMap` preview fed solely by `embeddedMindMap.markdown` (no separate title/description fields—use the first parent branch as the visible title), now with pan and zoom support.
 - Mind-map specific CTA copy and footer links.
 - Shared navigation, hero typography calculations, FAQ grid, etc.
 
