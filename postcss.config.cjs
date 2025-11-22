@@ -18,7 +18,7 @@ const plugins = {
 if (isProduction) {
   plugins[path.join(__dirname, "purgecss.plugin.cjs")] = {
     content: contentGlobs,
-    defaultExtractor: (content) => content.match(/[\w-/:.%@[\]]+/g) ?? [],
+    defaultExtractor: (content) => content.match(/[\w-/:.%@[\](),]+/g) ?? [],
     safelist: [
       /data-theme/,
       /flashcard-grade-/,
