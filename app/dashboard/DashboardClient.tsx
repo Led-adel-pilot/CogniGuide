@@ -179,15 +179,9 @@ export default function DashboardClient() {
   const [isReverseTrialEndModalOpen, setIsReverseTrialEndModalOpen] = useState(false);
   const [trialEndStats, setTrialEndStats] = useState<{ mindmaps: number; flashcards: number; explanations: number }>({ mindmaps: 0, flashcards: 0, explanations: 0 });
   const [trialModalEligible, setTrialModalEligible] = useState(false);
-  const [hasGeneratedThisSession, setHasGeneratedThisSession] = useState(false);
+
   const trialModalSeenKeyRef = useRef<string | null>(null);
   const trialEndModalSeenKeyRef = useRef<string | null>(null);
-  const trialModalEligibleRef = useRef<boolean>(false);
-  const hasGeneratedThisSessionRef = useRef<boolean>(false);
-  const trialModalTimeoutRef = useRef<number | null>(null);
-  const isTrialModalOpenRef = useRef<boolean>(false);
-  const firstStudyModalOpenedAtRef = useRef<number | null>(null);
-  const hasRecordedFirstStudyOpenRef = useRef<boolean>(false);
   const isTrialUser = userTier === 'trial';
   const isPaidUser = userTier === 'paid' || userTier === 'trial';
   const balanceDisplay = isPaidUser
@@ -220,102 +214,7 @@ export default function DashboardClient() {
   const suppressModelTooltip = isModeMenuOpen || isPricingModalOpen;
   const modelTriggerTooltip = suppressModelTooltip ? undefined : 'Change AI model';
 
-  useEffect(() => {
-    trialModalEligibleRef.current = trialModalEligible;
-  }, [trialModalEligible]);
 
-  useEffect(() => {
-    hasGeneratedThisSessionRef.current = hasGeneratedThisSession;
-  }, [hasGeneratedThisSession]);
-
-  useEffect(() => {
-    isTrialModalOpenRef.current = isTrialModalOpen;
-  }, [isTrialModalOpen]);
-
-  const cancelTrialModalTimeout = useCallback(() => {
-    if (trialModalTimeoutRef.current) {
-      clearTimeout(trialModalTimeoutRef.current);
-      trialModalTimeoutRef.current = null;
-    }
-  }, []);
-
-  useEffect(() => {
-    if (!hasGeneratedThisSession) {
-      hasRecordedFirstStudyOpenRef.current = false;
-      firstStudyModalOpenedAtRef.current = null;
-      cancelTrialModalTimeout();
-    }
-  }, [cancelTrialModalTimeout, hasGeneratedThisSession]);
-
-  useEffect(() => {
-    if (!user?.id || userTier !== 'trial' || !trialEndsAt) {
-      hasRecordedFirstStudyOpenRef.current = false;
-      firstStudyModalOpenedAtRef.current = null;
-      cancelTrialModalTimeout();
-    }
-  }, [cancelTrialModalTimeout, trialEndsAt, user?.id, userTier]);
-
-  const scheduleTrialModalDisplay = useCallback(() => {
-    cancelTrialModalTimeout();
-    if (!trialModalEligibleRef.current) return;
-    if (!hasGeneratedThisSessionRef.current) return;
-    if (!user || userTier !== 'trial' || !trialEndsAt) return;
-    const firstOpenAt = firstStudyModalOpenedAtRef.current;
-    if (!firstOpenAt || !hasRecordedFirstStudyOpenRef.current) return;
-
-    const elapsed = Date.now() - firstOpenAt;
-    const remaining = Math.max(20000 - elapsed, 0);
-
-    const openModal = () => {
-      trialModalTimeoutRef.current = null;
-      if (!trialModalEligibleRef.current) return;
-      if (!hasGeneratedThisSessionRef.current) return;
-      if (!user || userTier !== 'trial' || !trialEndsAt) return;
-      if (isTrialModalOpenRef.current) return;
-      setIsTrialModalOpen(true);
-      setTrialModalEligible(false);
-    };
-
-    if (remaining === 0) {
-      openModal();
-    } else {
-      trialModalTimeoutRef.current = window.setTimeout(openModal, remaining);
-    }
-  }, [cancelTrialModalTimeout, trialEndsAt, user, userTier]);
-
-  useEffect(() => {
-    const studyModalOpen = flashcardsOpen || Boolean(markdown);
-    if (!studyModalOpen) return;
-    if (!hasGeneratedThisSession) return;
-    if (!hasRecordedFirstStudyOpenRef.current) {
-      hasRecordedFirstStudyOpenRef.current = true;
-      firstStudyModalOpenedAtRef.current = Date.now();
-    }
-    scheduleTrialModalDisplay();
-  }, [flashcardsOpen, hasGeneratedThisSession, markdown, scheduleTrialModalDisplay]);
-
-  useEffect(() => {
-    if (!trialModalEligible) {
-      cancelTrialModalTimeout();
-      return;
-    }
-    scheduleTrialModalDisplay();
-  }, [cancelTrialModalTimeout, scheduleTrialModalDisplay, trialModalEligible]);
-
-  useEffect(() => {
-    if (typeof window === 'undefined') {
-      return;
-    }
-    const handleStudyModalOpened = () => {
-      hasRecordedFirstStudyOpenRef.current = true;
-      firstStudyModalOpenedAtRef.current = Date.now();
-      scheduleTrialModalDisplay();
-    };
-    window.addEventListener('cogniguide:study-modal-opened', handleStudyModalOpened);
-    return () => {
-      window.removeEventListener('cogniguide:study-modal-opened', handleStudyModalOpened);
-    };
-  }, [scheduleTrialModalDisplay]);
 
   type PricingModalOpenOptions = {
     name: string;
@@ -676,20 +575,6 @@ export default function DashboardClient() {
 
   useEffect(() => {
     setTrialModalEligible(false);
-    if (!user?.id) {
-      setHasGeneratedThisSession(false);
-      return;
-    }
-
-    let hasGenerated = false;
-    const flagKey = `cogniguide:has_generated_${user.id}`;
-    try {
-      if (typeof window !== 'undefined') {
-        hasGenerated = localStorage.getItem(flagKey) === '1';
-      }
-    } catch { }
-
-    setHasGeneratedThisSession(hasGenerated);
   }, [user?.id]);
 
   useEffect(() => {
@@ -711,6 +596,8 @@ export default function DashboardClient() {
     setTrialModalEligible(!seen);
     if (seen) {
       setIsTrialModalOpen(false);
+    } else {
+      setIsTrialModalOpen(true);
     }
 
     // Check for Reverse Trial End Modal (Day 7)
@@ -780,15 +667,7 @@ export default function DashboardClient() {
     }
   }, [user?.id, trialEndsAt, userTier, tierLoading]);
 
-  useEffect(() => {
-    if (!trialModalEligible) return;
-    if (!user || userTier !== 'trial' || !trialEndsAt) return;
-    if (isTrialModalOpen) return;
-    if (!hasGeneratedThisSession) return;
-    if (flashcardsOpen || Boolean(markdown)) return;
 
-    scheduleTrialModalDisplay();
-  }, [flashcardsOpen, hasGeneratedThisSession, isTrialModalOpen, markdown, scheduleTrialModalDisplay, trialEndsAt, trialModalEligible, user, userTier]);
 
   const persistReferralRedemptionSeen = useCallback(
     async (redemptionId: string, userId: string) => {
@@ -821,10 +700,9 @@ export default function DashboardClient() {
         localStorage.setItem(key, '1');
       } catch { }
     }
-    cancelTrialModalTimeout();
     setIsTrialModalOpen(false);
     setTrialModalEligible(false);
-  }, [cancelTrialModalTimeout]);
+  }, []);
 
   const handleDismissReverseTrialEndModal = useCallback(() => {
     const key = trialEndModalSeenKeyRef.current;
@@ -841,41 +719,7 @@ export default function DashboardClient() {
     openPricingModal({ name: 'reverse_trial_end_modal' });
   }, [handleDismissReverseTrialEndModal, openPricingModal]);
 
-  const maybeOpenTrialModalAfterContentClose = useCallback(() => {
-    cancelTrialModalTimeout();
-    if (!trialModalSeenKeyRef.current) return;
-    if (!trialModalEligibleRef.current) return;
-    if (!hasGeneratedThisSessionRef.current) return;
-    scheduleTrialModalDisplay();
-  }, [cancelTrialModalTimeout, scheduleTrialModalDisplay]);
 
-  useEffect(() => {
-    if (typeof window === 'undefined') {
-      return;
-    }
-    const handleStudyModalClosed = () => {
-      maybeOpenTrialModalAfterContentClose();
-    };
-    window.addEventListener('cogniguide:study-modal-closed', handleStudyModalClosed);
-    return () => {
-      window.removeEventListener('cogniguide:study-modal-closed', handleStudyModalClosed);
-    };
-  }, [maybeOpenTrialModalAfterContentClose]);
-
-  useEffect(() => {
-    cancelTrialModalTimeout();
-    if (!trialModalEligible) return;
-    if (!user || userTier !== 'trial' || !trialEndsAt) return;
-    if (!hasGeneratedThisSessionRef.current) return;
-    if (isTrialModalOpenRef.current) return;
-    if (!(flashcardsOpen || Boolean(markdown))) return;
-
-    scheduleTrialModalDisplay();
-
-    return () => {
-      cancelTrialModalTimeout();
-    };
-  }, [cancelTrialModalTimeout, flashcardsOpen, markdown, scheduleTrialModalDisplay, trialEndsAt, trialModalEligible, user, userTier]);
 
   const showReferralRewardNotice = useCallback((amount: number, redemptionId?: string, userIdOverride?: string) => {
     const key = redemptionId ? `referral:${redemptionId}` : `manual:${amount}`;
@@ -1273,7 +1117,6 @@ export default function DashboardClient() {
 
       // Define event handlers
       handleGenerationComplete = () => {
-        setHasGeneratedThisSession(true);
         const generationFlagUserId = userIdRef.current ?? authed.id ?? null;
         if (generationFlagUserId) {
           try {
