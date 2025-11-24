@@ -91,7 +91,7 @@ export default function ReverseTrialEndModal({ open, onClose, onUpgrade, stats }
               onClick={onClose}
               className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors py-1 px-2 mt-1"
             >
-              Continue with Free plan
+              Switch to limited free plan
             </button>
             <div className="flex flex-col items-center gap-0.5 text-center">
               <button
@@ -99,7 +99,7 @@ export default function ReverseTrialEndModal({ open, onClose, onUpgrade, stats }
                 onClick={onUpgrade}
                 className="flex rounded-full bg-primary px-6 py-2 text-sm font-semibold text-primary-foreground shadow-md shadow-primary/20 hover:bg-primary/90 transition-all hover:scale-[1.01] active:scale-[0.99] max-w-[260px] justify-center whitespace-nowrap"
               >
-                Upgrade & Keep Momentum
+                Upgrade & Keep everything
               </button>
               <span className="text-[11px] leading-tight text-muted-foreground tracking-wide font-medium">Cancel anytime • No hidden fees</span>
             </div>
