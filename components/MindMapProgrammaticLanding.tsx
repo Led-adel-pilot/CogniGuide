@@ -549,6 +549,7 @@ export default function MindMapProgrammaticLanding({ page }: MindMapProgrammatic
                         markdown={heroMindMapMarkdown}
                         initialAutoFitScaleMultiplier={1.65}
                         initialAutoFitCenterBias={{ x: -0.05 }}
+                        interactionMode="full"
                       />
                     </div>
                   </div>

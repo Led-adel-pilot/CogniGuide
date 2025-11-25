@@ -3,6 +3,7 @@
 import '@/styles/mindmap.css';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { initializeMindMap, cleanup } from '@/lib/markmap-renderer';
+import type { InitializeOptions } from '@/lib/markmap-renderer';
 import { ensureKatexAssets } from '@/lib/katex-loader';
 
 interface AutoFitCenterBias {
@@ -14,12 +15,14 @@ interface EmbeddedMindMapProps {
   markdown: string;
   initialAutoFitScaleMultiplier?: number;
   initialAutoFitCenterBias?: AutoFitCenterBias;
+  interactionMode?: InitializeOptions['interactionMode'];
 }
 
 export default function EmbeddedMindMap({
   markdown,
   initialAutoFitScaleMultiplier,
   initialAutoFitCenterBias,
+  interactionMode = 'pan-only',
 }: EmbeddedMindMapProps) {
   const [isLoading, setIsLoading] = useState(true);
   const viewportRef = useRef<HTMLDivElement>(null);
@@ -37,11 +40,11 @@ export default function EmbeddedMindMap({
     if (!viewportRef.current || !containerRef.current) return;
 
     initializeMindMap(markdown, viewportRef.current, containerRef.current, {
-      interactionMode: 'full',
+      interactionMode,
       initialAutoFitScaleMultiplier,
       initialAutoFitCenterBias,
     });
-  }, [initialAutoFitCenterBias, initialAutoFitScaleMultiplier, markdown]);
+  }, [initialAutoFitCenterBias, initialAutoFitScaleMultiplier, interactionMode, markdown]);
 
   useEffect(() => {
     let cancelled = false;
