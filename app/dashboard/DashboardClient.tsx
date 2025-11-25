@@ -35,6 +35,8 @@ type SessionUser = {
   referralLastSeenId?: string | null;
 };
 
+type OnboardingStageState = WizardStage | 'progress';
+
 function getMetadataString(metadata: Record<string, unknown>, key: string): string | null {
   const value = metadata[key];
   return typeof value === 'string' && value.trim().length > 0 ? value.trim() : null;
@@ -182,7 +184,7 @@ export default function DashboardClient() {
   const [trialEndStats, setTrialEndStats] = useState<{ mindmaps: number; flashcards: number; explanations: number }>({ mindmaps: 0, flashcards: 0, explanations: 0 });
   const [trialModalEligible, setTrialModalEligible] = useState(false);
   const [isOnboardingOpen, setIsOnboardingOpen] = useState(false);
-  const [onboardingStage, setOnboardingStage] = useState<WizardStage>('mode');
+  const [onboardingStage, setOnboardingStage] = useState<OnboardingStageState>('mode');
   const [onboardingMode, setOnboardingMode] = useState<WizardModeChoice>(null);
   const [onboardingInputChoice, setOnboardingInputChoice] = useState<WizardInputChoice>(null);
   const [onboardingPrompt, setOnboardingPrompt] = useState('');
