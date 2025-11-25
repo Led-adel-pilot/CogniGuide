@@ -15,6 +15,7 @@ import { createInitialSchedule } from '@/lib/spaced-repetition';
 import PricingModal from '@/components/PricingModal';
 import ReverseTrialModal from '@/components/ReverseTrialModal';
 import ReverseTrialEndModal from '@/components/ReverseTrialEndModal';
+import OnboardingWizardModal, { WizardInputChoice, WizardModeChoice, WizardStage } from '@/components/OnboardingWizardModal';
 import { requestTooltipHide } from '@/components/TooltipLayer';
 import { PAID_SUBSCRIPTION_STATUSES, type ModelChoice } from '@/lib/plans';
 import CogniGuideLogo from '../../CogniGuide_logo.png';
@@ -24,6 +25,7 @@ import ThemeToggle from '@/components/ThemeToggle';
 import { cn, formatDate, formatTime } from '@/lib/utils';
 import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
 import { copyTextToClipboard } from '@/lib/copy-to-clipboard';
+import { GENERATION_INTENT_KEY, rememberFlashcardIntent } from '@/lib/generationIntent';
 
 type SessionUser = {
   id: string;
@@ -179,9 +181,17 @@ export default function DashboardClient() {
   const [isReverseTrialEndModalOpen, setIsReverseTrialEndModalOpen] = useState(false);
   const [trialEndStats, setTrialEndStats] = useState<{ mindmaps: number; flashcards: number; explanations: number }>({ mindmaps: 0, flashcards: 0, explanations: 0 });
   const [trialModalEligible, setTrialModalEligible] = useState(false);
+  const [isOnboardingOpen, setIsOnboardingOpen] = useState(false);
+  const [onboardingStage, setOnboardingStage] = useState<WizardStage>('mode');
+  const [onboardingMode, setOnboardingMode] = useState<WizardModeChoice>(null);
+  const [onboardingInputChoice, setOnboardingInputChoice] = useState<WizardInputChoice>(null);
+  const [onboardingPrompt, setOnboardingPrompt] = useState('');
+  const [awaitingFirstOutcome, setAwaitingFirstOutcome] = useState(false);
 
   const trialModalSeenKeyRef = useRef<string | null>(null);
   const trialEndModalSeenKeyRef = useRef<string | null>(null);
+  const onboardingSeenKeyRef = useRef<string | null>(null);
+  const trialModalShownRef = useRef(false);
   const isTrialUser = userTier === 'trial';
   const isPaidUser = userTier === 'paid' || userTier === 'trial';
   const balanceDisplay = isPaidUser
@@ -213,6 +223,14 @@ export default function DashboardClient() {
       : modelDetails[resolvedHoveredModel].description;
   const suppressModelTooltip = isModeMenuOpen || isPricingModalOpen;
   const modelTriggerTooltip = suppressModelTooltip ? undefined : 'Change AI model';
+  const suggestedTopics = [
+    'Neural networks and backpropagation',
+    'Photosynthesis basics and the Calvin cycle',
+    'World War II causes and turning points',
+    'Cardiovascular system overview',
+  ];
+  const hasGeneratedContent = combinedHistory.length > 0;
+  const onboardingModalOpen = isOnboardingOpen && onboardingStage !== 'progress' && !hasGeneratedContent;
 
 
 
@@ -539,6 +557,16 @@ export default function DashboardClient() {
     referralLastSeenIdRef.current = user?.referralLastSeenId ?? null;
 
     if (user?.id) {
+      onboardingSeenKeyRef.current = `cogniguide_onboarding_seen_${user.id}`;
+    } else {
+      onboardingSeenKeyRef.current = null;
+      setIsOnboardingOpen(false);
+      setOnboardingMode(null);
+      setOnboardingInputChoice(null);
+      setAwaitingFirstOutcome(false);
+    }
+
+    if (user?.id) {
       let cachedTier: 'free' | 'trial' | 'paid' | null = null;
       try {
         if (typeof window !== 'undefined') {
@@ -576,6 +604,12 @@ export default function DashboardClient() {
   useEffect(() => {
     setTrialModalEligible(false);
   }, [user?.id]);
+
+  useEffect(() => {
+    if (isTrialModalOpen) {
+      trialModalShownRef.current = true;
+    }
+  }, [isTrialModalOpen]);
 
   useEffect(() => {
     if (!user?.id || !trialEndsAt || userTier !== 'trial') {
@@ -719,7 +753,159 @@ export default function DashboardClient() {
     openPricingModal({ name: 'reverse_trial_end_modal' });
   }, [handleDismissReverseTrialEndModal, openPricingModal]);
 
+  const markOnboardingSeen = useCallback(() => {
+    const key = onboardingSeenKeyRef.current;
+    if (key && typeof window !== 'undefined') {
+      try {
+        localStorage.setItem(key, '1');
+      } catch { }
+    }
+    setIsOnboardingOpen(false);
+    setAwaitingFirstOutcome(false);
+    setOnboardingStage('mode');
+  }, []);
 
+  const clearGenerationIntent = useCallback(() => {
+    if (typeof window === 'undefined') return;
+    try {
+      window.sessionStorage?.removeItem(GENERATION_INTENT_KEY);
+    } catch { }
+    try {
+      window.localStorage?.removeItem(GENERATION_INTENT_KEY);
+    } catch { }
+  }, []);
+
+  const focusGeneratorArea = useCallback(() => {
+    if (typeof window === 'undefined') return;
+    const generatorNode = document.getElementById('generator-panel');
+    if (generatorNode) {
+      generatorNode.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }, []);
+
+  const synchronizeGeneratorMode = useCallback(
+    (mode: Exclude<WizardModeChoice, null>) => {
+      setOnboardingMode(mode);
+      if (mode === 'flashcards') {
+        rememberFlashcardIntent();
+      } else {
+        clearGenerationIntent();
+      }
+
+      if (typeof window !== 'undefined') {
+        try {
+          const target = document.querySelector(`button[data-mode="${mode}"]`);
+          if (target) {
+            target.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+          }
+        } catch { }
+      }
+
+      setIsOnboardingOpen(true);
+      setOnboardingStage('input');
+      setOnboardingInputChoice(null);
+    },
+    [clearGenerationIntent]
+  );
+
+  const applyPromptToForm = useCallback((promptText: string) => {
+    const trimmed = promptText.trim();
+    if (!trimmed || typeof window === 'undefined') return false;
+    const textarea = document.getElementById('prompt-input') as HTMLTextAreaElement | null;
+    if (!textarea) return false;
+
+    try {
+      const setter = Object.getOwnPropertyDescriptor(window.HTMLTextAreaElement.prototype, 'value')?.set;
+      setter?.call(textarea, trimmed);
+      const inputEvent = new Event('input', { bubbles: true });
+      textarea.dispatchEvent(inputEvent);
+      textarea.focus();
+      return true;
+    } catch {
+      return false;
+    }
+  }, []);
+
+  const handlePromptPrefill = useCallback(
+    (topic: string) => {
+      const normalizedTopic = topic.trim();
+      if (!normalizedTopic) return;
+      const prefix = onboardingMode === 'flashcards' ? 'Generate flashcards about' : 'Create a mind map about';
+      const promptText = `${prefix} ${normalizedTopic}`;
+      setOnboardingPrompt(promptText);
+      setOnboardingInputChoice('prompt');
+      setAwaitingFirstOutcome(true);
+      focusGeneratorArea();
+      setOnboardingStage('progress');
+      setIsOnboardingOpen(false);
+      applyPromptToForm(promptText);
+    },
+    [applyPromptToForm, focusGeneratorArea, onboardingMode]
+  );
+
+  const handleUploadChosen = useCallback(() => {
+    setOnboardingInputChoice('upload');
+    setAwaitingFirstOutcome(true);
+    focusGeneratorArea();
+    setOnboardingStage('progress');
+    setIsOnboardingOpen(false);
+  }, [focusGeneratorArea]);
+
+  const handleOnboardingModeSelect = useCallback(
+    (mode: Exclude<WizardModeChoice, null>) => {
+      synchronizeGeneratorMode(mode);
+      setAwaitingFirstOutcome(false);
+      setOnboardingInputChoice(null);
+      setOnboardingStage('input');
+    },
+    [synchronizeGeneratorMode]
+  );
+
+  const handleBackToModeStage = useCallback(() => {
+    setOnboardingStage('mode');
+    setIsOnboardingOpen(true);
+    setAwaitingFirstOutcome(false);
+    setOnboardingInputChoice(null);
+  }, []);
+
+  const handleCloseOnboardingModal = useCallback(() => {
+    setIsOnboardingOpen(false);
+    if (awaitingFirstOutcome) {
+      setOnboardingStage('progress');
+    }
+  }, [awaitingFirstOutcome]);
+
+  const handleOnboardingPromptChange = useCallback((value: string) => {
+    setOnboardingPrompt(value);
+  }, []);
+
+  useEffect(() => {
+    if (!user?.id || isHistoryInitialLoading) return;
+    if (combinedHistory.length > 0) {
+      markOnboardingSeen();
+    }
+  }, [combinedHistory.length, isHistoryInitialLoading, markOnboardingSeen, user?.id]);
+
+  useEffect(() => {
+    if (!user?.id || isHistoryInitialLoading) return;
+    let onboardingSeen = false;
+    try {
+      if (onboardingSeenKeyRef.current && typeof window !== 'undefined') {
+        onboardingSeen = localStorage.getItem(onboardingSeenKeyRef.current) === '1';
+      }
+    } catch { }
+
+    if (onboardingSeen || combinedHistory.length > 0) return;
+    if (trialModalShownRef.current && isTrialModalOpen) return;
+    if (awaitingFirstOutcome || onboardingStage === 'progress') return;
+    if (isOnboardingOpen) return;
+
+    setIsOnboardingOpen(true);
+    if (!onboardingMode) {
+      setOnboardingMode('mindmap');
+    }
+    setOnboardingStage('mode');
+  }, [awaitingFirstOutcome, combinedHistory.length, isHistoryInitialLoading, isTrialModalOpen, onboardingMode, onboardingStage, user?.id]);
 
   const showReferralRewardNotice = useCallback((amount: number, redemptionId?: string, userIdOverride?: string) => {
     const key = redemptionId ? `referral:${redemptionId}` : `manual:${amount}`;
@@ -2221,7 +2407,7 @@ export default function DashboardClient() {
           <div className="w-6" /> {/* Spacer */}
         </header>
         <div className="container mx-auto px-6 pb-6 mt-16 md:mt-10">
-          <div className="max-w-3xl mx-auto">
+          <div className="max-w-3xl mx-auto" id="generator-panel">
             <div className="relative flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-center mb-8 min-h-[3rem]">
               {(() => {
                 const shouldShowButton = !tierLoading && !isPaidUser;
@@ -2810,6 +2996,21 @@ export default function DashboardClient() {
         open={isTrialModalOpen && Boolean(user && trialEndsAt)}
         onClose={handleDismissTrialModal}
         trialEndsAt={trialEndsAt}
+      />
+      <OnboardingWizardModal
+        open={onboardingModalOpen}
+        stage={onboardingStage === 'progress' ? 'input' : onboardingStage}
+        selectedMode={onboardingMode}
+        inputChoice={onboardingInputChoice}
+        customPrompt={onboardingPrompt}
+        suggestedTopics={suggestedTopics}
+        onBackToMode={handleBackToModeStage}
+        onModeSelect={handleOnboardingModeSelect}
+        onUploadChosen={handleUploadChosen}
+        onPromptPrefill={handlePromptPrefill}
+        onCustomPromptChange={handleOnboardingPromptChange}
+        onSkip={markOnboardingSeen}
+        onClose={handleCloseOnboardingModal}
       />
       <ReverseTrialEndModal
         open={isReverseTrialEndModalOpen && Boolean(user && trialEndsAt)}

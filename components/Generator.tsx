@@ -56,6 +56,7 @@ export default function Generator({
   const lastPreparseKeyRef = useRef<string | null>(null);
   // Cache for file set processing results (keyed by file set combination)
   const processedFileSetsCache = useRef<Map<string, { result: Record<string, unknown>; processedAt: number }>>(new Map());
+  const pendingOnboardingFilesRef = useRef<File[] | null>(null);
 
   // Debug logging in development
   const isDevelopment = process.env.NODE_ENV === 'development';
@@ -886,6 +887,54 @@ export default function Generator({
 
   const requireAuthErrorMessage = 'Please sign up to generate with CogniGuide.';
 
+  // Bridge onboarding modal dropzone files into the main generator flow
+  useEffect(() => {
+    const tryProcessOnboardingFiles = (files: File[]) => {
+      pendingOnboardingFilesRef.current = files;
+      if (isLoading || markdown !== null || flashcardsOpen) return;
+      if (!authChecked) return;
+      if (!isAuthed) {
+        setShowAuth(true);
+        return;
+      }
+      handleFileChange(files);
+      pendingOnboardingFilesRef.current = null;
+    };
+
+    const handleOnboardingFiles = (event: Event) => {
+      const detail = (event as CustomEvent<{ files?: File[] }>).detail;
+      const incomingFiles = detail?.files;
+      if (!incomingFiles || incomingFiles.length === 0) return;
+      tryProcessOnboardingFiles(incomingFiles);
+    };
+
+    if (typeof window !== 'undefined') {
+      (window as any).__cogniguide_onboarding_files = tryProcessOnboardingFiles;
+      window.addEventListener('cogniguide:onboarding-files', handleOnboardingFiles as EventListener);
+    }
+
+    return () => {
+      if (typeof window !== 'undefined') {
+        if ((window as any).__cogniguide_onboarding_files) {
+          delete (window as any).__cogniguide_onboarding_files;
+        }
+        window.removeEventListener('cogniguide:onboarding-files', handleOnboardingFiles as EventListener);
+      }
+    };
+  }, [authChecked, flashcardsOpen, handleFileChange, isAuthed, isLoading, markdown]);
+
+  useEffect(() => {
+    if (!pendingOnboardingFilesRef.current || pendingOnboardingFilesRef.current.length === 0) return;
+    if (isLoading || markdown !== null || flashcardsOpen) return;
+    if (!authChecked) return;
+    if (!isAuthed) {
+      setShowAuth(true);
+      return;
+    }
+    handleFileChange(pendingOnboardingFilesRef.current);
+    pendingOnboardingFilesRef.current = null;
+  }, [authChecked, flashcardsOpen, handleFileChange, isAuthed, isLoading, markdown]);
+
   const handleSubmit = async () => {
     if (authChecked && !isAuthed) {
       setError(requireAuthErrorMessage);
@@ -1513,6 +1562,8 @@ export default function Generator({
               <div className="flex items-center justify-center">
                 <div className="inline-flex p-1 rounded-full border bg-muted/50">
                   <button
+                    type="button"
+                    data-mode="mindmap"
                     onClick={() => {
                       posthog.capture('generation_mode_changed', { new_mode: 'mindmap' });
                       setMode('mindmap');
@@ -1520,6 +1571,8 @@ export default function Generator({
                     className={`px-4 py-1.5 text-sm font-semibold rounded-full transition-colors ${mode==='mindmap' ? 'bg-background text-primary shadow' : 'text-muted-foreground hover:text-primary'}`}
                   >Mind Map</button>
                   <button
+                    type="button"
+                    data-mode="flashcards"
                     onClick={() => {
                       posthog.capture('generation_mode_changed', { new_mode: 'flashcards' });
                       setMode('flashcards');
@@ -1535,6 +1588,7 @@ export default function Generator({
                 uploadProgress={uploadProgress}
                 allowedNameSizes={allowedNameSizes}
                 size={compact ? 'compact' : 'default'}
+                externalFiles={files}
                 onOpen={() => {
                   if (!authChecked) return false;
                   if (!isAuthed) {

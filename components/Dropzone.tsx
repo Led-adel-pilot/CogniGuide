@@ -77,6 +77,10 @@ interface DropzoneProps {
   size?: 'default' | 'compact';
   // Callback when a file is removed (useful for resetting upload states)
   onFileRemove?: (file: File) => void;
+  // Custom id for the hidden file input (avoid collisions when multiple dropzones exist)
+  inputId?: string;
+  // Optional externally-controlled files to display (used when files are added elsewhere)
+  externalFiles?: File[];
 }
 
 function ImagePreview({ file, children }: { file: File, children: React.ReactNode }) {
@@ -104,19 +108,39 @@ function ImagePreview({ file, children }: { file: File, children: React.ReactNod
   );
 }
 
-export default function Dropzone({ onFileChange, disabled = false, onOpen, isPreParsing = false, uploadProgress, allowedNameSizes, size = 'default', onFileRemove }: DropzoneProps) {
+export default function Dropzone({ onFileChange, disabled = false, onOpen, isPreParsing = false, uploadProgress, allowedNameSizes, size = 'default', onFileRemove, inputId = 'dropzone-file', externalFiles }: DropzoneProps) {
   const [dragIsOver, setDragIsOver] = useState(false);
   const [files, setFiles] = useState<File[]>([]);
   const inputRef = useRef<HTMLInputElement | null>(null);
   const [inputKey, setInputKey] = useState(0);
   const [uploadingFileKeys, setUploadingFileKeys] = useState<Set<string>>(new Set());
   const [currentBatchProgress, setCurrentBatchProgress] = useState(0);
+  const isSyncingExternalRef = useRef(false);
 
   const getFileKey = useCallback((file: File) => `${file.name}|${file.size}|${file.lastModified ?? ''}`, []);
 
   useEffect(() => {
+    if (isSyncingExternalRef.current) {
+      isSyncingExternalRef.current = false;
+      return;
+    }
     onFileChange(files);
   }, [files, onFileChange]);
+
+  // Keep internal state in sync when files are provided externally (e.g., onboarding drop)
+  useEffect(() => {
+    if (!externalFiles) return;
+    const currentSig = files.map(getFileKey).join('|');
+    const externalSig = externalFiles.map(getFileKey).join('|');
+    if (currentSig === externalSig) return;
+    isSyncingExternalRef.current = true;
+    setFiles(externalFiles);
+    setUploadingFileKeys(new Set(externalFiles.map(getFileKey)));
+    if (!isPreParsing) {
+      setCurrentBatchProgress(0);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [externalFiles?.length, getFileKey, isPreParsing]);
 
   // Prune files when an allowed list is provided
   useEffect(() => {
@@ -349,7 +373,7 @@ export default function Dropzone({ onFileChange, disabled = false, onOpen, isPre
   return (
     <div className="w-full">
       <label
-        htmlFor="dropzone-file"
+        htmlFor={inputId}
         className={dropzoneClassName}
         onClick={(e) => {
           if (disabled) return;
@@ -458,7 +482,7 @@ export default function Dropzone({ onFileChange, disabled = false, onOpen, isPre
         <input
           key={inputKey}
           ref={inputRef}
-          id="dropzone-file"
+          id={inputId}
           type="file"
           className="hidden"
           onChange={handleFileSelect}

@@ -195,6 +195,7 @@
   .flashcard-grade-hard { @apply dark:border-amber-800 dark:bg-amber-900/30 dark:text-amber-300 dark:hover:bg-amber-900/50; }
   .flashcard-grade-good { @apply dark:border-sky-800 dark:bg-sky-900/30 dark:text-sky-300 dark:hover:bg-sky-900/50; }
   .flashcard-grade-easy { @apply dark:border-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300 dark:hover:bg-emerald-900/50; }
+  .pill-soft-sky { @apply dark:border-sky-800 dark:bg-sky-900/30 dark:text-sky-300 dark:hover:bg-sky-900/50; }
 
   /* Spaced repetition due badge dark-mode override */
   .spaced-due-badge { @apply dark:border-blue-800 dark:bg-blue-900/30 dark:text-blue-300; }
@@ -572,6 +573,7 @@
 .flashcard-grade-hard { @apply border-amber-200 bg-amber-50 text-amber-700 hover:bg-amber-100; }
 .flashcard-grade-good { @apply border-sky-200 bg-sky-50 text-sky-700 hover:bg-sky-100; }
 .flashcard-grade-easy { @apply border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100; }
+.pill-soft-sky { @apply border-sky-200 bg-sky-50 text-sky-700 hover:bg-sky-100; }
 
 /* Scrollbar: transparent track, thicker, shorter track, hover fades */
 @layer base {
