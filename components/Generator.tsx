@@ -118,6 +118,7 @@ export default function Generator({
       ? `${baseCtaTooltip}\n${normalizedFreeGenerations} of ${FREE_PLAN_GENERATIONS} free uses remaining`
       : baseCtaTooltip;
   const isOutOfFreeGenerations = normalizedFreeGenerations === 0 && !resolvedIsPaidSubscriber;
+  const serverIntentHydratedRef = useRef(false);
 
   useEffect(() => {
     const intent = getStoredGenerationIntent();
@@ -129,6 +130,54 @@ export default function Generator({
   useEffect(() => {
     rememberGenerationIntent(mode);
   }, [mode]);
+
+  useEffect(() => {
+    const hydrateIntentFromServer = async () => {
+      if (!authChecked || !isAuthed || !userId || serverIntentHydratedRef.current) return;
+      if (getStoredGenerationIntent()) return;
+      serverIntentHydratedRef.current = true;
+
+      try {
+        const [{ data: latestMindmap }, { data: latestFlashcards }] = await Promise.all([
+          supabase
+            .from('mindmaps')
+            .select('created_at')
+            .eq('user_id', userId)
+            .order('created_at', { ascending: false })
+            .limit(1)
+            .maybeSingle(),
+          supabase
+            .from('flashcards')
+            .select('created_at')
+            .eq('user_id', userId)
+            .order('created_at', { ascending: false })
+            .limit(1)
+            .maybeSingle(),
+        ]);
+
+        const mindmapTime = latestMindmap?.created_at ? new Date(latestMindmap.created_at).getTime() : null;
+        const flashcardsTime = latestFlashcards?.created_at ? new Date(latestFlashcards.created_at).getTime() : null;
+
+        let nextMode: GenerationIntent | null = null;
+        if (mindmapTime !== null && flashcardsTime !== null) {
+          nextMode = mindmapTime >= flashcardsTime ? 'mindmap' : 'flashcards';
+        } else if (mindmapTime !== null) {
+          nextMode = 'mindmap';
+        } else if (flashcardsTime !== null) {
+          nextMode = 'flashcards';
+        }
+
+        if (nextMode && !getStoredGenerationIntent()) {
+          setMode(nextMode);
+        }
+      } catch (error) {
+        serverIntentHydratedRef.current = false;
+        console.error('Failed to hydrate generation intent from server:', error);
+      }
+    };
+
+    hydrateIntentFromServer();
+  }, [authChecked, isAuthed, userId]);
 
   const evaluateLowTextWarning = useCallback((text: string, rawCharCount: number | undefined, fileList?: File[] | null) => {
     if (!fileList || fileList.length === 0) {
