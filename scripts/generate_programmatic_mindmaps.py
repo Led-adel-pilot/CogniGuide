@@ -85,7 +85,7 @@ PSYCHOLOGY-DRIVEN CTR GUIDANCE FOR METADATA:
 5) On-page copy:
 - Hero heading/subheading must clarify the use-case and point to visual outcomes (clarity, alignment, studying).
 - Features section: 3 benefits that speak to inputs (files, prompts), outputs (structure, exports), and downstream actions (teaching, decision-making).
-- How it works: Exactly 3 steps tuned to the CSV row’s context. Emphasize visual transformation, editing, and next action (export/share/flashcards).
+- How it works: Exactly 3 steps tuned to the CSV row’s context. Emphasize visual transformation, AI generation, and next action (export/share).
 - SEO section: Body paragraphs + list should reference adjacent keywords (concept maps, idea maps, brainstorming, curriculum planning, etc.).
 - FAQ: 4 topic-specific Q&As. Show empathy for blockers (format support, collaboration, exporting, reliability).
 
@@ -108,7 +108,7 @@ Return JSON with this shape (comments describe expectations). The slug, path, an
   },
   "hero": {
     "heading": string,        // contains the target keyword or closest variant
-    "subheading": string,
+    "subheading": string,   // Naturally mentions the core value (Upload PDF or any document and AI converts it into a mind map)
     "primaryCta": { "type": "modal", "label": "Generate mind map" }
   },
   "featuresSection": {
