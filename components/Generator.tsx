@@ -8,7 +8,7 @@ import Dropzone from '@/components/Dropzone';
 import PromptForm from '@/components/PromptForm';
 import { supabase } from '@/lib/supabaseClient';
 import { FREE_PLAN_GENERATIONS, type ModelChoice } from '@/lib/plans';
-import { getStoredGenerationIntent } from '@/lib/generationIntent';
+import { getStoredGenerationIntent, rememberGenerationIntent, type GenerationIntent } from '@/lib/generationIntent';
 import { AlertTriangle, Sparkles } from 'lucide-react';
 import type AuthModalComponent from '@/components/AuthModal';
 import type MindMapModalComponent from '@/components/MindMapModal';
@@ -86,10 +86,7 @@ export default function Generator({
   const [isAuthed, setIsAuthed] = useState(false);
   const [isPaidSubscriberState, setIsPaidSubscriberState] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
-  const [mode, setMode] = useState<'mindmap' | 'flashcards'>(() => {
-    const intent = getStoredGenerationIntent();
-    return intent === 'flashcards' ? 'flashcards' : 'mindmap';
-  });
+  const [mode, setMode] = useState<GenerationIntent>(() => getStoredGenerationIntent() ?? 'mindmap');
   const [flashcardsOpen, setFlashcardsOpen] = useState(false);
   const [flashcardsTitle, setFlashcardsTitle] = useState<string | null>(null);
   const [flashcardsCards, setFlashcardsCards] = useState<FlashcardType[] | null>(null);
@@ -124,10 +121,14 @@ export default function Generator({
 
   useEffect(() => {
     const intent = getStoredGenerationIntent();
-    if (intent === 'flashcards') {
-      setMode('flashcards');
+    if (intent) {
+      setMode(intent);
     }
   }, []);
+
+  useEffect(() => {
+    rememberGenerationIntent(mode);
+  }, [mode]);
 
   const evaluateLowTextWarning = useCallback((text: string, rawCharCount: number | undefined, fileList?: File[] | null) => {
     if (!fileList || fileList.length === 0) {

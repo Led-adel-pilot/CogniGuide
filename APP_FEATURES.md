@@ -59,7 +59,7 @@ This document captures every user-facing capability of CogniGuide without diving
 - Credit usage is metered: 1 credit covers roughly 3,800 characters of processed content via the Fast Model. Image-only requests start at half a credit, and even prompt-only generations charge a minimum of 1 credit.
 - **Anonymous vs. Authenticated Experience:**
     - **Anonymous Visitors:** Get 3 free generations to try the tool immediately without signing up.
-    - **Reverse Trial (New Accounts):** Upon signing up, new users unlock a **7-day Reverse Trial** of the Student plan. This grants **1,000 credits**, access to the Smart Model, and AI flashcard explanations, ensuring they can experience the full power of CogniGuide before falling back to the Free tier.
+    - **New Accounts (Reverse Trial):** Authenticated users enter a special trial lifecycle designed to maximize conversion (detailed in **Section 13. Paid Conversion & Trial Lifecycle**).
 - Plans include a Free tier (5 monthly credits), Student tier (5,000 monthly credits), and Pro tier (7,500 monthly credits). Every plan unlocks the same core features; the paid plans simply lift content limits and refresh credits more generously.
 - Payments and upgrades surface through an in-app pricing modal that lets authenticated users toggle billing cycles, open Paddle’s checkout, and see their real-time balance before purchasing.
 - When a generation hits an insufficient-credit limit, the UI shows an inline upgrade prompt and opens the pricing modal so learners can stay focused on studying.
@@ -94,6 +94,39 @@ This document captures every user-facing capability of CogniGuide without diving
 - Legal trust is reinforced via dedicated pages for refund policy, cancellation policy, and terms of service; every one follows the same polished layout with collapsible sections for readability.
 - The sitemap and favicon are explicitly maintained so search engines and browsers understand CogniGuide’s structure.
 
-## 13. Future Readiness
+## 13. Paid Conversion & Trial Lifecycle
+- **Reverse Trial Concept:** Unlike traditional "freemium" models that start restricted, CogniGuide immediately unlocks the full Student tier (1,000 credits, Smart Model, AI Explanations) for 7 days upon sign-up. This "Reverse Trial" lets users experience maximum value before hitting limits.
+- **Stage 1: The Welcome Modal:**
+    - Trigger: Displayed once immediately after a new user signs in and their trial begins.
+    - Purpose: Welcomes the user, explicitly lists the unlocked premium features, and states the trial end date.
+    - Action: A simple "Continue" button dismisses the modal—no upsell is attempted here, focusing purely on activation.
+- **Stage 2: The Conversion Modal (End of Trial):**
+    - Trigger: Activates when the trial has **1 day or less remaining**.
+    - **Personalized Stats:** The modal dynamically calculates and displays the user's actual usage during the trial (e.g., "In 7 days you've created 5 mind maps, 120 flashcards, and used 15 AI explanations").
+    - **Value Comparison:** A side-by-side view contrasts the "Free" plan (downgrade) vs. the "Student" plan (keep everything), highlighting the loss of Smart Mode and credit limits.
+    - **Conversion Path:** The primary "Upgrade & Keep everything" button launches the Pricing Modal directly, while a subtle secondary link allows users to accept the downgrade to the Free tier.
+- **Lifecycle Management:** Both modals use `localStorage` flags to ensure they are shown exactly once per user, preventing annoyance while guaranteeing that every user sees the value proposition at the critical moment.
+
+## 14. Pricing Interface & Purchase Flow
+- **Visual Layout:** The pricing page uses a clean, responsive 3-column grid:
+    - **Pro (Left):** Positioned for high-end users, listing maximum credit limits.
+    - **Student (Center):** Visually emphasized with a "Most popular" badge, a distinct border/background style, and a calculated "Daily Cost" estimate (e.g., "≈ $0.33 per day - Less than one coffee per week!") to frame the value.
+    - **Free (Right):** A baseline comparison showing the limitations (no AI explanations, no Smart Mode).
+- **Interactive Controls:**
+    - **Billing Toggle:** A central toggle lets users switch between "Monthly" and "Yearly" pricing, with the yearly option highlighting "Save 2 months."
+    - **Dynamic Buttons:** Button states update in real-time based on the user's status:
+        - *Unauthenticated:* "Sign up" (triggers the `AuthModal`).
+        - *Free User:* "Upgrade to Student/Pro."
+        - *Current Subscriber:* "Current plan" (disabled) or "Switch to Yearly" / "Upgrade to Pro."
+- **Purchase Flow:**
+    - Clicking a plan triggers a **PostHog event** (`pricing_plan_cta_clicked`).
+    - If unauthenticated, the **AuthModal** opens; upon successful sign-in, the user is redirected back to complete the purchase.
+    - If authenticated, the **Paddle Checkout Overlay** opens directly on top of the page, pre-filled with the user's ID to ensure immediate provisioning via webhook.
+- **Transparency:** A "How credits work" section below the plans demystifies usage:
+    - Explains the "1 credit ≈ 10 slides or 2 pages" rule.
+    - Explicitly notes the higher cost multiplier (**5.2x**) for the Smart AI model.
+    - Provides a concrete estimate of total output (e.g., "enough for ~1,600 monthly generations").
+
+## 15. Future Readiness
 - Plans exist for future enhancements like credit gifting, team credit pools, dynamic pricing, marketplaces for unused credits, usage analytics, budget controls, and integrations with analytics or CRM tools.
 - Monitoring and logging currently cover webhook events, credit deductions, refunds, authentication flows, and purchases to keep the monetization plumbing reliable.

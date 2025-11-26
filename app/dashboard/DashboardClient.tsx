@@ -25,7 +25,7 @@ import ThemeToggle from '@/components/ThemeToggle';
 import { cn, formatDate, formatTime } from '@/lib/utils';
 import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
 import { copyTextToClipboard } from '@/lib/copy-to-clipboard';
-import { GENERATION_INTENT_KEY, rememberFlashcardIntent } from '@/lib/generationIntent';
+import { rememberFlashcardIntent, rememberGenerationIntent } from '@/lib/generationIntent';
 
 type SessionUser = {
   id: string;
@@ -767,16 +767,6 @@ export default function DashboardClient() {
     setOnboardingStage('mode');
   }, []);
 
-  const clearGenerationIntent = useCallback(() => {
-    if (typeof window === 'undefined') return;
-    try {
-      window.sessionStorage?.removeItem(GENERATION_INTENT_KEY);
-    } catch { }
-    try {
-      window.localStorage?.removeItem(GENERATION_INTENT_KEY);
-    } catch { }
-  }, []);
-
   const focusGeneratorArea = useCallback(() => {
     if (typeof window === 'undefined') return;
     const generatorNode = document.getElementById('generator-panel');
@@ -791,7 +781,7 @@ export default function DashboardClient() {
       if (mode === 'flashcards') {
         rememberFlashcardIntent();
       } else {
-        clearGenerationIntent();
+        rememberGenerationIntent('mindmap');
       }
 
       if (typeof window !== 'undefined') {
@@ -807,7 +797,7 @@ export default function DashboardClient() {
       setOnboardingStage('input');
       setOnboardingInputChoice(null);
     },
-    [clearGenerationIntent]
+    []
   );
 
   const applyPromptToForm = useCallback((promptText: string) => {
