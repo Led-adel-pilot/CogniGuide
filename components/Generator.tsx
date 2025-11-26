@@ -86,7 +86,8 @@ export default function Generator({
   const [isAuthed, setIsAuthed] = useState(false);
   const [isPaidSubscriberState, setIsPaidSubscriberState] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
-  const [mode, setMode] = useState<GenerationIntent>(() => getStoredGenerationIntent() ?? 'mindmap');
+  const initialStoredIntentRef = useRef<GenerationIntent | null>(getStoredGenerationIntent());
+  const [mode, setMode] = useState<GenerationIntent>(() => initialStoredIntentRef.current ?? 'mindmap');
   const [flashcardsOpen, setFlashcardsOpen] = useState(false);
   const [flashcardsTitle, setFlashcardsTitle] = useState<string | null>(null);
   const [flashcardsCards, setFlashcardsCards] = useState<FlashcardType[] | null>(null);
@@ -119,23 +120,21 @@ export default function Generator({
       : baseCtaTooltip;
   const isOutOfFreeGenerations = normalizedFreeGenerations === 0 && !resolvedIsPaidSubscriber;
   const serverIntentHydratedRef = useRef(false);
+  const serverIntentHydratingRef = useRef(false);
 
   useEffect(() => {
-    const intent = getStoredGenerationIntent();
-    if (intent) {
-      setMode(intent);
-    }
-  }, []);
-
-  useEffect(() => {
+    const hasStored = Boolean(initialStoredIntentRef.current);
+    const hydrationDone = serverIntentHydratedRef.current;
+    const isDefaultMindmap = mode === 'mindmap' && !hasStored && !hydrationDone;
+    if (isDefaultMindmap) return;
     rememberGenerationIntent(mode);
   }, [mode]);
 
   useEffect(() => {
     const hydrateIntentFromServer = async () => {
-      if (!authChecked || !isAuthed || !userId || serverIntentHydratedRef.current) return;
+      if (!authChecked || !isAuthed || !userId || serverIntentHydratedRef.current || serverIntentHydratingRef.current) return;
       if (getStoredGenerationIntent()) return;
-      serverIntentHydratedRef.current = true;
+      serverIntentHydratingRef.current = true;
 
       try {
         const [{ data: latestMindmap }, { data: latestFlashcards }] = await Promise.all([
@@ -169,10 +168,15 @@ export default function Generator({
 
         if (nextMode && !getStoredGenerationIntent()) {
           setMode(nextMode);
+          rememberGenerationIntent(nextMode);
         }
+
+        serverIntentHydratedRef.current = true;
       } catch (error) {
         serverIntentHydratedRef.current = false;
         console.error('Failed to hydrate generation intent from server:', error);
+      } finally {
+        serverIntentHydratingRef.current = false;
       }
     };
 
