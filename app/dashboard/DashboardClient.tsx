@@ -2407,33 +2407,38 @@ export default function DashboardClient() {
           <div className="max-w-3xl mx-auto" id="generator-panel">
             <div className="relative flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-center mb-8 min-h-[3rem]">
               {(() => {
-                const shouldShowButton =
-                  !tierLoading && (!isPaidUser || (isTrialUser && credits <= 100));
+                const isTrialEndingSoon = (() => {
+                  if (tierLoading || userTier !== 'trial' || !trialEndsAt) return false;
+                  const end = new Date(trialEndsAt);
+                  const now = new Date();
+                  const diffTime = end.getTime() - now.getTime();
+                  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                  return diffDays <= 5 && diffDays >= 0;
+                })();
 
-                // Check for trial expiration warning
+                const shouldShowButton = !tierLoading && userTier !== 'paid' && !isTrialEndingSoon;
+
                 let trialWarning = null;
-                if (!tierLoading && userTier === 'trial' && trialEndsAt) {
+                if (isTrialEndingSoon && trialEndsAt) {
                   const end = new Date(trialEndsAt);
                   const now = new Date();
                   const diffTime = end.getTime() - now.getTime();
                   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
-                  if (diffDays <= 2 && diffDays >= 0) {
-                    trialWarning = (
-                      <div className="flex justify-center w-full">
-                        <button
-                          type="button"
-                          onClick={() => openPricingModal({ name: 'trial_expiring_pill' })}
-                          className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-100 text-amber-700 border border-amber-200 text-sm font-semibold cursor-pointer transition-colors hover:bg-amber-200 shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:ring-offset-2 focus-visible:ring-offset-background dark:bg-amber-500/20 dark:text-amber-100 dark:border-amber-500/40 dark:hover:bg-amber-500/30"
-                          title="You are currently exceeding the Free plan limits. Upgrade to keep these credits valid."
-                          aria-label="Open pricing to keep your trial benefits"
-                        >
-                          <CalendarClock className="h-4 w-4" />
-                          <span>Trial ends in {diffDays} {diffDays === 1 ? 'day' : 'days'}</span>
-                        </button>
-                      </div>
-                    );
-                  }
+                  trialWarning = (
+                    <div className="flex justify-center w-full">
+                      <button
+                        type="button"
+                        onClick={() => openPricingModal({ name: 'trial_expiring_pill' })}
+                        className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-100 text-amber-700 border border-amber-200 text-sm font-semibold cursor-pointer transition-colors hover:bg-amber-200 shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:ring-offset-2 focus-visible:ring-offset-background dark:bg-amber-500/20 dark:text-amber-100 dark:border-amber-500/40 dark:hover:bg-amber-500/30"
+                        title="You are currently exceeding the Free plan limits. Upgrade to keep these credits valid."
+                        aria-label="Open pricing to keep your trial benefits"
+                      >
+                        <CalendarClock className="h-4 w-4" />
+                        <span>Trial ends in {diffDays} {diffDays === 1 ? 'day' : 'days'}</span>
+                      </button>
+                    </div>
+                  );
                 }
 
                 return (
@@ -2443,7 +2448,7 @@ export default function DashboardClient() {
                         <button
                           title="View pricing plans"
                           onClick={() => openPricingModal({ name: 'dashboard_upgrade_cta' })}
-                          className="upgrade-plan-btn inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary text-primary-foreground hover:bg-primary/90 transition-colors mx-auto"
+                          className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border pill-soft-sky text-sm font-semibold cursor-pointer transition-colors shadow-sm mx-auto focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-300/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                         >
                           <Sparkles className="h-4 w-4" />
                           <span>Upgrade your Plan</span>
