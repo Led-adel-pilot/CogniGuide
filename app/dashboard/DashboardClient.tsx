@@ -831,6 +831,11 @@ export default function DashboardClient() {
       setOnboardingStage('progress');
       setIsOnboardingOpen(false);
       applyPromptToForm(promptText);
+      try {
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new CustomEvent('cogniguide:onboarding-auto-submit', { detail: { reason: 'prompt-prefill' } }));
+        }
+      } catch { }
     },
     [applyPromptToForm, focusGeneratorArea, onboardingMode]
   );

@@ -57,6 +57,7 @@ export default function Generator({
   // Cache for file set processing results (keyed by file set combination)
   const processedFileSetsCache = useRef<Map<string, { result: Record<string, unknown>; processedAt: number }>>(new Map());
   const pendingOnboardingFilesRef = useRef<File[] | null>(null);
+  const pendingOnboardingAutoSubmitRef = useRef(false);
 
   // Debug logging in development
   const isDevelopment = process.env.NODE_ENV === 'development';
@@ -943,28 +944,45 @@ export default function Generator({
 
   // Bridge onboarding modal dropzone files into the main generator flow
   useEffect(() => {
-    const tryProcessOnboardingFiles = (files: File[]) => {
+    const tryProcessOnboardingFiles = async (files: File[], options?: { autoSubmit?: boolean }) => {
+      const wantsAutoSubmit = Boolean(options?.autoSubmit);
       pendingOnboardingFilesRef.current = files;
+      if (wantsAutoSubmit) {
+        pendingOnboardingAutoSubmitRef.current = true;
+      }
       if (isLoading || markdown !== null || flashcardsOpen) return;
       if (!authChecked) return;
       if (!isAuthed) {
         setShowAuth(true);
         return;
       }
-      handleFileChange(files);
-      pendingOnboardingFilesRef.current = null;
+      try {
+        await handleFileChange(files);
+      } finally {
+        if (pendingOnboardingFilesRef.current === files) {
+          pendingOnboardingFilesRef.current = null;
+        }
+      }
     };
 
     const handleOnboardingFiles = (event: Event) => {
-      const detail = (event as CustomEvent<{ files?: File[] }>).detail;
+      const detail = (event as CustomEvent<{ files?: File[]; autoSubmit?: boolean }>).detail;
       const incomingFiles = detail?.files;
       if (!incomingFiles || incomingFiles.length === 0) return;
-      tryProcessOnboardingFiles(incomingFiles);
+      void tryProcessOnboardingFiles(incomingFiles, { autoSubmit: detail?.autoSubmit });
+    };
+
+    const handleOnboardingAutoSubmit = () => {
+      pendingOnboardingAutoSubmitRef.current = true;
+      if (authChecked && !isAuthed) {
+        setShowAuth(true);
+      }
     };
 
     if (typeof window !== 'undefined') {
       (window as any).__cogniguide_onboarding_files = tryProcessOnboardingFiles;
       window.addEventListener('cogniguide:onboarding-files', handleOnboardingFiles as EventListener);
+      window.addEventListener('cogniguide:onboarding-auto-submit', handleOnboardingAutoSubmit as EventListener);
     }
 
     return () => {
@@ -973,20 +991,29 @@ export default function Generator({
           delete (window as any).__cogniguide_onboarding_files;
         }
         window.removeEventListener('cogniguide:onboarding-files', handleOnboardingFiles as EventListener);
+        window.removeEventListener('cogniguide:onboarding-auto-submit', handleOnboardingAutoSubmit as EventListener);
       }
     };
   }, [authChecked, flashcardsOpen, handleFileChange, isAuthed, isLoading, markdown]);
 
   useEffect(() => {
-    if (!pendingOnboardingFilesRef.current || pendingOnboardingFilesRef.current.length === 0) return;
+    const pendingFiles = pendingOnboardingFilesRef.current;
+    if (!pendingFiles || pendingFiles.length === 0) return;
     if (isLoading || markdown !== null || flashcardsOpen) return;
     if (!authChecked) return;
     if (!isAuthed) {
       setShowAuth(true);
       return;
     }
-    handleFileChange(pendingOnboardingFilesRef.current);
-    pendingOnboardingFilesRef.current = null;
+    (async () => {
+      try {
+        await handleFileChange(pendingFiles);
+      } finally {
+        if (pendingOnboardingFilesRef.current === pendingFiles) {
+          pendingOnboardingFilesRef.current = null;
+        }
+      }
+    })();
   }, [authChecked, flashcardsOpen, handleFileChange, isAuthed, isLoading, markdown]);
 
   const handleSubmit = async () => {
@@ -1547,6 +1574,26 @@ export default function Generator({
       setIsLoading(false);
     }
   };
+
+  // Auto-start generation when onboarding sends input
+  useEffect(() => {
+    if (!pendingOnboardingAutoSubmitRef.current) return;
+    if (!authChecked) return;
+    if (!isAuthed) {
+      setShowAuth(true);
+      return;
+    }
+    if (isLoading || isPreParsing || flashcardsOpen || markdown !== null) return;
+    const hasInput = files.length > 0 || prompt.trim().length > 0;
+    if (!hasInput) return;
+    pendingOnboardingAutoSubmitRef.current = false;
+    void handleSubmit();
+  }, [authChecked, files.length, flashcardsOpen, handleSubmit, isAuthed, isLoading, isPreParsing, markdown, prompt]);
+  useEffect(() => {
+    if (isLoading) {
+      pendingOnboardingAutoSubmitRef.current = false;
+    }
+  }, [isLoading]);
 
   const handleCloseModal = () => setMarkdown(null);
   const handleCloseFlashcards = () => { setFlashcardsOpen(false); setFlashcardsCards(null); setFlashcardsError(null); setFlashcardsDeckId(undefined); };

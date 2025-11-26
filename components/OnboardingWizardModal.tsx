@@ -117,13 +117,13 @@ export default function OnboardingWizardModal({
                     if (!files.length) return;
                     try {
                       if (typeof window !== 'undefined') {
-                        const forward = (window as any).__cogniguide_onboarding_files as ((f: File[]) => void) | undefined;
+                        const forward = (window as any).__cogniguide_onboarding_files as ((f: File[], options?: { autoSubmit?: boolean }) => void) | undefined;
                         if (typeof forward === 'function') {
-                          forward(files);
+                          forward(files, { autoSubmit: true });
                         } else {
                           window.dispatchEvent(
                             new CustomEvent('cogniguide:onboarding-files', {
-                              detail: { files },
+                              detail: { files, autoSubmit: true },
                               bubbles: true,
                             })
                           );
