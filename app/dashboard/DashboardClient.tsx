@@ -2407,7 +2407,8 @@ export default function DashboardClient() {
           <div className="max-w-3xl mx-auto" id="generator-panel">
             <div className="relative flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-center mb-8 min-h-[3rem]">
               {(() => {
-                const shouldShowButton = !tierLoading && !isPaidUser;
+                const shouldShowButton =
+                  !tierLoading && (!isPaidUser || (isTrialUser && credits <= 100));
 
                 // Check for trial expiration warning
                 let trialWarning = null;
