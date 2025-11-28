@@ -2559,10 +2559,13 @@ export default function DashboardClient() {
 
       {
         spacedOpen && (
-          <div className="fixed inset-0 bg-black/40 dark:bg-black/60 z-50 flex items-center justify-center" onClick={() => setSpacedOpen(false)}>
-            <div className="bg-background rounded-2xl p-4 w-full max-w-2xl border" onClick={(e) => e.stopPropagation()}>
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-bold">Spaced repetition</h2>
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 transition-all duration-300" onClick={() => setSpacedOpen(false)}>
+            <div
+              className="bg-background rounded-2xl p-5 w-full max-w-2xl border border-border/50 shadow-2xl flex flex-col animate-in fade-in zoom-in-95 duration-200 max-h-[85vh]"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-center justify-between mb-2 flex-shrink-0">
+                <h2 className="text-xl font-bold bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">Spaced Repetition</h2>
                 <button
                   onClick={() => setSpacedOpen(false)}
                   className="p-2 rounded-full hover:bg-muted/50 transition-colors text-muted-foreground hover:text-foreground"
@@ -2570,30 +2573,41 @@ export default function DashboardClient() {
                   <X className="h-5 w-5" />
                 </button>
               </div>
+              
               {spacedError && (
-                <div className="mb-3 text-sm text-red-600">{spacedError}</div>
+                <div className="mb-4 p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-sm text-red-600 dark:text-red-400">
+                  {spacedError}
+                </div>
               )}
+              
               {!spacedError && (
-                <div className="text-sm text-muted-foreground">
+                <div className="text-sm text-muted-foreground mb-4 px-1">
                   Select a deck with cards due now, or study all due cards interleaved for best results.
                 </div>
               )}
-              <div className="mt-4 flex flex-col gap-2 max-h-80 overflow-y-auto">
+
+              <div className="flex-1 overflow-y-auto -mx-2 px-2 min-h-0 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:'none'] space-y-3">
                 {(spacedLoading || !isFlashcardsInitialized) && (
-                  <div className="text-sm text-muted-foreground">Loading due decks…</div>
+                  <div className="flex flex-col items-center justify-center py-8 text-muted-foreground gap-2">
+                    <Loader2 className="h-5 w-5 animate-spin" />
+                    <span className="text-sm">Loading due decks…</span>
+                  </div>
                 )}
+                
                 {!spacedLoading && isFlashcardsInitialized && dueQueue.length > 0 && (
-                  <div className="p-2 rounded-xl border flex items-center justify-between">
-                    <div className="flex-1">
-                      <div className="font-medium line-clamp-1 flex items-center gap-2">
+                  <div className="p-3 rounded-2xl border border-border/50 bg-card/50 hover:border-primary transition-colors flex items-center justify-between gap-4 group">
+                    <div className="flex-1 min-w-0 pl-1">
+                      <div className="font-semibold text-sm text-foreground flex items-center gap-2 mb-0.5">
                         <Sparkles className="h-4 w-4 text-primary" />
                         Interleaving Mode
                       </div>
-                      <div className="text-xs text-muted-foreground">Shuffle cards from multiple decks for better retention and learning efficiency</div>
+                      <div className="text-xs text-muted-foreground leading-relaxed">
+                        Shuffle cards from multiple decks for better retention and learning efficiency
+                      </div>
                     </div>
                     <button
                       title="Start interleaved study session"
-                      className="px-3 py-1.5 text-xs rounded-full border bg-primary text-primary-foreground hover:bg-primary/90"
+                      className="px-4 py-2 text-xs font-semibold rounded-full bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm hover:shadow transition-all flex-shrink-0"
                       onClick={() => {
                         const dueMap = (typeof window !== 'undefined' && (window as any).__cogniguide_due_map) || {};
                         const allDueCards = dueQueue.flatMap(deck => {
@@ -2668,35 +2682,36 @@ export default function DashboardClient() {
                         setFlashcardsOpen(true);
                       }}
                     >
-                      Study
+                      Study All
                     </button>
                   </div>
                 )}
+                
                 {!spacedLoading && isFlashcardsInitialized && dueQueue.map((f) => {
                   const dueMap = (typeof window !== 'undefined' && (window as any).__cogniguide_due_map) || {};
                   const count = Array.isArray(dueMap[f.id]) ? (dueMap[f.id] as number[]).length : 0;
                   const isCancelling = cancellingDeckId === f.id;
                   return (
-                    <div key={f.id} className="p-2 rounded-xl border flex items-center justify-between gap-3">
-                      <div className="min-w-0">
-                        <div className="font-medium line-clamp-1">{f.title || 'flashcards'}</div>
-                        <div className="text-xs text-muted-foreground">{count} due now</div>
+                    <div key={f.id} className="p-3 rounded-2xl border border-border/50 bg-card/50 hover:border-primary transition-colors flex items-center justify-between gap-3">
+                      <div className="min-w-0 pl-1">
+                        <div className="font-medium text-sm line-clamp-1 text-foreground">{f.title || 'flashcards'}</div>
+                        <div className="text-xs text-muted-foreground mt-0.5">{count} due now</div>
                       </div>
                       <div className="flex items-center gap-2">
                         <button
                           title="Remove deck from due list"
                           className={cn(
-                            'px-3 py-1.5 text-xs rounded-full border hover:bg-muted/50 transition-colors',
+                            'px-3 py-1.5 text-xs font-medium rounded-full border border-border/50 hover:bg-muted/80 hover:text-foreground transition-colors text-muted-foreground',
                             isCancelling ? 'opacity-60 cursor-not-allowed' : '',
                           )}
                           onClick={() => handleCancelDueDeck(f.id)}
                           disabled={isCancelling}
                         >
-                          Cancel
+                          Skip
                         </button>
                         <button
                           className={cn(
-                            'px-3 py-1.5 text-xs rounded-full border bg-primary text-primary-foreground hover:bg-primary/90',
+                            'px-4 py-1.5 text-xs font-semibold rounded-full bg-primary/10 text-primary hover:bg-primary/20 border border-primary/10 transition-all',
                             isCancelling ? 'opacity-60 cursor-not-allowed' : '',
                           )}
                           onClick={() => {
@@ -2728,8 +2743,17 @@ export default function DashboardClient() {
                     </div>
                   );
                 })}
+                
                 {!spacedLoading && isFlashcardsInitialized && dueQueue.length === 0 && (
-                  <div className="text-sm text-muted-foreground">No saved flashcards yet.</div>
+                  <div className="flex flex-col items-center justify-center py-12 text-center px-4">
+                    <div className="w-12 h-12 rounded-full bg-muted/50 flex items-center justify-center mb-3">
+                      <Check className="h-6 w-6 text-muted-foreground" />
+                    </div>
+                    <p className="text-foreground font-medium">All caught up!</p>
+                    <p className="text-sm text-muted-foreground mt-1 max-w-xs">
+                      You have no due cards right now. Great job keeping up with your reviews.
+                    </p>
+                  </div>
                 )}
               </div>
             </div>
