@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { BrainCircuit, FileText, Sparkles } from 'lucide-react';
 import Dropzone from '@/components/Dropzone';
+import PromptForm from '@/components/PromptForm';
 import { cn } from '@/lib/utils';
 
 export type WizardModeChoice = 'mindmap' | 'flashcards' | null;
@@ -17,7 +18,7 @@ interface OnboardingWizardModalProps {
   onBackToMode: () => void;
   onModeSelect: (mode: Exclude<WizardModeChoice, null>) => void;
   onUploadChosen: () => void;
-  onPromptPrefill: (prompt: string) => void;
+  onPromptPrefill: (prompt: string, isFullPrompt?: boolean) => void;
   onCustomPromptChange: (value: string) => void;
   onSkip: () => void;
   onClose: () => void;
@@ -67,10 +68,12 @@ export default function OnboardingWizardModal({
             </div>
           </div>
         </div>
-        <div className="px-6 sm:px-8 pt-8 pb-10 space-y-6">
+        <div className="px-6 sm:px-8 pt-8 pb-6 space-y-6">
           <div className="space-y-3 text-center">
-            <h2 className="text-2xl font-bold text-foreground">
-              {stage === 'mode' ? "What is your main goal today?" : "Add something to study"}
+            <h2 className={cn("font-bold text-foreground", stage === 'mode' ? "text-2xl" : "text-xl")}>
+              {stage === 'mode'
+                ? "What is your main goal today?"
+                : `Add something to study, Our AI will convert to ${selectedMode === 'flashcards' ? 'flashcards' : 'a Mind Map'}`}
             </h2>
           </div>
 
@@ -143,16 +146,30 @@ export default function OnboardingWizardModal({
               </div>
 
               <div className="space-y-3 text-left">
-                <p className="text-sm font-semibold text-foreground">Don&apos;t have a file? Try one of these topics</p>
-                <div className="grid w-full grid-cols-1 gap-2 sm:grid-cols-2 justify-items-stretch">
+                <p className="text-sm font-semibold text-foreground">Don&apos;t have a file? Just type what you want</p>
+                <PromptForm
+                  prompt={customPrompt}
+                  setPrompt={onCustomPromptChange}
+                  onSubmit={(text) => onPromptPrefill(text, true)}
+                  isLoading={false}
+                  disabled={false}
+                  filesLength={0}
+                  mode={(selectedMode as 'mindmap' | 'flashcards') || 'mindmap'}
+                  ctaLabel="Generate"
+                />
+                <p className="text-sm font-semibold text-foreground pt-2">OR try one of these topics</p>
+                <div className="flex w-full gap-2 overflow-x-auto pb-2 no-scrollbar">
                   {suggestedTopics.map((topic) => (
                     <button
                       key={topic}
                       type="button"
-                      onClick={() => onPromptPrefill(topic)}
-                      className="inline-flex w-full items-center justify-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold text-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-300/50 pill-soft-sky"
+                      onClick={() => {
+                        const prefix = selectedMode === 'flashcards' ? 'Generate flashcards about' : 'Create a mind map about';
+                        onCustomPromptChange(`${prefix} ${topic}`);
+                      }}
+                      className="inline-flex flex-shrink-0 items-center justify-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold text-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-300/50 pill-soft-sky"
                     >
-                      <span className="truncate">{topic}</span>
+                      <span className="whitespace-nowrap">{topic}</span>
                     </button>
                   ))}
                 </div>

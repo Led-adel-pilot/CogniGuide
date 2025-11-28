@@ -226,10 +226,10 @@ export default function DashboardClient() {
   const suppressModelTooltip = isModeMenuOpen || isPricingModalOpen;
   const modelTriggerTooltip = suppressModelTooltip ? undefined : 'Change AI model';
   const suggestedTopics = [
-    'Neural networks and backpropagation',
-    'Photosynthesis basics and the Calvin cycle',
-    'World War II causes and turning points',
-    'Cardiovascular system overview',
+    'Neural Networks',
+    'Photosynthesis Basics',
+    'World War II',
+    'Cardiovascular System',
   ];
   const hasGeneratedContent = combinedHistory.length > 0;
   const onboardingModalOpen = isOnboardingOpen && onboardingStage !== 'progress' && !hasGeneratedContent;
@@ -820,11 +820,11 @@ export default function DashboardClient() {
   }, []);
 
   const handlePromptPrefill = useCallback(
-    (topic: string) => {
+    (topic: string, isFullPrompt = false) => {
       const normalizedTopic = topic.trim();
       if (!normalizedTopic) return;
       const prefix = onboardingMode === 'flashcards' ? 'Generate flashcards about' : 'Create a mind map about';
-      const promptText = `${prefix} ${normalizedTopic}`;
+      const promptText = isFullPrompt ? normalizedTopic : `${prefix} ${normalizedTopic}`;
       setOnboardingPrompt(promptText);
       setOnboardingInputChoice('prompt');
       setAwaitingFirstOutcome(true);
