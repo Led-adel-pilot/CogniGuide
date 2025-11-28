@@ -288,6 +288,7 @@ export default function DashboardClient() {
   const [initialDueIndex, setInitialDueIndex] = useState<number | undefined>(undefined);
   const [activeDeckId, setActiveDeckId] = useState<string | undefined>(undefined);
   const [spacedLoading, setSpacedLoading] = useState(false);
+  const [isFlashcardsInitialized, setIsFlashcardsInitialized] = useState(false);
   const [spacedError, setSpacedError] = useState<string | null>(null);
   const [spacedPrefetched, setSpacedPrefetched] = useState(false);
   const [legalOpen, setLegalOpen] = useState(false);
@@ -1337,8 +1338,11 @@ export default function DashboardClient() {
       await initPaginatedHistory(authed.id);
       try {
         const allFlash = await loadAllFlashcardsOnly(authed.id);
+        setIsFlashcardsInitialized(true);
         await prefetchSpacedData(allFlash);
-      } catch { }
+      } catch {
+        setIsFlashcardsInitialized(true);
+      }
 
       // Add event listeners
       window.addEventListener('cogniguide:generation-complete', handleGenerationComplete);
@@ -2061,6 +2065,7 @@ export default function DashboardClient() {
               onClick={async () => {
                 setSpacedOpen(true);
                 setSpacedError(null);
+                if (!isFlashcardsInitialized) return;
                 if (!spacedPrefetched) {
                   setSpacedLoading(true);
                   try { await prefetchSpacedData(flashcardsHistory); } catch (err: any) { setSpacedError(err?.message || 'Failed to load due decks'); } finally { setSpacedLoading(false); }
@@ -2555,14 +2560,14 @@ export default function DashboardClient() {
       {
         spacedOpen && (
           <div className="fixed inset-0 bg-black/40 dark:bg-black/60 z-50 flex items-center justify-center" onClick={() => setSpacedOpen(false)}>
-            <div className="bg-background rounded-[2rem] p-6 w-full max-w-2xl border" onClick={(e) => e.stopPropagation()}>
+            <div className="bg-background rounded-2xl p-4 w-full max-w-2xl border" onClick={(e) => e.stopPropagation()}>
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-lg font-bold">Spaced repetition</h2>
                 <button
                   onClick={() => setSpacedOpen(false)}
-                  className="px-3 py-1.5 rounded-full border hover:bg-muted/50 transition-colors"
+                  className="p-2 rounded-full hover:bg-muted/50 transition-colors text-muted-foreground hover:text-foreground"
                 >
-                  Close
+                  <X className="h-5 w-5" />
                 </button>
               </div>
               {spacedError && (
@@ -2574,10 +2579,10 @@ export default function DashboardClient() {
                 </div>
               )}
               <div className="mt-4 flex flex-col gap-2 max-h-80 overflow-y-auto">
-                {spacedLoading && (
+                {(spacedLoading || !isFlashcardsInitialized) && (
                   <div className="text-sm text-muted-foreground">Loading due decks…</div>
                 )}
-                {!spacedLoading && dueQueue.length > 0 && (
+                {!spacedLoading && isFlashcardsInitialized && dueQueue.length > 0 && (
                   <div className="p-2 rounded-xl border flex items-center justify-between">
                     <div className="flex-1">
                       <div className="font-medium line-clamp-1 flex items-center gap-2">
@@ -2667,7 +2672,7 @@ export default function DashboardClient() {
                     </button>
                   </div>
                 )}
-                {!spacedLoading && dueQueue.map((f) => {
+                {!spacedLoading && isFlashcardsInitialized && dueQueue.map((f) => {
                   const dueMap = (typeof window !== 'undefined' && (window as any).__cogniguide_due_map) || {};
                   const count = Array.isArray(dueMap[f.id]) ? (dueMap[f.id] as number[]).length : 0;
                   const isCancelling = cancellingDeckId === f.id;
@@ -2723,7 +2728,7 @@ export default function DashboardClient() {
                     </div>
                   );
                 })}
-                {!spacedLoading && dueQueue.length === 0 && (
+                {!spacedLoading && isFlashcardsInitialized && dueQueue.length === 0 && (
                   <div className="text-sm text-muted-foreground">No saved flashcards yet.</div>
                 )}
               </div>
