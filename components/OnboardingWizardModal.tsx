@@ -115,15 +115,20 @@ export default function OnboardingWizardModal({
                 <Dropzone
                   onFileChange={(files) => {
                     if (!files.length) return;
+                    const hasImage = files.some((file) => {
+                      const lowerName = file.name.toLowerCase();
+                      return file.type.startsWith('image/') || lowerName.endsWith('.png') || lowerName.endsWith('.jpg') || lowerName.endsWith('.jpeg') || lowerName.endsWith('.webp') || lowerName.endsWith('.gif');
+                    });
+                    const autoSubmit = !hasImage;
                     try {
                       if (typeof window !== 'undefined') {
                         const forward = (window as any).__cogniguide_onboarding_files as ((f: File[], options?: { autoSubmit?: boolean }) => void) | undefined;
                         if (typeof forward === 'function') {
-                          forward(files, { autoSubmit: true });
+                          forward(files, { autoSubmit });
                         } else {
                           window.dispatchEvent(
                             new CustomEvent('cogniguide:onboarding-files', {
-                              detail: { files, autoSubmit: true },
+                              detail: { files, autoSubmit },
                               bubbles: true,
                             })
                           );
