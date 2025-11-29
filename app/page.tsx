@@ -1,10 +1,16 @@
-import { Metadata } from 'next';
+import { Metadata, Viewport } from 'next';
 import HomeLanding from '@/components/HomeLanding';
 import { siteMetadata } from '@/lib/siteMetadata';
 
 const pageTitle = 'AI Mind Maps & Flashcards for Effective Studying';
 const pageDescription =
   'Turn class notes, textbooks, and lecture slides into interactive mind maps and adaptive flashcards with CogniGuide\'s AI study assistant.';
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  themeColor: '#ffffff',
+};
 
 export const metadata: Metadata = {
   title: pageTitle,
