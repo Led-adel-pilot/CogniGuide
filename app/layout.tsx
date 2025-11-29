@@ -5,12 +5,6 @@ import { siteMetadata } from "@/lib/siteMetadata";
 
 const googleSiteVerification = process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION;
 
-export const viewport: Viewport = {
-  width: "device-width",
-  initialScale: 1,
-  themeColor: "#ffffff",
-};
-
 const baseMetadata: Metadata = {
   metadataBase: new URL(siteMetadata.url),
   title: {
@@ -63,6 +57,14 @@ const baseMetadata: Metadata = {
 if (!googleSiteVerification) {
   delete baseMetadata.verification;
 }
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  viewportFit: "cover",
+  themeColor: "#ffffff",
+};
 
 export const metadata: Metadata = baseMetadata;
 

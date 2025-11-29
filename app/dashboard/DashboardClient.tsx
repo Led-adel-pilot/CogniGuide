@@ -198,6 +198,24 @@ export default function DashboardClient() {
   const trialModalShownRef = useRef(false);
   const isTrialUser = userTier === 'trial';
   const isPaidUser = userTier === 'paid' || userTier === 'trial';
+
+  // Ensure mobile browsers pick up the correct viewport tag on the first load
+  useEffect(() => {
+    if (typeof document === 'undefined') return;
+    const desired = 'width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover';
+    const existing = document.querySelector<HTMLMetaElement>('meta[name="viewport"]');
+    if (existing) {
+      const current = (existing.getAttribute('content') || '').trim();
+      if (current !== desired) {
+        existing.setAttribute('content', desired);
+      }
+      return;
+    }
+    const meta = document.createElement('meta');
+    meta.name = 'viewport';
+    meta.content = desired;
+    document.head.prepend(meta);
+  }, []);
   const balanceDisplay = isPaidUser
     ? (Math.floor(credits * 10) / 10).toFixed(1)
     : Math.max(0, Math.floor(credits)).toString();
