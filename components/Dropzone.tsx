@@ -313,10 +313,10 @@ export default function Dropzone({ onFileChange, disabled = false, onOpen, isPre
   const isCentered = files.length <= 2;
   const gridClass = isCentered
     ? "flex flex-wrap justify-center -m-2 w-full"
-    : "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 w-full";
+    : "grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 w-full";
 
   const wrapperClass = isCentered
-    ? "w-full sm:w-1/2 md:w-1/3 lg:w-1/4 p-2 flex-none"
+    ? "w-1/2 sm:w-1/2 md:w-1/3 lg:w-1/4 p-2 flex-none"
     : "";
 
   const getFileIcon = (file: File) => {
