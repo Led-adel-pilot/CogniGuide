@@ -2412,8 +2412,8 @@ export default function DashboardClient() {
           </button>
           {renderModelSelector(isMobileModeMenuOpen, setIsMobileModeMenuOpen)}
         </header>
-        <div className="container mx-auto px-2 md:px-6 pb-6 mt-16 md:mt-10">
-          <div className="max-w-3xl mx-auto" id="generator-panel">
+        <div className="container mx-auto px-2 md:px-6 pb-6 flex flex-col justify-center min-h-[calc(100vh-5rem)] md:block md:min-h-0 md:mt-10">
+          <div className="max-w-3xl mx-auto w-full" id="generator-panel">
             <div className="relative flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-center mb-8 min-h-[3rem]">
               {(() => {
                 const isTrialEndingSoon = (() => {
