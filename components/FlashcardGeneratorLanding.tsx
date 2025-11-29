@@ -394,6 +394,7 @@ export default function FlashcardGeneratorLanding({ page }: FlashcardGeneratorLa
       setIsAuthed(signedIn);
       if (signedIn) {
         setShowAuth(false);
+        router.replace('/dashboard');
       }
       syncAuthState(signedIn);
     };

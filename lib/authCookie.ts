@@ -24,11 +24,25 @@ export function readSignedInFromCookies(): boolean {
     }
   }
 
-  if (cgValue !== null) {
-    return cgValue === '1';
+  if (cgValue !== null && cgValue === '1') {
+    return true;
   }
 
-  return hasSupabaseSession;
+  if (hasSupabaseSession) {
+    return true;
+  }
+
+  // Check LocalStorage for Supabase session
+  try {
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key?.startsWith('sb-') && key?.endsWith('-auth-token')) {
+        return true;
+      }
+    }
+  } catch {}
+
+  return false;
 }
 
 export function writeCgAuthedCookie(signedIn: boolean): void {

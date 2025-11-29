@@ -308,6 +308,7 @@ export default function MindMapProgrammaticLanding({ page }: MindMapProgrammatic
       setIsAuthed(signedIn);
       if (signedIn) {
         setShowAuth(false);
+        router.replace('/dashboard');
       }
       syncAuthState(signedIn);
     };

@@ -129,6 +129,7 @@ export default function HomeLanding() {
       setIsAuthed(signedIn);
       if (signedIn) {
         setShowAuth(false);
+        router.replace('/dashboard');
       }
       syncAuthState(signedIn);
     };
