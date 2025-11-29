@@ -2101,7 +2101,7 @@ export default function DashboardClient() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center text-gray-600">
+      <div className="min-h-[100dvh] flex items-center justify-center text-gray-600">
         <Loader2 className="h-6 w-6 animate-spin mr-2" /> Loading...
       </div>
     );
@@ -2117,7 +2117,7 @@ export default function DashboardClient() {
       )}
       {/* Sidebar */}
       <aside
-        className={`fixed inset-y-0 left-0 z-40 w-72 border-r bg-[#F9F9F9] dark:bg-[#0a0f14] pl-2 pt-2 pb-2 pr-0 flex flex-col h-[100dvh] min-h-0 transform transition-transform duration-300 md:relative md:translate-x-0 md:flex ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
+        className={`fixed top-0 left-0 z-40 w-72 border-r bg-[#F9F9F9] dark:bg-[#0a0f14] pl-2 pt-2 pb-2 pr-0 flex flex-col h-[100dvh] min-h-0 transform transition-transform duration-300 md:relative md:translate-x-0 md:flex ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
           }`}
       >
         <div className="flex-1 overflow-y-auto" ref={listRef}>
