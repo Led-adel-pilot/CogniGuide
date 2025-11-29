@@ -1649,7 +1649,7 @@ export default function Generator({
       />
       <AuthModal open={showAuth} />
       <section id="generator" className={showTitle ? (compact ? 'pt-3 pb-5' : 'pt-4 pb-8') : (compact ? 'pb-12' : 'pb-20')}>
-        <div className="container">
+        <div className="w-full">
           {showTitle && (
             <div className={compact ? 'text-center mb-4' : 'text-center mb-6'}>
               <h2 className={compact ? 'text-2xl md:text-3xl font-bold font-heading tracking-tight' : 'text-3xl md:text-4xl font-bold font-heading tracking-tight'}>Turn Your Notes into Mind Maps &amp; Flashcards with AI.</h2>

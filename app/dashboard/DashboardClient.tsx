@@ -2402,7 +2402,7 @@ export default function DashboardClient() {
           {renderModelSelector(isDesktopModeMenuOpen, setIsDesktopModeMenuOpen)}
         </div>
 
-        <header className="md:hidden flex items-center justify-between sticky top-0 bg-background/80 backdrop-blur-sm px-4 py-2 z-10">
+        <header className="md:hidden flex items-center sticky top-0 bg-background/80 backdrop-blur-sm px-4 py-2 z-10 gap-2">
           <button
             onClick={() => setIsSidebarOpen(true)}
             className="p-2 -ml-2"
@@ -2410,12 +2410,9 @@ export default function DashboardClient() {
           >
             <Menu className="h-6 w-6" />
           </button>
-          <div className="flex items-center justify-center">
-            {renderModelSelector(isMobileModeMenuOpen, setIsMobileModeMenuOpen)}
-          </div>
-          <div className="w-6" /> {/* Spacer */}
+          {renderModelSelector(isMobileModeMenuOpen, setIsMobileModeMenuOpen)}
         </header>
-        <div className="container mx-auto px-6 pb-6 mt-16 md:mt-10">
+        <div className="container mx-auto px-2 md:px-6 pb-6 mt-16 md:mt-10">
           <div className="max-w-3xl mx-auto" id="generator-panel">
             <div className="relative flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-center mb-8 min-h-[3rem]">
               {(() => {
