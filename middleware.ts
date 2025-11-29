@@ -3,7 +3,17 @@ import { NextResponse, type NextRequest } from 'next/server'
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
-  if (pathname === '/') {
+  // Check specific paths or patterns that should redirect if authed
+  // (The matcher handles the execution scope, but we double-check here for clarity if needed, 
+  // though strictly speaking the matcher is the gatekeeper.)
+  const shouldCheckAuth = 
+    pathname === '/' ||
+    pathname === '/ai-flashcard-generator' ||
+    pathname === '/ai-mind-map-generator' ||
+    pathname.startsWith('/flashcards') ||
+    pathname.startsWith('/mind-maps')
+
+  if (shouldCheckAuth) {
     // Fast path: check our own lightweight cookie set on auth change
     const cgAuthed = request.cookies.get('cg_authed')?.value
     if (cgAuthed === '1') {
@@ -33,5 +43,9 @@ export function middleware(request: NextRequest) {
 export const config = {
   matcher: [
     '/',
+    '/ai-flashcard-generator',
+    '/ai-mind-map-generator',
+    '/flashcards/:path*',
+    '/mind-maps/:path*',
   ],
 }
