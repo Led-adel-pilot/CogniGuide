@@ -62,6 +62,8 @@ function RadialProgressBar({ progress = 0, size = 48, strokeWidth = 5 }: RadialP
   );
 }
 
+export const getDropzoneFileKey = (file: File) => `${file.name}|${file.size}|${file.lastModified ?? ''}`;
+
 interface DropzoneProps {
   onFileChange: (files: File[]) => void;
   disabled?: boolean;
@@ -69,8 +71,10 @@ interface DropzoneProps {
   onOpen?: () => boolean | void;
   // Show loading state for pre-parsing
   isPreParsing?: boolean;
-  // Upload progress percentage (0-100)
-  uploadProgress?: number;
+  // Upload progress map: fileKey -> percentage (0-100)
+  uploadProgress?: Record<string, number>;
+  // Keys of files that have finished processing
+  completedKeys?: Set<string>;
   // Optional whitelist of files to keep by name+size (used to prune overflow files)
   allowedNameSizes?: { name: string; size: number }[];
   // Visual size variant
@@ -108,17 +112,16 @@ function ImagePreview({ file, children }: { file: File, children: React.ReactNod
   );
 }
 
-export default function Dropzone({ onFileChange, disabled = false, onOpen, isPreParsing = false, uploadProgress, allowedNameSizes, size = 'default', onFileRemove, inputId = 'dropzone-file', externalFiles }: DropzoneProps) {
+export default function Dropzone({ onFileChange, disabled = false, onOpen, isPreParsing = false, uploadProgress, completedKeys, allowedNameSizes, size = 'default', onFileRemove, inputId = 'dropzone-file', externalFiles }: DropzoneProps) {
   const [dragIsOver, setDragIsOver] = useState(false);
   const [files, setFiles] = useState<File[]>([]);
   const inputRef = useRef<HTMLInputElement | null>(null);
   const [inputKey, setInputKey] = useState(0);
   const [uploadingFileKeys, setUploadingFileKeys] = useState<Set<string>>(new Set());
-  const [currentBatchProgress, setCurrentBatchProgress] = useState(0);
   const isSyncingExternalRef = useRef(false);
   const prevExternalSigRef = useRef<string | null>(null);
 
-  const getFileKey = useCallback((file: File) => `${file.name}|${file.size}|${file.lastModified ?? ''}`, []);
+  const getFileKey = getDropzoneFileKey;
 
   useEffect(() => {
     if (isSyncingExternalRef.current) {
@@ -158,11 +161,8 @@ export default function Dropzone({ onFileChange, disabled = false, onOpen, isPre
         newKeys.forEach(k => next.add(k));
         return next;
       });
-      if (!isPreParsing) {
-        setCurrentBatchProgress(0);
-      }
     }
-  }, [externalFiles, files, getFileKey, isPreParsing]);
+  }, [externalFiles, files, getFileKey]);
 
   // Prune files when an allowed list is provided
   useEffect(() => {
@@ -225,9 +225,6 @@ export default function Dropzone({ onFileChange, disabled = false, onOpen, isPre
           }
         });
         if (newKeys.length > 0) {
-          if (!isPreParsing) {
-            setCurrentBatchProgress(0);
-          }
           setUploadingFileKeys(prev => {
             const nextSet = new Set(prev);
             newKeys.forEach(k => nextSet.add(k));
@@ -237,7 +234,7 @@ export default function Dropzone({ onFileChange, disabled = false, onOpen, isPre
         return next;
       });
     }
-  }, [disabled, getFileKey, isPreParsing]);
+  }, [disabled, getFileKey]);
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFiles = e.target.files;
@@ -265,9 +262,6 @@ export default function Dropzone({ onFileChange, disabled = false, onOpen, isPre
           }
         });
         if (newKeys.length > 0) {
-          if (!isPreParsing) {
-            setCurrentBatchProgress(0);
-          }
           setUploadingFileKeys(prev => {
             const nextSet = new Set(prev);
             newKeys.forEach(k => nextSet.add(k));
@@ -302,19 +296,8 @@ export default function Dropzone({ onFileChange, disabled = false, onOpen, isPre
   }
 
   useEffect(() => {
-    if (isPreParsing) {
-      if (typeof uploadProgress === 'number') {
-        setCurrentBatchProgress(uploadProgress);
-      } else {
-        setCurrentBatchProgress(prev => (prev < 100 ? prev : 100));
-      }
-    }
-  }, [isPreParsing, uploadProgress]);
-
-  useEffect(() => {
     if (!isPreParsing) {
       setUploadingFileKeys(new Set());
-      setCurrentBatchProgress(0);
     }
   }, [isPreParsing]);
 
@@ -419,11 +402,10 @@ export default function Dropzone({ onFileChange, disabled = false, onOpen, isPre
             <div className={gridClass}>
               {files.map((file, index) => {
                 const fileKey = getFileKey(file);
-                const showProgress = isPreParsing && uploadingFileKeys.has(fileKey);
-                const displayProgress = Math.min(Math.max(currentBatchProgress, 0), 100);
-                const isUploading = typeof uploadProgress === 'number'
-                  ? uploadProgress < 100
-                  : displayProgress < 100;
+                const showProgress = isPreParsing && uploadingFileKeys.has(fileKey) && !completedKeys?.has(fileKey);
+                const progressValue = uploadProgress?.[fileKey] ?? 0;
+                const displayProgress = Math.min(Math.max(progressValue, 0), 100);
+                const isUploading = displayProgress < 100;
 
                 return (
                   <div key={fileKey} className={wrapperClass}>
