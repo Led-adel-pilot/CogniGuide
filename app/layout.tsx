@@ -1,9 +1,16 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import TooltipLayer from "@/components/TooltipLayer";
 import { siteMetadata } from "@/lib/siteMetadata";
 
 const googleSiteVerification = process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION;
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+};
 
 const baseMetadata: Metadata = {
   metadataBase: new URL(siteMetadata.url),
