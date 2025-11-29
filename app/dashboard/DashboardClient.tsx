@@ -2021,6 +2021,80 @@ export default function DashboardClient() {
     router.replace('/');
   };
 
+  const renderModelSelector = () => (
+    <Popover open={isModeMenuOpen} onOpenChange={setIsModeMenuOpen}>
+      <PopoverTrigger asChild>
+        <button
+          type="button"
+          className="group inline-flex items-center gap-2 rounded-full bg-background px-3 py-2 text-sm font-medium text-foreground transition hover:bg-muted/70"
+          aria-haspopup="listbox"
+          aria-expanded={isModeMenuOpen}
+          aria-label="Change AI model"
+          data-tooltip={modelTriggerTooltip}
+        >
+          <div className="flex items-center gap-1">
+            <span className="text-lg font-semibold">{modelDetails[selectedModel].label}</span>
+            <span className="text-sm text-muted-foreground">Mode</span>
+          </div>
+          {!tierLoading && !isPaidUser && selectedModel === 'smart' && (
+            <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 text-[11px] font-semibold uppercase tracking-wide text-primary">
+              <Lock className="h-3 w-3" /> Pro
+            </span>
+          )}
+          <ChevronDown className="h-4 w-4 text-muted-foreground transition group-hover:translate-y-0.5" />
+        </button>
+      </PopoverTrigger>
+      <PopoverContent
+        align="start"
+        className="w-[260px] border-none bg-muted/50 p-2 shadow-xl backdrop-blur rounded-2xl"
+      >
+        <div className="flex flex-col gap-1" role="listbox" aria-label="Generation modes">
+          {(['fast', 'smart'] as ModelChoice[]).map((choice) => {
+            const isActive = selectedModel === choice;
+            const locked = choice === 'smart' && !isPaidUser;
+            const optionLabel = locked ? 'Smart' : modelDetails[choice].label;
+            const shortDescription = choice === 'fast' ? 'Quick generation' : 'Detailed outputs';
+            const tooltipText =
+              choice === 'smart'
+                ? 'Produces richer, more structured outputs. Consumes more credits.'
+                : 'Baseline model responds quickly and uses the fewest credits.';
+            return (
+              <button
+                title={tooltipText}
+                key={choice}
+                type="button"
+                onClick={() => handleSelectModel(choice)}
+                onMouseEnter={() => setHoveredModel(choice)}
+                onFocus={() => setHoveredModel(choice)}
+                role="option"
+                aria-selected={isActive}
+                className={cn(
+                  'group flex w-full items-start gap-3 rounded-xl px-3 py-2 text-left transition',
+                  isActive ? 'bg-primary/10 text-primary' : 'hover:bg-muted/70'
+                )}
+              >
+                <div className="flex flex-1 items-center gap-2">
+                  <div className="flex flex-col">
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-semibold leading-none">{optionLabel}</span>
+                      {!tierLoading && locked ? (
+                        <span className="inline-flex items-center gap-1 text-[11px] font-semibold uppercase tracking-wide text-primary">
+                          <Lock className="h-3 w-3" /> Subscriber Access
+                        </span>
+                      ) : null}
+                    </div>
+                    <span className="text-xs text-muted-foreground mt-0.5">{shortDescription}</span>
+                  </div>
+                  {isActive && <Check className="ml-auto h-4 w-4" />}
+                </div>
+              </button>
+            );
+          })}
+        </div>
+      </PopoverContent>
+    </Popover>
+  );
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center text-gray-600">
@@ -2319,82 +2393,12 @@ export default function DashboardClient() {
 
       {/* Main content */}
       <main className="flex-1 overflow-y-auto min-h-0 relative">
-        {/* Models selector positioned at top left edge with sidebar */}
-        <div className="absolute top-20 left-2 z-20 md:left-4 md:top-4">
-          <Popover open={isModeMenuOpen} onOpenChange={setIsModeMenuOpen}>
-            <PopoverTrigger asChild>
-              <button
-                type="button"
-                className="group inline-flex items-center gap-2 rounded-full bg-background px-3 py-2 text-sm font-medium text-foreground transition hover:bg-muted/70"
-                aria-haspopup="listbox"
-                aria-expanded={isModeMenuOpen}
-                aria-label="Change AI model"
-                data-tooltip={modelTriggerTooltip}
-              >
-                <div className="flex items-center gap-1">
-                  <span className="text-lg font-semibold">{modelDetails[selectedModel].label}</span>
-                  <span className="text-sm text-muted-foreground">Mode</span>
-                </div>
-                {!tierLoading && !isPaidUser && selectedModel === 'smart' && (
-                  <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 text-[11px] font-semibold uppercase tracking-wide text-primary">
-                    <Lock className="h-3 w-3" /> Pro
-                  </span>
-                )}
-                <ChevronDown className="h-4 w-4 text-muted-foreground transition group-hover:translate-y-0.5" />
-              </button>
-            </PopoverTrigger>
-            <PopoverContent
-              align="start"
-              className="w-[260px] border-none bg-muted/50 p-2 shadow-xl backdrop-blur rounded-2xl"
-            >
-              <div className="flex flex-col gap-1" role="listbox" aria-label="Generation modes">
-                {(['fast', 'smart'] as ModelChoice[]).map((choice) => {
-                  const isActive = selectedModel === choice;
-                  const locked = choice === 'smart' && !isPaidUser;
-                  const optionLabel = locked ? 'Smart' : modelDetails[choice].label;
-                  const shortDescription = choice === 'fast' ? 'Quick generation' : 'Detailed outputs';
-                  const tooltipText =
-                    choice === 'smart'
-                      ? 'Produces richer, more structured outputs. Consumes more credits.'
-                      : 'Baseline model responds quickly and uses the fewest credits.';
-                  return (
-                    <button
-                      title={tooltipText}
-                      key={choice}
-                      type="button"
-                      onClick={() => handleSelectModel(choice)}
-                      onMouseEnter={() => setHoveredModel(choice)}
-                      onFocus={() => setHoveredModel(choice)}
-                      role="option"
-                      aria-selected={isActive}
-                      className={cn(
-                        'group flex w-full items-start gap-3 rounded-xl px-3 py-2 text-left transition',
-                        isActive ? 'bg-primary/10 text-primary' : 'hover:bg-muted/70'
-                      )}
-                    >
-                      <div className="flex flex-1 items-center gap-2">
-                        <div className="flex flex-col">
-                          <div className="flex items-center gap-2">
-                            <span className="text-sm font-semibold leading-none">{optionLabel}</span>
-                            {!tierLoading && locked ? (
-                              <span className="inline-flex items-center gap-1 text-[11px] font-semibold uppercase tracking-wide text-primary">
-                                <Lock className="h-3 w-3" /> Subscriber Access
-                              </span>
-                            ) : null}
-                          </div>
-                          <span className="text-xs text-muted-foreground mt-0.5">{shortDescription}</span>
-                        </div>
-                        {isActive && <Check className="ml-auto h-4 w-4" />}
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
-            </PopoverContent>
-          </Popover>
+        {/* Models selector positioned at top left edge with sidebar (Desktop Only) */}
+        <div className="hidden md:block absolute md:left-4 md:top-4 z-20">
+          {renderModelSelector()}
         </div>
 
-        <header className="md:hidden flex items-center justify-between sticky top-0 bg-background/80 backdrop-blur-sm px-6 py-3 border-b z-10">
+        <header className="md:hidden flex items-center justify-between sticky top-0 bg-background/80 backdrop-blur-sm px-4 py-2 z-10">
           <button
             onClick={() => setIsSidebarOpen(true)}
             className="p-2 -ml-2"
@@ -2402,9 +2406,8 @@ export default function DashboardClient() {
           >
             <Menu className="h-6 w-6" />
           </button>
-          <div className="flex items-center gap-2">
-            <Image src={CogniGuideLogo} alt="CogniGuide" width={24} height={24} className="h-6 w-6" />
-            <span className="font-bold">CogniGuide</span>
+          <div className="flex items-center justify-center">
+            {renderModelSelector()}
           </div>
           <div className="w-6" /> {/* Spacer */}
         </header>
