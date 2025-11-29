@@ -116,6 +116,7 @@ export default function Dropzone({ onFileChange, disabled = false, onOpen, isPre
   const [uploadingFileKeys, setUploadingFileKeys] = useState<Set<string>>(new Set());
   const [currentBatchProgress, setCurrentBatchProgress] = useState(0);
   const isSyncingExternalRef = useRef(false);
+  const prevExternalSigRef = useRef<string | null>(null);
 
   const getFileKey = useCallback((file: File) => `${file.name}|${file.size}|${file.lastModified ?? ''}`, []);
 
@@ -130,17 +131,38 @@ export default function Dropzone({ onFileChange, disabled = false, onOpen, isPre
   // Keep internal state in sync when files are provided externally (e.g., onboarding drop)
   useEffect(() => {
     if (!externalFiles) return;
-    const currentSig = files.map(getFileKey).join('|');
+    
     const externalSig = externalFiles.map(getFileKey).join('|');
+    
+    // Only sync if the external files actually changed
+    if (prevExternalSigRef.current === externalSig) {
+      return;
+    }
+    prevExternalSigRef.current = externalSig;
+
+    const currentSig = files.map(getFileKey).join('|');
     if (currentSig === externalSig) return;
+
     isSyncingExternalRef.current = true;
     setFiles(externalFiles);
-    setUploadingFileKeys(new Set(externalFiles.map(getFileKey)));
-    if (!isPreParsing) {
-      setCurrentBatchProgress(0);
+    
+    // Only add NEW files to uploading keys, don't reset existing ones
+    const currentKeys = new Set(files.map(getFileKey));
+    const newKeys = externalFiles
+      .map(getFileKey)
+      .filter(key => !currentKeys.has(key));
+
+    if (newKeys.length > 0) {
+      setUploadingFileKeys(prev => {
+        const next = new Set(prev);
+        newKeys.forEach(k => next.add(k));
+        return next;
+      });
+      if (!isPreParsing) {
+        setCurrentBatchProgress(0);
+      }
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [externalFiles?.length, getFileKey, isPreParsing]);
+  }, [externalFiles, files, getFileKey, isPreParsing]);
 
   // Prune files when an allowed list is provided
   useEffect(() => {
@@ -404,7 +426,7 @@ export default function Dropzone({ onFileChange, disabled = false, onOpen, isPre
                   : displayProgress < 100;
 
                 return (
-                  <div key={index} className={wrapperClass}>
+                  <div key={fileKey} className={wrapperClass}>
                     <div
                       className="group relative flex flex-col items-center justify-center text-center p-4 border border-border/40 bg-background/80 hover:bg-background hover:border-primary/30 rounded-2xl transition-all duration-300 shadow-sm hover:shadow-md overflow-hidden h-full w-full"
                       onClick={(e) => e.stopPropagation()} // Prevent opening file dialog when clicking the card
