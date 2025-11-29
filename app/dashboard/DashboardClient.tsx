@@ -2108,7 +2108,7 @@ export default function DashboardClient() {
   }
 
   return (
-    <div className="flex h-screen overflow-hidden bg-background text-foreground">
+    <div className="flex h-[100dvh] overflow-hidden bg-background text-foreground">
       {isSidebarOpen && (
         <div
           className="fixed inset-0 z-30 bg-black/50 md:hidden"
@@ -2117,7 +2117,7 @@ export default function DashboardClient() {
       )}
       {/* Sidebar */}
       <aside
-        className={`fixed inset-y-0 left-0 z-40 w-72 border-r bg-[#F9F9F9] dark:bg-[#0a0f14] pl-2 pt-2 pb-2 pr-0 flex flex-col h-screen min-h-0 transform transition-transform duration-300 md:relative md:translate-x-0 md:flex ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
+        className={`fixed inset-y-0 left-0 z-40 w-72 border-r bg-[#F9F9F9] dark:bg-[#0a0f14] pl-2 pt-2 pb-2 pr-0 flex flex-col h-[100dvh] min-h-0 transform transition-transform duration-300 md:relative md:translate-x-0 md:flex ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
           }`}
       >
         <div className="flex-1 overflow-y-auto" ref={listRef}>
@@ -2412,7 +2412,7 @@ export default function DashboardClient() {
           </button>
           {renderModelSelector(isMobileModeMenuOpen, setIsMobileModeMenuOpen)}
         </header>
-        <div className="container mx-auto px-2 md:px-6 pb-6 flex flex-col justify-center min-h-[calc(100vh-5rem)] md:block md:min-h-0 md:mt-10">
+        <div className="container mx-auto px-2 md:px-6 pb-6 flex flex-col justify-center min-h-[calc(100dvh-5rem)] md:block md:min-h-0 md:mt-10">
           <div className="max-w-3xl mx-auto w-full" id="generator-panel">
             <div className="relative flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-center mb-8 min-h-[3rem]">
               {(() => {
