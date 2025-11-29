@@ -123,6 +123,21 @@ export default function RootLayout({
         <link rel="preconnect" href="https://cdn.jsdelivr.net" crossOrigin="anonymous" />
         <link rel="preconnect" href="https://us-assets.i.posthog.com" crossOrigin="anonymous" />
         <script
+          // Strip a leftover bare # (Supabase can leave it after handling tokens) so the URL stays clean
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  var hash = window.location.hash || '';
+                  if (hash === '#') {
+                    history.replaceState(null, '', window.location.pathname + window.location.search);
+                  }
+                } catch (e) {}
+              })();
+            `,
+          }}
+        />
+        <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
         />
