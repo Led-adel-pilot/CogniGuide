@@ -176,7 +176,9 @@ export default function DashboardClient() {
   const [userTier, setUserTier] = useState<'free' | 'trial' | 'paid'>('free');
   const [trialEndsAt, setTrialEndsAt] = useState<string | null>(null);
   const [tierLoading, setTierLoading] = useState<boolean>(true);
-  const [isModeMenuOpen, setIsModeMenuOpen] = useState(false);
+  const [isDesktopModeMenuOpen, setIsDesktopModeMenuOpen] = useState(false);
+  const [isMobileModeMenuOpen, setIsMobileModeMenuOpen] = useState(false);
+  const isModeMenuOpen = isDesktopModeMenuOpen || isMobileModeMenuOpen;
   const [isPricingModalOpen, setIsPricingModalOpen] = useState(false);
   const [hoveredModel, setHoveredModel] = useState<ModelChoice | null>(null);
   const [isTrialModalOpen, setIsTrialModalOpen] = useState(false);
@@ -956,13 +958,15 @@ export default function DashboardClient() {
           name: 'model_selector_locked',
           props: { requested_model: choice },
         });
-        setIsModeMenuOpen(false); // Close the popover when showing pricing modal
+        setIsDesktopModeMenuOpen(false);
+        setIsMobileModeMenuOpen(false);
         return;
       }
 
       setSelectedModel(choice);
       setHoveredModel(choice);
-      setIsModeMenuOpen(false);
+      setIsDesktopModeMenuOpen(false);
+      setIsMobileModeMenuOpen(false);
     },
     [isPaidUser, openPricingModal]
   );
@@ -2021,14 +2025,14 @@ export default function DashboardClient() {
     router.replace('/');
   };
 
-  const renderModelSelector = () => (
-    <Popover open={isModeMenuOpen} onOpenChange={setIsModeMenuOpen}>
+  const renderModelSelector = (isOpen: boolean, onOpenChange: (open: boolean) => void) => (
+    <Popover open={isOpen} onOpenChange={onOpenChange}>
       <PopoverTrigger asChild>
         <button
           type="button"
           className="group inline-flex items-center gap-2 rounded-full bg-background px-3 py-2 text-sm font-medium text-foreground transition hover:bg-muted/70"
           aria-haspopup="listbox"
-          aria-expanded={isModeMenuOpen}
+          aria-expanded={isOpen}
           aria-label="Change AI model"
           data-tooltip={modelTriggerTooltip}
         >
@@ -2395,7 +2399,7 @@ export default function DashboardClient() {
       <main className="flex-1 overflow-y-auto min-h-0 relative">
         {/* Models selector positioned at top left edge with sidebar (Desktop Only) */}
         <div className="hidden md:block absolute md:left-4 md:top-4 z-20">
-          {renderModelSelector()}
+          {renderModelSelector(isDesktopModeMenuOpen, setIsDesktopModeMenuOpen)}
         </div>
 
         <header className="md:hidden flex items-center justify-between sticky top-0 bg-background/80 backdrop-blur-sm px-4 py-2 z-10">
@@ -2407,7 +2411,7 @@ export default function DashboardClient() {
             <Menu className="h-6 w-6" />
           </button>
           <div className="flex items-center justify-center">
-            {renderModelSelector()}
+            {renderModelSelector(isMobileModeMenuOpen, setIsMobileModeMenuOpen)}
           </div>
           <div className="w-6" /> {/* Spacer */}
         </header>
