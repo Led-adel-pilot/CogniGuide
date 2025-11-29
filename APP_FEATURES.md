@@ -3,7 +3,7 @@
 This document captures every user-facing capability of CogniGuide without diving into implementation details. It follows the user’s journey from arrival through creation, sharing, study, and support so nothing about the product’s behavior and flow is left out.
 
 ## 1. Purpose & Audience
-- CogniGuide is positioned as an AI-powered study companion for students, educators, working professionals, and lifelong learners who need to convert dense content into memorable structures.
+- CogniGuide web app is positioned as an AI-powered study companion for students, educators, working professionals, and lifelong learners who need to convert dense content into memorable structures.
 - The product promise is clear: “Learn Faster. Remember More. Ace Your Exams.” Everything—from the landing page messaging to the dashboard controls—reinforces that goal.
 - Marketing and SEO copy focus on exam prep, professional certifications, lesson planning, research distillation, and knowledge management, making it easy for each persona to see how CogniGuide fits their workflow.
 

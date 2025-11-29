@@ -209,7 +209,7 @@ function buildFlashcardPrompt(opts: {
 
   const scopeLine = `You will be given source content. Generate high-quality active-recall flashcards that help a learner master the content.`;
 
-  const languageAndCount = `- Produce about 20 to 50 cards.
+  const languageAndCount = `- Produce about 20 to 50 cards. NEVER more than 50 cards.
 - The flashcards MUST be in the same language as the source content.`;
 
   const body = `You are an expert instructional designer.
