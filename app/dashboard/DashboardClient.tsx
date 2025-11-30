@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { supabase, MindmapRecord, FlashcardsRecord, type FlashcardExplanationMap } from '@/lib/supabaseClient';
@@ -200,7 +200,7 @@ export default function DashboardClient() {
   const isPaidUser = userTier === 'paid' || userTier === 'trial';
 
   // Ensure mobile browsers pick up the correct viewport tag on the first load
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (typeof document === 'undefined') return;
     const desired = 'width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover';
     const existing = document.querySelector<HTMLMetaElement>('meta[name="viewport"]');

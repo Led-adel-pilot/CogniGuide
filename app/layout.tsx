@@ -114,6 +114,10 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
+        <meta
+          name="viewport"
+          content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover"
+        />
         <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
         <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
         <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
@@ -123,13 +127,13 @@ export default function RootLayout({
         <link rel="preconnect" href="https://cdn.jsdelivr.net" crossOrigin="anonymous" />
         <link rel="preconnect" href="https://us-assets.i.posthog.com" crossOrigin="anonymous" />
         <script
-          // Strip a leftover bare # (Supabase can leave it after handling tokens) so the URL stays clean
+          // Strip a stray trailing # (Supabase sometimes leaves it) before first paint so the URL stays clean
           dangerouslySetInnerHTML={{
             __html: `
               (function() {
                 try {
                   var hash = window.location.hash || '';
-                  if (hash === '#') {
+                  if (hash === '#' || hash === '#/') {
                     history.replaceState(null, '', window.location.pathname + window.location.search);
                   }
                 } catch (e) {}
