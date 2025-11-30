@@ -15,7 +15,7 @@ import { createInitialSchedule } from '@/lib/spaced-repetition';
 import PricingModal from '@/components/PricingModal';
 import ReverseTrialModal from '@/components/ReverseTrialModal';
 import ReverseTrialEndModal from '@/components/ReverseTrialEndModal';
-import OnboardingWizardModal, { WizardInputChoice, WizardModeChoice, WizardStage } from '@/components/OnboardingWizardModal';
+import OnboardingWizardModal, { LearningGoalChoice, WizardInputChoice, WizardModeChoice, WizardStage } from '@/components/OnboardingWizardModal';
 import { requestTooltipHide } from '@/components/TooltipLayer';
 import { PAID_SUBSCRIPTION_STATUSES, type ModelChoice } from '@/lib/plans';
 import CogniGuideLogo from '../../CogniGuide_logo.png';
@@ -188,6 +188,7 @@ export default function DashboardClient() {
   const [isOnboardingOpen, setIsOnboardingOpen] = useState(false);
   const [onboardingStage, setOnboardingStage] = useState<OnboardingStageState>('mode');
   const [onboardingMode, setOnboardingMode] = useState<WizardModeChoice>(null);
+  const [onboardingGoal, setOnboardingGoal] = useState<LearningGoalChoice>(null);
   const [onboardingInputChoice, setOnboardingInputChoice] = useState<WizardInputChoice>(null);
   const [onboardingPrompt, setOnboardingPrompt] = useState('');
   const [awaitingFirstOutcome, setAwaitingFirstOutcome] = useState(false);
@@ -785,6 +786,7 @@ export default function DashboardClient() {
     }
     setIsOnboardingOpen(false);
     setAwaitingFirstOutcome(false);
+    setOnboardingGoal(null);
     setOnboardingStage('mode');
   }, []);
 
@@ -815,7 +817,8 @@ export default function DashboardClient() {
       }
 
       setIsOnboardingOpen(true);
-      setOnboardingStage('input');
+      setOnboardingStage('goal');
+      setOnboardingGoal(null);
       setOnboardingInputChoice(null);
     },
     []
@@ -874,15 +877,23 @@ export default function DashboardClient() {
       synchronizeGeneratorMode(mode);
       setAwaitingFirstOutcome(false);
       setOnboardingInputChoice(null);
-      setOnboardingStage('input');
+      setOnboardingStage('goal');
     },
     [synchronizeGeneratorMode]
   );
+
+  const handleOnboardingGoalSelect = useCallback((goal: Exclude<LearningGoalChoice, null>) => {
+    setOnboardingGoal(goal);
+    setOnboardingInputChoice(null);
+    setOnboardingStage('input');
+    setIsOnboardingOpen(true);
+  }, []);
 
   const handleBackToModeStage = useCallback(() => {
     setOnboardingStage('mode');
     setIsOnboardingOpen(true);
     setAwaitingFirstOutcome(false);
+    setOnboardingGoal(null);
     setOnboardingInputChoice(null);
   }, []);
 
@@ -3055,11 +3066,13 @@ export default function DashboardClient() {
         open={onboardingModalOpen}
         stage={onboardingStage === 'progress' ? 'input' : onboardingStage}
         selectedMode={onboardingMode}
+        selectedGoal={onboardingGoal}
         inputChoice={onboardingInputChoice}
         customPrompt={onboardingPrompt}
         suggestedTopics={suggestedTopics}
         onBackToMode={handleBackToModeStage}
         onModeSelect={handleOnboardingModeSelect}
+        onGoalSelect={handleOnboardingGoalSelect}
         onUploadChosen={handleUploadChosen}
         onPromptPrefill={handlePromptPrefill}
         onCustomPromptChange={handleOnboardingPromptChange}

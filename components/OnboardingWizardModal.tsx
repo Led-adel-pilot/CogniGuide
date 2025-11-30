@@ -1,22 +1,25 @@
 import { useState } from 'react';
-import { BrainCircuit, FileText, Sparkles } from 'lucide-react';
+import { BrainCircuit, FileText } from 'lucide-react';
 import Dropzone from '@/components/Dropzone';
 import PromptForm from '@/components/PromptForm';
 import { cn } from '@/lib/utils';
 
 export type WizardModeChoice = 'mindmap' | 'flashcards' | null;
 export type WizardInputChoice = 'upload' | 'prompt' | null;
-export type WizardStage = 'mode' | 'input';
+export type LearningGoalChoice = 'casual' | 'regular' | 'serious' | 'intense' | null;
+export type WizardStage = 'mode' | 'goal' | 'input';
 
 interface OnboardingWizardModalProps {
   open: boolean;
   stage: WizardStage;
   selectedMode: WizardModeChoice;
+  selectedGoal: LearningGoalChoice;
   inputChoice: WizardInputChoice;
   customPrompt: string;
   suggestedTopics: string[];
   onBackToMode: () => void;
   onModeSelect: (mode: Exclude<WizardModeChoice, null>) => void;
+  onGoalSelect: (goal: Exclude<LearningGoalChoice, null>) => void;
   onUploadChosen: () => void;
   onPromptPrefill: (prompt: string, isFullPrompt?: boolean) => void;
   onCustomPromptChange: (value: string) => void;
@@ -28,11 +31,13 @@ export default function OnboardingWizardModal({
   open,
   stage,
   selectedMode,
+  selectedGoal,
   inputChoice,
   customPrompt,
   suggestedTopics,
   onBackToMode,
   onModeSelect,
+  onGoalSelect,
   onUploadChosen,
   onPromptPrefill,
   onCustomPromptChange,
@@ -40,6 +45,22 @@ export default function OnboardingWizardModal({
   onClose,
 }: OnboardingWizardModalProps) {
   const [localSelectedMode, setLocalSelectedMode] = useState<WizardModeChoice>(null);
+  const stageOrder: WizardStage[] = ['mode', 'goal', 'input'];
+  const totalSteps = stageOrder.length + 1; // include generation step
+  const currentStepIndex = Math.max(stageOrder.indexOf(stage), 0);
+  const currentStepNumber = currentStepIndex + 1;
+  const progressPercent = Math.round((currentStepNumber / totalSteps) * 100);
+
+  const learningGoalOptions: Array<{
+    value: Exclude<LearningGoalChoice, null>;
+    duration: string;
+    label: string;
+  }> = [
+    { value: 'casual', duration: '5 min / day', label: 'Casual' },
+    { value: 'regular', duration: '10 min / day', label: 'Regular' },
+    { value: 'serious', duration: '15 min / day', label: 'Serious' },
+    { value: 'intense', duration: '20 min / day', label: 'Intense' },
+  ];
 
   const handleModeClick = (mode: Exclude<WizardModeChoice, null>) => {
     setLocalSelectedMode(mode);
@@ -57,13 +78,13 @@ export default function OnboardingWizardModal({
         <div className="px-6 mt-1 space-y-3">
           <div className="space-y-2">
             <div className="flex items-center justify-between text-xs font-semibold text-primary">
-              <span>Step {stage === 'mode' ? 1 : 2} of 3</span>
-              <span>{stage === 'mode' ? '33%' : '66%'}</span>
+              <span>Step {currentStepNumber} of {totalSteps}</span>
+              <span>{progressPercent}%</span>
             </div>
             <div className="h-2 w-full rounded-full bg-muted/60 overflow-hidden">
               <div
                 className="h-full bg-primary transition-all duration-500 ease-in-out"
-                style={{ width: stage === 'mode' ? '33%' : '66%' }}
+                style={{ width: `${progressPercent}%` }}
               />
             </div>
           </div>
@@ -73,7 +94,9 @@ export default function OnboardingWizardModal({
             <h2 className={cn("font-bold text-foreground", stage === 'mode' ? "text-2xl" : "text-xl")}>
               {stage === 'mode'
                 ? "What is your main goal today?"
-                : `Add something to study, Our AI will convert to ${selectedMode === 'flashcards' ? 'flashcards' : 'a Mind Map'}`}
+                : stage === 'goal'
+                  ? "What's your daily learning goal?"
+                  : `Add something to study, Our AI will convert to ${selectedMode === 'flashcards' ? 'flashcards' : 'a Mind Map'}`}
             </h2>
           </div>
 
@@ -111,6 +134,25 @@ export default function OnboardingWizardModal({
                   Memorize & revise with flashcards and spaced-repetition.
                 </p>
               </button>
+            </div>
+          ) : stage === 'goal' ? (
+            <div className="space-y-4">
+              <div className="space-y-3">
+                {learningGoalOptions.map((option) => (
+                  <button
+                    key={option.value}
+                    type="button"
+                    onClick={() => onGoalSelect(option.value)}
+                    className={cn(
+                      'flex w-full items-center justify-between rounded-2xl border px-5 py-3 text-left transition hover:border-primary hover:bg-primary/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30',
+                      selectedGoal === option.value ? 'border-primary bg-primary/10 shadow-sm' : 'border-border/60 bg-background'
+                    )}
+                  >
+                    <span className="text-base font-semibold text-foreground">{option.duration}</span>
+                    <span className="text-sm font-medium text-muted-foreground">{option.label}</span>
+                  </button>
+                ))}
+              </div>
             </div>
           ) : (
             <div className="space-y-4">
